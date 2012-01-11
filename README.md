@@ -17,7 +17,7 @@ This script is currently in a beta phase, may be instable and kill your cat!
 
 ## Changelog
 
-[changelog][changelog.md]
+[changelog](https://github.com/helmuthdu/aui/blob/master/changelog.md)
 
 ## What does the script do?
 
