@@ -20,7 +20,6 @@
 
 GNOME=0
 ARCHI=`uname -m`
-AURHELPER="yaourt"
 
 # Automatically detects the system language based on your rc.conf
 LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | cut -c9-13`
@@ -93,7 +92,8 @@ function sumary(){ #{{{
 			;;
 	esac
 } #}}}
-#begin #{{{
+
+#START {{{
 	clear
 	echo "Welcome to the Ultimate Archlinux install script by helmuthdu"
 	echo "Inspired by freitag archlinux helper script install"
@@ -111,7 +111,7 @@ function sumary(){ #{{{
 	echo "helmuthdu at gmail dot com"
 	finish_function
 #}}}
-#Language Selector#{{{
+#LANGUAGE SELECTOR {{{
 	print_title "LANGUAGE - https://wiki.archlinux.org/index.php/Locale"
 	question_for_answer "Default system language: \"$LOCATION\""
 	case "$OPTION" in
@@ -126,19 +126,19 @@ function sumary(){ #{{{
 	esac
 	finish_function
 #}}}
-#custom repositories #{{{
+#CUSTOM REPOSITORIES {{{
 	print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
 	question_for_answer "Add custom repositories"
 	case "$OPTION" in
 		"y")
-		#{{{
+		#CUSTOM REPOSITORIES {{{
 			LOOP=1
 			while [ "$LOOP" -ne 0 ]
 			do
 				print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
 				echo "[1] Ayatana"
 				echo "[2] Archlinuxfr"
-				echo "[3] My own repo"
+				echo "[3] Add my own custom repo"
 				echo ""
 				echo "[q] QUIT"
 				echo ""
@@ -146,14 +146,17 @@ function sumary(){ #{{{
 				case "$OPTION" in
 					1)
 						echo -e '[ayatana]\nServer = http://repo.ayatana.info/' >> /etc/pacman.conf
+						finish_function
 						;;
 					2)
-						echo -e '[archlinuxfr]\nServer = http://repo.archlinux.fr/$arch' >> /etc/pacman.conf
+						echo -e '\n[archlinuxfr]\nServer = http://repo.archlinux.fr/$arch' >> /etc/pacman.conf
+						finish_function
 						;;
 					3)
 						read -p "Repository Name [ex: custom]: " REPONAME
-						read -p "Repository Address: [ex: file:///media/backup/Archlinux/]" REPOADDRESS
-						echo -e '\n['$REPONAME']\nServer = '$REPOADDRESS'$arch' >> /etc/pacman.conf
+						read -p "Repository Address [ex: file:///media/backup/Archlinux/]: " REPOADDRESS
+						echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"'$arch' >> /etc/pacman.conf
+						finish_function
 						;;
 					*)
 						LOOP=0
@@ -170,7 +173,7 @@ function sumary(){ #{{{
 	sumary "Custom repositories installation"
 	finish_function
 #}}}
-#rankmirror #{{{
+#RANKMIRROR {{{
 	print_title "RANKMIRROR - https://wiki.archlinux.org/index.php/Improve_Pacman_Performance"
 	question_for_answer "Choosing the fastest mirror using rankmirror (this can take a while)"
 	case "$OPTION" in
@@ -187,7 +190,7 @@ function sumary(){ #{{{
 	sumary "New mirrorlist creation"
 	finish_function
 #}}}
-#system update #{{{
+#SYSTEM UPDATE {{{
 	print_title "UPDATING YOUR SYSTEM"
 	pacman -Syu
 	read -p "Reboot your system [y][n]: " OPTION
@@ -196,12 +199,12 @@ function sumary(){ #{{{
 		exit 0
 	fi
 #}}}
-#create a new user #{{{
+#CREATE A NEW USER {{{
 	print_title "CREATE USER ACCOUNT"
 	read -p "New user name: " USERNAME
-	useradd -m -g users -G users,audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash $USERNAME
+	useradd -m -g users -G users,audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
 	passwd $USERNAME
-	#set user as sudo #{{{
+	#SET USER AS SUDO #{{{
 		pacman -S --noconfirm sudo
 		## Uncomment to allow members of group wheel to execute any command
 		sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
@@ -209,7 +212,7 @@ function sumary(){ #{{{
 		#sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
 	#}}}
 #}}}
-#AUR Helper #{{{
+#AUR HELPER {{{
 	LOOP=1
 	while [ "$LOOP" -ne 0 ]
 	do
@@ -251,6 +254,14 @@ function sumary(){ #{{{
 					cd ..;
 					rm -fr packer*
 				"
+				su -l $USERNAME --command="
+					wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
+					tar zxvf packer.tar.gz;
+					cd packer;
+					makepkg --noconfirm -si;
+					cd ..;
+					rm -fr packer*
+				"
 				install_status
 				AURHELPER="packer"
 				LOOP=0
@@ -265,7 +276,7 @@ function sumary(){ #{{{
 	sumary "AUR Helper installation"
 	finish_function
 #}}}
-#base system #{{{
+#BASE SYSTEM {{{
 	print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
 	pacman -S --noconfirm curl bc rsync mlocate bash-completion vim
 	print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
@@ -293,16 +304,12 @@ function sumary(){ #{{{
 	sumary "TLP installation"
 	finish_function
 	#}}}
-	print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
-	pacman -S --noconfirm cups ghostscript gsfonts
-	pacman -S --noconfirm gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf
-	add_new_daemon "@cupsd"
 	print_title "NTFS/FAT - https://wiki.archlinux.org/index.php/Ntfs"
 	pacman -S --noconfirm ntfs-3g ntfsprogs dosfstools
 	print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
 	pacman -S --noconfirm rssh openssh
 	add_new_daemon "@sshd"
-	#configure ssh/samba #{{{
+	#configure ssh #{{{
 		echo -e "sshd: ALL\n# End of file" > /etc/hosts.allow
 		echo -e "ALL: ALL: DENY\n# End of file" > /etc/hosts.deny
 		#ssh_conf #{{{
@@ -339,15 +346,15 @@ function sumary(){ #{{{
 	sed -i '/MODULES[=]/s/MODULES[=](/&snd-usb-audio/' /etc/rc.conf
 	add_new_daemon "@alsa"
 #}}}
-#X #{{{
+#XORG {{{
 	print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
 	echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
-	pacman -S --noconfirm xorg-server xorg-xinit xorg-utils xorg-server-utils xorg-xkill xorg-xauth
-	pacman -S --noconfirm xf86-input-evdev xf86-input-synaptics
-	pacman -S --noconfirm mesa mesa-demos
+	pacman -S --noconfirm xorg-server xorg-xinit xorg-xkill
+	pacman -S --noconfirm xf86-input-evdev xf86-input-synaptics xf86-input-mouse xf86-input-keyboard
+	pacman -S --noconfirm mesa
 	pacman -S --noconfirm gamin
 #}}}
-#graphic cards #{{{
+#GRAPHIC CARDS {{{
 	print_title "GRAPHIC CARD"
 	echo "Select your GPU:"
 	echo "[1] Intel"
@@ -409,12 +416,18 @@ function sumary(){ #{{{
 	esac
 	finish_function
 #}}}
-#Additional Firmware #{{{
+#CUPS {{{
+	print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
+	pacman -S --noconfirm cups ghostscript gsfonts
+	pacman -S --noconfirm gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf
+	add_new_daemon "@cupsd"
+#}}}
+#ADDITIONAL FIRMWARE {{{
 	print_title "WIRELESS/BLUETOOTH ADDITIONAL DRIVERS - https://wiki.archlinux.org/index.php/Wireless_Setup"
 	question_for_answer "Install additional wireless/bluetooth firmwares"
 	case "$OPTION" in
 		"y")
-		#{{{
+		#ADDITIONAL FIRMWARE {{{
 			LOOP=1
 			while [ "$LOOP" -ne 0 ]
 			do
@@ -467,7 +480,7 @@ function sumary(){ #{{{
 	sumary "Additional Firmware"
 	finish_function
 #}}}
-#git access thru a firewall #{{{
+#GIT ACCESS THRU A FIREWALL {{{
 	print_title "GIT-TOR - https://wiki.archlinux.org/index.php/Tor"
 	question_for_answer "Ensuring access to GIT through a firewall (bypass college firewall)"
 	case "$OPTION" in
@@ -495,7 +508,7 @@ function sumary(){ #{{{
 	sumary "GIT-TOR installation"
 	finish_function
 #}}}
-#desktop environment #{{{
+#DESKTOP ENVIRONMENT {{{
 	print_title "DESKTOP ENVIRONMENT - https://wiki.archlinux.org/index.php/Desktop_Environment"
 	echo "Choose your desktop-environment:"
 	echo "[1] GNOME"
@@ -505,7 +518,7 @@ function sumary(){ #{{{
 	read -p "Option: " OPTION
 	case "$OPTION" in
 		1)
-			#GNOME #{{{
+			#GNOME {{{
 			print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
 			pacman -S --noconfirm gnome gnome-extra
 			pacman -S --noconfirm gedit-plugins pulseaudio-gnome gnome-tweak-tool telepathy deja-dup
@@ -515,6 +528,7 @@ function sumary(){ #{{{
 			pacman -Rdd --noconfirm sushi
 			aurhelper_install "gloobus-sushi-bzr"
 			pacman -S --noconfirm gksu gvfs-smb xdg-user-dirs
+			#GNOME FAVORITE APPS {{{
 			LOOP=1
 			while [ "$LOOP" -ne 0 ]
 			do
@@ -545,7 +559,8 @@ function sumary(){ #{{{
 						aurhelper_install "faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
 						;;
 					3)
-						aurhelper_install "zukitwo-themes zukini-theme light-themes-bzr egtk-bzr gtk-theme-aldabra"
+						aurhelper_install "egtk-bzr"
+						aurhelper_install "zukitwo-themes zukini-theme light-themes-bzr gtk-theme-aldabra"
 						;;
 					4)
 						aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-workspace-indicator gnome-shell-extension-places-menu gnome-shell-extension-dock gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
@@ -554,7 +569,7 @@ function sumary(){ #{{{
 						aurhelper_install "gnome-activity-journal libzeitgeist zeitgeist-datahub zeitgeist-extensions"
 						;;
 					6)
-						aurhelper_install "toilet figlet cowsay conky conky-colors"
+						aurhelper_install "conky conky-colors"
 						add_new_module "coretemp it87 acpi-cpufreq"
 						;;
 					7)
@@ -581,12 +596,12 @@ function sumary(){ #{{{
 					"a")
 						aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
 						aurhelper_install "faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
-						aurhelper_install "zukitwo-themes zukini-theme light-themes-bzr egtk-bzr gtk-theme-aldabra"
+						aurhelper_install "egtk-bzr zukitwo-themes zukini-theme light-themes-bzr gtk-theme-aldabra"
 						aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-workspace-indicator gnome-shell-extension-places-menu gnome-shell-extension-dock gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
 						aurhelper_install "gnome-activity-journal libzeitgeist zeitgeist-datahub zeitgeist-extensions"
 						aurhelper_install "pdfmod"
-						aurhelper_install "toilet figlet cowsay conky conky-colors"
-						su -l $USERNAME --command="yaourt -Sf --noconfirm hotot"
+						aurhelper_install "hotot"
+						aurhelper_install "conky conky-colors"
 						add_new_module "coretemp it87 acpi-cpufreq"
 						pacman -S --noconfirm openshot
 						pacman -S --noconfirm shotwell
@@ -601,6 +616,7 @@ function sumary(){ #{{{
 				esac
 				finish_function
 			done
+			#}}}
 			GNOME=1
 			add_new_daemon "gdm"
 			sumary "GNOME installation"
@@ -608,7 +624,7 @@ function sumary(){ #{{{
 			#}}}
 			;;
 		2)
-			#KDE #{{{
+			#KDE {{{
 			print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
 			pacman -S --noconfirm kde kde-l10n-$LOCATION_KDE
 			pacman -Rcsn --noconfirm kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
@@ -617,13 +633,14 @@ function sumary(){ #{{{
 			aurhelper_install "oxygen-gtk qtcurve-gtk2 qtcurve-kde4 bespin-svn"
 			aurhelper_install "kcm-wacomtablet"
 			aurhelper_install "quickaccess-plasmoid plasma-icontasks"
+			#FAVORITE KDE APPS {{{
 			LOOP=1
 			while [ "$LOOP" -ne 0 ]
 			do
 				print_title "FAVORITE KDE APPS"
 				echo "[1] Plasma Themes [Caledonia]"
 				echo "[2] KDE Icons [KFaenza]"
-				#these 2 themes are also my :)
+				#these 2 themes are also mine :)
 				echo "[3] QtCurve Themes [Kawai, Sweet]"
 				echo "[4] Choqok"
 				echo "[5] K3b"
@@ -634,6 +651,7 @@ function sumary(){ #{{{
 				echo "[10] Rosa Media Player"
 				echo "[11] Digikam"
 				echo "[12] Yakuake"
+				echo "[13] Speedcrunch"
 				echo ""
 				echo "[a] ALL"
 				echo "[q] QUIT"
@@ -692,10 +710,13 @@ function sumary(){ #{{{
 						pacman -S --noconfirm yakuake
 						aurhelper_install "yakuake-skin-plasma-oxygen-panel"
 						;;
+					13)
+						aurhelper_install "speedcrunch"
+						;;
 					"a")
 						aurhelper_install "caledonia-bundle"
 						aurhelper_install "kfaenza-icon-theme"
-						#QtCurve Themes #{{{
+						#QTCURVE THEMES #{{{
 						wget http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
 						wget http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
 						tar zxvf 144205-Sweet.tar.gz
@@ -717,9 +738,11 @@ function sumary(){ #{{{
 						aurhelper_install "minitube"
 						aurhelper_install "musique"
 						aurhelper_install "bangarang"
+						aurhelper_install "rosa-media-player"
 						pacman -S --noconfirm digikam kipi-plugins
 						pacman -S --noconfirm yakuake
 						aurhelper_install "yakuake-skin-plasma-oxygen-panel"
+						aurhelper_install "speedcrunch"
 						LOOP=0
 						;;
 					*)
@@ -728,6 +751,7 @@ function sumary(){ #{{{
 				esac
 				finish_function
 			done
+			#}}}
 			GNOME=0
 			add_new_daemon "kdm"
 			sumary "KDE installation"
@@ -735,10 +759,10 @@ function sumary(){ #{{{
 			#}}}
 			;;
 		3)
-			#XFCE #{{{
+			#XFCE {{{
 			print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
 			pacman -S --noconfirm xfce4 xfce4-goodies
-			pacman -S --noconfirm gstreamer0.10-plugins
+			pacman -S --noconfirm polkit-gnome gvfs-smb xdg-user-dirs
 			aurhelper_install "automounter"
 			GNOME=1
 			sumary "XFCE installation"
@@ -746,9 +770,13 @@ function sumary(){ #{{{
 			#}}}
 			;;
 		4)
-			#LXDE #{{{
+			#LXDE {{{
 			print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
 			pacman -S --noconfirm lxde
+			pacman -S --noconfirm polkit-gnome gvfs gvfs-smb xdg-user-dirs
+			pacman -S --noconfirm pm-utils upower
+			pacman -S --noconfirm leafpad xarchiver obconf epdfview
+			pacman -S --noconfirm galculator
 			add_new_daemon "lxdm"
 			GNOME=1
 			sumary "LXDE Installation"
@@ -756,11 +784,17 @@ function sumary(){ #{{{
 			#}}}
 			;;
 	esac
-	#networkmanager #{{{
-	print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
-	question_for_answer "Install NetworkManager"
+	#NETWORKMANAGER/WICD {{{
+	print_title "NETWORK CONNECTION MANAGER"
+	echo "[1] Networkmanager"
+	echo "[2] Wicd"
+	echo ""
+	echo "[q] QUIT"
+	echo ""
+	read -p "Option: " OPTION
 	case "$OPTION" in
-		"y")
+		1)
+			print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
 			if [ "$GNOME" -eq 1 ]; then
 				pacman -S --noconfirm networkmanager network-manager-applet
 			else
@@ -772,15 +806,26 @@ function sumary(){ #{{{
 			add_new_daemon "@networkmanager"
 			install_status
 			;;
+		2)
+			print_title "WICD - https://wiki.archlinux.org/index.php/Wicd"
+			if [ "$GNOME" -eq 1 ]; then
+				pacman -S --noconfirm wicd wicd-gtk
+			else
+				aurhelper_install "wicd wicd-kde"
+			fi
+			remove_daemon "network"
+			add_new_daemon "@wicd"
+			install_status
+			;;
 		*)
 			CURRENT_STATUS=0
 			;;
 	esac
-	sumary "NetworkManager installation"
+	sumary "Network Connection Manager installation"
 	finish_function
 	#}}}
 #}}}
-#developement #{{{
+#DEVELOPEMENT {{{
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
@@ -793,8 +838,9 @@ do
 	echo "[6] Aptana Studio"
 	echo "[7] Netbeans"
 	echo "[8] Eclipse"
-	echo "[9] Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl, Meld]"
+	echo "[9] Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
 	echo "[10] MySQL Workbench"
+	echo "[11] Meld"
 	echo ""
 	echo "[q] QUIT"
 	echo ""
@@ -889,11 +935,14 @@ do
 			LOOP=1
 			;;
 		9)
-			pacman -S --noconfirm valgrind gdb splint tidyhtml pyflakes meld
+			pacman -S --noconfirm valgrind gdb splint tidyhtml pyflakes
 			aurhelper_install "jsl"
 			;;
 		10)
 			aurhelper_install "mysql-workbench"
+			;;
+		11)
+			pacman -S --noconfirm meld
 			;;
 		*)
 			LOOP=0
@@ -902,19 +951,20 @@ do
 	finish_function
 done
 #}}}
-#office #{{{
+#OFFICE {{{
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
 	print_title "OFFICE APPS"
 	echo "[1] LibreOffice"
-	echo "[2] Latex [Texmaker, Lyx]"
-	echo "[3] CHM Viewer"
-	echo "[4] Xmind"
-	echo "[5] Wunderlist"
-	echo "[6] GCStar"
+	echo "[2] GNOME-Office [Abiword, Gnumeric]"
+	echo "[3] Latex [Texmaker, Lyx]"
+	echo "[4] CHM Viewer"
+	echo "[5] Xmind"
+	echo "[6] Wunderlist"
+	echo "[7] GCStar"
+	echo "[8] Zathura (Lightweight PDF Viewer)"
 	echo ""
-	echo "[a] ALL"
 	echo "[q] QUIT"
 	echo ""
 	read -p "Option: " OPTION
@@ -929,47 +979,32 @@ do
 			fi
 			;;
 		2)
+			pacman -S --noconfirm gnumeric abiword abiword-plugins
+			;;
+		3)
 			pacman -S --noconfirm texlive-latexextra texlive-langextra
 			pacman -S --noconfirm lyx texmaker
 			aurhelper_install "abntex"
 			aurhelper_install "latex-template-springer latex-template-ieee latex-beamer"
 			;;
-		3)
+		4)
 			if [ "$GNOME" -eq 1 ]; then
 				pacman -S --noconfirm chmsee
 			else
 				pacman -S --noconfirm kchmviewer
 			fi
-			;;
-		4)
-			aurhelper_install "xmind"
 			;;
 		5)
-			aurhelper_install "wunderlist"
+			aurhelper_install "xmind"
 			;;
 		6)
+			aurhelper_install "wunderlist"
+			;;
+		7)
 			pacman -S --noconfirm gcstar
 			;;
-		"a")
-			pacman -S --noconfirm libreoffice-$LOCATION_LO libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram
-			aurhelper_install "hunspell-$LOCATION_GNOME"
-			if [ "$GNOME" -eq 1 ]; then
-				pacman -S --noconfirm libreoffice-gnome
-			else
-				pacman -S --noconfirm libreoffice-kde4
-			fi
-			pacman -S --noconfirm texlive-latexextra texlive-langextra lyx texmaker
-			aurhelper_install "abntex"
-			aurhelper_install "latex-template-springer latex-template-ieee latex-beamer"
-			if [ "$GNOME" -eq 1 ]; then
-				pacman -S --noconfirm chmsee
-			else
-				pacman -S --noconfirm kchmviewer
-			fi
-			aurhelper_install "xmind"
-			aurhelper_install "wunderlist"
-			pacman -S --noconfirm gcstar
-			LOOP=0
+		8)
+			pacman -S --noconfirm zathura
 			;;
 		*)
 			LOOP=0
@@ -978,7 +1013,7 @@ do
 	finish_function
 done
 #}}}
-#System Tools #{{{
+#SYSTEM TOOLS {{{
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
@@ -1029,7 +1064,7 @@ do
 	finish_function
 done
 #}}}
-#graphics #{{{
+#GRAPHICS {{{
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
@@ -1073,7 +1108,7 @@ do
 	finish_function
 done
 #}}}
-#Internet #{{{
+#INTERNET {{{
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
@@ -1185,7 +1220,7 @@ sumary "LAMP installation"
 finish_function
 #}}}
 #}}}
-#multimedia #{{{
+#MULTIMEDIA {{{
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
@@ -1264,7 +1299,7 @@ do
 	finish_function
 done
 #}}}
-#Games #{{{
+#GAMES {{{
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
@@ -1286,7 +1321,7 @@ do
 	read -p "Option: " OPTION
 	case "$OPTION" in
 		1)
-		#{{{
+		#ACTION/ADVENTURE {{{
 		while [ "$LOOP" -ne 0 ]
 		do
 			print_title "ACTION AND ADVENTURE"
@@ -1324,7 +1359,7 @@ do
 		;;
 		#}}}
 		2)
-		#{{{
+		#ARCADE/PLATFORMER {{{
 		while [ "$LOOP" -ne 0 ]
 		do
 			print_title "ARCADE AND PLATFORMER"
@@ -1370,7 +1405,7 @@ do
 		;;
 		#}}}
 		3)
-		#{{{
+		#DUNGEON {{{
 		while [ "$LOOP" -ne 0 ]
 		do
 			print_title "DUNGEON"
@@ -1400,7 +1435,7 @@ do
 		;;
 		#}}}
 		4)
-		#{{{
+		#FPS {{{
 		while [ "$LOOP" -ne 0 ]
 		do
 			print_title "FPS"
@@ -1429,7 +1464,7 @@ do
 		;;
 		#}}}
 		5)
-		#{{{
+		#MMO {{{
 		while [ "$LOOP" -ne 0 ]
 		do
 			print_title "MMO"
@@ -1455,7 +1490,7 @@ do
 		;;
 		#}}}
 		6)
-		#{{{
+		#PUZZLE {{{
 		while [ "$LOOP" -ne 0 ]
 		do
 			print_title "PUZZLE"
@@ -1477,7 +1512,7 @@ do
 		;;
 		#}}}
 		7)
-		#{{{
+		#SIMULATION {{{
 		while [ "$LOOP" -ne 0 ]
 		do
 			print_title "SIMULATION"
@@ -1507,7 +1542,7 @@ do
 		;;
 		#}}}
 		8)
-		#{{{
+		#STRATEGY {{{
 		while [ "$LOOP" -ne 0 ]
 		do
 			print_title "STRATEGY"
@@ -1557,7 +1592,7 @@ do
 		;;
 		#}}}
 		9)
-		#{{{
+		#RACING {{{
 		while [ "$LOOP" -ne 0 ]
 		do
 			print_title "RACING"
@@ -1591,7 +1626,7 @@ do
 		;;
 		#}}}
 		10)
-		#{{{
+		#RPG {{{
 		while [ "$LOOP" -ne 0 ]
 		do
 			print_title "RPG"
@@ -1613,7 +1648,7 @@ do
 		;;
 		#}}}
 		11)
-		#{{{
+		#RPG {{{
 		while [ "$LOOP" -ne 0 ]
 		do
 			print_title "RPG"
@@ -1641,7 +1676,7 @@ do
 done
 finish_function
 #}}}
-#fonts #{{{
+#FONTS {{{
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
@@ -1679,7 +1714,8 @@ do
 			aurhelper_install "ttf-roboto"
 			;;
 		"a")
-			pacman -Rdd --noconfirm ttf-ubuntu-font-family ttf-droid
+			pacman -Rdd --noconfirm ttf-droid
+			pacman -Rdd --noconfirm ttf-ubuntu-font-family
 			aurhelper_install "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts"
 			LOOP=0
 			;;
@@ -1703,7 +1739,7 @@ esac
 sumary "Ubuntu Patched Fonts Configuration installation"
 finish_function
 #}}}
-#reboot #{{{
+#REBOOT {{{
 print_title "INSTALL COMPLETED"
 question_for_answer "Reboot now?"
 case "$OPTION" in
