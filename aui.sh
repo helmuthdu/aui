@@ -841,7 +841,6 @@ do
 	echo "[9] Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
 	echo "[10] MySQL Workbench"
 	echo "[11] Meld"
-	echo "[12] Giggle"
 	echo ""
 	echo "[q] QUIT"
 	echo ""
@@ -944,9 +943,6 @@ do
 			;;
 		11)
 			pacman -S --noconfirm meld
-			;;
-		12)
-			pacman -S --noconfirm giggle
 			;;
 		*)
 			LOOP=0
