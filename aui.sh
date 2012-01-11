@@ -945,7 +945,7 @@ do
 		11)
 			pacman -S --noconfirm meld
 			;;
-		11)
+		12)
 			pacman -S --noconfirm giggle
 			;;
 		*)
