@@ -249,7 +249,7 @@ function sumary(){ #{{{
 				LOOP=0
 				;;
 			2)
-				pacman -S --noconfirm git jshon
+				pacman -S --noconfirm git jshon curl
 				su -l $USERNAME --command="
 					wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
 					tar zxvf packer.tar.gz;
@@ -442,24 +442,31 @@ function sumary(){ #{{{
 				case "$OPTION" in
 					1)
 						aurhelper_install "ipw2100-fw"
+						finish_function
 						;;
 					2)
 						aurhelper_install "ipw2200-fw"
+						finish_function
 						;;
 					3)
 						aurhelper_install "b43-firmware"
+						finish_function
 						;;
 					4)
 						aurhelper_install "b43-firmware-legacy"
+						finish_function
 						;;
 					5)
 						aurhelper_install "broadcom-wl"
+						finish_function
 						;;
 					6)
 						aurhelper_install "bluez-firmware"
+						finish_function
 						;;
 					7)
 						aurhelper_install "wireless-regdb rfkill crda wpa_supplicant"
+						finish_function
 						;;
 					*)
 						LOOP=0
@@ -492,6 +499,8 @@ function sumary(){ #{{{
 			fi
 			pacman -S --noconfirm tor privoxy
 			rc.d start tor privoxy
+			groupadd -g 42 privoxy
+			useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
 			su -l $USERNAME --command="sudo /etc/rc.d/tor restart"
 			su -l $USERNAME --command="sudo /etc/rc.d/privoxy restart"
 			add_new_daemon "@tor @privoxy"
@@ -517,6 +526,7 @@ function sumary(){ #{{{
 			#GNOME {{{
 			print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
 			pacman -S --noconfirm gnome gnome-extra
+			gpasswd -a $USERNAME camera
 			pacman -S --noconfirm gedit-plugins pulseaudio-gnome gnome-tweak-tool telepathy deja-dup
 			pacman -S --noconfirm system-config-printer-gnome
 			aurhelper_install "automounter"
@@ -552,7 +562,7 @@ function sumary(){ #{{{
 						aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
 						;;
 					2)
-						aurhelper_install "faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+						aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
 						;;
 					3)
 						aurhelper_install "egtk-bzr"
@@ -1750,6 +1760,12 @@ case "$OPTION" in
 esac
 sumary "Ubuntu Patched Fonts Configuration installation"
 finish_function
+#}}}
+#CLEAN ORPHAN PACKAGES {{{
+	print_title "CLEAN ORPHAN PACKAGES"
+	sudo pacman -Rsc --noconfirm $(pacman -Qqdt)
+	#sudo pacman -Sc --noconfirm
+	paman-optimize
 #}}}
 #REBOOT {{{
 print_title "INSTALL COMPLETED"
