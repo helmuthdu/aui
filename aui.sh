@@ -18,6 +18,9 @@
 #-------------------------------------------------------------------------------
 # Run this script after your first boot with archlinux (as root)
 
+KDE=0
+LXDE=0
+XFCE=0
 GNOME=0
 ARCHI=`uname -m`
 
@@ -246,14 +249,7 @@ function sumary(){ #{{{
 				LOOP=0
 				;;
 			2)
-				su -l $USERNAME --command="
-					wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
-					tar zxvf packer.tar.gz;
-					cd packer;
-					makepkg --noconfirm -si;
-					cd ..;
-					rm -fr packer*
-				"
+				pacman -S --noconfirm git jshon
 				su -l $USERNAME --command="
 					wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
 					tar zxvf packer.tar.gz;
@@ -292,7 +288,7 @@ function sumary(){ #{{{
 	question_for_answer "Install TLP (great battery improvement on laptops)"
 	case "$OPTION" in
 		"y")
-			app_install "tlp"
+			aurhelper_install "tlp"
 			pacman -S --noconfirm upower
 			add_new_daemon "@tlp"
 			install_status
@@ -445,25 +441,25 @@ function sumary(){ #{{{
 				read -p "Option: " OPTION
 				case "$OPTION" in
 					1)
-						app_install "ipw2100-fw"
+						aurhelper_install "ipw2100-fw"
 						;;
 					2)
-						app_install "ipw2200-fw"
+						aurhelper_install "ipw2200-fw"
 						;;
 					3)
-						app_install "b43-firmware"
+						aurhelper_install "b43-firmware"
 						;;
 					4)
-						app_install "b43-firmware-legacy"
+						aurhelper_install "b43-firmware-legacy"
 						;;
 					5)
-						app_install "broadcom-wl"
+						aurhelper_install "broadcom-wl"
 						;;
 					6)
-						app_install "bluez-firmware"
+						aurhelper_install "bluez-firmware"
 						;;
 					7)
-						app_install "wireless-regdb rfkill crda wpa_supplicant"
+						aurhelper_install "wireless-regdb rfkill crda wpa_supplicant"
 						;;
 					*)
 						LOOP=0
@@ -617,12 +613,12 @@ function sumary(){ #{{{
 				finish_function
 			done
 			#}}}
-			GNOME=1
 			add_new_daemon "gdm"
 			sumary "GNOME installation"
 			finish_function
-			#}}}
+			GNOME=1
 			;;
+			#}}}
 		2)
 			#KDE {{{
 			print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
@@ -752,23 +748,23 @@ function sumary(){ #{{{
 				finish_function
 			done
 			#}}}
-			GNOME=0
 			add_new_daemon "kdm"
 			sumary "KDE installation"
 			finish_function
-			#}}}
+			KDE=1
 			;;
+			#}}}
 		3)
 			#XFCE {{{
 			print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
 			pacman -S --noconfirm xfce4 xfce4-goodies
 			pacman -S --noconfirm polkit-gnome gvfs-smb xdg-user-dirs
 			aurhelper_install "automounter"
-			GNOME=1
 			sumary "XFCE installation"
 			finish_function
-			#}}}
+			XFCE=1
 			;;
+			#}}}
 		4)
 			#LXDE {{{
 			print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
@@ -778,11 +774,11 @@ function sumary(){ #{{{
 			pacman -S --noconfirm leafpad xarchiver obconf epdfview
 			pacman -S --noconfirm galculator
 			add_new_daemon "lxdm"
-			GNOME=1
 			sumary "LXDE Installation"
 			finish_function
-			#}}}
+			LXDE=1
 			;;
+			#}}}
 	esac
 	#NETWORKMANAGER/WICD {{{
 	print_title "NETWORK CONNECTION MANAGER"
@@ -795,10 +791,12 @@ function sumary(){ #{{{
 	case "$OPTION" in
 		1)
 			print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
-			if [ "$GNOME" -eq 1 ]; then
+			if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
 				pacman -S --noconfirm networkmanager network-manager-applet
-			else
+			elif [ "$KDE" -eq 1 ]; then
 				pacman -S --noconfirm networkmanager kdeplasma-applets-networkmanagement
+			else
+				pacman -S --noconfirm networkmanager
 			fi
 			groupadd networkmanager
 			gpasswd -a $USERNAME networkmanager
@@ -808,10 +806,12 @@ function sumary(){ #{{{
 			;;
 		2)
 			print_title "WICD - https://wiki.archlinux.org/index.php/Wicd"
-			if [ "$GNOME" -eq 1 ]; then
+			if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
 				pacman -S --noconfirm wicd wicd-gtk
-			else
+			elif [ "$KDE" -eq 1 ]; then
 				aurhelper_install "wicd wicd-kde"
+			else
+				pacman -S --noconfirm wicd
 			fi
 			remove_daemon "network"
 			add_new_daemon "@wicd"
@@ -1146,15 +1146,19 @@ do
 		6)
 			if [ "$GNOME" -eq 1 ]; then
 				aurhelper_install "nautilus-dropbox"
-			else
+			elif [ "$XFCE" -eq 1 ]; then
+				aurhelper_install "thunar-dropbox"
+			elif [ "$KDE" -eq 1 ]; then
 				aurhelper_install "kfilebox"
+			else
+				aurhelper_install "dropbox"
 			fi
 			;;
 		7)
 			aurhelper_install "teamviewer"
 			;;
 		8)
-			if [ "$GNOME" -eq 1 ]; then
+			if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
 				aurhelper_install "transmission-gtk"
 			else
 				aurhelper_install "transmission-qt"
@@ -1167,13 +1171,21 @@ do
 			aurhelper_install "jdownloader"
 			aurhelper_install "google-earth"
 			aurhelper_install "teamviewer"
-			if [ "$GNOME" -eq 1 ]; then
-				aurhelper_install "nautilus-dropbox"
+			if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
 				aurhelper_install "transmission-gtk"
 			else
-				aurhelper_install "kfilebox"
 				aurhelper_install "transmission-qt"
 			fi
+			if [ "$GNOME" -eq 1 ]; then
+				aurhelper_install "nautilus-dropbox"
+			elif [ "$XFCE" -eq 1 ]; then
+				aurhelper_install "thunar-dropbox"
+			elif [ "$KDE" -eq 1 ]; then
+				aurhelper_install "kfilebox"
+			else
+				aurhelper_install "dropbox"
+			fi
+
 			LOOP=0
 			;;
 		*)
