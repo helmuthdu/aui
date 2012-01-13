@@ -114,6 +114,23 @@ function sumary(){ #{{{
 	echo "helmuthdu at gmail dot com"
 	finish_function
 #}}}
+#CHECK ROOT {{{
+CURRENTUSER="$(whoami)"
+if [ $CURRENTUSER != "root" ]; then
+	echo "Current user is NOT 'root'. EXIT now"
+	finish_function
+	exit 1
+fi
+#}}}
+#CHECK CONNECTION{{{
+if $(ping -c1 google.com &>/dev/null); then
+	echo "Internet connection working!"
+else
+	echo "No internet connection found. EXIT now"
+	finish_function
+	exit 1
+fi
+#}}}
 #LANGUAGE SELECTOR {{{
 	print_title "LANGUAGE - https://wiki.archlinux.org/index.php/Locale"
 	question_for_answer "Default system language: \"$LOCATION\""
