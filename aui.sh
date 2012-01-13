@@ -1297,7 +1297,7 @@ do
 			;;
 		11)
 			pacman -S --noconfirm vlc
-			if [ "$GNOME" -eq 0 ]; then
+			if [ "$KDE" -eq 1 ]; then
 				pacman -S --noconfirm phonon-vlc
 			fi
 			;;
