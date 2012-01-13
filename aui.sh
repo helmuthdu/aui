@@ -498,9 +498,9 @@ function sumary(){ #{{{
 				su -l $USERNAME --command="export GIT_PROXY_COMMAND=\"/usr/bin/proxy-wrapper\""
 			fi
 			pacman -S --noconfirm tor privoxy
-			rc.d start tor privoxy
 			groupadd -g 42 privoxy
 			useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
+			rc.d start tor privoxy
 			su -l $USERNAME --command="sudo /etc/rc.d/tor restart"
 			su -l $USERNAME --command="sudo /etc/rc.d/privoxy restart"
 			add_new_daemon "@tor @privoxy"
@@ -1765,7 +1765,7 @@ finish_function
 	print_title "CLEAN ORPHAN PACKAGES"
 	sudo pacman -Rsc --noconfirm $(pacman -Qqdt)
 	#sudo pacman -Sc --noconfirm
-	paman-optimize
+	pacman-optimize
 #}}}
 #REBOOT {{{
 print_title "INSTALL COMPLETED"
