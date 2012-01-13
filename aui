@@ -996,8 +996,9 @@ do
 	echo "[5] Xmind"
 	echo "[6] Wunderlist"
 	echo "[7] GCStar"
-	echo "[8] Zathura"
-	echo "[9] Sublime Text 2"
+	echo "[8] Zathura (Lightweight PDF Viewer)"
+	echo "[9] Marave (Lightweight Text Editor)"
+	echo "[10] Sublime Text 2"
 	echo ""
 	echo "[q] QUIT"
 	echo ""
@@ -1041,6 +1042,9 @@ do
 			pacman -S --noconfirm zathura
 			;;
 		9)
+			aurhelper_install "marave"
+			;;
+		10)
 			aurhelper_install "sublime-text"
 			;;
 		*)
