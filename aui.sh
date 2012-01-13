@@ -982,10 +982,10 @@ do
 		1)
 			pacman -S --noconfirm libreoffice-$LOCATION_LO libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram
 			aurhelper_install "hunspell-$LOCATION_GNOME"
-			if [ "$GNOME" -eq 1 ]; then
-				pacman -S --noconfirm libreoffice-gnome
-			else
+			if [ "$KDE" -eq 1 ]; then
 				pacman -S --noconfirm libreoffice-kde4
+			else
+				pacman -S --noconfirm libreoffice-gnome
 			fi
 			;;
 		2)
@@ -998,10 +998,10 @@ do
 			aurhelper_install "latex-template-springer latex-template-ieee latex-beamer"
 			;;
 		4)
-			if [ "$GNOME" -eq 1 ]; then
-				pacman -S --noconfirm chmsee
-			else
+			if [ "$KDE" -eq 1 ]; then
 				pacman -S --noconfirm kchmviewer
+			else
+				pacman -S --noconfirm chmsee
 			fi
 			;;
 		5)
@@ -1168,10 +1168,10 @@ do
 			aurhelper_install "teamviewer"
 			;;
 		8)
-			if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
-				aurhelper_install "transmission-gtk"
-			else
+			if [ "$KDE" -eq 1 ]; then
 				aurhelper_install "transmission-qt"
+			else
+				aurhelper_install "transmission-gtk"
 			fi
 			;;
 		"a")
@@ -1181,10 +1181,10 @@ do
 			aurhelper_install "jdownloader"
 			aurhelper_install "google-earth"
 			aurhelper_install "teamviewer"
-			if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
-				aurhelper_install "transmission-gtk"
-			else
+			if [ "$KDE" -eq 1 ]; then
 				aurhelper_install "transmission-qt"
+			else
+				aurhelper_install "transmission-gtk"
 			fi
 			if [ "$GNOME" -eq 1 ]; then
 				aurhelper_install "nautilus-dropbox"
