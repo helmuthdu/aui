@@ -544,7 +544,8 @@ fi
 			print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
 			pacman -S --noconfirm gnome gnome-extra
 			gpasswd -a $USERNAME camera
-			pacman -S --noconfirm gedit-plugins pulseaudio-gnome gnome-tweak-tool telepathy deja-dup
+			pacman -S --noconfirm pulseaudio-gnome gnome-tweak-tool telepathy deja-dup
+			aurhelper_install "gedit-plugins gedit-code-assistance-git gdp"
 			pacman -S --noconfirm system-config-printer-gnome
 			aurhelper_install "automounter"
 			aurhelper_install "nautilus-open-terminal gnome-defaults-list"
@@ -995,7 +996,8 @@ do
 	echo "[5] Xmind"
 	echo "[6] Wunderlist"
 	echo "[7] GCStar"
-	echo "[8] Zathura (Lightweight PDF Viewer)"
+	echo "[8] Zathura"
+	echo "[9] Sublime Text 2"
 	echo ""
 	echo "[q] QUIT"
 	echo ""
@@ -1037,6 +1039,9 @@ do
 			;;
 		8)
 			pacman -S --noconfirm zathura
+			;;
+		9)
+			aurhelper_install "sublime-text"
 			;;
 		*)
 			LOOP=0
@@ -1268,7 +1273,7 @@ finish_function
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
-	print_title "MULTIMEDIA APPS"
+	print_title "MULTIMEDIA APPS "
 	echo "[1] Rhythmbox"
 	echo "[2] Exaile"
 	echo "[3] Banshee"
@@ -1282,6 +1287,7 @@ do
 	echo "[11] VLC"
 	echo "[12] MIDI Support"
 	echo "[13] Codecs"
+	echo "[14] Audacity"
 	echo ""
 	echo "[q] QUIT"
 	echo ""
@@ -1335,6 +1341,9 @@ do
 			else
 				aurhelper_install "codecs64"
 			fi
+			;;
+		14)
+			pacman -S --noconfirm audacity
 			;;
 		*)
 			LOOP=0
