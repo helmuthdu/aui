@@ -1,5 +1,6 @@
 # Archlinux Ultimate Install Script
 
+Install and configure archlinux has never been easier!
 This script is currently in a beta phase, may be instable and kill your cat!
 
 ## Prerequisites
@@ -11,9 +12,9 @@ This script is currently in a beta phase, may be instable and kill your cat!
 
 ## How to use
 
-- Install git `pacman -S git`
-- get the script `git clone git://github.com/helmuthdu/aui.git`
-- run the script `./aui.sh`
+- Install git    ` pacman -S git                                `
+- get the script ` git clone git://github.com/helmuthdu/aui.git `
+- run the script ` ./aui.sh                                     `
 
 ## Changelog
 
