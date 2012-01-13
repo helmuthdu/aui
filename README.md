@@ -2,6 +2,8 @@
 
 Install and configure archlinux has never been easier!
 
+You can try it first with a `virtualbox`
+
 ## Prerequisites
 
 - You need to have Archlinux (`base` + `base_devel`) already installed and rebooted
