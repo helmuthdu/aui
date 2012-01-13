@@ -13,7 +13,7 @@ Install and configure archlinux has never been easier!
 
 - Install git: `pacman -S git`
 - get the script: `git clone git://github.com/helmuthdu/aui.git`
-- run the script: `./aui.sh`
+- run the script: `./aui`
 
 ## What does the script do?
 
