@@ -2,8 +2,6 @@
 
 Install and configure archlinux has never been easier!
 
-This script is currently in a beta phase, may be instable and kill your cat!
-
 ## Prerequisites
 
 - You need to have Archlinux (`base` + `base_devel`) already installed and rebooted
@@ -17,12 +15,7 @@ This script is currently in a beta phase, may be instable and kill your cat!
 - get the script: `git clone git://github.com/helmuthdu/aui.git`
 - run the script: `./aui.sh`
 
-## Changelog
-
-[changelog](https://github.com/helmuthdu/aui/blob/master/changelog.md)
-
 ## What does the script do?
-
 
 - Check current language
 - Install additional repositories
