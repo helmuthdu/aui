@@ -24,16 +24,16 @@ This script is currently in a beta phase, may be instable and kill your cat!
 ## What does the script do?
 
 
-- check current language
-- Install custom repositories
-- Use rankmirror
-- Do a system upgrade
+- Check current language
+- Install additional repositories
+- Configure rankmirror
+- System upgrade
 - Create a new user
 - Install and configure sudo
 - Install a AUR Helper [yaourt, packer]
 - Install base system
 - Install Xorg
-- Install GPU Driver
+- Install GPU Drivers
 - Install CUPS
 - Install Additional wireless/bluetooth firmwares
 - Ensuring access to GIT through a firewall
