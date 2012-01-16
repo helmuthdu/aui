@@ -567,7 +567,7 @@ fi
 				echo "[8] Openshot"
 				echo "[9] Synapse"
 				echo "[10] Shotwell"
-				echo "[11] Guake"
+				echo "[11] Terminator"
 				echo "[12] X-Chat"
 				echo "[13] Packagekit"
 				echo "[14] Marlin"
@@ -610,7 +610,8 @@ fi
 						pacman -S --noconfirm shotwell
 						;;
 					11)
-						pacman -S --noconfirm guake
+						pacman -S --noconfirm terminator
+						aurhelper_install "python-keybinder"
 						;;
 					12)
 						pacman -S --noconfirm xchat
@@ -634,7 +635,8 @@ fi
 						pacman -S --noconfirm docky
 						pacman -S --noconfirm openshot
 						pacman -S --noconfirm shotwell
-						pacman -S --noconfirm guake
+						pacman -S --noconfirm terminator
+						aurhelper_install "python-keybinder"
 						pacman -S --noconfirm xchat
 						pacman -S --noconfirm gnome-packagekit gnome-settings-daemon-updates
 						LOOP=0
@@ -896,7 +898,6 @@ do
 			ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
 			chown -R $USERNAME:users /home/$USERNAME/.vim
 			chown $USERNAME:users /home/$USERNAME/.vimrc
-			sed -i '/Icon/s/gvim/vim/g' /usr/share/applications/gvim.desktop
 			;;
 		3)
 			pacman -S --noconfirm emacs
