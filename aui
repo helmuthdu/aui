@@ -565,7 +565,7 @@ fi
 				echo "[6] Conky + CONKY-colors"
 				echo "[7] Docky"
 				echo "[8] Openshot"
-				echo "[9] PDFMod"
+				echo "[9] Synapse"
 				echo "[10] Shotwell"
 				echo "[11] Guake"
 				echo "[12] X-Chat"
@@ -604,7 +604,7 @@ fi
 						pacman -S --noconfirm openshot
 						;;
 					9)
-						aurhelper_install "pdfmod"
+						aurhelper_install "synapse"
 						;;
 					10)
 						pacman -S --noconfirm shotwell
@@ -627,7 +627,7 @@ fi
 						aurhelper_install "egtk-bzr zukitwo-themes zukini-theme light-themes-bzr gtk-theme-aldabra"
 						aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-workspace-indicator gnome-shell-extension-places-menu gnome-shell-extension-dock gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
 						aurhelper_install "gnome-activity-journal libzeitgeist zeitgeist-datahub zeitgeist-extensions"
-						aurhelper_install "pdfmod"
+						aurhelper_install "synapse"
 						aurhelper_install "conky conky-colors"
 						add_new_module "coretemp it87 acpi-cpufreq"
 						aurhelper_install "marlin-bzr extended-actions-bzr"
