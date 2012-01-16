@@ -570,7 +570,6 @@ fi
 				echo "[11] Terminator"
 				echo "[12] X-Chat"
 				echo "[13] Packagekit"
-				echo "[14] Marlin"
 				echo ""
 				echo "[a] ALL"
 				echo "[q] QUIT"
@@ -619,9 +618,6 @@ fi
 					13)
 						pacman -S --noconfirm gnome-packagekit gnome-settings-daemon-updates
 						;;
-					14)
-						aurhelper_install "marlin-bzr extended-actions-bzr"
-						;;
 					"a")
 						aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
 						aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
@@ -631,7 +627,6 @@ fi
 						aurhelper_install "synapse"
 						aurhelper_install "conky conky-colors"
 						add_new_module "coretemp it87 acpi-cpufreq"
-						aurhelper_install "marlin-bzr extended-actions-bzr"
 						pacman -S --noconfirm docky
 						pacman -S --noconfirm openshot
 						pacman -S --noconfirm shotwell
