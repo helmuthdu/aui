@@ -67,7 +67,7 @@ function remove_module(){ #{{{
 	sed -i '/MODULES[=]/s/'"$1"' //' /etc/rc.conf
 } #}}}
 function aurhelper_install(){ #{{{
-		su -l $USERNAME --command="$AURHELPER -S --noconfirm $1"
+		yes | su -l $USERNAME --command="$AURHELPER -S --noconfirm $1"
 } #}}}
 function finish_function(){ #{{{
 	print_line
@@ -210,9 +210,9 @@ fi
 	sumary "New mirrorlist creation"
 	finish_function
 #}}}
-#PACKMAN 4.0 {{{
-	print_title "PACMAN 4.0 - https://wiki.archlinux.org/index.php/Pacman"
-	question_for_answer "Automatically configure Pacman 4.0"
+#PACKMAN SIGNING {{{
+	print_title "PACMAN SIGNING - https://wiki.archlinux.org/index.php/Package_signing"
+	question_for_answer "Automatically configure pacman signing"
 	case "$OPTION" in
 		"y")
 			pacman-key --init
@@ -224,7 +224,7 @@ fi
 			CURRENT_STATUS=0
 			;;
 	esac
-	sumary "Pacman 4.0 configuration"
+	sumary "Pacman signing configuration"
 	finish_function
 #}}}
 #SYSTEM UPDATE {{{
