@@ -216,8 +216,8 @@ fi
 	case "$OPTION" in
 		"y")
 			pacman-key --init
-			sed -i '/SigLevel\ =\ Optional\ TrustAll/s/^#//' /etc/ssh/sshd_config
-			sed -i '/SigLevel\ =\ Never/s/^/#/' /etc/ssh/sshd_config
+			sed -i '/SigLevel\ [=]\ Optional\ TrustAll/s/^#//' /etc/pacman.conf
+			sed -i '/SigLevel\ [=]\ Never/s/^/#/' /etc/pacman.conf
 			install_status
 			;;
 		*)
