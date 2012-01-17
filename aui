@@ -210,6 +210,23 @@ fi
 	sumary "New mirrorlist creation"
 	finish_function
 #}}}
+#PACKMAN 4.0 {{{
+	print_title "PACMAN 4.0 - https://wiki.archlinux.org/index.php/Pacman"
+	question_for_answer "Automatically configure Pacman 4.0"
+	case "$OPTION" in
+		"y")
+			pacman-key --init
+			sed -i '/SigLevel\ =\ Optional\ TrustAll/s/^#//' /etc/ssh/sshd_config
+			sed -i '/SigLevel\ =\ Never/s/^/#/' /etc/ssh/sshd_config
+			install_status
+			;;
+		*)
+			CURRENT_STATUS=0
+			;;
+	esac
+	sumary "Pacman 4.0 configuration"
+	finish_function
+#}}}
 #SYSTEM UPDATE {{{
 	print_title "UPDATING YOUR SYSTEM"
 	pacman -Syu
@@ -322,7 +339,7 @@ fi
 	print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
 	pacman -S --noconfirm rssh openssh
 	add_new_daemon "@sshd"
-	#configure ssh #{{{
+	#CONFIGURE SSH #{{{
 		echo -e "sshd: ALL\n# End of file" > /etc/hosts.allow
 		echo -e "ALL: ALL: DENY\n# End of file" > /etc/hosts.deny
 		#ssh_conf #{{{
@@ -346,7 +363,7 @@ fi
 			sed -i '/TCPKeepAlive/s/^#//' /etc/ssh/sshd_config
 			sed -i '/the setting of/s/^/#/' /etc/ssh/sshd_config
 			sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
-			sed -i 's/ListenAddress ::/s/^/#/' /etc/ssh/sshd_config
+			sed -i '/ListenAddress\ ::/s/^/#/' /etc/ssh/sshd_config
 		#}}}
 	#}}}
 	print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
@@ -1231,7 +1248,7 @@ do
 	esac
 	finish_function
 done
-#lamp #{{{
+#LAMP #{{{
 print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlinux.org/index.php/LAMP"
 question_for_answer "Install LAMP"
 case "$OPTION" in
