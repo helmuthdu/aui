@@ -210,14 +210,39 @@ fi
 	sumary "New mirrorlist creation"
 	finish_function
 #}}}
+#CREATE A NEW USER {{{
+	print_title "CREATE USER ACCOUNT"
+	read -p "New user name: " USERNAME
+	useradd -m -g users -G users,audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
+	passwd $USERNAME
+	#SET USER AS SUDO #{{{
+		pacman -S --noconfirm sudo
+		## Uncomment to allow members of group wheel to execute any command
+		sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
+		## Same thing without a password (not secure)
+		#sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
+	#}}}
+#}}}
 #PACKMAN SIGNING {{{
 	print_title "PACMAN SIGNING - https://wiki.archlinux.org/index.php/Package_signing"
 	question_for_answer "Automatically configure pacman signing"
 	case "$OPTION" in
 		"y")
-			pacman-key --init
 			sed -i '/SigLevel\ [=]\ Optional\ TrustAll/s/^#//' /etc/pacman.conf
 			sed -i '/SigLevel\ [=]\ Never/s/^/#/' /etc/pacman.conf
+			su -l $USERNAME --command="
+				wget http://aur.archlinux.org/packages/rn/rng-tools/rng-tools.tar.gz
+				tar zxvf rng-tools.tar.gz
+				cd rng-tools
+				makepkg --noconfirm -si;
+				cd ..
+				rm -fr rng-tools*
+			"
+			sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
+			rngd -f -r /dev/urandom &
+			pacman-key --init
+			killall rngd
+			pacman -Rns --noconfirm rng-tools
 			install_status
 			;;
 		*)
@@ -235,19 +260,6 @@ fi
 		reboot
 		exit 0
 	fi
-#}}}
-#CREATE A NEW USER {{{
-	print_title "CREATE USER ACCOUNT"
-	read -p "New user name: " USERNAME
-	useradd -m -g users -G users,audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
-	passwd $USERNAME
-	#SET USER AS SUDO #{{{
-		pacman -S --noconfirm sudo
-		## Uncomment to allow members of group wheel to execute any command
-		sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
-		## Same thing without a password (not secure)
-		#sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
-	#}}}
 #}}}
 #AUR HELPER {{{
 	LOOP=1
