@@ -685,7 +685,7 @@ fi
 			pacman -Rcsn --noconfirm kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
 			pacman -S --noconfirm kdeadmin-system-config-printer-kde xdg-user-dirs
 			aurhelper_install "chakra-gtk-config"
-			aurhelper_install "oxygen-gtk qtcurve-gtk2 qtcurve-kde4 bespin-svn"
+			aurhelper_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
 			aurhelper_install "kcm-wacomtablet"
 			aurhelper_install "quickaccess-plasmoid plasma-icontasks"
 			#FAVORITE KDE APPS {{{
@@ -1317,6 +1317,7 @@ do
 	echo "[12] MIDI Support"
 	echo "[13] Codecs"
 	echo "[14] Audacity"
+	echo "[15] Puddletag"
 	echo ""
 	echo "[q] QUIT"
 	echo ""
@@ -1373,6 +1374,9 @@ do
 			;;
 		14)
 			pacman -S --noconfirm audacity
+			;;
+		15)
+			aurhelper_install "poddletag"
 			;;
 		*)
 			LOOP=0
