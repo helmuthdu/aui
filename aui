@@ -22,6 +22,10 @@ KDE=0
 LXDE=0
 XFCE=0
 GNOME=0
+
+YAOURT=0
+PACKER=0
+
 ARCHI=`uname -m`
 
 # Automatically detects the system language based on your rc.conf
@@ -31,15 +35,9 @@ LOCATION_GNOME=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
 LOCATION_LO=`echo $LOCATION | sed 's/_/-/'`
 
 function question_for_answer(){ #{{{
-    read -p "$1 [y][n]: " OPTION
+    read -p "$1 [y][N]: " OPTION
+    OPTION=`echo "$OPTION" | tr '[:upper:]' '[:lower:]'`
     echo ""
-} #}}}
-function install_status(){ #{{{
-    if [ $? -ne 0 ] ; then
-        CURRENT_STATUS=-1
-    else
-        CURRENT_STATUS=1
-    fi
 } #}}}
 function print_line(){ #{{{
     printf "%$(tput cols)s\n"|tr ' ' '-'
@@ -67,7 +65,18 @@ function remove_module(){ #{{{
     sed -i '/MODULES[=]/s/'"$1"' //' /etc/rc.conf
 } #}}}
 function aurhelper_install(){ #{{{
-    yes | su -l $USERNAME --command="$AURHELPER -S --noconfirm $1"
+    if [ "$YAOURT" -eq 1 ]; then
+        su -l $USERNAME --command="yaourt -S --noconfirm $1"
+    else
+        su -l $USERNAME --command="packer -S --noconfirm $1"
+    fi
+} #}}}
+function install_status(){ #{{{
+    if [ $? -ne 0 ] ; then
+        CURRENT_STATUS=-1
+    else
+        CURRENT_STATUS=1
+    fi
 } #}}}
 function finish_function(){ #{{{
     print_line
@@ -118,15 +127,6 @@ function sumary(){ #{{{
 CURRENTUSER="$(whoami)"
 if [ $CURRENTUSER != "root" ]; then
     echo "Current user is NOT 'root'. EXIT now"
-    finish_function
-    exit 1
-fi
-#}}}
-#CHECK CONNECTION{{{
-if $(ping -c1 google.com &>/dev/null); then
-    echo "Internet connection working!"
-else
-    echo "No internet connection found. EXIT now"
     finish_function
     exit 1
 fi
@@ -183,6 +183,7 @@ fi
                         ;;
                 esac
             done
+            pacman -Sy
             install_status
             ;;
         #}}}
@@ -216,7 +217,7 @@ fi
     useradd -m -g users -G users,audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
     passwd $USERNAME
     #SET USER AS SUDO #{{{
-        pacman -S --noconfirm sudo
+        pacman -S --noconfirm --needed sudo
         ## Uncomment to allow members of group wheel to execute any command
         sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
         ## Same thing without a password (not secure)
@@ -228,16 +229,18 @@ fi
     question_for_answer "Automatically configure pacman signing"
     case "$OPTION" in
         "y")
-            sed -i '/SigLevel\ [=]\ Optional\ TrustAll/s/^#//' /etc/pacman.conf
-            sed -i '/SigLevel\ [=]\ Never/s/^/#/' /etc/pacman.conf
+            #sed -i '/SigLevel\ [=]\ Optional\ TrustAll/s/^/#/' /etc/pacman.conf
+            #sed -i '/SigLevel\ [=]\ Never/s/^#//' /etc/pacman.conf
+            #INSTALL RNG-TOOLS {{{
             su -l $USERNAME --command="
                 wget http://aur.archlinux.org/packages/rn/rng-tools/rng-tools.tar.gz
                 tar zxvf rng-tools.tar.gz
                 cd rng-tools
-                makepkg --noconfirm -si;
+                makepkg -si --noconfirm;
                 cd ..
                 rm -fr rng-tools*
             "
+            #}}}
             sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
             rngd -f -r /dev/urandom &
             pacman-key --init
@@ -255,7 +258,7 @@ fi
 #SYSTEM UPDATE {{{
     print_title "UPDATING YOUR SYSTEM"
     pacman -Syu
-    read -p "Reboot your system [y][n]: " OPTION
+    question_for_answer "Reboot now?"
     if [ $OPTION = "y" ]; then
         reboot
         exit 0
@@ -273,12 +276,12 @@ fi
         read -p "Option: " OPTION
         case "$OPTION" in
             1)
-                pacman -S --noconfirm base-devel yajl
+                pacman -S --noconfirm --needed base-devel yajl
                 su -l $USERNAME --command="
                     wget http://aur.archlinux.org/packages/package-query/package-query.tar.gz;
                     tar zxvf package-query.tar.gz;
                     cd package-query;
-                    makepkg --noconfirm -si;
+                    makepkg -si --noconfirm;
                     cd ..;
                     rm -fr package-query*
                 "
@@ -286,26 +289,26 @@ fi
                     wget http://aur.archlinux.org/packages/yaourt/yaourt.tar.gz;
                     tar zxvf yaourt.tar.gz;
                     cd yaourt;
-                    makepkg --noconfirm -si;
+                    makepkg -si --noconfirm;
                     cd ..;
                     rm -fr yaourt*
                 "
                 install_status
-                AURHELPER="yaourt"
+                YAOURT=1
                 LOOP=0
                 ;;
             2)
-                pacman -S --noconfirm git jshon curl
+                pacman -S --noconfirm --needed git jshon curl
                 su -l $USERNAME --command="
                     wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
                     tar zxvf packer.tar.gz;
                     cd packer;
-                    makepkg --noconfirm -si;
+                    makepkg -si --noconfirm;
                     cd ..;
                     rm -fr packer*
                 "
                 install_status
-                AURHELPER="packer"
+                PACKER=1
                 LOOP=0
                 ;;
             *)
@@ -320,14 +323,15 @@ fi
 #}}}
 #BASE SYSTEM {{{
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-    pacman -S --noconfirm curl bc rsync mlocate bash-completion vim
+    pacman -S --noconfirm --needed curl bc rsync mlocate bash-completion vim net-tools
     print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
-    pacman -S --noconfirm tar gzip bzip2 unzip unrar p7zip
+    pacman -S --noconfirm --needed unzip unrar p7zip
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
-    pacman -S --noconfirm dbus
+    pacman -S --noconfirm --needed dbus
     add_new_daemon "dbus"
+    rc.d start dbus
     print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
-    pacman -S --noconfirm acpi acpid
+    pacman -S --noconfirm --needed acpi acpid
     add_new_daemon "acpid"
     #TLP #{{{
     print_title "TLP - https://wiki.archlinux.org/index.php/TLP"
@@ -335,7 +339,7 @@ fi
     case "$OPTION" in
         "y")
             aurhelper_install "tlp"
-            pacman -S --noconfirm upower
+            pacman -S --noconfirm --needed upower
             add_new_daemon "@tlp"
             install_status
             ;;
@@ -347,9 +351,9 @@ fi
     finish_function
     #}}}
     print_title "NTFS/FAT - https://wiki.archlinux.org/index.php/Ntfs"
-    pacman -S --noconfirm ntfs-3g ntfsprogs dosfstools
+    pacman -S --noconfirm --needed ntfs-3g ntfsprogs dosfstools
     print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
-    pacman -S --noconfirm rssh openssh
+    pacman -S --noconfirm --needed rssh openssh
     add_new_daemon "@sshd"
     #CONFIGURE SSH #{{{
         echo -e "sshd: ALL\n# End of file" > /etc/hosts.allow
@@ -379,11 +383,11 @@ fi
         #}}}
     #}}}
     print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
-    pacman -S --noconfirm samba
+    pacman -S --noconfirm --needed samba
     cp /etc/samba/smb.conf.default /etc/samba/smb.conf
     add_new_daemon "@samba"
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
-    pacman -S --noconfirm alsa-utils alsa-plugins
+    pacman -S --noconfirm --needed alsa-utils alsa-plugins
     sed -i '/MODULES[=]/s/snd-usb-audio//' /etc/rc.conf
     sed -i '/MODULES[=]/s/MODULES[=](/&snd-usb-audio/' /etc/rc.conf
     add_new_daemon "@alsa"
@@ -391,10 +395,10 @@ fi
 #XORG {{{
     print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
     echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
-    pacman -S --noconfirm xorg-server xorg-xinit xorg-xkill
-    pacman -S --noconfirm xf86-input-evdev xf86-input-synaptics xf86-input-mouse xf86-input-keyboard
-    pacman -S --noconfirm mesa
-    pacman -S --noconfirm gamin
+    pacman -S --noconfirm --needed xorg-server xorg-xinit xorg-xkill
+    pacman -S --noconfirm --needed xf86-input-synaptics xf86-input-mouse xf86-input-keyboard
+    pacman -S --noconfirm --needed mesa
+    pacman -S --noconfirm --needed gamin
 #}}}
 #GRAPHIC CARDS {{{
     print_title "GRAPHIC CARD"
@@ -411,7 +415,7 @@ fi
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm libgl xf86-video-intel
+            pacman -S --noconfirm --needed libgl xf86-video-intel
             install_status
             sumary "Intel GPU driver installation"
             ;;
@@ -420,25 +424,25 @@ fi
             [catalyst]
             Server = http://catalyst.apocalypsus.net/repo/catalyst/\$arch" >> /etc/pacman.conf
             pacman -Sy
-            pacman -S  --noconfirm catalyst catalyst-utils
+            pacman -S --noconfirm --needed  catalyst catalyst-utils
             install_status
             sumary "ATI GPU driver installation"
             ;;
         3)
             pacman -Rdd --noconfirm libgl
-            pacman -S --noconfirm nvidia nvidia-utils
+            pacman -S --noconfirm --needed nvidia nvidia-utils
             install_status
             sumary "nVidia GPU driver installation"
             ;;
         4)
-            pacman -S --noconfirm libgl xf86-video-nouveau nouveau-dri
+            pacman -S --noconfirm --needed libgl xf86-video-nouveau nouveau-dri
             modprobe nouveau
             add_new_module "nouveau"
             install_status
             sumary "Nouveau GPU driver installation"
             ;;
         5)
-            pacman -S --noconfirm virtualbox-archlinux-additions
+            pacman -S --noconfirm --needed virtualbox-archlinux-additions
             modprobe -a vboxguest vboxsf vboxvideo
             add_new_module "vboxguest vboxsf vboxvideo"
             groupadd vboxsf
@@ -447,7 +451,7 @@ fi
             sumary "Virtualbox guest additions (incl. video drivers) installation"
             ;;
         6)
-            pacman -S --noconfirm xf86-video-vesa
+            pacman -S --noconfirm --needed xf86-video-vesa
             install_status
             sumary "Vesa GPU driver installation"
             ;;
@@ -460,8 +464,8 @@ fi
 #}}}
 #CUPS {{{
     print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
-    pacman -S --noconfirm cups ghostscript gsfonts
-    pacman -S --noconfirm gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf
+    pacman -S --noconfirm --needed cups ghostscript gsfonts
+    pacman -S --noconfirm --needed gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf
     add_new_daemon "@cupsd"
 #}}}
 #ADDITIONAL FIRMWARE {{{
@@ -543,9 +547,9 @@ fi
                 export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
                 su -l $USERNAME --command="export GIT_PROXY_COMMAND=\"/usr/bin/proxy-wrapper\""
             fi
-            pacman -S --noconfirm tor privoxy
             groupadd -g 42 privoxy
             useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
+            pacman -S --noconfirm tor privoxy
             rc.d start tor privoxy
             su -l $USERNAME --command="sudo /etc/rc.d/tor restart"
             su -l $USERNAME --command="sudo /etc/rc.d/privoxy restart"
@@ -571,16 +575,13 @@ fi
         1)
             #GNOME {{{
             print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
-            pacman -S --noconfirm gnome gnome-extra
+            pacman -S --noconfirm --needed gnome gnome-extra
             gpasswd -a $USERNAME camera
-            pacman -S --noconfirm pulseaudio-gnome gnome-tweak-tool telepathy deja-dup
-            aurhelper_install "gedit-plugins gedit-code-assistance-git gdp"
-            pacman -S --noconfirm system-config-printer-gnome
+            pacman -S --noconfirm --needed gedit-plugins pulseaudio-gnome gnome-tweak-tool telepathy deja-dup
+            pacman -S --noconfirm --needed system-config-printer-gnome
             aurhelper_install "automounter"
             aurhelper_install "nautilus-open-terminal gnome-defaults-list"
-            pacman -Rdd --noconfirm sushi
-            aurhelper_install "gloobus-sushi-bzr"
-            pacman -S --noconfirm gksu gvfs-smb xdg-user-dirs
+            pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
             #GNOME FAVORITE APPS {{{
             LOOP=1
             while [ "$LOOP" -ne 0 ]
@@ -599,6 +600,7 @@ fi
                 echo "[11] Terminator"
                 echo "[12] X-Chat"
                 echo "[13] Packagekit"
+                echo "[14] Gloobus-Sushi"
                 echo ""
                 echo "[a] ALL"
                 echo "[q] QUIT"
@@ -626,26 +628,30 @@ fi
                         add_new_module "coretemp it87 acpi-cpufreq"
                         ;;
                     7)
-                        pacman -S --noconfirm docky
+                        pacman -S --noconfirm --needed docky
                         ;;
                     8)
-                        pacman -S --noconfirm openshot
+                        pacman -S --noconfirm --needed openshot
                         ;;
                     9)
                         aurhelper_install "synapse"
                         ;;
                     10)
-                        pacman -S --noconfirm shotwell
+                        pacman -S --noconfirm --needed shotwell
                         ;;
                     11)
-                        pacman -S --noconfirm terminator
+                        pacman -S --noconfirm --needed terminator
                         aurhelper_install "python-keybinder"
                         ;;
                     12)
-                        pacman -S --noconfirm xchat
+                        pacman -S --noconfirm --needed xchat
                         ;;
                     13)
-                        pacman -S --noconfirm gnome-packagekit gnome-settings-daemon-updates
+                        pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
+                        ;;
+                    14)
+                        pacman -Rdd --noconfirm sushi
+                        aurhelper_install "gloobus-sushi-bzr"
                         ;;
                     "a")
                         aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
@@ -656,13 +662,15 @@ fi
                         aurhelper_install "synapse"
                         aurhelper_install "conky conky-colors"
                         add_new_module "coretemp it87 acpi-cpufreq"
-                        pacman -S --noconfirm docky
-                        pacman -S --noconfirm openshot
-                        pacman -S --noconfirm shotwell
-                        pacman -S --noconfirm terminator
+                        pacman -S --noconfirm --needed docky
+                        pacman -S --noconfirm --needed openshot
+                        pacman -S --noconfirm --needed shotwell
+                        pacman -S --noconfirm --needed terminator
                         aurhelper_install "python-keybinder"
-                        pacman -S --noconfirm xchat
-                        pacman -S --noconfirm gnome-packagekit gnome-settings-daemon-updates
+                        pacman -S --noconfirm --needed xchat
+                        pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
+                        pacman -Rdd --noconfirm sushi
+                        aurhelper_install "gloobus-sushi-bzr"
                         LOOP=0
                         ;;
                     *)
@@ -681,9 +689,9 @@ fi
         2)
             #KDE {{{
             print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
-            pacman -S --noconfirm kde kde-l10n-$LOCATION_KDE
-            pacman -Rcsn --noconfirm kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
-            pacman -S --noconfirm kdeadmin-system-config-printer-kde xdg-user-dirs
+            pacman -S --noconfirm --needed kde kde-l10n-$LOCATION_KDE
+            pacman -Rcsn kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
+            pacman -S --noconfirm --needed kdeadmin-system-config-printer-kde xdg-user-dirs
             aurhelper_install "chakra-gtk-config"
             aurhelper_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
             aurhelper_install "kcm-wacomtablet"
@@ -738,10 +746,10 @@ fi
                         #}}}
                         ;;
                     4)
-                        pacman -S --noconfirm choqok
+                        pacman -S --noconfirm --needed choqok
                         ;;
                     5)
-                        pacman -S --noconfirm k3b dvd+rw-tools
+                        pacman -S --noconfirm --needed k3b dvd+rw-tools
                         ;;
                     6)
                         aurhelper_install "apper"
@@ -759,10 +767,10 @@ fi
                         aurhelper_install "rosa-media-player"
                         ;;
                     11)
-                        pacman -S --noconfirm digikam kipi-plugins
+                        pacman -S --noconfirm --needed digikam kipi-plugins
                         ;;
                     12)
-                        pacman -S --noconfirm yakuake
+                        pacman -S --noconfirm --needed yakuake
                         aurhelper_install "yakuake-skin-plasma-oxygen-panel"
                         ;;
                     13)
@@ -787,15 +795,15 @@ fi
                         chown -R $USERNAME:users /home/$USERNAME/.kde4
                         rm -fr Kawai Sweet
                         #}}}
-                        pacman -S --noconfirm choqok
-                        pacman -S --noconfirm k3b dvd+rw-tools
+                        pacman -S --noconfirm --needed choqok
+                        pacman -S --noconfirm --needed k3b dvd+rw-tools
                         aurhelper_install "apper"
                         aurhelper_install "minitube"
                         aurhelper_install "musique"
                         aurhelper_install "bangarang"
                         aurhelper_install "rosa-media-player"
-                        pacman -S --noconfirm digikam kipi-plugins
-                        pacman -S --noconfirm yakuake
+                        pacman -S --noconfirm --needed digikam kipi-plugins
+                        pacman -S --noconfirm --needed yakuake
                         aurhelper_install "yakuake-skin-plasma-oxygen-panel"
                         aurhelper_install "speedcrunch"
                         LOOP=0
@@ -816,8 +824,8 @@ fi
         3)
             #XFCE {{{
             print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
-            pacman -S --noconfirm xfce4 xfce4-goodies
-            pacman -S --noconfirm polkit-gnome gvfs-smb xdg-user-dirs
+            pacman -S --noconfirm --needed xfce4 xfce4-goodies
+            pacman -S --noconfirm --needed polkit-gnome gvfs-smb xdg-user-dirs
             aurhelper_install "automounter"
             sumary "XFCE installation"
             finish_function
@@ -827,11 +835,11 @@ fi
         4)
             #LXDE {{{
             print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
-            pacman -S --noconfirm lxde
-            pacman -S --noconfirm polkit-gnome gvfs gvfs-smb xdg-user-dirs
-            pacman -S --noconfirm pm-utils upower
-            pacman -S --noconfirm leafpad xarchiver obconf epdfview
-            pacman -S --noconfirm galculator
+            pacman -S --noconfirm --needed lxde
+            pacman -S --noconfirm --needed polkit-gnome gvfs gvfs-smb xdg-user-dirs
+            pacman -S --noconfirm --needed pm-utils upower
+            pacman -S --noconfirm --needed leafpad xarchiver obconf epdfview
+            pacman -S --noconfirm --needed galculator
             add_new_daemon "lxdm"
             sumary "LXDE Installation"
             finish_function
@@ -851,11 +859,11 @@ fi
         1)
             print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
             if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
-                pacman -S --noconfirm networkmanager network-manager-applet
+                pacman -S --noconfirm --needed networkmanager network-manager-applet
             elif [ "$KDE" -eq 1 ]; then
-                pacman -S --noconfirm networkmanager kdeplasma-applets-networkmanagement
+                pacman -S --noconfirm --needed networkmanager kdeplasma-applets-networkmanagement
             else
-                pacman -S --noconfirm networkmanager
+                pacman -S --noconfirm --needed networkmanager
             fi
             groupadd networkmanager
             gpasswd -a $USERNAME networkmanager
@@ -866,11 +874,11 @@ fi
         2)
             print_title "WICD - https://wiki.archlinux.org/index.php/Wicd"
             if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
-                pacman -S --noconfirm wicd wicd-gtk
+                pacman -S --noconfirm --needed wicd wicd-gtk
             elif [ "$KDE" -eq 1 ]; then
                 aurhelper_install "wicd wicd-kde"
             else
-                pacman -S --noconfirm wicd
+                pacman -S --noconfirm --needed wicd
             fi
             remove_daemon "network"
             add_new_daemon "@wicd"
@@ -906,7 +914,7 @@ do
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm qtcreator qt-doc
+            pacman -S --noconfirm --needed qtcreator qt-doc
             mkdir -p /home/$USERNAME/.config/Nokia/qtcreator/styles
             wget http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
             mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
@@ -914,7 +922,7 @@ do
             ;;
         2)
             pacman -Rdd --noconfirm vim
-            pacman -S --noconfirm gvim wmctrl ctags
+            pacman -S --noconfirm --needed gvim wmctrl ctags
             aurhelper_install "discount"
             #helmuthdu's vimrc
             git clone git://github.com/helmuthdu/vim.git
@@ -924,7 +932,7 @@ do
             chown $USERNAME:users /home/$USERNAME/.vimrc
             ;;
         3)
-            pacman -S --noconfirm emacs
+            pacman -S --noconfirm --needed emacs
             ;;
         4)
             pacman -Rdd --noconfirm jre7-openjdk
@@ -932,13 +940,13 @@ do
             aurhelper_install "jdk"
             ;;
         5)
-            pacman -S --noconfirm intellij-idea-community-edition
+            pacman -S --noconfirm --needed intellij-idea-community-edition
             ;;
         6)
             aurhelper_install "aptana-studio"
             ;;
         7)
-            pacman -S --noconfirm netbeans
+            pacman -S --noconfirm --needed netbeans
             ;;
         8)
             while [ "$LOOP" -ne 0 ]
@@ -959,10 +967,10 @@ do
                 read -p "Option: " OPTION
                 case "$OPTION" in
                     1)
-                        pacman -S --noconfirm eclipse
+                        pacman -S --noconfirm --needed eclipse
                         ;;
                     2)
-                        pacman -S --noconfirm eclipse-cdt
+                        pacman -S --noconfirm --needed eclipse-cdt
                         ;;
                     3)
                         aurhelper_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
@@ -993,14 +1001,14 @@ do
             LOOP=1
             ;;
         9)
-            pacman -S --noconfirm valgrind gdb splint tidyhtml pyflakes
+            pacman -S --noconfirm --needed valgrind gdb splint tidyhtml pyflakes
             aurhelper_install "jsl"
             ;;
         10)
             aurhelper_install "mysql-workbench"
             ;;
         11)
-            pacman -S --noconfirm meld
+            pacman -S --noconfirm --needed meld
             ;;
         *)
             LOOP=0
@@ -1030,28 +1038,28 @@ do
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm libreoffice-$LOCATION_LO libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram
+            pacman -S --noconfirm --needed libreoffice-$LOCATION_LO libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram
             aurhelper_install "hunspell-$LOCATION_GNOME"
             if [ "$KDE" -eq 1 ]; then
-                pacman -S --noconfirm libreoffice-kde4
+                pacman -S --noconfirm --needed libreoffice-kde4
             else
-                pacman -S --noconfirm libreoffice-gnome
+                pacman -S --noconfirm --needed libreoffice-gnome
             fi
             ;;
         2)
-            pacman -S --noconfirm gnumeric abiword abiword-plugins
+            pacman -S --noconfirm --needed gnumeric abiword abiword-plugins
             ;;
         3)
-            pacman -S --noconfirm texlive-latexextra texlive-langextra
-            pacman -S --noconfirm lyx texmaker
+            pacman -S --noconfirm --needed texlive-latexextra texlive-langextra
+            pacman -S --noconfirm --needed lyx texmaker
             aurhelper_install "abntex"
             aurhelper_install "latex-template-springer latex-template-ieee latex-beamer"
             ;;
         4)
             if [ "$KDE" -eq 1 ]; then
-                pacman -S --noconfirm kchmviewer
+                pacman -S --noconfirm --needed kchmviewer
             else
-                pacman -S --noconfirm chmsee
+                pacman -S --noconfirm --needed chmsee
             fi
             ;;
         5)
@@ -1061,10 +1069,10 @@ do
             aurhelper_install "wunderlist"
             ;;
         7)
-            pacman -S --noconfirm gcstar
+            pacman -S --noconfirm --needed gcstar
             ;;
         8)
-            pacman -S --noconfirm zathura
+            pacman -S --noconfirm --needed zathura
             ;;
         9)
             aurhelper_install "marave"
@@ -1095,16 +1103,16 @@ do
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm htop
+            pacman -S --noconfirm --needed htop
             ;;
         2)
-            pacman -S --noconfirm grsync
+            pacman -S --noconfirm --needed grsync
             ;;
         3)
-            pacman -S --noconfirm wine wine_gecko winetricks
+            pacman -S --noconfirm --needed wine wine_gecko winetricks
             ;;
         4)
-            pacman -S --noconfirm virtualbox virtualbox-additions
+            pacman -S --noconfirm --needed virtualbox virtualbox-additions
             aurhelper_install "virtualbox-ext-oracle"
             modprobe vboxdrv
             groupadd vboxusers
@@ -1112,10 +1120,10 @@ do
             add_new_module "vboxdrv"
             ;;
         "a")
-            pacman -S --noconfirm htop
-            pacman -S --noconfirm grsync
-            pacman -S --noconfirm wine wine_gecko winetricks
-            pacman -S --noconfirm virtualbox virtualbox-additions
+            pacman -S --noconfirm --needed htop
+            pacman -S --noconfirm --needed grsync
+            pacman -S --noconfirm --needed wine wine_gecko winetricks
+            pacman -S --noconfirm --needed virtualbox virtualbox-additions
             aurhelper_install "virtualbox-ext-oracle"
             modprobe vboxdrv
             groupadd vboxusers
@@ -1147,23 +1155,23 @@ do
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm inkscape uniconvertor python2-numpy python-lxml
+            pacman -S --noconfirm --needed inkscape uniconvertor python2-numpy python-lxml
             aurhelper_install "sozi"
             ;;
         2)
-            pacman -S --noconfirm gimp
+            pacman -S --noconfirm --needed gimp
             ;;
         3)
             aurhelper_install "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
             ;;
         4)
-            pacman -S --noconfirm blender
+            pacman -S --noconfirm --needed blender
             ;;
         5)
-            pacman -S --noconfirm mcomix
+            pacman -S --noconfirm --needed mcomix
             ;;
         "a")
-            pacman -S --noconfirm gimp inkscape uniconvertor python2-numpy python-lxml blender mcomix
+            pacman -S --noconfirm --needed gimp inkscape uniconvertor python2-numpy python-lxml blender mcomix
             aurhelper_install "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb sozi"
             LOOP=0
             ;;
@@ -1194,13 +1202,13 @@ do
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm firefox firefox-i18n-$LOCATION_GNOME flashplugin
+            pacman -S --noconfirm --needed firefox firefox-i18n-$LOCATION_GNOME flashplugin
             ;;
         2)
-            pacman -S --noconfirm thunderbird thunderbird-i18n-$LOCATION_GNOME
+            pacman -S --noconfirm --needed thunderbird thunderbird-i18n-$LOCATION_GNOME
             ;;
         3)
-            pacman -S --noconfirm flashplugin
+            pacman -S --noconfirm --needed flashplugin
             aurhelper_install "google-chrome"
             ;;
         4)
@@ -1231,8 +1239,8 @@ do
             fi
             ;;
         "a")
-            pacman -S --noconfirm firefox firefox-i18n-$LOCATION_GNOME flashplugin
-            pacman -S --noconfirm thunderbird thunderbird-i18n-$LOCATION_GNOME
+            pacman -S --noconfirm --needed firefox firefox-i18n-$LOCATION_GNOME flashplugin
+            pacman -S --noconfirm --needed thunderbird thunderbird-i18n-$LOCATION_GNOME
             aurhelper_install "google-chrome"
             aurhelper_install "jdownloader"
             aurhelper_install "google-earth"
@@ -1265,7 +1273,7 @@ print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlin
 question_for_answer "Install LAMP"
 case "$OPTION" in
     "y")
-        pacman -S --noconfirm apache mysql php php-apache php-mcrypt php-gd
+        pacman -S --noconfirm --needed apache mysql php php-apache php-mcrypt php-gd
         aurhelper_install "adminer"
         rc.d start httpd mysqld
         /usr/bin/mysql_secure_installation
@@ -1324,19 +1332,19 @@ do
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm rhythmbox
+            pacman -S --noconfirm --needed rhythmbox
             ;;
         2)
-            pacman -S --noconfirm exaile
+            pacman -S --noconfirm --needed exaile
             ;;
         3)
-            pacman -S --noconfirm banshee
+            pacman -S --noconfirm --needed banshee
             ;;
         4)
-            pacman -S --noconfirm clementine
+            pacman -S --noconfirm --needed clementine
             ;;
         5)
-            pacman -S --noconfirm amarok
+            pacman -S --noconfirm --needed amarok
             ;;
         6)
             aurhelper_install "beatbox-bzr"
@@ -1351,12 +1359,12 @@ do
             aurhelper_install "transmageddon"
             ;;
         10)
-            pacman -S --noconfirm xbmc
+            pacman -S --noconfirm --needed xbmc
             ;;
         11)
-            pacman -S --noconfirm vlc
+            pacman -S --noconfirm --needed vlc
             if [ "$KDE" -eq 1 ]; then
-                pacman -S --noconfirm phonon-vlc
+                pacman -S --noconfirm --needed phonon-vlc
             fi
             ;;
         12)
@@ -1364,7 +1372,7 @@ do
             echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
             ;;
         13)
-            pacman -S --noconfirm gstreamer0.10-plugins
+            pacman -S --noconfirm --needed gstreamer0.10-plugins
             aurhelper_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
             if [ "$ARCHI" = "i686" ]; then
                 aurhelper_install "codecs"
@@ -1373,10 +1381,10 @@ do
             fi
             ;;
         14)
-            pacman -S --noconfirm audacity
+            pacman -S --noconfirm --needed audacity
             ;;
         15)
-            aurhelper_install "poddletag"
+            aurhelper_install "puddletag"
             ;;
         *)
             LOOP=0
@@ -1465,22 +1473,22 @@ do
                     aurhelper_install "opensonic"
                     ;;
                 2)
-                    pacman -S --noconfirm frogatto
+                    pacman -S --noconfirm --needed frogatto
                     ;;
                 3)
-                    pacman -S --noconfirm bomberclone
+                    pacman -S --noconfirm --needed bomberclone
                     ;;
                 4)
                     aurhelper_install "goonies"
                     ;;
                 5)
-                    pacman -S --noconfirm neverball
+                    pacman -S --noconfirm --needed neverball
                     ;;
                 6)
-                    pacman -S --noconfirm smc
+                    pacman -S --noconfirm --needed smc
                     ;;
                 7)
-                    pacman -S --noconfirm xmoto
+                    pacman -S --noconfirm --needed xmoto
                     ;;
                 *)
                     LOOP=0
@@ -1536,10 +1544,10 @@ do
                     aurhelper_install "worldofpadman"
                     ;;
                 2)
-                    pacman -S --noconfirm warsow
+                    pacman -S --noconfirm --needed warsow
                     ;;
                 3)
-                    pacman -S --noconfirm alienarena
+                    pacman -S --noconfirm --needed alienarena
                     ;;
                 *)
                     LOOP=0
@@ -1617,7 +1625,7 @@ do
                     aurhelper_install "corsix-th"
                     ;;
                 3)
-                    pacman -S --noconfirm openttd
+                    pacman -S --noconfirm --needed openttd
                     ;;
                 *)
                     LOOP=0
@@ -1644,27 +1652,19 @@ do
             read -p "Option: " OPTION
             case "$OPTION" in
                 1)
-                    question_for_answer "Install Devel Version"
-                    case "$OPTION" in
-                        "y")
-                            aurhelper_install "wesnoth-devel"
-                            ;;
-                        *)
-                            pacman -S --noconfirm wesnoth
-                            ;;
-                    esac
+                    pacman -S --noconfirm --needed wesnoth
                     ;;
                 3)
                     aurhelper_install "0ad"
                     ;;
                 4)
-                    pacman -S --noconfirm hedgewars
+                    pacman -S --noconfirm --needed hedgewars
                     ;;
                 5)
-                    pacman -S --noconfirm warzone2100
+                    pacman -S --noconfirm --needed warzone2100
                     ;;
                 6)
-                    pacman -S --noconfirm megaglest
+                    pacman -S --noconfirm --needed megaglest
                     ;;
                 7)
                     aurhelper_install "commander-zod"
@@ -1698,10 +1698,10 @@ do
                     aurhelper_install "death-rally"
                     ;;
                 3)
-                    pacman -S --noconfirm supertuxkart
+                    pacman -S --noconfirm --needed supertuxkart
                     ;;
                 4)
-                    pacman -S --noconfirm speed-dreams
+                    pacman -S --noconfirm --needed speed-dreams
                     ;;
                 *)
                     LOOP=0
@@ -1745,7 +1745,7 @@ do
             read -p "Option: " OPTION
             case "$OPTION" in
                 1)
-                    pacman -S --noconfirm zsnes
+                    pacman -S --noconfirm --needed zsnes
                     ;;
                 *)
                     LOOP=0
@@ -1783,10 +1783,10 @@ do
             aurhelper_install "ttf-ms-fonts"
             ;;
         2)
-            pacman -S --noconfirm ttf-dejavu
+            pacman -S --noconfirm --needed ttf-dejavu
             ;;
         3)
-            pacman -S --noconfirm ttf-liberation
+            pacman -S --noconfirm --needed ttf-liberation
             ;;
         4)
             aurhelper_install "ttf-kochi-substitute"
@@ -1828,7 +1828,7 @@ finish_function
 #CLEAN ORPHAN PACKAGES {{{
     print_title "CLEAN ORPHAN PACKAGES"
     sudo pacman -Rsc --noconfirm $(pacman -Qqdt)
-    #sudo pacman -Sc --noconfirm
+    #sudo pacman -S --noconfirm --neededc --noconfirm
     pacman-optimize
 #}}}
 #REBOOT {{{
