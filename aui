@@ -160,7 +160,7 @@ fi
                 echo "[2] Archlinuxfr"
                 echo "[3] Add my own custom repo"
                 echo ""
-                echo "[q] QUIT"
+                echo "[c] CLOSE"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -333,23 +333,6 @@ fi
     print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
     pacman -S --noconfirm --needed acpi acpid
     add_new_daemon "acpid"
-    #TLP #{{{
-    print_title "TLP - https://wiki.archlinux.org/index.php/TLP"
-    question_for_answer "Install TLP (great battery improvement on laptops)"
-    case "$OPTION" in
-        "y")
-            aurhelper_install "tlp"
-            pacman -S --noconfirm --needed upower
-            add_new_daemon "@tlp"
-            install_status
-            ;;
-        *)
-            CURRENT_STATUS=0
-            ;;
-    esac
-    sumary "TLP installation"
-    finish_function
-    #}}}
     print_title "NTFS/FAT - https://wiki.archlinux.org/index.php/Ntfs"
     pacman -S --noconfirm --needed ntfs-3g ntfsprogs dosfstools
     print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
@@ -392,6 +375,23 @@ fi
     sed -i '/MODULES[=]/s/MODULES[=](/&snd-usb-audio/' /etc/rc.conf
     add_new_daemon "@alsa"
 #}}}
+#TLP #{{{
+    print_title "TLP - https://wiki.archlinux.org/index.php/TLP"
+    question_for_answer "Install TLP (great battery improvement on laptops)"
+    case "$OPTION" in
+        "y")
+            aurhelper_install "tlp"
+            pacman -S --noconfirm --needed upower
+            add_new_daemon "@tlp"
+            install_status
+            ;;
+        *)
+            CURRENT_STATUS=0
+            ;;
+    esac
+    sumary "TLP installation"
+    finish_function
+#}}}
 #XORG {{{
     print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
     echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
@@ -410,7 +410,7 @@ fi
     echo "[5] Virtualbox"
     echo "[6] Vesa"
     echo ""
-    echo "[q] QUIT"
+    echo "[c] CLOSE"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -486,7 +486,7 @@ fi
                 echo "[6] bluez-firmware"
                 echo "[7] Tools"
                 echo ""
-                echo "[q] QUIT"
+                echo "[c] CLOSE"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -570,6 +570,8 @@ fi
     echo "[2] KDE"
     echo "[3] XFCE"
     echo "[4] LXDE"
+    echo ""
+    echo "[n] NONE"
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
@@ -603,7 +605,7 @@ fi
                 echo "[14] Gloobus-Sushi"
                 echo ""
                 echo "[a] ALL"
-                echo "[q] QUIT"
+                echo "[c] CLOSE"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -717,7 +719,7 @@ fi
                 echo "[13] Speedcrunch"
                 echo ""
                 echo "[a] ALL"
-                echo "[q] QUIT"
+                echo "[c] CLOSE"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -852,7 +854,7 @@ fi
     echo "[1] Networkmanager"
     echo "[2] Wicd"
     echo ""
-    echo "[q] QUIT"
+    echo "[c] CLOSE"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -909,7 +911,7 @@ do
     echo "[10] MySQL Workbench"
     echo "[11] Meld"
     echo ""
-    echo "[q] QUIT"
+    echo "[c] CLOSE"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -924,12 +926,13 @@ do
             pacman -Rdd --noconfirm vim
             pacman -S --noconfirm --needed gvim wmctrl ctags
             aurhelper_install "discount"
-            #helmuthdu's vimrc
-            git clone git://github.com/helmuthdu/vim.git
-            mv vim /home/$USERNAME/.vim
-            ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
-            chown -R $USERNAME:users /home/$USERNAME/.vim
-            chown $USERNAME:users /home/$USERNAME/.vimrc
+            #HELMUTHDU'S VIMRC {{{
+                git clone git://github.com/helmuthdu/vim.git
+                mv vim /home/$USERNAME/.vim
+                ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
+                chown -R $USERNAME:users /home/$USERNAME/.vim
+                chown $USERNAME:users /home/$USERNAME/.vimrc
+            #}}}
             ;;
         3)
             pacman -S --noconfirm --needed emacs
@@ -1033,7 +1036,7 @@ do
     echo "[9] Marave (Lightweight Text Editor)"
     echo "[10] Sublime Text 2"
     echo ""
-    echo "[q] QUIT"
+    echo "[c] CLOSE"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1098,7 +1101,7 @@ do
     echo "[4] Virtualbox"
     echo ""
     echo "[a] ALL"
-    echo "[q] QUIT"
+    echo "[c] CLOSE"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1150,7 +1153,7 @@ do
     echo "[5] MComix"
     echo ""
     echo "[a] ALL"
-    echo "[q] QUIT"
+    echo "[c] CLOSE"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1197,7 +1200,7 @@ do
     echo "[8] Trasmission"
     echo ""
     echo "[a] ALL"
-    echo "[q] QUIT"
+    echo "[c] CLOSE"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1268,43 +1271,43 @@ do
     esac
     finish_function
 done
-#LAMP #{{{
-print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlinux.org/index.php/LAMP"
-question_for_answer "Install LAMP"
-case "$OPTION" in
-    "y")
-        pacman -S --noconfirm --needed apache mysql php php-apache php-mcrypt php-gd
-        aurhelper_install "adminer"
-        rc.d start httpd mysqld
-        /usr/bin/mysql_secure_installation
-        echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
-        echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
-        sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
-        echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
-        sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
-        sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
-        sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
-        sed -i '/mysql.so/s/^;//' /etc/php/php.ini
-        sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
-        sed -i '/gd.so/s/^;//' /etc/php/php.ini
-        sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
-        su -l $USERNAME --command="mkdir -p ~/Sites"
-        su -l $USERNAME --command="chmod 775 ~/ && chmod -R 775 ~/Sites"
-        rc.d restart httpd mysqld
-        add_new_daemon "httpd @mysqld"
-        install_status
-        ;;
-    *)
-        CURRENT_STATUS=0
-        ;;
-esac
-echo ""
-print_line
-echo "The folder \"Sites\" has been created in your home"
-echo "You can access your projects at \"http://localhost/~username\""
-sumary "LAMP installation"
-finish_function
 #}}}
+#LAMP #{{{
+    print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlinux.org/index.php/LAMP"
+    question_for_answer "Install LAMP"
+    case "$OPTION" in
+        "y")
+            pacman -S --noconfirm --needed apache mysql php php-apache php-mcrypt php-gd
+            aurhelper_install "adminer"
+            rc.d start httpd mysqld
+            /usr/bin/mysql_secure_installation
+            echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
+            echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
+            sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
+            echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
+            sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
+            sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
+            sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
+            sed -i '/mysql.so/s/^;//' /etc/php/php.ini
+            sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
+            sed -i '/gd.so/s/^;//' /etc/php/php.ini
+            sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
+            su -l $USERNAME --command="mkdir -p ~/Sites"
+            su -l $USERNAME --command="chmod 775 ~/ && chmod -R 775 ~/Sites"
+            rc.d restart httpd mysqld
+            add_new_daemon "httpd @mysqld"
+            install_status
+            ;;
+        *)
+            CURRENT_STATUS=0
+            ;;
+    esac
+    echo ""
+    print_line
+    echo "The folder \"Sites\" has been created in your home"
+    echo "You can access your projects at \"http://localhost/~username\""
+    sumary "LAMP installation"
+    finish_function
 #}}}
 #MULTIMEDIA {{{
 LOOP=1
@@ -1327,7 +1330,7 @@ do
     echo "[14] Audacity"
     echo "[15] Puddletag"
     echo ""
-    echo "[q] QUIT"
+    echo "[c] CLOSE"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1410,7 +1413,7 @@ do
     echo "[10] RPG"
     echo "[11] Emulators"
     echo ""
-    echo "[q] QUIT"
+    echo "[c] CLOSE"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1775,7 +1778,7 @@ do
     echo "[6] ttf-roboto"
     echo ""
     echo "[a] ALL"
-    echo "[q] QUIT"
+    echo "[c] CLOSE"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1832,19 +1835,19 @@ finish_function
     pacman-optimize
 #}}}
 #REBOOT {{{
-print_title "INSTALL COMPLETED"
-question_for_answer "Reboot now?"
-case "$OPTION" in
-    "y")
-        echo "Thanks for using the Ultimate Arch install script by helmuthdu"
-        echo "Your Computer will now restart"
-        finish_function
-        reboot
-        exit 0
-        ;;
-    *)
-        echo "Thanks for using the Ultimate Arch install script by helmuthdu"
-        exit 0
-        ;;
-esac
+    print_title "INSTALL COMPLETED"
+    question_for_answer "Reboot now?"
+    case "$OPTION" in
+        "y")
+            echo "Thanks for using the Ultimate Arch install script by helmuthdu"
+            echo "Your Computer will now restart"
+            finish_function
+            reboot
+            exit 0
+            ;;
+        *)
+            echo "Thanks for using the Ultimate Arch install script by helmuthdu"
+            exit 0
+            ;;
+    esac
 #}}}
