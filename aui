@@ -124,12 +124,12 @@ function sumary(){ #{{{
     finish_function
 #}}}
 #CHECK ROOT {{{
-CURRENTUSER="$(whoami)"
-if [ $CURRENTUSER != "root" ]; then
-    echo "Current user is NOT 'root'. EXIT now"
-    finish_function
-    exit 1
-fi
+    CURRENTUSER="$(whoami)"
+    if [ $CURRENTUSER != "root" ]; then
+        echo "Current user is NOT 'root'. EXIT now"
+        finish_function
+        exit 1
+    fi
 #}}}
 #LANGUAGE SELECTOR {{{
     print_title "LANGUAGE - https://wiki.archlinux.org/index.php/Locale"
@@ -617,7 +617,7 @@ fi
                         ;;
                     3)
                         aurhelper_install "egtk-bzr"
-                        aurhelper_install "zukitwo-themes zukini-theme light-themes-bzr gtk-theme-aldabra"
+                        aurhelper_install "zukitwo-themes zukini-theme light-themes gtk-theme-aldabra"
                         ;;
                     4)
                         aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-workspace-indicator gnome-shell-extension-places-menu gnome-shell-extension-dock gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
