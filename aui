@@ -70,6 +70,19 @@ function aurhelper_install(){ #{{{
     else
         su -l $USERNAME --command="packer -S --noconfirm $1"
     fi
+
+    for PACKAGE in $1; do
+        if !(pacman -Q $1 &>/dev/null) ; then
+            question_for_answer "Package $PACKAGE not installed, try install again?"
+            if [ $OPTION = "y" ]; then
+                if [ "$YAOURT" -eq 1 ]; then
+                    su -l $USERNAME --command="yaourt -S $PACKAGE"
+                else
+                    su -l $USERNAME --command="packer -S $PACKAGE"
+                fi
+            fi
+        fi
+    done
 } #}}}
 function install_status(){ #{{{
     if [ $? -ne 0 ] ; then
@@ -80,9 +93,8 @@ function install_status(){ #{{{
 } #}}}
 function finish_function(){ #{{{
     print_line
-    echo "Continue with RETURN"
-    read
-    clear
+    local dummy
+    read -e -s -r -p "Press any key to continue..." -n 1 dummy
 } #}}}
 function sumary(){ #{{{
     case $CURRENT_STATUS in
@@ -158,7 +170,9 @@ function sumary(){ #{{{
                 print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
                 echo "[1] Ayatana"
                 echo "[2] Archlinuxfr"
-                echo "[3] Add my own custom repo"
+                if [ "$ARCHI" = "x86_64" ]; then echo "[3] Multilib"; fi
+                echo ""
+                echo "[a] \"Add Custom\""
                 echo ""
                 echo "[c] CLOSE"
                 echo ""
@@ -173,6 +187,10 @@ function sumary(){ #{{{
                         finish_function
                         ;;
                     3)
+                        echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+                        finish_function
+                        ;;
+                    "a")
                         read -p "Repository Name [ex: custom]: " REPONAME
                         read -p "Repository Address [ex: file:///media/backup/Archlinux/]: " REPOADDRESS
                         echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"'$arch' >> /etc/pacman.conf
@@ -210,6 +228,15 @@ function sumary(){ #{{{
     esac
     sumary "New mirrorlist creation"
     finish_function
+#}}}
+#SYSTEM UPDATE {{{
+    print_title "UPDATING YOUR SYSTEM"
+    pacman -Syu
+    question_for_answer "Reboot now?"
+    if [ $OPTION = "y" ]; then
+        reboot
+        exit 0
+    fi
 #}}}
 #CREATE A NEW USER {{{
     print_title "CREATE USER ACCOUNT"
@@ -254,15 +281,6 @@ function sumary(){ #{{{
     esac
     sumary "Pacman signing configuration"
     finish_function
-#}}}
-#SYSTEM UPDATE {{{
-    print_title "UPDATING YOUR SYSTEM"
-    pacman -Syu
-    question_for_answer "Reboot now?"
-    if [ $OPTION = "y" ]; then
-        reboot
-        exit 0
-    fi
 #}}}
 #AUR HELPER {{{
     LOOP=1
@@ -325,7 +343,8 @@ function sumary(){ #{{{
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
     pacman -S --noconfirm --needed curl bc rsync mlocate bash-completion vim net-tools
     print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
-    pacman -S --noconfirm --needed unzip unrar p7zip
+    pacman -S --noconfirm --needed zip unzip unrar p7zip
+    aurhelper_install "rar"
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
     pacman -S --noconfirm --needed dbus
     add_new_daemon "dbus"
@@ -620,6 +639,7 @@ function sumary(){ #{{{
                         aurhelper_install "zukitwo-themes zukini-theme light-themes gtk-theme-aldabra"
                         ;;
                     4)
+                        aurhelper_install "libkeybinder3"
                         aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-workspace-indicator gnome-shell-extension-places-menu gnome-shell-extension-dock gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
                         ;;
                     5)
@@ -658,7 +678,9 @@ function sumary(){ #{{{
                     "a")
                         aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
-                        aurhelper_install "egtk-bzr zukitwo-themes zukini-theme light-themes-bzr gtk-theme-aldabra"
+                        aurhelper_install "egtk-bzr"
+                        aurhelper_install "zukitwo-themes zukini-theme light-themes gtk-theme-aldabra"
+                        aurhelper_install "libkeybinder3"
                         aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-workspace-indicator gnome-shell-extension-places-menu gnome-shell-extension-dock gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
                         aurhelper_install "gnome-activity-journal libzeitgeist zeitgeist-datahub zeitgeist-extensions"
                         aurhelper_install "synapse"
@@ -1221,14 +1243,13 @@ do
             aurhelper_install "google-earth"
             ;;
         6)
+            aurhelper_install "dropbox"
             if [ "$GNOME" -eq 1 ]; then
                 aurhelper_install "nautilus-dropbox"
             elif [ "$XFCE" -eq 1 ]; then
                 aurhelper_install "thunar-dropbox"
             elif [ "$KDE" -eq 1 ]; then
                 aurhelper_install "kfilebox"
-            else
-                aurhelper_install "dropbox"
             fi
             ;;
         7)
