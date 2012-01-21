@@ -1274,16 +1274,14 @@ do
             else
                 aurhelper_install "transmission-gtk"
             fi
+            aurhelper_install "dropbox"
             if [ "$GNOME" -eq 1 ]; then
                 aurhelper_install "nautilus-dropbox"
             elif [ "$XFCE" -eq 1 ]; then
                 aurhelper_install "thunar-dropbox"
             elif [ "$KDE" -eq 1 ]; then
                 aurhelper_install "kfilebox"
-            else
-                aurhelper_install "dropbox"
             fi
-
             LOOP=0
             ;;
         *)
