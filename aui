@@ -1341,11 +1341,12 @@ done
                 sed -i '/mysql.so/s/^;//' /etc/php/php.ini
                 sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
                 sed -i '/gd.so/s/^;//' /etc/php/php.ini
+                sed -i '/display_errors[=]/s/off/on/' /etc/php/php.ini
                 sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
                 #}}}
             fi
             su -l $USERNAME --command="mkdir -p ~/Sites"
-            su -l $USERNAME --command="chmod 775 ~/ && chmod -R 775 ~/Sites"
+            su -l $USERNAME --command="chmod o+x ~/ && chmod -R g+xr-w ~/Sites"
             rc.d restart httpd mysqld
             add_daemon "httpd @mysqld"
             install_status
@@ -1357,7 +1358,6 @@ done
             CURRENT_STATUS=0
             ;;
     esac
-    echo ""
     print_line
     sumary "LAMP installation"
     finish_function
