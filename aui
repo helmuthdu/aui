@@ -50,14 +50,14 @@ function print_title (){ #{{{
     printf "%$(tput cols)s\n"|tr ' ' '-'
     echo ""
 } #}}}
-function add_new_daemon(){ #{{{
+function add_daemon(){ #{{{
     remove_daemon "$1"
     sed -i '/DAEMONS[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
 } #}}}
 function remove_daemon(){ #{{{
     sed -i '/DAEMONS[=]/s/'"$1"' //' /etc/rc.conf
 } #}}}
-function add_new_module(){ #{{{
+function add_module(){ #{{{
     remove_module "$1"
     sed -i '/MODULES[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
     #sed -i '/MODULES[=]/s/^[^ ]*\>/& '"$1"'/' /etc/rc.conf
@@ -371,16 +371,16 @@ function reboot_now(){ #{{{
     aurhelper_install "rar"
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
     pacman -S --noconfirm --needed dbus
-    add_new_daemon "dbus"
+    add_daemon "dbus"
     rc.d start dbus
     print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
     pacman -S --noconfirm --needed acpi acpid
-    add_new_daemon "acpid"
+    add_daemon "acpid"
     print_title "NTFS/FAT - https://wiki.archlinux.org/index.php/Ntfs"
     pacman -S --noconfirm --needed ntfs-3g ntfsprogs dosfstools
     print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
     pacman -S --noconfirm --needed rssh openssh
-    add_new_daemon "@sshd"
+    add_daemon "@sshd"
     #CONFIGURE SSH #{{{
         echo -e "sshd: ALL\n# End of file" > /etc/hosts.allow
         echo -e "ALL: ALL: DENY\n# End of file" > /etc/hosts.deny
@@ -411,12 +411,12 @@ function reboot_now(){ #{{{
     print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
     pacman -S --noconfirm --needed samba
     cp /etc/samba/smb.conf.default /etc/samba/smb.conf
-    add_new_daemon "@samba"
+    add_daemon "@samba"
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
     pacman -S --noconfirm --needed alsa-utils alsa-plugins
     sed -i '/MODULES[=]/s/snd-usb-audio//' /etc/rc.conf
     sed -i '/MODULES[=]/s/MODULES[=](/&snd-usb-audio/' /etc/rc.conf
-    add_new_daemon "@alsa"
+    add_daemon "@alsa"
 #}}}
 #TLP #{{{
     print_title "TLP - https://wiki.archlinux.org/index.php/TLP"
@@ -425,7 +425,7 @@ function reboot_now(){ #{{{
         "y")
             aurhelper_install "tlp"
             pacman -S --noconfirm --needed upower
-            add_new_daemon "@tlp"
+            add_daemon "@tlp"
             install_status
             ;;
         *)
@@ -480,14 +480,14 @@ function reboot_now(){ #{{{
         4)
             pacman -S --noconfirm --needed libgl xf86-video-nouveau nouveau-dri
             modprobe nouveau
-            add_new_module "nouveau"
+            add_module "nouveau"
             install_status
             sumary "Nouveau GPU driver installation"
             ;;
         5)
             pacman -S --noconfirm --needed virtualbox-archlinux-additions
             modprobe -a vboxguest vboxsf vboxvideo
-            add_new_module "vboxguest vboxsf vboxvideo"
+            add_module "vboxguest vboxsf vboxvideo"
             groupadd vboxsf
             gpasswd -a $USERNAME vboxsf
             install_status
@@ -509,7 +509,7 @@ function reboot_now(){ #{{{
     print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
     pacman -S --noconfirm --needed cups ghostscript gsfonts
     pacman -S --noconfirm --needed gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf
-    add_new_daemon "@cupsd"
+    add_daemon "@cupsd"
 #}}}
 #ADDITIONAL FIRMWARE {{{
     print_title "WIRELESS/BLUETOOTH ADDITIONAL DRIVERS - https://wiki.archlinux.org/index.php/Wireless_Setup"
@@ -596,7 +596,7 @@ function reboot_now(){ #{{{
             rc.d start tor privoxy
             su -l $USERNAME --command="sudo /etc/rc.d/tor restart"
             su -l $USERNAME --command="sudo /etc/rc.d/privoxy restart"
-            add_new_daemon "@tor @privoxy"
+            add_daemon "@tor @privoxy"
             install_status
             ;;
         *)
@@ -672,7 +672,7 @@ function reboot_now(){ #{{{
                         ;;
                     6)
                         aurhelper_install "conky conky-colors"
-                        add_new_module "coretemp it87 acpi-cpufreq"
+                        add_module "coretemp it87 acpi-cpufreq"
                         ;;
                     7)
                         pacman -S --noconfirm --needed docky
@@ -713,7 +713,7 @@ function reboot_now(){ #{{{
                         aurhelper_install "gnome-activity-journal libzeitgeist zeitgeist-datahub zeitgeist-extensions"
                         aurhelper_install "synapse"
                         aurhelper_install "conky conky-colors"
-                        add_new_module "coretemp it87 acpi-cpufreq"
+                        add_module "coretemp it87 acpi-cpufreq"
                         pacman -S --noconfirm --needed docky
                         pacman -S --noconfirm --needed openshot
                         pacman -S --noconfirm --needed shotwell
@@ -733,7 +733,7 @@ function reboot_now(){ #{{{
                 finish_function
             done
             #}}}
-            add_new_daemon "gdm"
+            add_daemon "gdm"
             sumary "GNOME installation"
             finish_function
             GNOME=1
@@ -868,7 +868,7 @@ function reboot_now(){ #{{{
                 finish_function
             done
             #}}}
-            add_new_daemon "kdm"
+            add_daemon "kdm"
             sumary "KDE installation"
             finish_function
             KDE=1
@@ -893,7 +893,7 @@ function reboot_now(){ #{{{
             pacman -S --noconfirm --needed pm-utils upower
             pacman -S --noconfirm --needed leafpad xarchiver obconf epdfview
             pacman -S --noconfirm --needed galculator
-            add_new_daemon "lxdm"
+            add_daemon "lxdm"
             sumary "LXDE Installation"
             finish_function
             LXDE=1
@@ -921,7 +921,7 @@ function reboot_now(){ #{{{
             groupadd networkmanager
             gpasswd -a $USERNAME networkmanager
             remove_daemon "network"
-            add_new_daemon "@networkmanager"
+            add_daemon "@networkmanager"
             install_status
             ;;
         2)
@@ -934,7 +934,7 @@ function reboot_now(){ #{{{
                 pacman -S --noconfirm --needed wicd
             fi
             remove_daemon "network"
-            add_new_daemon "@wicd"
+            add_daemon "@wicd"
             install_status
             ;;
         *)
@@ -1172,7 +1172,7 @@ do
             modprobe vboxdrv
             groupadd vboxusers
             gpasswd -a $USERNAME vboxusers
-            add_new_module "vboxdrv"
+            add_module "vboxdrv"
             ;;
         "a")
             pacman -S --noconfirm --needed htop
@@ -1183,7 +1183,7 @@ do
             modprobe vboxdrv
             groupadd vboxusers
             gpasswd -a $USERNAME vboxusers
-            add_new_module "vboxdrv"
+            add_module "vboxdrv"
             LOOP=0
             ;;
         *)
@@ -1348,7 +1348,7 @@ done
             su -l $USERNAME --command="mkdir -p ~/Sites"
             su -l $USERNAME --command="chmod 775 ~/ && chmod -R 775 ~/Sites"
             rc.d restart httpd mysqld
-            add_new_daemon "httpd @mysqld"
+            add_daemon "httpd @mysqld"
             install_status
             print_line
             echo "The folder \"Sites\" has been created in your home"
