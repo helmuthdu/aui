@@ -35,6 +35,7 @@ LOCATION_GNOME=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
 LOCATION_LO=`echo $LOCATION | sed 's/_/-/'`
 
 function question_for_answer(){ #{{{
+    unset $OPTION
     read -p "$1 [y][N]: " OPTION
     OPTION=`echo "$OPTION" | tr '[:upper:]' '[:lower:]'`
     echo ""
@@ -116,11 +117,24 @@ function sumary(){ #{{{
             ;;
     esac
 } #}}}
+function reboot_now(){ #{{{
+    question_for_answer "Reboot now?"
+    case "$OPTION" in
+        "y")
+            echo "Thanks for using the Archlinux Ultimate Install script by helmuthdu"
+            echo "Your Computer will now restart"
+            finish_function
+            reboot
+            exit 0
+            ;;
+        *)
+            ;;
+    esac
+} #}}}
 
-#START {{{
+#INIT {{{
     clear
-    echo "Welcome to the Ultimate Archlinux install script by helmuthdu"
-    echo "Inspired by freitag archlinux helper script install"
+    echo "Welcome to the Archlinux Ultimate install script by helmuthdu"
     print_line
     echo "Requirements:"
     echo "-> Archlinux installation"
@@ -129,8 +143,7 @@ function sumary(){ #{{{
     print_line
     echo "Script can be canceled all the time with CTRL+C"
     print_line
-    echo "OPEN THIS SCRIPTS AND READ ALL OPTIONS BEFORE USE IT"
-    echo "Not recommended use this script more then 1 time (create duplicate values)"
+    echo "it's highly recommended you read this script before use it"
     echo "This version is still in BETA. Send bugreports to: "
     echo "helmuthdu at gmail dot com"
     finish_function
@@ -232,11 +245,7 @@ function sumary(){ #{{{
 #SYSTEM UPDATE {{{
     print_title "UPDATING YOUR SYSTEM"
     pacman -Syu
-    question_for_answer "Reboot now?"
-    if [ $OPTION = "y" ]; then
-        reboot
-        exit 0
-    fi
+    reboot_now
 #}}}
 #CREATE A NEW USER {{{
     print_title "CREATE USER ACCOUNT"
@@ -252,12 +261,10 @@ function sumary(){ #{{{
     #}}}
 #}}}
 #PACKMAN SIGNING {{{
-    print_title "PACMAN SIGNING - https://wiki.archlinux.org/index.php/Package_signing"
+    print_title "PACMAN SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
     question_for_answer "Automatically configure pacman signing"
     case "$OPTION" in
         "y")
-            #sed -i '/SigLevel\ [=]\ Optional\ TrustAll/s/^/#/' /etc/pacman.conf
-            #sed -i '/SigLevel\ [=]\ Never/s/^#//' /etc/pacman.conf
             #INSTALL RNG-TOOLS {{{
             su -l $USERNAME --command="
                 wget http://aur.archlinux.org/packages/rn/rng-tools/rng-tools.tar.gz
@@ -273,6 +280,13 @@ function sumary(){ #{{{
             pacman-key --init
             killall rngd
             pacman -Rns --noconfirm rng-tools
+            #DEVELOPER AND TU KEYS {{{
+            curl https://www.archlinux.org/{developers,trustedusers}/ |
+            awk -F\" '(/pgp.mit.edu/) {sub(/.*search=0x/,"");print $1}' |
+            xargs pacman-key --recv-keys
+            #}}}
+            sed -i '/SigLevel\ [=]\ Optional\ TrustAll/s/^#//' /etc/pacman.conf
+            sed -i '/SigLevel\ [=]\ Never/s/^/#/' /etc/pacman.conf
             install_status
             ;;
         *)
@@ -312,6 +326,11 @@ function sumary(){ #{{{
                     rm -fr yaourt*
                 "
                 install_status
+                if !(pacman -Q yaourt &>/dev/null) ; then
+                    echo "Yaourt not installed. EXIT now"
+                    finish_function
+                    exit 0
+                fi
                 YAOURT=1
                 LOOP=0
                 ;;
@@ -326,6 +345,11 @@ function sumary(){ #{{{
                     rm -fr packer*
                 "
                 install_status
+                if !(pacman -Q packer &>/dev/null) ; then
+                    echo "Packer not installed. EXIT now"
+                    finish_function
+                    exit 0
+                fi
                 PACKER=1
                 LOOP=0
                 ;;
@@ -949,6 +973,7 @@ do
             pacman -S --noconfirm --needed gvim wmctrl ctags
             aurhelper_install "discount"
             #HELMUTHDU'S VIMRC {{{
+                pacman -S --noconfirm --needed git
                 git clone git://github.com/helmuthdu/vim.git
                 mv vim /home/$USERNAME/.vim
                 ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
@@ -1297,25 +1322,32 @@ done
     case "$OPTION" in
         "y")
             pacman -S --noconfirm --needed apache mysql php php-apache php-mcrypt php-gd
-            aurhelper_install "adminer"
-            rc.d start httpd mysqld
-            /usr/bin/mysql_secure_installation
-            echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
-            echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
-            sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
-            echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
-            sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
-            sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
-            sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
-            sed -i '/mysql.so/s/^;//' /etc/php/php.ini
-            sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
-            sed -i '/gd.so/s/^;//' /etc/php/php.ini
-            sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
+            if !(pacman -Q adminer &>/dev/null) ; then
+                aurhelper_install "adminer"
+                rc.d start httpd mysqld
+                #CONFIGURE LAMP SERVER {{{
+                /usr/bin/mysql_secure_installation
+                echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
+                echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
+                sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
+                echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
+                sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
+                sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
+                sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
+                sed -i '/mysql.so/s/^;//' /etc/php/php.ini
+                sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
+                sed -i '/gd.so/s/^;//' /etc/php/php.ini
+                sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
+                #}}}
+            fi
             su -l $USERNAME --command="mkdir -p ~/Sites"
             su -l $USERNAME --command="chmod 775 ~/ && chmod -R 775 ~/Sites"
             rc.d restart httpd mysqld
             add_new_daemon "httpd @mysqld"
             install_status
+            print_line
+            echo "The folder \"Sites\" has been created in your home"
+            echo "You can access your projects at \"http://localhost/~username\""
             ;;
         *)
             CURRENT_STATUS=0
@@ -1323,8 +1355,6 @@ done
     esac
     echo ""
     print_line
-    echo "The folder \"Sites\" has been created in your home"
-    echo "You can access your projects at \"http://localhost/~username\""
     sumary "LAMP installation"
     finish_function
 #}}}
@@ -1853,20 +1883,9 @@ finish_function
     #sudo pacman -S --noconfirm --neededc --noconfirm
     pacman-optimize
 #}}}
-#REBOOT {{{
+#END {{{
     print_title "INSTALL COMPLETED"
-    question_for_answer "Reboot now?"
-    case "$OPTION" in
-        "y")
-            echo "Thanks for using the Ultimate Arch install script by helmuthdu"
-            echo "Your Computer will now restart"
-            finish_function
-            reboot
-            exit 0
-            ;;
-        *)
-            echo "Thanks for using the Ultimate Arch install script by helmuthdu"
-            exit 0
-            ;;
-    esac
+    reboot_now
+    echo "Thanks for using the Archlinux Ultimate Install script by helmuthdu"
+    exit 0
 #}}}
