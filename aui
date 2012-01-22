@@ -35,7 +35,6 @@ LOCATION_GNOME=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
 LOCATION_LO=`echo $LOCATION | sed 's/_/-/'`
 
 function question_for_answer(){ #{{{
-    unset $OPTION
     read -p "$1 [y][N]: " OPTION
     OPTION=`echo "$OPTION" | tr '[:upper:]' '[:lower:]'`
     echo ""
