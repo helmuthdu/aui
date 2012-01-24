@@ -22,6 +22,7 @@ KDE=0
 LXDE=0
 XFCE=0
 GNOME=0
+OPENBOX=0
 
 YAOURT=0
 PACKER=0
@@ -186,7 +187,7 @@ function reboot_now(){ #{{{
                 echo ""
                 echo "[a] \"Add Custom\""
                 echo ""
-                echo "[c] CLOSE"
+                echo "[n] NEXT"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -452,7 +453,7 @@ function reboot_now(){ #{{{
     echo "[5] Virtualbox"
     echo "[6] Vesa"
     echo ""
-    echo "[c] CLOSE"
+    echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -528,7 +529,7 @@ function reboot_now(){ #{{{
                 echo "[6] bluez-firmware"
                 echo "[7] Tools"
                 echo ""
-                echo "[c] CLOSE"
+                echo "[n] NEXT"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -612,8 +613,9 @@ function reboot_now(){ #{{{
     echo "[2] KDE"
     echo "[3] XFCE"
     echo "[4] LXDE"
+    echo "[5] OpenBox"
     echo ""
-    echo "[n] NONE"
+    echo "[n] NEXT"
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
@@ -621,12 +623,13 @@ function reboot_now(){ #{{{
             print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
             pacman -S --noconfirm --needed gnome gnome-extra
             gpasswd -a $USERNAME camera
-            pacman -S --noconfirm --needed gedit-plugins pulseaudio-gnome gnome-tweak-tool telepathy deja-dup
+            pacman -S --noconfirm --needed pulseaudio-gnome telepathy deja-dup
+            pacman -S --noconfirm --needed gedit-plugins gnome-tweak-tool
             pacman -S --noconfirm --needed system-config-printer-gnome
             aurhelper_install "automounter"
             aurhelper_install "nautilus-open-terminal gnome-defaults-list"
             pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
-            #GNOME FAVORITE APPS {{{
+            #FAVORITE GNOME APPS {{{
             LOOP=1
             while [ "$LOOP" -ne 0 ]
             do
@@ -638,7 +641,7 @@ function reboot_now(){ #{{{
                 echo "[5] GNOME Activity Journal"
                 echo "[6] Conky + CONKY-colors"
                 echo "[7] Docky"
-                echo "[8] Openshot"
+                echo "[8] GNOME-MPlayer"
                 echo "[9] Synapse"
                 echo "[10] Shotwell"
                 echo "[11] Terminator"
@@ -648,7 +651,7 @@ function reboot_now(){ #{{{
                 echo "[15] Gloobus-Sushi"
                 echo ""
                 echo "[a] ALL"
-                echo "[c] CLOSE"
+                echo "[n] NEXT"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -677,7 +680,7 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed docky
                         ;;
                     8)
-                        pacman -S --noconfirm --needed openshot
+                        pacman -S --noconfirm --needed gnome-mplayer
                         ;;
                     9)
                         aurhelper_install "synapse"
@@ -744,7 +747,7 @@ function reboot_now(){ #{{{
             pacman -S --noconfirm --needed kde kde-l10n-$LOCATION_KDE
             pacman -Rcsn kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
             pacman -S --noconfirm --needed kdeadmin-system-config-printer-kde xdg-user-dirs
-            aurhelper_install "chakra-gtk-config"
+            aurhelper_install "kde-gtk-config-git"
             aurhelper_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
             aurhelper_install "kcm-wacomtablet"
             aurhelper_install "quickaccess-plasmoid plasma-icontasks"
@@ -755,7 +758,6 @@ function reboot_now(){ #{{{
                 print_title "FAVORITE KDE APPS"
                 echo "[1] Plasma Themes [Caledonia]"
                 echo "[2] KDE Icons [KFaenza]"
-                #these 2 themes are also mine :)
                 echo "[3] QtCurve Themes [Kawai, Sweet]"
                 echo "[4] Choqok"
                 echo "[5] K3b"
@@ -767,9 +769,10 @@ function reboot_now(){ #{{{
                 echo "[11] Digikam"
                 echo "[12] Yakuake"
                 echo "[13] Speedcrunch"
+                echo "[14] Konversation"
                 echo ""
                 echo "[a] ALL"
-                echo "[c] CLOSE"
+                echo "[n] NEXT"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -828,6 +831,9 @@ function reboot_now(){ #{{{
                     13)
                         aurhelper_install "speedcrunch"
                         ;;
+                    14)
+                        pacman -S --noconfirm --needed konversation
+                        ;;
                     "a")
                         aurhelper_install "caledonia-bundle"
                         aurhelper_install "kfaenza-icon-theme"
@@ -858,6 +864,7 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed yakuake
                         aurhelper_install "yakuake-skin-plasma-oxygen-panel"
                         aurhelper_install "speedcrunch"
+                        pacman -S --noconfirm --needed konversation
                         LOOP=0
                         ;;
                     *)
@@ -878,7 +885,67 @@ function reboot_now(){ #{{{
             print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
             pacman -S --noconfirm --needed xfce4 xfce4-goodies
             pacman -S --noconfirm --needed polkit-gnome gvfs-smb xdg-user-dirs
+            aurhelper_install "gnome-defaults-list"
             aurhelper_install "automounter"
+            #FAVORITE XFCE APPS {{{
+            LOOP=1
+            while [ "$LOOP" -ne 0 ]
+            do
+                print_title "FAVORITE GNOME APPS"
+                echo "[1] Icons [Faience, Faenza, Elementary]"
+                echo "[2] Themes [Zukitwo]"
+                echo "[3] Conky + CONKY-colors"
+                echo "[4] Docky"
+                echo "[5] GNOME-MPlayer"
+                echo "[6] Kupfer"
+                echo "[7] Shotwell"
+                echo "[8] Terminator"
+                echo "[9] X-Chat"
+                echo "[10] Shutter"
+                echo ""
+                echo "[n] NEXT"
+                echo ""
+                read -p "Option: " OPTION
+                case "$OPTION" in
+                    1)
+                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                        ;;
+                    2)
+                        aurhelper_install "zukitwo-themes"
+                        ;;
+                    3)
+                        aurhelper_install "conky conky-colors"
+                        add_module "coretemp it87 acpi-cpufreq"
+                        ;;
+                    4)
+                        pacman -S --noconfirm --needed docky
+                        ;;
+                    5)
+                        pacman -S --noconfirm --needed gnome-mplayer
+                        ;;
+                    6)
+                        aurhelper_install "kupfer"
+                        ;;
+                    7)
+                        pacman -S --noconfirm --needed shotwell
+                        ;;
+                    8)
+                        pacman -S --noconfirm --needed terminator
+                        aurhelper_install "python-keybinder"
+                        ;;
+                    9)
+                        pacman -S --noconfirm --needed xchat
+                        ;;
+                    10)
+                        aurhelper_install "shutter"
+                        ;;
+                    *)
+                        LOOP=0
+                        ;;
+                esac
+                finish_function
+            done
+            #}}}
             sumary "XFCE installation"
             finish_function
             XFCE=1
@@ -887,13 +954,171 @@ function reboot_now(){ #{{{
         4)
             #LXDE {{{
             print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
-            pacman -S --noconfirm --needed lxde
+            pacman -S --noconfirm --needed lxde obconf
             pacman -S --noconfirm --needed polkit-gnome gvfs gvfs-smb xdg-user-dirs
             pacman -S --noconfirm --needed pm-utils upower
-            pacman -S --noconfirm --needed leafpad xarchiver obconf epdfview
-            pacman -S --noconfirm --needed galculator
+            pacman -S --noconfirm --needed leafpad xarchiver epdfview
+            aurhelper_install "gnome-defaults-list"
             add_daemon "lxdm"
+            #FAVORITE LXDE APPS {{{
+            LOOP=1
+            while [ "$LOOP" -ne 0 ]
+            do
+                print_title "FAVORITE LXDE APPS"
+                echo "[1] Icons [Faience, Faenza, Elementary]"
+                echo "[2] Conky + CONKY-colors"
+                echo "[3] Xfburn"
+                echo "[4] Pidgin"
+                echo "[5] Shotwell"
+                echo "[6] Terminator"
+                echo "[7] Irssi"
+                echo "[8] Shutter"
+                echo "[9] Galculator"
+                echo "[10] GNOME-MPlayer"
+                echo "[11] Kupfer"
+                echo ""
+                echo "[n] NEXT"
+                echo ""
+                read -p "Option: " OPTION
+                case "$OPTION" in
+                    1)
+                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                        ;;
+                    2)
+                        aurhelper_install "conky conky-colors"
+                        add_module "coretemp it87 acpi-cpufreq"
+                        ;;
+                    3)
+                        pacman -S --noconfirm --needed xfburn
+                        ;;
+                    4)
+                        pacman -S --noconfirm --needed pidgin
+                        ;;
+                    5)
+                        pacman -S --noconfirm --needed shotwell
+                        ;;
+                    6)
+                        pacman -S --noconfirm --needed terminator
+                        aurhelper_install "python-keybinder"
+                        ;;
+                    7)
+                        pacman -S --noconfirm --needed irssi
+                        ;;
+                    8)
+                        aurhelper_install "shutter"
+                        ;;
+                    9)
+                        pacman -S --noconfirm --needed galculator
+                        ;;
+                    10)
+                        pacman -S --noconfirm --needed gnome-mplayer
+                        ;;
+                    11)
+                        aurhelper_install "kupfer"
+                        ;;
+                    *)
+                        LOOP=0
+                        ;;
+                esac
+                finish_function
+            done
+            #}}}
             sumary "LXDE Installation"
+            finish_function
+            LXDE=1
+            ;;
+            #}}}
+        5)
+            #OPENBOX {{{
+            print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
+            pacman -S --noconfirm --needed openbox obconf obmenu menumaker
+            pacman -S --noconfirm --needed lxappearance consolekit
+            pacman -S --noconfirm --needed xdg-user-dirs
+            pacman -S --noconfirm --needed leafpad xarchiver epdfview geeqie nitrogen
+            aurhelper_install "gnome-defaults-list"
+            mkdir -p /home/$USERNAME/.config/openbox/
+            cp /etc/xdg/openbox/rc.xml /home/$USERNAME/.config/openbox/
+            cp /etc/xdg/openbox/menu.xml /home/$USERNAME/.config/openbox/
+            cp /etc/xdg/openbox/autostart /home/$USERNAME/.config/openbox/
+            echo -e 'exec ck-launch-session dbus-launch openbox-session' >> /home/$USERNAME/.xinitrc
+            chown -R $USERNAME:users /home/$USERNAME/.config
+            chown $USERNAME:users /home/$USERNAME/.xinitrc
+            #FAVORITE OPENBOX APPS {{{
+            LOOP=1
+            while [ "$LOOP" -ne 0 ]
+            do
+                print_title "FAVORITE OPENBOX APPS"
+                echo "[1] Icons [Faience, Faenza, Elementary]"
+                echo "[2] Conky + CONKY-colors"
+                echo "[3] Xfburn"
+                echo "[4] Kupfer"
+                echo "[5] Shotwell"
+                echo "[6] Terminator"
+                echo "[7] Irssi"
+                echo "[8] Shutter"
+                echo "[9] Tint2"
+                echo "[10] Thunar"
+                echo "[11] Volwheel"
+                echo "[12] Pidgin"
+                echo "[13] Galculator"
+                echo "[14] GNOME-MPlayer"
+                echo ""
+                echo "[n] NEXT"
+                echo ""
+                read -p "Option: " OPTION
+                case "$OPTION" in
+                    1)
+                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                        ;;
+                    2)
+                        aurhelper_install "conky conky-colors"
+                        add_module "coretemp it87 acpi-cpufreq"
+                        ;;
+                    3)
+                        pacman -S --noconfirm --needed xfburn
+                        ;;
+                    4)
+                        aurhelper_install "kupfer"
+                        ;;
+                    5)
+                        pacman -S --noconfirm --needed shotwell
+                        ;;
+                    6)
+                        pacman -S --noconfirm --needed terminator
+                        aurhelper_install "python-keybinder"
+                        ;;
+                    7)
+                        pacman -S --noconfirm --needed irssi
+                        ;;
+                    8)
+                        aurhelper_install "shutter"
+                        ;;
+                    9)
+                        pacman -S --noconfirm --needed tint2
+                        ;;
+                    10)
+                        pacman -S --noconfirm --needed polkit-gnome gvfs-smb thunar
+                        ;;
+                    11)
+                        pacman -S --noconfirm --needed volwheel
+                        ;;
+                    12)
+                        pacman -S --noconfirm --needed pidgin
+                        ;;
+                    13)
+                        pacman -S --noconfirm --needed galculator
+                        ;;
+                    14)
+                        pacman -S --noconfirm --needed gnome-mplayer
+                        ;;
+                    *)
+                        LOOP=0
+                        ;;
+                esac
+                finish_function
+            done
+            #}}}
+            sumary "OpenBox Installation"
             finish_function
             LXDE=1
             ;;
@@ -904,7 +1129,7 @@ function reboot_now(){ #{{{
     echo "[1] Networkmanager"
     echo "[2] Wicd"
     echo ""
-    echo "[c] CLOSE"
+    echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -957,11 +1182,12 @@ do
     echo "[6] Aptana Studio"
     echo "[7] Netbeans"
     echo "[8] Eclipse"
-    echo "[9] Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
-    echo "[10] MySQL Workbench"
-    echo "[11] Meld"
+    echo "[9] Sublime Text 2"
+    echo "[10] Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
+    echo "[11] MySQL Workbench"
+    echo "[12] Meld"
     echo ""
-    echo "[c] CLOSE"
+    echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1055,13 +1281,16 @@ do
             LOOP=1
             ;;
         9)
+            aurhelper_install "sublime-text"
+            ;;
+        10)
             pacman -S --noconfirm --needed valgrind gdb splint tidyhtml pyflakes
             aurhelper_install "jsl"
             ;;
-        10)
+        11)
             aurhelper_install "mysql-workbench"
             ;;
-        11)
+        12)
             pacman -S --noconfirm --needed meld
             ;;
         *)
@@ -1079,15 +1308,13 @@ do
     echo "[1] LibreOffice"
     echo "[2] GNOME-Office [Abiword, Gnumeric]"
     echo "[3] Latex [Texmaker, Lyx]"
-    echo "[4] CHM Viewer"
+    if [ "$KDE" -eq 1 ]; then echo "[4] Kchmviewer"; else echo "[4] Chmsee"; fi
     echo "[5] Xmind"
     echo "[6] Wunderlist"
     echo "[7] GCStar"
-    echo "[8] Zathura (Lightweight PDF Viewer)"
-    echo "[9] Marave (Lightweight Text Editor)"
-    echo "[10] Sublime Text 2"
+    echo "[8] Zathura"
     echo ""
-    echo "[c] CLOSE"
+    echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1128,12 +1355,6 @@ do
         8)
             pacman -S --noconfirm --needed zathura
             ;;
-        9)
-            aurhelper_install "marave"
-            ;;
-        10)
-            aurhelper_install "sublime-text"
-            ;;
         *)
             LOOP=0
             ;;
@@ -1152,7 +1373,7 @@ do
     echo "[4] Virtualbox"
     echo ""
     echo "[a] ALL"
-    echo "[c] CLOSE"
+    echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1204,7 +1425,7 @@ do
     echo "[5] MComix"
     echo ""
     echo "[a] ALL"
-    echo "[c] CLOSE"
+    echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1251,7 +1472,7 @@ do
     echo "[8] Trasmission"
     echo ""
     echo "[a] ALL"
-    echo "[c] CLOSE"
+    echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1383,7 +1604,7 @@ do
     echo "[14] Audacity"
     echo "[15] Puddletag"
     echo ""
-    echo "[c] CLOSE"
+    echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1466,7 +1687,7 @@ do
     echo "[10] RPG"
     echo "[11] Emulators"
     echo ""
-    echo "[c] CLOSE"
+    echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1831,7 +2052,7 @@ do
     echo "[6] ttf-roboto"
     echo ""
     echo "[a] ALL"
-    echo "[c] CLOSE"
+    echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
