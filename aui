@@ -1220,6 +1220,7 @@ do
                 pacman -S --noconfirm --needed git
                 git clone git://github.com/helmuthdu/vim.git
                 mv vim /home/$USERNAME/.vim
+                git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
                 ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
                 chown -R $USERNAME:users /home/$USERNAME/.vim
                 chown $USERNAME:users /home/$USERNAME/.vimrc
