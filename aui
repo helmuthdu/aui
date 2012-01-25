@@ -908,7 +908,7 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed docky
                         ;;
                     3)
-                        pacman -S --noconfirm --needed gnome-mplayer
+                        pacman OpenBox -S --noconfirm --needed gnome-mplayer
                         ;;
                     4)
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
@@ -954,7 +954,6 @@ function reboot_now(){ #{{{
             pacman -S --noconfirm --needed pm-utils upower
             pacman -S --noconfirm --needed polkit-gnome gvfs gvfs-smb xdg-user-dirs
             aurhelper_install "gnome-defaults-list"
-            add_daemon "lxdm"
             #FAVORITE LXDE APPS {{{
             LOOP=1
             while [ "$LOOP" -ne 0 ]
@@ -1018,6 +1017,7 @@ function reboot_now(){ #{{{
                 pause_function
             done
             #}}}
+            add_daemon "lxdm"
             install_status
             LXDE=1
             ;;
@@ -1120,6 +1120,9 @@ function reboot_now(){ #{{{
             LXDE=1
             ;;
             #}}}
+        *)
+            CURRENT_STATUS=0
+            ;;
     esac
     sumary "Desktop Environment Installation"
     pause_function
@@ -1173,14 +1176,14 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "DEVELOPMENT APPS"
-    echo "[1] QT-Creator"
-    echo "[2] Gvim"
+    echo "[1] Aptana Studio"
+    echo "[2] Eclipse"
     echo "[3] Emacs"
-    echo "[4] Oracle Java"
+    echo "[4] Gvim"
     echo "[5] IntelliJ IDEA"
-    echo "[6] Aptana Studio"
-    echo "[7] Netbeans"
-    echo "[8] Eclipse"
+    echo "[6] Netbeans"
+    echo "[7] Oracle Java"
+    echo "[8] QT Creator"
     echo "[9] Sublime Text 2"
     echo "[10] Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
     echo "[11] MySQL Workbench"
@@ -1191,44 +1194,10 @@ do
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm --needed qtcreator qt-doc
-            mkdir -p /home/$USERNAME/.config/Nokia/qtcreator/styles
-            wget http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
-            mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
-            chown -R $USERNAME:users /home/$USERNAME/.config
-            ;;
-        2)
-            pacman -Rdd --noconfirm vim
-            pacman -S --noconfirm --needed gvim wmctrl ctags
-            aurhelper_install "discount"
-            #HELMUTHDU'S VIMRC {{{
-                pacman -S --noconfirm --needed git
-                git clone git://github.com/helmuthdu/vim.git
-                mv vim /home/$USERNAME/.vim
-                git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
-                ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
-                chown -R $USERNAME:users /home/$USERNAME/.vim
-                chown $USERNAME:users /home/$USERNAME/.vimrc
-            #}}}
-            ;;
-        3)
-            pacman -S --noconfirm --needed emacs
-            ;;
-        4)
-            pacman -Rdd --noconfirm jre7-openjdk
-            pacman -Rdd --noconfirm jdk7-openjdk
-            aurhelper_install "jdk"
-            ;;
-        5)
-            pacman -S --noconfirm --needed intellij-idea-community-edition
-            ;;
-        6)
             aurhelper_install "aptana-studio"
             ;;
-        7)
-            pacman -S --noconfirm --needed netbeans
-            ;;
-        8)
+        2)
+            #ECLIPSE {{{
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "ECLIPSE - https://wiki.archlinux.org/index.php/Eclipse"
@@ -1279,6 +1248,42 @@ do
                 esac
             done
             LOOP=1
+            #}}}
+            ;;
+        3)
+            pacman -S --noconfirm --needed emacs
+            ;;
+        4)
+            pacman -Rdd --noconfirm vim
+            pacman -S --noconfirm --needed gvim wmctrl ctags
+            aurhelper_install "discount"
+            #HELMUTHDU'S VIMRC {{{
+                pacman -S --noconfirm --needed git
+                git clone git://github.com/helmuthdu/vim.git
+                mv vim /home/$USERNAME/.vim
+                git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
+                ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
+                chown -R $USERNAME:users /home/$USERNAME/.vim
+                chown $USERNAME:users /home/$USERNAME/.vimrc
+            #}}}
+            ;;
+        5)
+            pacman -S --noconfirm --needed intellij-idea-community-edition
+            ;;
+        6)
+            pacman -S --noconfirm --needed netbeans
+            ;;
+        7)
+            pacman -Rdd --noconfirm jre7-openjdk
+            pacman -Rdd --noconfirm jdk7-openjdk
+            aurhelper_install "jdk"
+            ;;
+        8)
+            pacman -S --noconfirm --needed qtcreator qt-doc
+            mkdir -p /home/$USERNAME/.config/Nokia/qtcreator/styles
+            wget http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
+            mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
+            chown -R $USERNAME:users /home/$USERNAME/.config
             ;;
         9)
             aurhelper_install "sublime-text"
@@ -1367,10 +1372,10 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "SYSTEM TOOLS APPS"
-    echo "[1] Htop"
-    echo "[2] Grsync"
-    echo "[3] Wine"
-    echo "[4] Virtualbox"
+    echo "[1] Grsync"
+    echo "[2] Htop"
+    echo "[3] Virtualbox"
+    echo "[4] Wine"
     echo ""
     echo "[a] ALL"
     echo "[n] NEXT"
@@ -1378,21 +1383,21 @@ do
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm --needed htop
-            ;;
-        2)
             pacman -S --noconfirm --needed grsync
             ;;
-        3)
-            pacman -S --noconfirm --needed wine wine_gecko winetricks
+        2)
+            pacman -S --noconfirm --needed htop
             ;;
-        4)
+        3)
             pacman -S --noconfirm --needed virtualbox virtualbox-additions
             aurhelper_install "virtualbox-ext-oracle"
             modprobe vboxdrv
             groupadd vboxusers
             gpasswd -a $USERNAME vboxusers
             add_module "vboxdrv"
+            ;;
+        4)
+            pacman -S --noconfirm --needed wine wine_gecko winetricks
             ;;
         "a")
             pacman -S --noconfirm --needed htop
