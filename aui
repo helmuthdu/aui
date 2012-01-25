@@ -73,6 +73,8 @@ function aurhelper_install(){ #{{{
             else
                 su -l $USERNAME --command="packer -S --noconfirm $PACKAGE"
             fi
+        else
+            echo -e "Package $PACKAGE already installed"
         fi
     done
     for PACKAGE in $1; do
@@ -95,7 +97,7 @@ function install_status(){ #{{{
         CURRENT_STATUS=1
     fi
 } #}}}
-function finish_function(){ #{{{
+function pause_function(){ #{{{
     print_line
     local dummy
     read -e -s -r -p "Press any key to continue..." -n 1 dummy
@@ -126,7 +128,7 @@ function reboot_now(){ #{{{
         "y")
             echo "Thanks for using the Archlinux Ultimate Install script by helmuthdu"
             echo "Your Computer will now restart"
-            finish_function
+            pause_function
             reboot
             exit 0
             ;;
@@ -149,13 +151,13 @@ function reboot_now(){ #{{{
     echo "it's highly recommended you read this script before use it"
     echo "This version is still in BETA. Send bugreports to: "
     echo "helmuthdu at gmail dot com"
-    finish_function
+    pause_function
 #}}}
 #CHECK ROOT {{{
     CURRENTUSER="$(whoami)"
     if [ $CURRENTUSER != "root" ]; then
         echo "Current user is NOT 'root'. EXIT now"
-        finish_function
+        pause_function
         exit 1
     fi
 #}}}
@@ -172,7 +174,7 @@ function reboot_now(){ #{{{
         *)
             ;;
     esac
-    finish_function
+    pause_function
 #}}}
 #CUSTOM REPOSITORIES {{{
     print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
@@ -196,21 +198,21 @@ function reboot_now(){ #{{{
                 case "$OPTION" in
                     1)
                         echo -e '\n[ayatana]\nServer = http://repo.ayatana.info/' >> /etc/pacman.conf
-                        finish_function
+                        pause_function
                         ;;
                     2)
                         echo -e '\n[archlinuxfr]\nServer = http://repo.archlinux.fr/$arch' >> /etc/pacman.conf
-                        finish_function
+                        pause_function
                         ;;
                     3)
                         echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
-                        finish_function
+                        pause_function
                         ;;
                     "a")
                         read -p "Repository Name [ex: custom]: " REPONAME
                         read -p "Repository Address [ex: file:///media/backup/Archlinux/]: " REPOADDRESS
                         echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"'$arch' >> /etc/pacman.conf
-                        finish_function
+                        pause_function
                         ;;
                     *)
                         LOOP=0
@@ -226,7 +228,7 @@ function reboot_now(){ #{{{
             ;;
     esac
     sumary "Custom repositories installation"
-    finish_function
+    pause_function
 #}}}
 #RANKMIRROR {{{
     print_title "RANKMIRROR - https://wiki.archlinux.org/index.php/Improve_Pacman_Performance"
@@ -243,7 +245,7 @@ function reboot_now(){ #{{{
             ;;
     esac
     sumary "New mirrorlist creation"
-    finish_function
+    pause_function
 #}}}
 #SYSTEM UPDATE {{{
     print_title "UPDATING YOUR SYSTEM"
@@ -297,7 +299,7 @@ function reboot_now(){ #{{{
             ;;
     esac
     sumary "Pacman signing configuration"
-    finish_function
+    pause_function
 #}}}
 #AUR HELPER {{{
     LOOP=1
@@ -331,7 +333,7 @@ function reboot_now(){ #{{{
                 install_status
                 if !(pacman -Q yaourt &>/dev/null) ; then
                     echo "Yaourt not installed. EXIT now"
-                    finish_function
+                    pause_function
                     exit 0
                 fi
                 YAOURT=1
@@ -350,7 +352,7 @@ function reboot_now(){ #{{{
                 install_status
                 if !(pacman -Q packer &>/dev/null) ; then
                     echo "Packer not installed. EXIT now"
-                    finish_function
+                    pause_function
                     exit 0
                 fi
                 PACKER=1
@@ -358,13 +360,13 @@ function reboot_now(){ #{{{
                 ;;
             *)
                 echo "Wrong option"
-                finish_function
+                pause_function
                 LOOP=1
                 ;;
         esac
     done
     sumary "AUR Helper installation"
-    finish_function
+    pause_function
 #}}}
 #BASE SYSTEM {{{
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
@@ -436,7 +438,7 @@ function reboot_now(){ #{{{
             ;;
     esac
     sumary "TLP installation"
-    finish_function
+    pause_function
 #}}}
 #XORG {{{
     print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
@@ -506,7 +508,7 @@ function reboot_now(){ #{{{
             sumary "GPU drivers installation"
             ;;
     esac
-    finish_function
+    pause_function
 #}}}
 #CUPS {{{
     print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
@@ -538,31 +540,31 @@ function reboot_now(){ #{{{
                 case "$OPTION" in
                     1)
                         aurhelper_install "ipw2100-fw"
-                        finish_function
+                        pause_function
                         ;;
                     2)
                         aurhelper_install "ipw2200-fw"
-                        finish_function
+                        pause_function
                         ;;
                     3)
                         aurhelper_install "b43-firmware"
-                        finish_function
+                        pause_function
                         ;;
                     4)
                         aurhelper_install "b43-firmware-legacy"
-                        finish_function
+                        pause_function
                         ;;
                     5)
                         aurhelper_install "broadcom-wl"
-                        finish_function
+                        pause_function
                         ;;
                     6)
                         aurhelper_install "bluez-firmware"
-                        finish_function
+                        pause_function
                         ;;
                     7)
                         aurhelper_install "wireless-regdb rfkill crda wpa_supplicant"
-                        finish_function
+                        pause_function
                         ;;
                     *)
                         LOOP=0
@@ -577,7 +579,7 @@ function reboot_now(){ #{{{
             ;;
     esac
     sumary "Additional Firmware"
-    finish_function
+    pause_function
 #}}}
 #GIT ACCESS THRU A FIREWALL {{{
     print_title "GIT-TOR - https://wiki.archlinux.org/index.php/Tor"
@@ -607,7 +609,7 @@ function reboot_now(){ #{{{
             ;;
     esac
     sumary "GIT-TOR installation"
-    finish_function
+    pause_function
 #}}}
 #DESKTOP ENVIRONMENT {{{
     print_title "DESKTOP ENVIRONMENT - https://wiki.archlinux.org/index.php/Desktop_Environment"
@@ -641,16 +643,15 @@ function reboot_now(){ #{{{
                 echo "[3]  Gnome Activity Journal"
                 echo "[4]  Gnome Icons [Faience, Faenza, Elementary]"
                 echo "[5]  Gnome Themes [Zukitwo, eGTK, Light, Aldabra]"
-                echo "[6]  Gnome MPlayer"
-                echo "[7]  GnomeShell Extensions"
-                echo "[8]  GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
-                echo "[9]  Gloobus-Sushi"
-                echo "[10] Packagekit"
-                echo "[11] Shotwell"
-                echo "[12] Shutter"
-                echo "[13] Synapse"
-                echo "[14] Terminator"
-                echo "[15] X-Chat"
+                echo "[6]  GnomeShell Extensions"
+                echo "[7]  GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
+                echo "[8]  Gloobus-Sushi"
+                echo "[9]  Packagekit"
+                echo "[10] Shotwell"
+                echo "[11] Shutter"
+                echo "[12] Synapse"
+                echo "[13] Terminator"
+                echo "[14] X-Chat"
                 echo ""
                 echo "[a] ALL"
                 echo "[n] NEXT"
@@ -675,36 +676,33 @@ function reboot_now(){ #{{{
                         aurhelper_install "zukitwo-themes light-themes gtk-theme-aldabra"
                         ;;
                     6)
-                        pacman -S --noconfirm --needed gnome-mplayer
-                        ;;
-                    7)
                         aurhelper_install "libkeybinder3"
                         aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-workspace-indicator gnome-shell-extension-places-menu gnome-shell-extension-dock gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
                         ;;
-                    8)
+                    7)
                         aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
                         ;;
-                    9)
+                    8)
                         pacman -Rdd --noconfirm sushi
                         aurhelper_install "gloobus-sushi-bzr"
                         ;;
-                    10)
+                    9)
                         pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
                         ;;
-                    11)
+                    10)
                         pacman -S --noconfirm --needed shotwell
                         ;;
-                    12)
+                    11)
                         aurhelper_install "shutter"
                         ;;
-                    13)
+                    12)
                         aurhelper_install "synapse"
                         ;;
-                    14)
+                    13)
                         aurhelper_install "python-keybinder"
                         pacman -S --noconfirm --needed terminator
                         ;;
-                    15)
+                    14)
                         pacman -S --noconfirm --needed xchat
                         ;;
                     "a")
@@ -734,12 +732,13 @@ function reboot_now(){ #{{{
                         LOOP=0
                         ;;
                 esac
-                finish_function
+                pause_function
             done
             #}}}
             add_daemon "gdm"
-            sumary "GNOME installation"
-            finish_function
+            install_status
+            sumary "Gnome installation"
+            pause_function
             GNOME=1
             ;;
             #}}}
@@ -769,9 +768,8 @@ function reboot_now(){ #{{{
                 echo "[9]  Musique"
                 echo "[10] Plasma Themes [Caledonia]"
                 echo "[11] QtCurve Themes [Kawai, Sweet]"
-                echo "[12] Rosa Media Player"
-                echo "[13] Speedcrunch"
-                echo "[14] Yakuake"
+                echo "[12] Speedcrunch"
+                echo "[13] Yakuake"
                 echo ""
                 echo "[a] ALL"
                 echo "[n] NEXT"
@@ -827,12 +825,9 @@ function reboot_now(){ #{{{
                         #}}}
                         ;;
                     12)
-                        aurhelper_install "rosa-media-player"
-                        ;;
-                    13)
                         aurhelper_install "speedcrunch"
                         ;;
-                    14)
+                    13)
                         pacman -S --noconfirm --needed yakuake
                         aurhelper_install "yakuake-skin-plasma-oxygen-panel"
                         ;;
@@ -848,7 +843,6 @@ function reboot_now(){ #{{{
                         aurhelper_install "kfaenza-icon-theme"
                         aurhelper_install "minitube"
                         aurhelper_install "musique"
-                        aurhelper_install "rosa-media-player"
                         aurhelper_install "speedcrunch"
                         aurhelper_install "yakuake-skin-plasma-oxygen-panel"
                         #QTCURVE THEMES #{{{
@@ -873,12 +867,13 @@ function reboot_now(){ #{{{
                         LOOP=0
                         ;;
                 esac
-                finish_function
+                pause_function
             done
             #}}}
             add_daemon "kdm"
+            install_status
             sumary "KDE installation"
-            finish_function
+            pause_function
             KDE=1
             ;;
             #}}}
@@ -896,7 +891,6 @@ function reboot_now(){ #{{{
                 print_title "FAVORITE GNOME APPS"
                 echo "[1]  Conky + CONKY-colors"
                 echo "[2]  Docky"
-                echo "[3]  GNOME-MPlayer"
                 echo "[4]  Icons [Faience, Faenza, Elementary]"
                 echo "[5]  Kupfer"
                 echo "[6]  Parole"
@@ -949,11 +943,12 @@ function reboot_now(){ #{{{
                         LOOP=0
                         ;;
                 esac
-                finish_function
+                pause_function
             done
             #}}}
+            install_status
             sumary "XFCE installation"
-            finish_function
+            pause_function
             XFCE=1
             ;;
             #}}}
@@ -973,16 +968,15 @@ function reboot_now(){ #{{{
                 print_title "FAVORITE LXDE APPS"
                 echo "[1]  Conky + CONKY-colors"
                 echo "[2]  Galculator"
-                echo "[3]  Gnome MPlayer"
-                echo "[4]  Icons [Faience, Faenza, Elementary]"
-                echo "[5]  Irssi"
-                echo "[6]  Kupfer"
-                echo "[7]  Parole"
-                echo "[8]  Pidgin"
-                echo "[9]  Shotwell"
-                echo "[10] Shutter"
-                echo "[11] Terminator"
-                echo "[12] Xfburn"
+                echo "[3]  Icons [Faience, Faenza, Elementary]"
+                echo "[4]  Irssi"
+                echo "[5]  Kupfer"
+                echo "[6]  Parole"
+                echo "[7]  Pidgin"
+                echo "[8]  Shotwell"
+                echo "[9]  Shutter"
+                echo "[10] Terminator"
+                echo "[11] Xfburn"
                 echo ""
                 echo "[n] NEXT"
                 echo ""
@@ -996,45 +990,43 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed galculator
                         ;;
                     3)
-                        pacman -S --noconfirm --needed gnome-mplayer
-                        ;;
-                    4)
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         ;;
-                    5)
+                    4)
                         pacman -S --noconfirm --needed irssi
                         ;;
-                    6)
+                    5)
                         aurhelper_install "kupfer"
                         ;;
-                    7)
+                    6)
                         pacman -S --noconfirm --needed parole
                         ;;
-                    8)
+                    7)
                         pacman -S --noconfirm --needed pidgin
                         ;;
-                    9)
+                    8)
                         pacman -S --noconfirm --needed shotwell
                         ;;
-                    10)
+                    9)
                         aurhelper_install "shutter"
                         ;;
-                    11)
+                    10)
                         pacman -S --noconfirm --needed terminator
                         aurhelper_install "python-keybinder"
                         ;;
-                    12)
+                    11)
                         pacman -S --noconfirm --needed xfburn
                         ;;
                     *)
                         LOOP=0
                         ;;
                 esac
-                finish_function
+                pause_function
             done
             #}}}
+            install_status
             sumary "LXDE Installation"
-            finish_function
+            pause_function
             LXDE=1
             ;;
             #}}}
@@ -1060,19 +1052,18 @@ function reboot_now(){ #{{{
                 print_title "FAVORITE OPENBOX APPS"
                 echo "[1]  Conky + CONKY-colors"
                 echo "[2]  Galculator"
-                echo "[3]  Gnome MPlayer"
-                echo "[4]  Icons [Faience, Faenza, Elementary]"
-                echo "[5]  Irssi"
-                echo "[6]  Kupfer"
-                echo "[7]  Parole"
-                echo "[8]  Pidgin"
-                echo "[9]  Shotwell"
-                echo "[10] Shutter"
-                echo "[11] Terminator"
-                echo "[12] Thunar"
-                echo "[13] Tint2"
-                echo "[14] Volwheel"
-                echo "[15] Xfburn"
+                echo "[3]  Icons [Faience, Faenza, Elementary]"
+                echo "[4]  Irssi"
+                echo "[5]  Kupfer"
+                echo "[6]  Parole"
+                echo "[7]  Pidgin"
+                echo "[8]  Shotwell"
+                echo "[9]  Shutter"
+                echo "[10] Terminator"
+                echo "[11] Thunar"
+                echo "[12] Tint2"
+                echo "[13] Volwheel"
+                echo "[14] Xfburn"
                 echo ""
                 echo "[n] NEXT"
                 echo ""
@@ -1086,54 +1077,52 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed galculator
                         ;;
                     3)
-                        pacman -S --noconfirm --needed gnome-mplayer
-                        ;;
-                    4)
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         ;;
-                    5)
+                    4)
                         pacman -S --noconfirm --needed irssi
                         ;;
-                    6)
+                    5)
                         aurhelper_install "kupfer"
                         ;;
-                    7)
+                    6)
                         pacman -S --noconfirm --needed parole
                         ;;
-                    8)
+                    7)
                         pacman -S --noconfirm --needed pidgin
                         ;;
-                    9)
+                    8)
                         pacman -S --noconfirm --needed shotwell
                         ;;
-                    10)
+                    9)
                         aurhelper_install "shutter"
                         ;;
-                    11)
+                    10)
                         pacman -S --noconfirm --needed terminator
                         aurhelper_install "python-keybinder"
                         ;;
-                    12)
+                    11)
                         pacman -S --noconfirm --needed polkit-gnome gvfs-smb thunar
                         ;;
-                    13)
+                    12)
                         pacman -S --noconfirm --needed tint2
                         ;;
-                    14)
+                    13)
                         pacman -S --noconfirm --needed volwheel
                         ;;
-                    15)
+                    14)
                         pacman -S --noconfirm --needed xfburn
                         ;;
                     *)
                         LOOP=0
                         ;;
                 esac
-                finish_function
+                pause_function
             done
             #}}}
+            install_status
             sumary "OpenBox Installation"
-            finish_function
+            pause_function
             LXDE=1
             ;;
             #}}}
@@ -1180,7 +1169,7 @@ function reboot_now(){ #{{{
             ;;
     esac
     sumary "Network Connection Manager installation"
-    finish_function
+    pause_function
     #}}}
 #}}}
 #DEVELOPEMENT {{{
@@ -1312,7 +1301,7 @@ do
             LOOP=0
             ;;
     esac
-    finish_function
+    pause_function
 done
 #}}}
 #OFFICE {{{
@@ -1374,7 +1363,7 @@ do
             LOOP=0
             ;;
     esac
-    finish_function
+    pause_function
 done
 #}}}
 #SYSTEM TOOLS {{{
@@ -1425,7 +1414,7 @@ do
             LOOP=0
             ;;
     esac
-    finish_function
+    pause_function
 done
 #}}}
 #GRAPHICS {{{
@@ -1469,7 +1458,7 @@ do
             LOOP=0
             ;;
     esac
-    finish_function
+    pause_function
 done
 #}}}
 #INTERNET {{{
@@ -1553,7 +1542,7 @@ do
             LOOP=0
             ;;
     esac
-    finish_function
+    pause_function
 done
 #}}}
 #LAMP #{{{
@@ -1596,7 +1585,7 @@ done
     esac
     print_line
     sumary "LAMP installation"
-    finish_function
+    pause_function
 #}}}
 #MULTIMEDIA {{{
 LOOP=1
@@ -1611,13 +1600,15 @@ do
     echo "[6]  Clementine"
     echo "[7]  Codecs"
     echo "[8]  Exaile"
-    echo "[9]  MIDI Support"
-    echo "[10] Nuvola"
-    echo "[11] Puddletag"
-    echo "[12] Rhythmbox"
-    echo "[13] Transmageddon"
-    echo "[14] VLC"
-    echo "[15] XBMC"
+    if [ "$KDE" -eq 1 ]; then echo "[9] SMPlayer"; else echo "[9] Gnome MPlayer"; fi
+    echo "[10] MIDI Support"
+    echo "[11] Nuvola"
+    echo "[12] Puddletag"
+    echo "[13] Rhythmbox"
+    echo "[14] Transmageddon"
+    echo "[15] VLC"
+    echo "[16] XBMC"
+    if [ "$KDE" -eq 1 ]; then echo "[17] ROSA Media Player";fi
     echo ""
     echo "[n] NEXT"
     echo ""
@@ -1654,35 +1645,45 @@ do
             pacman -S --noconfirm --needed exaile
             ;;
         9)
+            if [ "$KDE" -eq 1 ]; then
+                pacman -S --noconfirm --needed smplayer
+            else
+                pacman -S --noconfirm --needed gnome-mplayer
+            fi
+            ;;
+        10)
             aurhelper_install "timidity++ fluidr3"
             echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
             ;;
-        10)
+        11)
             aurhelper_install "nuvola-bzr-stable"
             ;;
-        11)
+        12)
             aurhelper_install "puddletag"
             ;;
-        12)
+        13)
             pacman -S --noconfirm --needed rhythmbox
             ;;
-        13)
+        14)
             aurhelper_install "transmageddon"
             ;;
-        14)
+        15)
             pacman -S --noconfirm --needed vlc
             if [ "$KDE" -eq 1 ]; then
                 pacman -S --noconfirm --needed phonon-vlc
             fi
             ;;
-        15)
+        16)
             pacman -S --noconfirm --needed xbmc
+            ;;
+        17)
+            aurhelper_install "rosa-media-player"
             ;;
         *)
             LOOP=0
             ;;
     esac
-    finish_function
+    pause_function
 done
 #}}}
 #GAMES {{{
@@ -2052,7 +2053,7 @@ do
         ;;
     esac
 done
-finish_function
+pause_function
 #}}}
 #FONTS {{{
 LOOP=1
@@ -2101,21 +2102,34 @@ do
             LOOP=0
             ;;
     esac
-    finish_function
+    pause_function
 done
-print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
-question_for_answer "Install ubuntu patched (cairo, fontconfig, freetype and libxft) packages"
-case "$OPTION" in
-    "y")
-        pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
-        aurhelper_install "cairo-ubuntu fontconfig-ubuntu freetype2-ubuntu"
-        ;;
-    *)
-        CURRENT_STATUS=0
-        ;;
-esac
-sumary "Ubuntu Patched Fonts Configuration installation"
-finish_function
+#}}}
+#FONTS CONFIGURATION {{{
+    print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
+    echo "[1] Ubuntu patched packages"
+    echo "[2] Cleartype patched packages"
+    echo ""
+    echo "[n] NEXT"
+    echo ""
+    read -p "Option: " OPTION
+    case "$OPTION" in
+        1)
+            pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
+            aurhelper_install "cairo-ubuntu fontconfig-ubuntu freetype2-ubuntu"
+            install_status
+            ;;
+        2)
+            pacman -Rdd --noconfirm cairo freetype2 libxft
+            aurhelper_install "freetype2-cleartype libxft-cleartype cairo-cleartype"
+            install_status
+            ;;
+        *)
+            CURRENT_STATUS=0
+            ;;
+    esac
+    sumary "Patched Fonts Configuration installation"
+    pause_function
 #}}}
 #CLEAN ORPHAN PACKAGES {{{
     print_title "CLEAN ORPHAN PACKAGES"
