@@ -19,12 +19,13 @@ You can try it first with a `virtualbox`
 
 ## What does the script do?
 
-- Check current language
+- Automatic configure rc.conf
 - Install additional repositories
 - Configure rankmirror
 - System upgrade
 - Create a new user
 - Install and configure sudo
+- Configure pacman package signing
 - Install a AUR Helper [yaourt, packer]
 - Install base system
 - Install Xorg
@@ -32,7 +33,7 @@ You can try it first with a `virtualbox`
 - Install CUPS
 - Install Additional wireless/bluetooth firmwares
 - Ensuring access to GIT through a firewall
-- Install a Desktop Environment [GNOME, KDE, XFCE, LXDE]
+- Install a Desktop Environment [GNOME, KDE, XFCE, LXDE, OpenBox]
 - Install Developement tools [Vim, Emacs, Eclipse...]
 - Install Office apps [LibreOffice, GNOME-Office, Latex...]
 - Install System tools [Wine, Virtualbox, Grsync, Htop]
@@ -42,4 +43,3 @@ You can try it first with a `virtualbox`
 - Install Multimedia apps [Rhythmbox, Clementine, Codecs...]
 - Install Games [HoN, World of Padman, Wesnoth...]
 - Install Fonts [Liberation, MS-Fonts, Google-webfonts...]
-- Automatic configure rc.conf
