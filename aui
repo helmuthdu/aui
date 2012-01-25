@@ -1600,7 +1600,7 @@ do
     echo "[6]  Clementine"
     echo "[7]  Codecs"
     echo "[8]  Exaile"
-    if [ "$KDE" -eq 1 ]; then echo "[9] SMPlayer"; else echo "[9] Gnome MPlayer"; fi
+    if [ "$KDE" -eq 1 ]; then echo "[9]  SMPlayer"; else echo "[9]  Gnome MPlayer"; fi
     echo "[10] MIDI Support"
     echo "[11] Nuvola"
     echo "[12] Puddletag"
