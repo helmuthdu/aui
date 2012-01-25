@@ -737,8 +737,6 @@ function reboot_now(){ #{{{
             #}}}
             add_daemon "gdm"
             install_status
-            sumary "Gnome installation"
-            pause_function
             GNOME=1
             ;;
             #}}}
@@ -872,8 +870,6 @@ function reboot_now(){ #{{{
             #}}}
             add_daemon "kdm"
             install_status
-            sumary "KDE installation"
-            pause_function
             KDE=1
             ;;
             #}}}
@@ -947,8 +943,6 @@ function reboot_now(){ #{{{
             done
             #}}}
             install_status
-            sumary "XFCE installation"
-            pause_function
             XFCE=1
             ;;
             #}}}
@@ -1025,8 +1019,6 @@ function reboot_now(){ #{{{
             done
             #}}}
             install_status
-            sumary "LXDE Installation"
-            pause_function
             LXDE=1
             ;;
             #}}}
@@ -1036,7 +1028,7 @@ function reboot_now(){ #{{{
             pacman -S --noconfirm --needed openbox obconf obmenu menumaker
             pacman -S --noconfirm --needed lxappearance consolekit
             pacman -S --noconfirm --needed xdg-user-dirs
-            pacman -S --noconfirm --needed leafpad xarchiver epdfview geeqie nitrogen
+            pacman -S --noconfirm --needed leafpad xarchiver epdfview nitrogen
             aurhelper_install "gnome-defaults-list"
             mkdir -p /home/$USERNAME/.config/openbox/
             cp /etc/xdg/openbox/rc.xml /home/$USERNAME/.config/openbox/
@@ -1052,18 +1044,19 @@ function reboot_now(){ #{{{
                 print_title "FAVORITE OPENBOX APPS"
                 echo "[1]  Conky + CONKY-colors"
                 echo "[2]  Galculator"
-                echo "[3]  Icons [Faience, Faenza, Elementary]"
-                echo "[4]  Irssi"
-                echo "[5]  Kupfer"
-                echo "[6]  Parole"
-                echo "[7]  Pidgin"
-                echo "[8]  Shotwell"
-                echo "[9]  Shutter"
-                echo "[10] Terminator"
-                echo "[11] Thunar"
-                echo "[12] Tint2"
-                echo "[13] Volwheel"
-                echo "[14] Xfburn"
+                echo "[3]  Gthumb"
+                echo "[4]  Icons [Faience, Faenza, Elementary]"
+                echo "[5]  Irssi"
+                echo "[6]  Kupfer"
+                echo "[7]  Parole"
+                echo "[8]  Pidgin"
+                echo "[9]  Shotwell"
+                echo "[10] Shutter"
+                echo "[11] Terminator"
+                echo "[12] Thunar"
+                echo "[13] Tint2"
+                echo "[14] Volwheel"
+                echo "[15] Xfburn"
                 echo ""
                 echo "[n] NEXT"
                 echo ""
@@ -1077,40 +1070,43 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed galculator
                         ;;
                     3)
-                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                        pacman -S --noconfirm --needed gthumb
                         ;;
                     4)
-                        pacman -S --noconfirm --needed irssi
+                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         ;;
                     5)
-                        aurhelper_install "kupfer"
+                        pacman -S --noconfirm --needed irssi
                         ;;
                     6)
-                        pacman -S --noconfirm --needed parole
+                        aurhelper_install "kupfer"
                         ;;
                     7)
-                        pacman -S --noconfirm --needed pidgin
+                        pacman -S --noconfirm --needed parole
                         ;;
                     8)
-                        pacman -S --noconfirm --needed shotwell
+                        pacman -S --noconfirm --needed pidgin
                         ;;
                     9)
-                        aurhelper_install "shutter"
+                        pacman -S --noconfirm --needed shotwell
                         ;;
                     10)
+                        aurhelper_install "shutter"
+                        ;;
+                    11)
                         pacman -S --noconfirm --needed terminator
                         aurhelper_install "python-keybinder"
                         ;;
-                    11)
+                    12)
                         pacman -S --noconfirm --needed polkit-gnome gvfs-smb thunar
                         ;;
-                    12)
+                    13)
                         pacman -S --noconfirm --needed tint2
                         ;;
-                    13)
+                    14)
                         pacman -S --noconfirm --needed volwheel
                         ;;
-                    14)
+                    15)
                         pacman -S --noconfirm --needed xfburn
                         ;;
                     *)
@@ -1121,13 +1117,14 @@ function reboot_now(){ #{{{
             done
             #}}}
             install_status
-            sumary "OpenBox Installation"
-            pause_function
             LXDE=1
             ;;
             #}}}
     esac
-    #NETWORKMANAGER/WICD {{{
+    sumary "Desktop Environment Installation"
+    pause_function
+#}}}
+#NETWORKMANAGER/WICD {{{
     print_title "NETWORK CONNECTION MANAGER"
     echo "[1] Networkmanager"
     echo "[2] Wicd"
@@ -1170,7 +1167,6 @@ function reboot_now(){ #{{{
     esac
     sumary "Network Connection Manager installation"
     pause_function
-    #}}}
 #}}}
 #DEVELOPEMENT {{{
 LOOP=1
@@ -1646,7 +1642,7 @@ do
             ;;
         9)
             if [ "$KDE" -eq 1 ]; then
-                pacman -S --noconfirm --needed smplayer
+                pacman -S --noconfirm --needed smplayer smplayer-themes
             else
                 pacman -S --noconfirm --needed gnome-mplayer
             fi
