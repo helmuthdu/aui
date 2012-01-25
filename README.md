@@ -23,10 +23,10 @@ You can try it first with a `virtualbox`
 - Install additional repositories
 - Configure rankmirror
 - System upgrade
-- Create a new user
+- Create and configure new user
 - Install and configure sudo
 - Configure pacman package signing
-- Install a AUR Helper [yaourt, packer]
+- Install an AUR Helper [yaourt, packer]
 - Install base system
 - Install Xorg
 - Install GPU Drivers
