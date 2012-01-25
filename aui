@@ -749,7 +749,6 @@ function reboot_now(){ #{{{
             aurhelper_install "kcm-wacomtablet"
             aurhelper_install "kde-gtk-config-git"
             aurhelper_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
-            aurhelper_install "quickaccess-plasmoid plasma-icontasks"
             #FAVORITE KDE APPS {{{
             LOOP=1
             while [ "$LOOP" -ne 0 ]
