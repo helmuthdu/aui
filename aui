@@ -45,9 +45,9 @@ function print_line(){ #{{{
 } #}}}
 function print_title (){ #{{{
     clear
-    printf "%$(tput cols)s\n"|tr ' ' '-'
+    print_line
     echo -e "# $1"
-    printf "%$(tput cols)s\n"|tr ' ' '-'
+    print_line
     echo ""
 } #}}}
 function add_daemon(){ #{{{
@@ -99,8 +99,7 @@ function install_status(){ #{{{
 } #}}}
 function pause_function(){ #{{{
     print_line
-    local dummy
-    read -e -s -r -p "Press any key to continue..." -n 1 dummy
+    read -e -sn 1 -p "Press any key to continue…"
 } #}}}
 function sumary(){ #{{{
     case $CURRENT_STATUS in
@@ -881,7 +880,7 @@ function reboot_now(){ #{{{
             aurhelper_install "gnome-defaults-list"
             #FAVORITE XFCE APPS {{{
             LOOP=1
-            while [ "$LOOP" -ne 0 ]
+            while [ "$LOOP" -ne -4 ]
             do
                 print_title "FAVORITE GNOME APPS"
                 echo "[1]  Conky + CONKY-colors"
@@ -889,11 +888,12 @@ function reboot_now(){ #{{{
                 echo "[4]  Icons [Faience, Faenza, Elementary]"
                 echo "[5]  Kupfer"
                 echo "[6]  Parole"
-                echo "[7]  Shotwell"
-                echo "[8]  Shutter"
-                echo "[9]  Terminator"
-                echo "[10] Themes [Zukitwo]"
-                echo "[11] X-Chat"
+                echo "[7]  Pidgin"
+                echo "[8]  Shotwell"
+                echo "[9]  Shutter"
+                echo "[10] Terminator"
+                echo "[11] Themes [Zukitwo]"
+                echo "[12] X-Chat"
                 echo ""
                 echo "[n] NEXT"
                 echo ""
@@ -919,19 +919,22 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed parole
                         ;;
                     7)
-                        pacman -S --noconfirm --needed shotwell
+                        pacman -S --noconfirm --needed pidgin
                         ;;
                     8)
-                        aurhelper_install "shutter"
+                        pacman -S --noconfirm --needed shotwell
                         ;;
                     9)
+                        aurhelper_install "shutter"
+                        ;;
+                    10)
                         pacman -S --noconfirm --needed terminator
                         aurhelper_install "python-keybinder"
                         ;;
-                    10)
+                    11)
                         aurhelper_install "zukitwo-themes"
                         ;;
-                    11)
+                    12)
                         pacman -S --noconfirm --needed xchat
                         ;;
                     *)
