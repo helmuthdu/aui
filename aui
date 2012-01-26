@@ -662,7 +662,7 @@ function reboot_now(){ #{{{
                         add_module "coretemp it87 acpi-cpufreq"
                         ;;
                     2)
-                        pacman -S --noconfirm --needed docky
+                        aurhelper_install "docky"
                         ;;
                     3)
                         aurhelper_install "gnome-activity-journal libzeitgeist zeitgeist-datahub zeitgeist-extensions"
@@ -705,13 +705,13 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed xchat
                         ;;
                     "a")
-                        pacman -S --noconfirm --needed docky
                         pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
                         pacman -S --noconfirm --needed openshot
                         pacman -S --noconfirm --needed shotwell
                         pacman -S --noconfirm --needed terminator
                         pacman -S --noconfirm --needed xchat
                         pacman -Rdd --noconfirm sushi
+                        aurhelper_install "docky"
                         aurhelper_install "conky conky-colors"
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         aurhelper_install "gloobus-sushi-bzr"
@@ -904,7 +904,7 @@ function reboot_now(){ #{{{
                         add_module "coretemp it87 acpi-cpufreq"
                         ;;
                     2)
-                        pacman -S --noconfirm --needed docky
+                        aurhelper_install "docky"
                         ;;
                     3)
                         pacman OpenBox -S --noconfirm --needed gnome-mplayer
