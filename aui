@@ -1160,36 +1160,44 @@ do
                 case "$OPTION" in
                     1)
                         pacman -S --noconfirm --needed eclipse
+                        pause_function
                         ;;
                     2)
                         pacman -S --noconfirm --needed eclipse-cdt
+                        pause_function
                         ;;
                     3)
                         aurhelper_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
+                        pause_function
                         ;;
                     4)
                         aurhelper_install "eclipse-wtp-wst"
+                        pause_function
                         ;;
                     5)
                         aurhelper_install "eclipse-pdt"
+                        pause_function
                         ;;
                     6)
                         aurhelper_install "eclipse-pydev"
+                        pause_function
                         ;;
                     7)
                         aurhelper_install "eclipse-aptana"
+                        pause_function
                         ;;
                     8)
                         aurhelper_install "eclipse-vrapper"
+                        pause_function
                         ;;
                     9)
                         aurhelper_install "eclipse-egit"
+                        pause_function
                         ;;
                     *)
                         LOOP=0
                         ;;
                 esac
-                pause_function
             done
             LOOP=1
             #}}}
@@ -1550,43 +1558,53 @@ do
                 case "$OPTION" in
                     1)
                         pacman -S --noconfirm --needed amarok
+                        pause_function
                         ;;
                     2)
                         pacman -S --noconfirm --needed banshee
+                        pause_function
                         ;;
                     3)
                         aurhelper_install "beatbox-bzr"
+                        pause_function
                         ;;
                     4)
                         pacman -S --noconfirm --needed clementine
+                        pause_function
                         ;;
                     5)
                         aurhelper_install "exaile"
+                        pause_function
                         ;;
                     6)
                         aurhelper_install "nuvola-bzr-stable"
+                        pause_function
                         ;;
                     7)
                         pacman -S --noconfirm --needed rhythmbox
+                        pause_function
                         ;;
                     8)
                         aurhelper_install "puddletag"
+                        pause_function
                         ;;
                     9)
                         aurhelper_install "timidity++ fluidr3"
                         echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
+                        pause_function
                         ;;
                     10)
                         pacman -S --noconfirm --needed gstreamer0.10-plugins
+                        pause_function
                         ;;
                     11)
                         pacman -S --noconfirm --needed audacity
+                        pause_function
                         ;;
                     *)
                         LOOP=0
                         ;;
                 esac
-                pause_function
             done
             LOOP=1
             ;;
@@ -1615,30 +1633,38 @@ do
                 case "$OPTION" in
                     1)
                         pacman -S --noconfirm --needed gnome-mplayer
+                        pause_function
                         ;;
                     2)
                         pacman -S --noconfirm --needed parole
+                        pause_function
                         ;;
                     3)
                         aurhelper_install "rosa-media-player"
+                        pause_function
                         ;;
                     4)
                         pacman -S --noconfirm --needed smplayer smplayer-themes
+                        pause_function
                         ;;
                     5)
                         pacman -S --noconfirm --needed vlc
                         if [ "$KDE" -eq 1 ]; then
                             pacman -S --noconfirm --needed phonon-vlc
                         fi
+                        pause_function
                         ;;
                     6)
                         pacman -S --noconfirm --needed xbmc
+                        pause_function
                         ;;
                     7)
                         aurhelper_install "arista-transcoder"
+                        pause_function
                         ;;
                     8)
                         aurhelper_install "transmageddon"
+                        pause_function
                         ;;
                     9)
                         aurhelper_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
@@ -1647,21 +1673,24 @@ do
                         else
                             aurhelper_install "codecs64"
                         fi
+                        pause_function
                         ;;
                     10)
                         pacman -S --noconfirm --needed kdenlive
+                        pause_function
                         ;;
                     11)
                         pacman -S --noconfirm --needed openshot
+                        pause_function
                         ;;
                     12)
                         pacman -S --noconfirm --needed pitivi
+                        pause_function
                         ;;
                     *)
                         LOOP=0
                         ;;
                 esac
-                pause_function
             done
             LOOP=1
             ;;
@@ -1711,24 +1740,28 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "astromenace"
+                    pause_function
                     ;;
                 2)
                     aurhelper_install "opentyrian-hg"
+                    pause_function
                     ;;
                 3)
                     aurhelper_install "mars-shooter"
+                    pause_function
                     ;;
                 4)
                     aurhelper_install "yofrankie"
+                    pause_function
                     ;;
                 5)
                     aurhelper_install "counter-strike-2d"
+                    pause_function
                     ;;
                 *)
                     LOOP=0
                     ;;
             esac
-            pause_function
         done
         LOOP=1
         ;;
@@ -1752,30 +1785,36 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "opensonic"
+                    pause_function
                     ;;
                 2)
                     pacman -S --noconfirm --needed frogatto
+                    pause_function
                     ;;
                 3)
                     pacman -S --noconfirm --needed bomberclone
+                    pause_function
                     ;;
                 4)
                     aurhelper_install "goonies"
+                    pause_function
                     ;;
                 5)
                     pacman -S --noconfirm --needed neverball
+                    pause_function
                     ;;
                 6)
                     pacman -S --noconfirm --needed smc
+                    pause_function
                     ;;
                 7)
                     pacman -S --noconfirm --needed xmoto
+                    pause_function
                     ;;
                 *)
                     LOOP=0
                     ;;
             esac
-            pause_function
         done
         LOOP=1
         ;;
@@ -1795,18 +1834,20 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "tome4"
+                    pause_function
                     ;;
                 2)
                     aurhelper_install "lostlabyrinth"
+                    pause_function
                     ;;
                 3)
                     aurhelper_install "scourge"
+                    pause_function
                     ;;
                 *)
                     LOOP=0
                     ;;
             esac
-            pause_function
         done
         LOOP=1
         ;;
@@ -1824,12 +1865,12 @@ do
             case "$OPTION" in
                 1)
                     pacman -S --noconfirm --needed zsnes
+                    pause_function
                     ;;
                 *)
                     LOOP=0
                     ;;
             esac
-            pause_function
         done
         LOOP=1
         ;;
@@ -1848,18 +1889,20 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "worldofpadman"
+                    pause_function
                     ;;
                 2)
                     pacman -S --noconfirm --needed warsow
+                    pause_function
                     ;;
                 3)
                     pacman -S --noconfirm --needed alienarena
+                    pause_function
                     ;;
                 *)
                     LOOP=0
                     ;;
             esac
-            pause_function
         done
         LOOP=1
         ;;
@@ -1878,15 +1921,16 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "hon"
+                    pause_function
                     ;;
                 2)
                     aurhelper_install "spiral-knights"
+                    pause_function
                     ;;
                 *)
                     LOOP=0
                     ;;
             esac
-            pause_function
         done
         LOOP=1
         ;;
@@ -1904,12 +1948,12 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "numptyphysics-svn"
+                    pause_function
                     ;;
                 *)
                     LOOP=0
                     ;;
             esac
-            pause_function
         done
         LOOP=1
         ;;
@@ -1927,12 +1971,12 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "ardentryst"
+                    pause_function
                     ;;
                 *)
                     LOOP=0
                     ;;
             esac
-            pause_function
         done
         LOOP=1
         ;;
@@ -1953,21 +1997,24 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "maniadrive"
+                    pause_function
                     ;;
                 2)
                     aurhelper_install "death-rally"
+                    pause_function
                     ;;
                 3)
                     pacman -S --noconfirm --needed supertuxkart
+                    pause_function
                     ;;
                 4)
                     pacman -S --noconfirm --needed speed-dreams
+                    pause_function
                     ;;
                 *)
                     LOOP=0
                     ;;
             esac
-            pause_function
         done
         LOOP=1
         ;;
@@ -1987,18 +2034,20 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "simutrans"
+                    pause_function
                     ;;
                 2)
                     aurhelper_install "corsix-th"
+                    pause_function
                     ;;
                 3)
                     pacman -S --noconfirm --needed openttd
+                    pause_function
                     ;;
                 *)
                     LOOP=0
                     ;;
             esac
-            pause_function
         done
         LOOP=1
         ;;
@@ -2021,27 +2070,32 @@ do
             case "$OPTION" in
                 1)
                     pacman -S --noconfirm --needed wesnoth
+                    pause_function
                     ;;
                 3)
                     aurhelper_install "0ad"
+                    pause_function
                     ;;
                 4)
                     pacman -S --noconfirm --needed hedgewars
+                    pause_function
                     ;;
                 5)
                     pacman -S --noconfirm --needed warzone2100
+                    pause_function
                     ;;
                 6)
                     pacman -S --noconfirm --needed megaglest
+                    pause_function
                     ;;
                 7)
                     aurhelper_install "commander-zod"
+                    pause_function
                     ;;
                 *)
                     LOOP=0
                     ;;
             esac
-            pause_function
         done
         LOOP=1
         ;;
