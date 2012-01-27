@@ -99,7 +99,7 @@ function install_status(){ #{{{
 } #}}}
 function pause_function(){ #{{{
     print_line
-    read -e -sn 1 -p "Press any key to continue…"
+    read -e -sn 1 -p "Press any key to continue..."
 } #}}}
 function sumary(){ #{{{
     case $CURRENT_STATUS in
@@ -641,16 +641,14 @@ function reboot_now(){ #{{{
                 echo "[2]  Docky"
                 echo "[3]  Gnome Activity Journal"
                 echo "[4]  Gnome Icons [Faience, Faenza, Elementary]"
-                echo "[5]  Gnome Themes [Zukitwo, eGTK, Light, Aldabra]"
+                echo "[5]  Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
                 echo "[6]  GnomeShell Extensions"
                 echo "[7]  GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
                 echo "[8]  Gloobus-Sushi"
                 echo "[9]  Packagekit"
-                echo "[10] Shotwell"
-                echo "[11] Shutter"
-                echo "[12] Synapse"
-                echo "[13] Terminator"
-                echo "[14] X-Chat"
+                echo "[10] Shutter"
+                echo "[11] Synapse"
+                echo "[12] Terminator"
                 echo ""
                 echo "[a] ALL"
                 echo "[n] NEXT"
@@ -672,7 +670,7 @@ function reboot_now(){ #{{{
                         ;;
                     5)
                         aurhelper_install "egtk-bzr"
-                        aurhelper_install "zukitwo-themes light-themes gtk-theme-aldabra"
+                        aurhelper_install "zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
                         ;;
                     6)
                         aurhelper_install "libkeybinder3"
@@ -689,27 +687,18 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
                         ;;
                     10)
-                        pacman -S --noconfirm --needed shotwell
-                        ;;
-                    11)
                         aurhelper_install "shutter"
                         ;;
-                    12)
+                    11)
                         aurhelper_install "synapse"
                         ;;
-                    13)
+                    12)
                         aurhelper_install "python-keybinder"
                         pacman -S --noconfirm --needed terminator
                         ;;
-                    14)
-                        pacman -S --noconfirm --needed xchat
-                        ;;
                     "a")
                         pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
-                        pacman -S --noconfirm --needed openshot
-                        pacman -S --noconfirm --needed shotwell
                         pacman -S --noconfirm --needed terminator
-                        pacman -S --noconfirm --needed xchat
                         pacman -Rdd --noconfirm sushi
                         aurhelper_install "docky"
                         aurhelper_install "conky conky-colors"
@@ -723,7 +712,7 @@ function reboot_now(){ #{{{
                         aurhelper_install "shutter"
                         aurhelper_install "synapse"
                         aurhelper_install "egtk-bzr"
-                        aurhelper_install "zukitwo-themes light-themes gtk-theme-aldabra"
+                        aurhelper_install "zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
                         add_module "coretemp it87 acpi-cpufreq"
                         LOOP=0
                         ;;
@@ -759,13 +748,12 @@ function reboot_now(){ #{{{
                 echo "[4]  Digikam"
                 echo "[5]  K3b"
                 echo "[6]  KDE Icons [KFaenza]"
-                echo "[7]  Konversation"
-                echo "[8]  Minitube"
-                echo "[9]  Musique"
-                echo "[10] Plasma Themes [Caledonia]"
-                echo "[11] QtCurve Themes [Kawai, Sweet]"
-                echo "[12] Speedcrunch"
-                echo "[13] Yakuake"
+                echo "[7]  Minitube"
+                echo "[8]  Musique"
+                echo "[9]  Plasma Themes [Caledonia]"
+                echo "[10] QtCurve Themes [Kawai, Sweet]"
+                echo "[11] Speedcrunch"
+                echo "[12] Yakuake"
                 echo ""
                 echo "[a] ALL"
                 echo "[n] NEXT"
@@ -791,18 +779,15 @@ function reboot_now(){ #{{{
                         aurhelper_install "kfaenza-icon-theme"
                         ;;
                     7)
-                        pacman -S --noconfirm --needed konversation
-                        ;;
-                    8)
                         aurhelper_install "minitube"
                         ;;
-                    9)
+                    8)
                         aurhelper_install "musique"
                         ;;
-                    10)
+                    9)
                         aurhelper_install "caledonia-bundle"
                         ;;
-                    11)
+                    10)
                         #QtCurve Themes #{{{
                         wget http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
                         wget http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
@@ -820,10 +805,10 @@ function reboot_now(){ #{{{
                         rm -fr Kawai Sweet
                         #}}}
                         ;;
-                    12)
+                    11)
                         aurhelper_install "speedcrunch"
                         ;;
-                    13)
+                    12)
                         pacman -S --noconfirm --needed yakuake
                         aurhelper_install "yakuake-skin-plasma-oxygen-panel"
                         ;;
@@ -831,7 +816,6 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed choqok
                         pacman -S --noconfirm --needed digikam kipi-plugins
                         pacman -S --noconfirm --needed k3b dvd+rw-tools
-                        pacman -S --noconfirm --needed konversation
                         pacman -S --noconfirm --needed yakuake
                         aurhelper_install "apper"
                         aurhelper_install "bangarang"
@@ -885,15 +869,11 @@ function reboot_now(){ #{{{
                 print_title "FAVORITE GNOME APPS"
                 echo "[1]  Conky + CONKY-colors"
                 echo "[2]  Docky"
-                echo "[4]  Icons [Faience, Faenza, Elementary]"
-                echo "[5]  Kupfer"
-                echo "[6]  Parole"
-                echo "[7]  Pidgin"
-                echo "[8]  Shotwell"
-                echo "[9]  Shutter"
-                echo "[10] Terminator"
-                echo "[11] Themes [Zukitwo]"
-                echo "[12] X-Chat"
+                echo "[3]  Icons [Faience, Faenza, Elementary]"
+                echo "[4]  Kupfer"
+                echo "[5]  Shutter"
+                echo "[6]  Terminator"
+                echo "[7]  Themes [Zukitwo]"
                 echo ""
                 echo "[n] NEXT"
                 echo ""
@@ -907,35 +887,20 @@ function reboot_now(){ #{{{
                         aurhelper_install "docky"
                         ;;
                     3)
-                        pacman OpenBox -S --noconfirm --needed gnome-mplayer
-                        ;;
-                    4)
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         ;;
-                    5)
+                    4)
                         aurhelper_install "kupfer"
                         ;;
-                    6)
-                        pacman -S --noconfirm --needed parole
-                        ;;
-                    7)
-                        pacman -S --noconfirm --needed pidgin
-                        ;;
-                    8)
-                        pacman -S --noconfirm --needed shotwell
-                        ;;
-                    9)
+                    5)
                         aurhelper_install "shutter"
                         ;;
-                    10)
+                    6)
                         pacman -S --noconfirm --needed terminator
                         aurhelper_install "python-keybinder"
                         ;;
-                    11)
+                    7)
                         aurhelper_install "zukitwo-themes"
-                        ;;
-                    12)
-                        pacman -S --noconfirm --needed xchat
                         ;;
                     *)
                         LOOP=0
@@ -966,12 +931,9 @@ function reboot_now(){ #{{{
                 echo "[3]  Icons [Faience, Faenza, Elementary]"
                 echo "[4]  Irssi"
                 echo "[5]  Kupfer"
-                echo "[6]  Parole"
-                echo "[7]  Pidgin"
-                echo "[8]  Shotwell"
-                echo "[9]  Shutter"
-                echo "[10] Terminator"
-                echo "[11] Xfburn"
+                echo "[6]  Shutter"
+                echo "[7]  Terminator"
+                echo "[8]  Xfburn"
                 echo ""
                 echo "[n] NEXT"
                 echo ""
@@ -994,22 +956,13 @@ function reboot_now(){ #{{{
                         aurhelper_install "kupfer"
                         ;;
                     6)
-                        pacman -S --noconfirm --needed parole
-                        ;;
-                    7)
-                        pacman -S --noconfirm --needed pidgin
-                        ;;
-                    8)
-                        pacman -S --noconfirm --needed shotwell
-                        ;;
-                    9)
                         aurhelper_install "shutter"
                         ;;
-                    10)
+                    7)
                         pacman -S --noconfirm --needed terminator
                         aurhelper_install "python-keybinder"
                         ;;
-                    11)
+                    8)
                         pacman -S --noconfirm --needed xfburn
                         ;;
                     *)
@@ -1050,15 +1003,12 @@ function reboot_now(){ #{{{
                 echo "[4]  Icons [Faience, Faenza, Elementary]"
                 echo "[5]  Irssi"
                 echo "[6]  Kupfer"
-                echo "[7]  Parole"
-                echo "[8]  Pidgin"
-                echo "[9]  Shotwell"
-                echo "[10] Shutter"
-                echo "[11] Terminator"
-                echo "[12] Thunar"
-                echo "[13] Tint2"
-                echo "[14] Volwheel"
-                echo "[15] Xfburn"
+                echo "[7]  Shutter"
+                echo "[8]  Terminator"
+                echo "[9]  Thunar"
+                echo "[10] Tint2"
+                echo "[11] Volwheel"
+                echo "[12] Xfburn"
                 echo ""
                 echo "[n] NEXT"
                 echo ""
@@ -1084,31 +1034,22 @@ function reboot_now(){ #{{{
                         aurhelper_install "kupfer"
                         ;;
                     7)
-                        pacman -S --noconfirm --needed parole
-                        ;;
-                    8)
-                        pacman -S --noconfirm --needed pidgin
-                        ;;
-                    9)
-                        pacman -S --noconfirm --needed shotwell
-                        ;;
-                    10)
                         aurhelper_install "shutter"
                         ;;
-                    11)
+                    8)
                         pacman -S --noconfirm --needed terminator
                         aurhelper_install "python-keybinder"
                         ;;
-                    12)
+                    9)
                         pacman -S --noconfirm --needed polkit-gnome gvfs-smb thunar
                         ;;
-                    13)
+                    10)
                         pacman -S --noconfirm --needed tint2
                         ;;
-                    14)
+                    11)
                         pacman -S --noconfirm --needed volwheel
                         ;;
-                    15)
+                    12)
                         pacman -S --noconfirm --needed xfburn
                         ;;
                     *)
@@ -1248,6 +1189,7 @@ do
                         LOOP=0
                         ;;
                 esac
+                pause_function
             done
             LOOP=1
             #}}}
@@ -1379,7 +1321,6 @@ do
     echo "[3] Virtualbox"
     echo "[4] Wine"
     echo ""
-    echo "[a] ALL"
     echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
@@ -1401,18 +1342,6 @@ do
         4)
             pacman -S --noconfirm --needed wine wine_gecko winetricks
             ;;
-        "a")
-            pacman -S --noconfirm --needed htop
-            pacman -S --noconfirm --needed grsync
-            pacman -S --noconfirm --needed wine wine_gecko winetricks
-            pacman -S --noconfirm --needed virtualbox virtualbox-additions
-            aurhelper_install "virtualbox-ext-oracle"
-            modprobe vboxdrv
-            groupadd vboxusers
-            gpasswd -a $USERNAME vboxusers
-            add_module "vboxdrv"
-            LOOP=0
-            ;;
         *)
             LOOP=0
             ;;
@@ -1430,8 +1359,8 @@ do
     echo "[3] Gimp-plugins"
     echo "[4] Inkscape"
     echo "[5] MComix"
+    echo "[6] Shotwell"
     echo ""
-    echo "[a] ALL"
     echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
@@ -1452,10 +1381,8 @@ do
         5)
             pacman -S --noconfirm --needed mcomix
             ;;
-        "a")
-            pacman -S --noconfirm --needed gimp inkscape uniconvertor python2-numpy python-lxml blender mcomix
-            aurhelper_install "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb sozi"
-            LOOP=0
+        6)
+            pacman -S --noconfirm --needed shotwell
             ;;
         *)
             LOOP=0
@@ -1469,25 +1396,37 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "INTERNET APPS"
-    echo "[1] Firefox"
-    echo "[2] Thunderbird"
-    echo "[3] Google-Chrome"
-    echo "[4] Jdownloader"
-    echo "[5] Google Earth"
-    echo "[6] Dropbox"
-    echo "[7] Teamviewer"
-    echo "[8] Trasmission"
+    echo "[1]  Dropbox"
+    echo "[2]  Google Earth"
+    echo "[3]  Google Chrome"
+    echo "[4]  Jdownloader"
+    echo "[5]  Mozilla Firefox"
+    echo "[6]  Mozilla Thunderbird"
+    echo "[7]  Pidgin"
+    echo "[8]  Skype"
+    echo "[9]  TeamSpeak"
+    echo "[10] Teamviewer"
+    echo "[11] Trasmission"
+    if [ "$KDE" -eq 1 ]; then echo "[12] Konversation"; else echo "[12] X-Chat"; fi
     echo ""
-    echo "[a] ALL"
     echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm --needed firefox firefox-i18n-$LOCATION_GNOME flashplugin
+            aurhelper_install "dropbox"
+            if [ "$GNOME" -eq 1 ]; then
+                aurhelper_install "nautilus-dropbox"
+            elif [ "$XFCE" -eq 1 ]; then
+                aurhelper_install "thunar-dropbox"
+            elif [ "$KDE" -eq 1 ]; then
+                aurhelper_install "kfilebox"
+            else
+                aurhelper_install "dropbox-cli"
+            fi
             ;;
         2)
-            pacman -S --noconfirm --needed thunderbird thunderbird-i18n-$LOCATION_GNOME
+            aurhelper_install "google-earth"
             ;;
         3)
             pacman -S --noconfirm --needed flashplugin
@@ -1497,49 +1436,36 @@ do
             aurhelper_install "jdownloader"
             ;;
         5)
-            aurhelper_install "google-earth"
+            pacman -S --noconfirm --needed firefox firefox-i18n-$LOCATION_GNOME flashplugin
             ;;
         6)
-            aurhelper_install "dropbox"
-            if [ "$GNOME" -eq 1 ]; then
-                aurhelper_install "nautilus-dropbox"
-            elif [ "$XFCE" -eq 1 ]; then
-                aurhelper_install "thunar-dropbox"
-            elif [ "$KDE" -eq 1 ]; then
-                aurhelper_install "kfilebox"
-            fi
+            pacman -S --noconfirm --needed thunderbird thunderbird-i18n-$LOCATION_GNOME
             ;;
         7)
-            aurhelper_install "teamviewer"
+            pacman -S --noconfirm --needed pidgin
             ;;
         8)
+            pacman -S --noconfirm --needed skype
+            ;;
+        9)
+            aurhelper_install "teamspeak3"
+            ;;
+        10)
+            aurhelper_install "teamviewer"
+            ;;
+        11)
             if [ "$KDE" -eq 1 ]; then
                 aurhelper_install "transmission-qt"
             else
                 aurhelper_install "transmission-gtk"
             fi
             ;;
-        "a")
-            pacman -S --noconfirm --needed firefox firefox-i18n-$LOCATION_GNOME flashplugin
-            pacman -S --noconfirm --needed thunderbird thunderbird-i18n-$LOCATION_GNOME
-            aurhelper_install "google-chrome"
-            aurhelper_install "jdownloader"
-            aurhelper_install "google-earth"
-            aurhelper_install "teamviewer"
+        12)
             if [ "$KDE" -eq 1 ]; then
-                aurhelper_install "transmission-qt"
+                pacman -S --noconfirm --needed konversation
             else
-                aurhelper_install "transmission-gtk"
+                pacman -S --noconfirm --needed xchat
             fi
-            aurhelper_install "dropbox"
-            if [ "$GNOME" -eq 1 ]; then
-                aurhelper_install "nautilus-dropbox"
-            elif [ "$XFCE" -eq 1 ]; then
-                aurhelper_install "thunar-dropbox"
-            elif [ "$KDE" -eq 1 ]; then
-                aurhelper_install "kfilebox"
-            fi
-            LOOP=0
             ;;
         *)
             LOOP=0
@@ -1586,7 +1512,6 @@ done
             CURRENT_STATUS=0
             ;;
     esac
-    print_line
     sumary "LAMP installation"
     pause_function
 #}}}
@@ -1595,99 +1520,158 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "MULTIMEDIA APPS "
-    echo "[1]  Amarok"
-    echo "[2]  Arista"
-    echo "[3]  Audacity"
-    echo "[4]  Banshee"
-    echo "[5]  Beatbox"
-    echo "[6]  Clementine"
-    echo "[7]  Codecs"
-    echo "[8]  Exaile"
-    if [ "$KDE" -eq 1 ]; then echo "[9]  SMPlayer"; else echo "[9]  Gnome MPlayer"; fi
-    echo "[10] MIDI Support"
-    echo "[11] Nuvola"
-    echo "[12] Puddletag"
-    echo "[13] Rhythmbox"
-    echo "[14] Transmageddon"
-    echo "[15] VLC"
-    echo "[16] XBMC"
-    if [ "$KDE" -eq 1 ]; then echo "[17] ROSA Media Player";fi
+    echo "[1] Audio apps"
+    echo "[2] Video apps"
     echo ""
     echo "[n] NEXT"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm --needed amarok
+            #AUDIO {{{
+            while [ "$LOOP" -ne 0 ]
+            do
+                print_title "AUDIO APPS "
+                echo "[1]  Amarok"
+                echo "[2]  Banshee"
+                echo "[3]  Beatbox"
+                echo "[4]  Clementine"
+                echo "[5]  Exaile"
+                echo "[6]  Nuvola"
+                echo "[7]  Rhythmbox"
+                echo "[8]  Puddletag"
+                echo "[9]  MIDI"
+                echo "[10] Codecs"
+                echo "[11] Audacity"
+                echo ""
+                echo "[b] BACK"
+                echo ""
+                read -p "Option: " OPTION
+                case "$OPTION" in
+                    1)
+                        pacman -S --noconfirm --needed amarok
+                        ;;
+                    2)
+                        pacman -S --noconfirm --needed banshee
+                        ;;
+                    3)
+                        aurhelper_install "beatbox-bzr"
+                        ;;
+                    4)
+                        pacman -S --noconfirm --needed clementine
+                        ;;
+                    5)
+                        aurhelper_install "exaile"
+                        ;;
+                    6)
+                        aurhelper_install "nuvola-bzr-stable"
+                        ;;
+                    7)
+                        pacman -S --noconfirm --needed rhythmbox
+                        ;;
+                    8)
+                        aurhelper_install "puddletag"
+                        ;;
+                    9)
+                        aurhelper_install "timidity++ fluidr3"
+                        echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
+                        ;;
+                    10)
+                        pacman -S --noconfirm --needed gstreamer0.10-plugins
+                        ;;
+                    11)
+                        pacman -S --noconfirm --needed audacity
+                        ;;
+                    *)
+                        LOOP=0
+                        ;;
+                esac
+                pause_function
+            done
+            LOOP=1
             ;;
+            #}}}
         2)
-            aurhelper_install "arista-transcoder"
+            #VIDEO {{{
+            while [ "$LOOP" -ne 0 ]
+            do
+                print_title "VIDEO APPS "
+                echo "[1]  Gnome Mplayer"
+                echo "[2]  Parole"
+                echo "[3]  Rosa Media Player"
+                echo "[4]  SMplayer"
+                echo "[5]  VLC"
+                echo "[6]  XBMC"
+                echo "[7]  Arista"
+                echo "[8]  Transmageddon"
+                echo "[9]  Codecs"
+                echo "[10] Kdenlive"
+                echo "[11] Openshot"
+                echo "[12] Pitivi"
+                echo ""
+                echo "[b] BACK"
+                echo ""
+                read -p "Option: " OPTION
+                case "$OPTION" in
+                    1)
+                        pacman -S --noconfirm --needed gnome-mplayer
+                        ;;
+                    2)
+                        pacman -S --noconfirm --needed parole
+                        ;;
+                    3)
+                        aurhelper_install "rosa-media-player"
+                        ;;
+                    4)
+                        pacman -S --noconfirm --needed smplayer smplayer-themes
+                        ;;
+                    5)
+                        pacman -S --noconfirm --needed vlc
+                        if [ "$KDE" -eq 1 ]; then
+                            pacman -S --noconfirm --needed phonon-vlc
+                        fi
+                        ;;
+                    6)
+                        pacman -S --noconfirm --needed xbmc
+                        ;;
+                    7)
+                        aurhelper_install "arista-transcoder"
+                        ;;
+                    8)
+                        aurhelper_install "transmageddon"
+                        ;;
+                    9)
+                        aurhelper_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
+                        if [ "$ARCHI" = "i686" ]; then
+                            aurhelper_install "codecs"
+                        else
+                            aurhelper_install "codecs64"
+                        fi
+                        ;;
+                    10)
+                        pacman -S --noconfirm --needed kdenlive
+                        ;;
+                    11)
+                        pacman -S --noconfirm --needed openshot
+                        ;;
+                    12)
+                        pacman -S --noconfirm --needed pitivi
+                        ;;
+                    *)
+                        LOOP=0
+                        ;;
+                esac
+                pause_function
+            done
+            LOOP=1
             ;;
-        3)
-            pacman -S --noconfirm --needed audacity
-            ;;
-        4)
-            pacman -S --noconfirm --needed banshee
-            ;;
-        5)
-            aurhelper_install "beatbox-bzr"
-            ;;
-        6)
-            pacman -S --noconfirm --needed clementine
-            ;;
-        7)
-            pacman -S --noconfirm --needed gstreamer0.10-plugins
-            aurhelper_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
-            if [ "$ARCHI" = "i686" ]; then
-                aurhelper_install "codecs"
-            else
-                aurhelper_install "codecs64"
-            fi
-            ;;
-        8)
-            pacman -S --noconfirm --needed exaile
-            ;;
-        9)
-            if [ "$KDE" -eq 1 ]; then
-                pacman -S --noconfirm --needed smplayer smplayer-themes
-            else
-                pacman -S --noconfirm --needed gnome-mplayer
-            fi
-            ;;
-        10)
-            aurhelper_install "timidity++ fluidr3"
-            echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
-            ;;
-        11)
-            aurhelper_install "nuvola-bzr-stable"
-            ;;
-        12)
-            aurhelper_install "puddletag"
-            ;;
-        13)
-            pacman -S --noconfirm --needed rhythmbox
-            ;;
-        14)
-            aurhelper_install "transmageddon"
-            ;;
-        15)
-            pacman -S --noconfirm --needed vlc
-            if [ "$KDE" -eq 1 ]; then
-                pacman -S --noconfirm --needed phonon-vlc
-            fi
-            ;;
-        16)
-            pacman -S --noconfirm --needed xbmc
-            ;;
-        17)
-            aurhelper_install "rosa-media-player"
-            ;;
+            #}}}
         *)
             LOOP=0
             ;;
     esac
-    pause_function
 done
+pause_function
 #}}}
 #GAMES {{{
 LOOP=1
@@ -1744,6 +1728,7 @@ do
                     LOOP=0
                     ;;
             esac
+            pause_function
         done
         LOOP=1
         ;;
@@ -1790,6 +1775,7 @@ do
                     LOOP=0
                     ;;
             esac
+            pause_function
         done
         LOOP=1
         ;;
@@ -1820,6 +1806,7 @@ do
                     LOOP=0
                     ;;
             esac
+            pause_function
         done
         LOOP=1
         ;;
@@ -1842,6 +1829,7 @@ do
                     LOOP=0
                     ;;
             esac
+            pause_function
         done
         LOOP=1
         ;;
@@ -1871,6 +1859,7 @@ do
                     LOOP=0
                     ;;
             esac
+            pause_function
         done
         LOOP=1
         ;;
@@ -1897,6 +1886,7 @@ do
                     LOOP=0
                     ;;
             esac
+            pause_function
         done
         LOOP=1
         ;;
@@ -1919,6 +1909,7 @@ do
                     LOOP=0
                     ;;
             esac
+            pause_function
         done
         LOOP=1
         ;;
@@ -1941,6 +1932,7 @@ do
                     LOOP=0
                     ;;
             esac
+            pause_function
         done
         LOOP=1
         ;;
@@ -1975,6 +1967,7 @@ do
                     LOOP=0
                     ;;
             esac
+            pause_function
         done
         LOOP=1
         ;;
@@ -2005,6 +1998,7 @@ do
                     LOOP=0
                     ;;
             esac
+            pause_function
         done
         LOOP=1
         ;;
@@ -2047,6 +2041,7 @@ do
                     LOOP=0
                     ;;
             esac
+            pause_function
         done
         LOOP=1
         ;;
@@ -2069,6 +2064,7 @@ do
     echo "[4] ttf-liberation"
     echo "[5] ttf-ms-fonts"
     echo "[6] ttf-roboto"
+    echo "[7] ttf-vista-fonts"
     echo ""
     echo "[a] ALL"
     echo "[n] NEXT"
@@ -2095,10 +2091,13 @@ do
         6)
             aurhelper_install "ttf-roboto"
             ;;
+        7)
+            aurhelper_install "ttf-vista-fonts"
+            ;;
         "a")
             pacman -Rdd --noconfirm ttf-droid
             pacman -Rdd --noconfirm ttf-ubuntu-font-family
-            aurhelper_install "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts"
+            aurhelper_install "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts"
             LOOP=0
             ;;
         *)
@@ -2123,8 +2122,8 @@ done
             install_status
             ;;
         2)
-            pacman -Rdd --noconfirm cairo freetype2 libxft
-            aurhelper_install "freetype2-cleartype libxft-cleartype cairo-cleartype"
+            pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
+            aurhelper_install "freetype2-cleartype libxft-cleartype cairo-cleartype fontconfig-cleartype"
             install_status
             ;;
         *)
