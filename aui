@@ -637,8 +637,8 @@ function reboot_now(){ #{{{
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE GNOME APPS"
-                echo "[1]  Conky + CONKY-colors"
-                echo "[2]  Docky"
+                echo "[1]  Cairo Dock"
+                echo "[2]  Conky + CONKY-colors"
                 echo "[3]  Gnome Activity Journal"
                 echo "[4]  Gnome Icons [Faience, Faenza, Elementary]"
                 echo "[5]  Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
@@ -656,11 +656,11 @@ function reboot_now(){ #{{{
                 read -p "Option: " OPTION
                 case "$OPTION" in
                     1)
-                        aurhelper_install "conky conky-colors"
-                        add_module "coretemp it87 acpi-cpufreq"
+                        aurhelper_install "cairo-dock cairo-dock-plug-ins"
                         ;;
                     2)
-                        aurhelper_install "docky"
+                        aurhelper_install "conky conky-colors"
+                        add_module "coretemp it87 acpi-cpufreq"
                         ;;
                     3)
                         aurhelper_install "gnome-activity-journal libzeitgeist zeitgeist-datahub zeitgeist-extensions"
@@ -700,7 +700,7 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
                         pacman -S --noconfirm --needed terminator
                         pacman -Rdd --noconfirm sushi
-                        aurhelper_install "docky"
+                        aurhelper_install "cairo-dock cairo-dock-plug-ins"
                         aurhelper_install "conky conky-colors"
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         aurhelper_install "gloobus-sushi-bzr"
@@ -867,8 +867,8 @@ function reboot_now(){ #{{{
             while [ "$LOOP" -ne -4 ]
             do
                 print_title "FAVORITE GNOME APPS"
-                echo "[1]  Conky + CONKY-colors"
-                echo "[2]  Docky"
+                echo "[1]  Cairo Dock"
+                echo "[2]  Conky + CONKY-colors"
                 echo "[3]  Icons [Faience, Faenza, Elementary]"
                 echo "[4]  Kupfer"
                 echo "[5]  Shutter"
@@ -880,11 +880,11 @@ function reboot_now(){ #{{{
                 read -p "Option: " OPTION
                 case "$OPTION" in
                     1)
-                        aurhelper_install "conky conky-colors"
-                        add_module "coretemp it87 acpi-cpufreq"
+                        aurhelper_install "cairo-dock cairo-dock-plug-ins"
                         ;;
                     2)
-                        aurhelper_install "docky"
+                        aurhelper_install "conky conky-colors"
+                        add_module "coretemp it87 acpi-cpufreq"
                         ;;
                     3)
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
