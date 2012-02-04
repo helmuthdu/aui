@@ -1060,7 +1060,7 @@ function reboot_now(){ #{{{
             done
             #}}}
             install_status
-            LXDE=1
+            XFCE=1
             ;;
             #}}}
         *)
