@@ -670,7 +670,7 @@ function reboot_now(){ #{{{
                         ;;
                     5)
                         aurhelper_install "libkeybinder3"
-                        aurhelper_install "gpaste-git gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme-git gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
+                        aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme-git gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
                         ;;
                     6)
                         aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
