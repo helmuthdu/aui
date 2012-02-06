@@ -639,16 +639,15 @@ function reboot_now(){ #{{{
                 print_title "FAVORITE GNOME APPS"
                 echo "[1]  Cairo Dock"
                 echo "[2]  Conky + CONKY-colors"
-                echo "[3]  Gnome Activity Journal"
-                echo "[4]  Gnome Icons [Faience, Faenza, Elementary]"
-                echo "[5]  Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
-                echo "[6]  GnomeShell Extensions"
-                echo "[7]  GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
-                echo "[8]  Gloobus-Sushi"
-                echo "[9]  Packagekit"
-                echo "[10] Shutter"
-                echo "[11] Synapse"
-                echo "[12] Terminator"
+                echo "[3]  Gnome Icons [Faience, Faenza, Elementary]"
+                echo "[4]  Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
+                echo "[5]  GnomeShell Extensions"
+                echo "[6]  GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
+                echo "[7]  Gloobus-Sushi"
+                echo "[8]  Packagekit"
+                echo "[9]  Shutter"
+                echo "[10] Synapse"
+                echo "[11] Terminator"
                 echo ""
                 echo "[a] ALL"
                 echo "[n] NEXT"
@@ -656,43 +655,40 @@ function reboot_now(){ #{{{
                 read -p "Option: " OPTION
                 case "$OPTION" in
                     1)
-                        aurhelper_install "cairo-dock cairo-dock-plug-ins"
+                        aurhelper_install "cairo-dock-bzr cairo-dock-plugins-bzr"
                         ;;
                     2)
                         aurhelper_install "conky conky-colors"
                         add_module "coretemp it87 acpi-cpufreq"
                         ;;
                     3)
-                        aurhelper_install "gnome-activity-journal libzeitgeist zeitgeist-datahub zeitgeist-extensions"
-                        ;;
-                    4)
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         ;;
-                    5)
+                    4)
                         aurhelper_install "egtk-bzr"
                         aurhelper_install "zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
                         ;;
-                    6)
+                    5)
                         aurhelper_install "libkeybinder3"
-                        aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-workspace-indicator gnome-shell-extension-places-menu gnome-shell-extension-dock gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
+                        aurhelper_install "gpaste-git gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme-git gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
                         ;;
-                    7)
+                    6)
                         aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
                         ;;
-                    8)
+                    7)
                         pacman -Rdd --noconfirm sushi
                         aurhelper_install "gloobus-sushi-bzr"
                         ;;
-                    9)
+                    8)
                         pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
                         ;;
-                    10)
+                    9)
                         aurhelper_install "shutter"
                         ;;
-                    11)
+                    10)
                         aurhelper_install "synapse"
                         ;;
-                    12)
+                    11)
                         aurhelper_install "python-keybinder"
                         pacman -S --noconfirm --needed terminator
                         ;;
@@ -700,14 +696,14 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
                         pacman -S --noconfirm --needed terminator
                         pacman -Rdd --noconfirm sushi
-                        aurhelper_install "cairo-dock cairo-dock-plug-ins"
+                        aurhelper_install "cairo-dock-bzr cairo-dock-plugins-bzr"
                         aurhelper_install "conky conky-colors"
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         aurhelper_install "gloobus-sushi-bzr"
                         aurhelper_install "gnome-activity-journal libzeitgeist zeitgeist-datahub zeitgeist-extensions"
                         aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
                         aurhelper_install "libkeybinder3"
-                        aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-workspace-indicator gnome-shell-extension-places-menu gnome-shell-extension-dock gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
+                        aurhelper_install "gpaste-git gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme-git gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
                         aurhelper_install "python-keybinder"
                         aurhelper_install "shutter"
                         aurhelper_install "synapse"
@@ -880,7 +876,7 @@ function reboot_now(){ #{{{
                 read -p "Option: " OPTION
                 case "$OPTION" in
                     1)
-                        aurhelper_install "cairo-dock cairo-dock-plug-ins"
+                        aurhelper_install "cairo-dock-bzr cairo-dock-plugins-bzr"
                         ;;
                     2)
                         aurhelper_install "conky conky-colors"
