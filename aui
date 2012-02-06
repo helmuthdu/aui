@@ -700,7 +700,6 @@ function reboot_now(){ #{{{
                         aurhelper_install "conky conky-colors"
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         aurhelper_install "gloobus-sushi-bzr"
-                        aurhelper_install "gnome-activity-journal libzeitgeist zeitgeist-datahub zeitgeist-extensions"
                         aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
                         aurhelper_install "libkeybinder3"
                         aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git"
