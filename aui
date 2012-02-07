@@ -726,7 +726,7 @@ function reboot_now(){ #{{{
         2)
             #KDE {{{
             print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
-            pacman -S --noconfirm --needed kde kde-l10n-$LOCATION_KDE
+            pacman -S --noconfirm --needed kde kde-l10n-$LOCATION_KDE kipi-plugins
             pacman -Rcsn kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
             pacman -S --noconfirm --needed kdeadmin-system-config-printer-kde xdg-user-dirs
             aurhelper_install "kcm-wacomtablet"
@@ -765,7 +765,7 @@ function reboot_now(){ #{{{
                         pacman -S --noconfirm --needed choqok
                         ;;
                     4)
-                        pacman -S --noconfirm --needed digikam kipi-plugins
+                        pacman -S --noconfirm --needed digikam
                         ;;
                     5)
                         pacman -S --noconfirm --needed k3b dvd+rw-tools
@@ -809,7 +809,7 @@ function reboot_now(){ #{{{
                         ;;
                     "a")
                         pacman -S --noconfirm --needed choqok
-                        pacman -S --noconfirm --needed digikam kipi-plugins
+                        pacman -S --noconfirm --needed digikam
                         pacman -S --noconfirm --needed k3b dvd+rw-tools
                         pacman -S --noconfirm --needed yakuake
                         aurhelper_install "apper"
@@ -859,7 +859,7 @@ function reboot_now(){ #{{{
             aurhelper_install "gnome-defaults-list"
             #FAVORITE XFCE APPS {{{
             LOOP=1
-            while [ "$LOOP" -ne -4 ]
+            while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE GNOME APPS"
                 echo "[1]  Cairo Dock"
@@ -1265,6 +1265,7 @@ do
     echo "[6] Wunderlist"
     echo "[7] Xmind"
     echo "[8] Zathura"
+    echo "[9] Impressive"
     echo ""
     echo "[n] NEXT"
     echo ""
@@ -1285,8 +1286,10 @@ do
         3)
             pacman -S --noconfirm --needed texlive-latexextra texlive-langextra
             pacman -S --noconfirm --needed lyx texmaker
-            aurhelper_install "abntex"
             aurhelper_install "latex-template-springer latex-template-ieee latex-beamer"
+            if [ $LOCATION = "pt_BR" ]; then
+                aurhelper_install "abntex"
+            fi
             ;;
         4)
             if [ "$KDE" -eq 1 ]; then
@@ -1306,6 +1309,9 @@ do
             ;;
         8)
             pacman -S --noconfirm --needed zathura
+            ;;
+        9)
+            pacman -S --noconfirm --needed impressive
             ;;
         *)
             LOOP=0
@@ -1439,10 +1445,16 @@ do
             aurhelper_install "jdownloader"
             ;;
         5)
-            pacman -S --noconfirm --needed firefox firefox-i18n-$LOCATION_GNOME flashplugin
+            pacman -S --noconfirm --needed firefox flashplugin
+            if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "pt_PT" ]; then
+                pacman -S --noconfirm --needed firefox-i18n-$LOCATION_GNOME
+            fi
             ;;
         6)
-            pacman -S --noconfirm --needed thunderbird thunderbird-i18n-$LOCATION_GNOME
+            pacman -S --noconfirm --needed thunderbird
+            if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "pt_PT" ]; then
+                pacman -S --noconfirm --needed thunderbird-i18n-$LOCATION_GNOME
+            fi
             ;;
         7)
             pacman -S --noconfirm --needed pidgin
