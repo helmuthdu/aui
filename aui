@@ -631,6 +631,7 @@ function reboot_now(){ #{{{
             pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
             pacman -S --noconfirm --needed pulseaudio-gnome telepathy deja-dup
             pacman -S --noconfirm --needed system-config-printer-gnome
+            aurhelper_install "zeitgeist libzeitgeist zeitgeist-datahub"
             aurhelper_install "automounter nautilus-open-terminal gnome-defaults-list"
             #FAVORITE GNOME APPS {{{
             LOOP=1
@@ -643,7 +644,7 @@ function reboot_now(){ #{{{
                 echo "[4]  Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
                 echo "[5]  GnomeShell Extensions"
                 echo "[6]  GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
-                echo "[7]  Gloobus-Sushi"
+                echo "[7]  Gnome Activity Journal "
                 echo "[8]  Packagekit"
                 echo "[9]  Shutter"
                 echo "[10] Synapse"
@@ -676,8 +677,7 @@ function reboot_now(){ #{{{
                         aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
                         ;;
                     7)
-                        pacman -Rdd --noconfirm sushi
-                        aurhelper_install "gloobus-sushi-bzr"
+                        aurhelper_install "gnome-activity-journal"
                         ;;
                     8)
                         pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
@@ -695,11 +695,10 @@ function reboot_now(){ #{{{
                     "a")
                         pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
                         pacman -S --noconfirm --needed terminator
-                        pacman -Rdd --noconfirm sushi
                         aurhelper_install "cairo-dock-bzr cairo-dock-plugins-bzr"
                         aurhelper_install "conky conky-colors"
                         aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
-                        aurhelper_install "gloobus-sushi-bzr"
+                        aurhelper_install "gnome-activity-journal"
                         aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
                         aurhelper_install "libkeybinder3"
                         aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
@@ -1863,7 +1862,7 @@ do
         #EMULATORS {{{
         while [ "$LOOP" -ne 0 ]
         do
-            print_title "RPG"
+            print_title "EMULATORS"
             echo "[1] ZSNES"
             echo ""
             echo "[b] BACK"
