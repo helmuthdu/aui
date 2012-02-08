@@ -13,8 +13,13 @@ You can try it first with a `virtualbox`
 
 ## How to use
 
+### With git
 - Install git: `pacman -S git`
 - get the script: `git clone git://github.com/helmuthdu/aui.git`
+- run the script: `./aui`
+
+### Without git
+- get the script: ` wget --no-check-certificate https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
 - run the script: `./aui`
 
 ## What does the script do?
