@@ -248,7 +248,7 @@ function reboot_now(){ #{{{
 #}}}
 #SYSTEM UPDATE {{{
     print_title "UPDATING YOUR SYSTEM"
-    pacman -Syu
+    pacman -Syuf
     reboot_now
 #}}}
 #CREATE A NEW USER {{{
@@ -269,6 +269,7 @@ function reboot_now(){ #{{{
     question_for_answer "Automatically configure pacman package signing"
     case "$OPTION" in
         "y")
+            pacman -S --noconfirm --needed base-devel
             #INSTALL RNG-TOOLS {{{
             su -l $USERNAME --command="
                 wget http://aur.archlinux.org/packages/rn/rng-tools/rng-tools.tar.gz
