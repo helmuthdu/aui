@@ -2344,8 +2344,8 @@ do
             install_additional_firmwares
             install_git_tor
             install_status
-            pause_function
             sumary "Basic setup installation"
+            pause_function
             BASICSETUP=1
             ;;
         2)
