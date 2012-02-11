@@ -89,7 +89,7 @@ function remove_module(){ #{{{
 } #}}}
 function aurhelper_install(){ #{{{
     for PACKAGE in $1; do
-        if !(pacman -Q $1 &>/dev/null) ; then
+        if !(pacman -Q $PACKAGE &>/dev/null) ; then
             if [ "$YAOURT" -eq 1 ]; then
                 su -l $USERNAME --command="yaourt -S --noconfirm $PACKAGE"
             else
@@ -100,7 +100,7 @@ function aurhelper_install(){ #{{{
         fi
     done
     for PACKAGE in $1; do
-        if !(pacman -Q $1 &>/dev/null) ; then
+        if !(pacman -Q $PACKAGE &>/dev/null) ; then
             question_for_answer "Package $PACKAGE not installed, try install again?"
             if [ $OPTION = "y" ]; then
                 if [ "$YAOURT" -eq 1 ]; then
