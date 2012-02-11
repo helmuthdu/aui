@@ -700,7 +700,7 @@ function install_desktop_environment(){
                 echo "11) Terminator"
                 echo ""
                 echo " a) ALL"
-                echo " b) BACK"
+                echo " d) DONE"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -799,7 +799,7 @@ function install_desktop_environment(){
                 echo "12) Yakuake"
                 echo ""
                 echo " a) ALL"
-                echo " b) BACK"
+                echo " d) DONE"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -918,7 +918,7 @@ function install_desktop_environment(){
                 echo " 6) Terminator"
                 echo " 7) Themes [Zukitwo]"
                 echo ""
-                echo " b) BACK"
+                echo " d) DONE"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -978,7 +978,7 @@ function install_desktop_environment(){
                 echo " 7) Terminator"
                 echo " 8) Xfburn"
                 echo ""
-                echo " b) BACK"
+                echo " d) DONE"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -1053,7 +1053,7 @@ function install_desktop_environment(){
                 echo "11) Volwheel"
                 echo "12) Xfburn"
                 echo ""
-                echo " b) BACK"
+                echo " d) DONE"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
