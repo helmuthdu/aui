@@ -27,6 +27,21 @@ OPENBOX=0
 YAOURT=0
 PACKER=0
 
+BASICSETUP=0
+DESKTOPENVIRONMENT=0
+DEVELOPMENTAPPS=0
+OFFICEAPPS=0
+SYSTEMAPPS=0
+GRAPHICSAPPS=0
+INTERNETAPPS=0
+AUDIOAPPS=0
+VIDEOAPPS=0
+LAMP=0
+GAMES=0
+FONTS=0
+FONTSCONFIG=0
+CLEANPACKAGES=0
+
 ARCHI=`uname -m`
 
 # Automatically detects the system language based on your rc.conf
@@ -49,6 +64,13 @@ function print_title (){ #{{{
     echo -e "# $1"
     print_line
     echo ""
+} #}}}
+function checkbox(){ #{{{
+    if [[ $1 -eq 1 ]]; then
+        echo "[X]"
+    else
+        echo "[ ]"
+    fi
 } #}}}
 function add_daemon(){ #{{{
     remove_daemon "$1"
@@ -136,7 +158,8 @@ function reboot_now(){ #{{{
     esac
 } #}}}
 
-#START {{{
+#WELCOME {{{
+function welcome(){
     clear
     echo "Welcome to the Archlinux Ultimate install script by helmuthdu"
     print_line
@@ -151,16 +174,21 @@ function reboot_now(){ #{{{
     echo "This version is still in BETA. Send bugreports to: "
     echo "helmuthdu at gmail dot com"
     pause_function
+
+}
 #}}}
 #CHECK ROOT {{{
+function check_root() {
     CURRENTUSER="$(whoami)"
     if [ $CURRENTUSER != "root" ]; then
         echo "Current user is NOT 'root'. EXIT now"
         pause_function
         exit 1
     fi
+}
 #}}}
 #LANGUAGE SELECTOR {{{
+function language_selector(){
     print_title "LANGUAGE - https://wiki.archlinux.org/index.php/Locale"
     question_for_answer "Default system language: \"$LOCATION\""
     case "$OPTION" in
@@ -174,8 +202,10 @@ function reboot_now(){ #{{{
             ;;
     esac
     pause_function
+}
 #}}}
 #CUSTOM REPOSITORIES {{{
+function custom_repositories(){
     print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
     question_for_answer "Add custom repositories"
     case "$OPTION" in
@@ -185,13 +215,13 @@ function reboot_now(){ #{{{
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
-                echo "[1] Ayatana"
-                echo "[2] Archlinuxfr"
-                if [ "$ARCHI" = "x86_64" ]; then echo "[3] Multilib"; fi
+                echo " 1) Ayatana"
+                echo " 2) Archlinuxfr"
+                if [ "$ARCHI" = "x86_64" ]; then echo " 3) Multilib"; fi
                 echo ""
-                echo "[a] \"Add Custom\""
+                echo " a) \"Add Custom\""
                 echo ""
-                echo "[n] NEXT"
+                echo " d) DONE"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -228,8 +258,10 @@ function reboot_now(){ #{{{
     esac
     sumary "Custom repositories installation"
     pause_function
+}
 #}}}
 #RANKMIRROR {{{
+function rankmirror(){
     print_title "RANKMIRROR - https://wiki.archlinux.org/index.php/Improve_Pacman_Performance"
     question_for_answer "Choosing the fastest mirror using rankmirror (this can take a while)"
     case "$OPTION" in
@@ -245,79 +277,90 @@ function reboot_now(){ #{{{
     esac
     sumary "New mirrorlist creation"
     pause_function
+}
 #}}}
 #SYSTEM UPDATE {{{
+function system_upgrade(){
     print_title "UPDATING YOUR SYSTEM"
     pacman -Syuf
     reboot_now
+}
 #}}}
 #CREATE A NEW USER {{{
-    print_title "CREATE USER ACCOUNT"
-    read -p "New user name: " USERNAME
-    useradd -m -g users -G users,audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
+function create_user(){
+    print_title "CREATE USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
+    read -p "New username: " USERNAME
+    useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
     passwd $USERNAME
     #SET USER AS SUDO #{{{
+        print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
         pacman -S --noconfirm --needed sudo
         ## Uncomment to allow members of group wheel to execute any command
         sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
         ## Same thing without a password (not secure)
         #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
     #}}}
+}
 #}}}
 #AUR HELPER {{{
+function choose_aurhelper(){
     LOOP=1
     while [ "$LOOP" -ne 0 ]
     do
         print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
         echo "Choose your default AUR helper to install"
-        echo "[1] Yaourt"
-        echo "[2] Packer"
+        echo " 1) Yaourt"
+        echo " 2) Packer"
         echo ""
         read -p "Option: " OPTION
         case "$OPTION" in
             1)
-                pacman -S --noconfirm --needed base-devel yajl
-                su -l $USERNAME --command="
-                    wget http://aur.archlinux.org/packages/package-query/package-query.tar.gz;
-                    tar zxvf package-query.tar.gz;
-                    cd package-query;
-                    makepkg -si --noconfirm;
-                    cd ..;
-                    rm -fr package-query*
-                "
-                su -l $USERNAME --command="
-                    wget http://aur.archlinux.org/packages/yaourt/yaourt.tar.gz;
-                    tar zxvf yaourt.tar.gz;
-                    cd yaourt;
-                    makepkg -si --noconfirm;
-                    cd ..;
-                    rm -fr yaourt*
-                "
-                install_status
                 if !(pacman -Q yaourt &>/dev/null) ; then
-                    echo "Yaourt not installed. EXIT now"
-                    pause_function
-                    exit 0
+                    pacman -S --noconfirm --needed base-devel yajl
+                    su -l $USERNAME --command="
+                        wget http://aur.archlinux.org/packages/package-query/package-query.tar.gz;
+                        tar zxvf package-query.tar.gz;
+                        cd package-query;
+                        makepkg -si --noconfirm;
+                        cd ..;
+                        rm -fr package-query*
+                    "
+                    su -l $USERNAME --command="
+                        wget http://aur.archlinux.org/packages/yaourt/yaourt.tar.gz;
+                        tar zxvf yaourt.tar.gz;
+                        cd yaourt;
+                        makepkg -si --noconfirm;
+                        cd ..;
+                        rm -fr yaourt*
+                    "
+                    if !(pacman -Q yaourt &>/dev/null) ; then
+                        echo "Yaourt not installed. EXIT now"
+                        pause_function
+                        exit 0
+                    fi
                 fi
+                install_status
                 YAOURT=1
                 LOOP=0
                 ;;
             2)
-                pacman -S --noconfirm --needed git jshon curl
-                su -l $USERNAME --command="
-                    wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
-                    tar zxvf packer.tar.gz;
-                    cd packer;
-                    makepkg -si --noconfirm;
-                    cd ..;
-                    rm -fr packer*
-                "
-                install_status
                 if !(pacman -Q packer &>/dev/null) ; then
-                    echo "Packer not installed. EXIT now"
-                    pause_function
-                    exit 0
+                    pacman -S --noconfirm --needed git jshon curl
+                    su -l $USERNAME --command="
+                        wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
+                        tar zxvf packer.tar.gz;
+                        cd packer;
+                        makepkg -si --noconfirm;
+                        cd ..;
+                        rm -fr packer*
+                    "
+                    if !(pacman -Q packer &>/dev/null) ; then
+                        echo "Packer not installed. EXIT now"
+                        pause_function
+                        exit 0
+                    fi
                 fi
+                install_status
                 PACKER=1
                 LOOP=0
                 ;;
@@ -330,8 +373,10 @@ function reboot_now(){ #{{{
     done
     sumary "AUR Helper installation"
     pause_function
+}
 #}}}
 #PACKMAN PACKAGE SIGNING {{{
+function pacman_package_signing(){
     print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
     question_for_answer "Automatically configure pacman package signing"
     case "$OPTION" in
@@ -358,8 +403,10 @@ function reboot_now(){ #{{{
     esac
     sumary "Pacman signing configuration"
     pause_function
+}
 #}}}
-#BASE SYSTEM {{{
+#BASIC SETUP{{{
+function install_basic_setup(){
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
     pacman -S --noconfirm --needed curl bc rsync mlocate bash-completion vim net-tools
     print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
@@ -413,8 +460,10 @@ function reboot_now(){ #{{{
     sed -i '/MODULES[=]/s/snd-usb-audio//' /etc/rc.conf
     sed -i '/MODULES[=]/s/MODULES[=](/&snd-usb-audio/' /etc/rc.conf
     add_daemon "@alsa"
+}
 #}}}
 #TLP #{{{
+function install_tlp(){
     print_title "TLP - https://wiki.archlinux.org/index.php/TLP"
     question_for_answer "Install TLP (great battery improvement on laptops)"
     case "$OPTION" in
@@ -430,26 +479,30 @@ function reboot_now(){ #{{{
     esac
     sumary "TLP installation"
     pause_function
+}
 #}}}
 #XORG {{{
+function install_xorg(){
     print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
     echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
     pacman -S --noconfirm --needed xorg-server xorg-xinit xorg-xkill
     pacman -S --noconfirm --needed xf86-input-synaptics xf86-input-mouse xf86-input-keyboard
     pacman -S --noconfirm --needed mesa
     pacman -S --noconfirm --needed gamin
+}
 #}}}
-#GRAPHIC CARDS {{{
-    print_title "GRAPHIC CARD"
+#VIDEO CARDS {{{
+function install_video_cards(){
+    print_title "VIDEO CARD"
     echo "Select your GPU:"
-    echo "[1] Intel"
-    echo "[2] ATI"
-    echo "[3] nVidia"
-    echo "[4] Nouveau"
-    echo "[5] Virtualbox"
-    echo "[6] Vesa"
+    echo " 1) Intel"
+    echo " 2) ATI"
+    echo " 3) nVidia"
+    echo " 4) Nouveau"
+    echo " 5) Virtualbox"
+    echo " 6) Vesa"
     echo ""
-    echo "[n] NEXT"
+    echo " s) SKIP"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -459,11 +512,7 @@ function reboot_now(){ #{{{
             sumary "Intel GPU driver installation"
             ;;
         2)
-            echo "
-            [catalyst]
-            Server = http://catalyst.apocalypsus.net/repo/catalyst/\$arch" >> /etc/pacman.conf
-            pacman -Sy
-            pacman -S --noconfirm --needed  catalyst catalyst-utils
+            aurhelper_install "catalyst catalyst-utils"
             install_status
             sumary "ATI GPU driver installation"
             ;;
@@ -500,32 +549,36 @@ function reboot_now(){ #{{{
             ;;
     esac
     pause_function
+}
 #}}}
 #CUPS {{{
+function install_cups(){
     print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
     pacman -S --noconfirm --needed cups ghostscript gsfonts
     pacman -S --noconfirm --needed gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf
     add_daemon "@cupsd"
+}
 #}}}
 #ADDITIONAL FIRMWARE {{{
-    print_title "WIRELESS/BLUETOOTH ADDITIONAL DRIVERS - https://wiki.archlinux.org/index.php/Wireless_Setup"
-    question_for_answer "Install additional wireless/bluetooth firmwares"
+function install_additional_firmwares(){
+    print_title "INSTALL ADDITIONAL FIRMWARES"
+    question_for_answer "Install additional firmwares [Wireless,Bluetooth]"
     case "$OPTION" in
         "y")
         #ADDITIONAL FIRMWARE {{{
             LOOP=1
             while [ "$LOOP" -ne 0 ]
             do
-                print_title "WIRELESS/BLUETOOTH ADDITIONAL DRIVERS"
-                echo "[1] ipw2100"
-                echo "[2] ipw2200"
-                echo "[3] b43"
-                echo "[4] b43legacy"
-                echo "[5] broadcom-wl"
-                echo "[6] bluez-firmware"
-                echo "[7] Tools"
+                print_title "INSTALL ADDITIONAL FIRMWARES"
+                echo " 1) ipw2100"
+                echo " 2) ipw2200"
+                echo " 3) b43"
+                echo " 4) b43legacy"
+                echo " 5) broadcom-wl"
+                echo " 6) bluez-firmware"
+                echo " 7) Wireless Tools"
                 echo ""
-                echo "[n] NEXT"
+                echo " d) DONE"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -571,8 +624,10 @@ function reboot_now(){ #{{{
     esac
     sumary "Additional Firmware"
     pause_function
+}
 #}}}
 #GIT ACCESS THRU A FIREWALL {{{
+function install_git_tor(){
     print_title "GIT-TOR - https://wiki.archlinux.org/index.php/Tor"
     question_for_answer "Ensuring access to GIT through a firewall (bypass college firewall)"
     case "$OPTION" in
@@ -601,17 +656,19 @@ function reboot_now(){ #{{{
     esac
     sumary "GIT-TOR installation"
     pause_function
+}
 #}}}
 #DESKTOP ENVIRONMENT {{{
+function install_desktop_environment(){
     print_title "DESKTOP ENVIRONMENT - https://wiki.archlinux.org/index.php/Desktop_Environment"
     echo "Choose your desktop-environment:"
-    echo "[1] GNOME"
-    echo "[2] KDE"
-    echo "[3] XFCE"
-    echo "[4] LXDE"
-    echo "[5] OpenBox"
+    echo " 1) GNOME"
+    echo " 2) KDE"
+    echo " 3) XFCE"
+    echo " 4) LXDE"
+    echo " 5) OpenBox"
     echo ""
-    echo "[n] NEXT"
+    echo " b) BACK"
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
@@ -630,20 +687,20 @@ function reboot_now(){ #{{{
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE GNOME APPS"
-                echo "[1]  Cairo Dock"
-                echo "[2]  Conky + CONKY-colors"
-                echo "[3]  Gnome Icons [Faience, Faenza, Elementary]"
-                echo "[4]  Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
-                echo "[5]  GnomeShell Extensions"
-                echo "[6]  GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
-                echo "[7]  Gnome Activity Journal "
-                echo "[8]  Packagekit"
-                echo "[9]  Shutter"
-                echo "[10] Synapse"
-                echo "[11] Terminator"
+                echo " 1) Cairo Dock"
+                echo " 2) Conky + CONKY-colors"
+                echo " 3) Gnome Icons [Faience, Faenza, Elementary]"
+                echo " 4) Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
+                echo " 5) GnomeShell Extensions"
+                echo " 6) GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
+                echo " 7) Gnome Activity Journal "
+                echo " 8) Packagekit"
+                echo " 9) Shutter"
+                echo "10) Synapse"
+                echo "11) Terminator"
                 echo ""
-                echo "[a] ALL"
-                echo "[n] NEXT"
+                echo " a) ALL"
+                echo " b) BACK"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -728,21 +785,21 @@ function reboot_now(){ #{{{
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE KDE APPS"
-                echo "[1]  Apper"
-                echo "[2]  Bangarang"
-                echo "[3]  Choqok"
-                echo "[4]  Digikam"
-                echo "[5]  K3b"
-                echo "[6]  KDE Icons [KFaenza]"
-                echo "[7]  Minitube"
-                echo "[8]  Musique"
-                echo "[9]  Plasma Themes [Caledonia]"
-                echo "[10] QtCurve Themes [Kawai, Sweet]"
-                echo "[11] Speedcrunch"
-                echo "[12] Yakuake"
+                echo " 1) Apper"
+                echo " 2) Bangarang"
+                echo " 3) Choqok"
+                echo " 4) Digikam"
+                echo " 5) K3b"
+                echo " 6) KDE Icons [KFaenza]"
+                echo " 7) Minitube"
+                echo " 8) Musique"
+                echo " 9) Plasma Themes [Caledonia]"
+                echo "10) QtCurve Themes [Kawai, Sweet]"
+                echo "11) Speedcrunch"
+                echo "12) Yakuake"
                 echo ""
-                echo "[a] ALL"
-                echo "[n] NEXT"
+                echo " a) ALL"
+                echo " b) BACK"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -853,15 +910,15 @@ function reboot_now(){ #{{{
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE GNOME APPS"
-                echo "[1]  Cairo Dock"
-                echo "[2]  Conky + CONKY-colors"
-                echo "[3]  Icons [Faience, Faenza, Elementary]"
-                echo "[4]  Kupfer"
-                echo "[5]  Shutter"
-                echo "[6]  Terminator"
-                echo "[7]  Themes [Zukitwo]"
+                echo " 1) Cairo Dock"
+                echo " 2) Conky + CONKY-colors"
+                echo " 3) Icons [Faience, Faenza, Elementary]"
+                echo " 4) Kupfer"
+                echo " 5) Shutter"
+                echo " 6) Terminator"
+                echo " 7) Themes [Zukitwo]"
                 echo ""
-                echo "[n] NEXT"
+                echo " b) BACK"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -912,16 +969,16 @@ function reboot_now(){ #{{{
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE LXDE APPS"
-                echo "[1]  Conky + CONKY-colors"
-                echo "[2]  Galculator"
-                echo "[3]  Icons [Faience, Faenza, Elementary]"
-                echo "[4]  Irssi"
-                echo "[5]  Kupfer"
-                echo "[6]  Shutter"
-                echo "[7]  Terminator"
-                echo "[8]  Xfburn"
+                echo " 1) Conky + CONKY-colors"
+                echo " 2) Galculator"
+                echo " 3) Icons [Faience, Faenza, Elementary]"
+                echo " 4) Irssi"
+                echo " 5) Kupfer"
+                echo " 6) Shutter"
+                echo " 7) Terminator"
+                echo " 8) Xfburn"
                 echo ""
-                echo "[n] NEXT"
+                echo " b) BACK"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -983,20 +1040,20 @@ function reboot_now(){ #{{{
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE OPENBOX APPS"
-                echo "[1]  Conky + CONKY-colors"
-                echo "[2]  Galculator"
-                echo "[3]  Gthumb"
-                echo "[4]  Icons [Faience, Faenza, Elementary]"
-                echo "[5]  Irssi"
-                echo "[6]  Kupfer"
-                echo "[7]  Shutter"
-                echo "[8]  Terminator"
-                echo "[9]  Thunar"
-                echo "[10] Tint2"
-                echo "[11] Volwheel"
-                echo "[12] Xfburn"
+                echo " 1) Conky + CONKY-colors"
+                echo " 2) Galculator"
+                echo " 3) Gthumb"
+                echo " 4) Icons [Faience, Faenza, Elementary]"
+                echo " 5) Irssi"
+                echo " 6) Kupfer"
+                echo " 7) Shutter"
+                echo " 8) Terminator"
+                echo " 9) Thunar"
+                echo "10) Tint2"
+                echo "11) Volwheel"
+                echo "12) Xfburn"
                 echo ""
-                echo "[n] NEXT"
+                echo " b) BACK"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -1055,13 +1112,15 @@ function reboot_now(){ #{{{
     esac
     sumary "Desktop Environment Installation"
     pause_function
+}
 #}}}
 #NETWORKMANAGER/WICD {{{
+function install_nm_wicd(){
     print_title "NETWORK CONNECTION MANAGER"
-    echo "[1] Networkmanager"
-    echo "[2] Wicd"
+    echo " 1) Networkmanager"
+    echo " 2) Wicd"
     echo ""
-    echo "[n] NEXT"
+    echo " s) SKIP"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1099,48 +1158,51 @@ function reboot_now(){ #{{{
     esac
     sumary "Network Connection Manager installation"
     pause_function
+}
 #}}}
 #DEVELOPEMENT {{{
+function install_development_apps(){
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "DEVELOPMENT APPS"
-    echo "[1] Aptana Studio"
-    echo "[2] Eclipse"
-    echo "[3] Emacs"
-    echo "[4] Gvim"
-    echo "[5] IntelliJ IDEA"
-    echo "[6] Netbeans"
-    echo "[7] Oracle Java"
-    echo "[8] QT Creator"
-    echo "[9] Sublime Text 2"
-    echo "[10] Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
-    echo "[11] MySQL Workbench"
-    echo "[12] Meld"
+    echo " 1) Aptana Studio"
+    echo " 2) Eclipse"
+    echo " 3) Emacs"
+    echo " 4) Gvim"
+    echo " 5) IntelliJ IDEA"
+    echo " 6) Netbeans"
+    echo " 7) Oracle Java"
+    echo " 8) QT Creator"
+    echo " 9) Sublime Text 2"
+    echo "10) Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
+    echo "11) MySQL Workbench"
+    echo "12) Meld"
     echo ""
-    echo "[n] NEXT"
+    echo " b) BACK"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
             aurhelper_install "aptana-studio"
+            pause_function
             ;;
         2)
             #ECLIPSE {{{
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "ECLIPSE - https://wiki.archlinux.org/index.php/Eclipse"
-                echo "[1] Eclipse Classic"
-                echo "[2] Eclipse IDE for C/C++ Developers "
-                echo "[3] Android Development Tools for Eclipse"
-                echo "[4] Web Development Tools for Eclipse"
-                echo "[5] PHP Development Tools for Eclipse"
-                echo "[6] Python Development Tools for Eclipse"
-                echo "[7] Aptana Studio plugin for Eclipse"
-                echo "[8] Vim-like editing plugin for Eclipse"
-                echo "[9] Git support plugin for Eclipse"
+                echo " 1) Eclipse Classic"
+                echo " 2) Eclipse IDE for C/C++ Developers "
+                echo " 3) Android Development Tools for Eclipse"
+                echo " 4) Web Development Tools for Eclipse"
+                echo " 5) PHP Development Tools for Eclipse"
+                echo " 6) Python Development Tools for Eclipse"
+                echo " 7) Aptana Studio plugin for Eclipse"
+                echo " 8) Vim-like editing plugin for Eclipse"
+                echo " 9) Git support plugin for Eclipse"
                 echo ""
-                echo "[b] BACK"
+                echo " b) BACK"
                 echo ""
                 read -p "Option: " OPTION
                 case "$OPTION" in
@@ -1190,6 +1252,7 @@ do
             ;;
         3)
             pacman -S --noconfirm --needed emacs
+            pause_function
             ;;
         4)
             pacman -Rdd --noconfirm vim
@@ -1204,17 +1267,21 @@ do
                 chown -R $USERNAME:users /home/$USERNAME/.vim
                 chown $USERNAME:users /home/$USERNAME/.vimrc
             #}}}
+            pause_function
             ;;
         5)
             pacman -S --noconfirm --needed intellij-idea-community-edition
+            pause_function
             ;;
         6)
             pacman -S --noconfirm --needed netbeans
+            pause_function
             ;;
         7)
             pacman -Rdd --noconfirm jre7-openjdk
             pacman -Rdd --noconfirm jdk7-openjdk
             aurhelper_install "jdk"
+            pause_function
             ;;
         8)
             pacman -S --noconfirm --needed qtcreator qt-doc
@@ -1222,43 +1289,49 @@ do
             wget http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
             mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
             chown -R $USERNAME:users /home/$USERNAME/.config
+            pause_function
             ;;
         9)
             aurhelper_install "sublime-text"
+            pause_function
             ;;
         10)
             pacman -S --noconfirm --needed valgrind gdb splint tidyhtml pyflakes
             aurhelper_install "jsl"
+            pause_function
             ;;
         11)
             aurhelper_install "mysql-workbench"
+            pause_function
             ;;
         12)
             pacman -S --noconfirm --needed meld
+            pause_function
             ;;
         *)
             LOOP=0
             ;;
     esac
-    pause_function
 done
+}
 #}}}
 #OFFICE {{{
+function install_office_apps(){
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "OFFICE APPS"
-    echo "[1] LibreOffice"
-    echo "[2] GnomeOffice [Abiword, Gnumeric]"
-    echo "[3] Latex [Texmaker, Lyx]"
-    if [ "$KDE" -eq 1 ]; then echo "[4] Kchmviewer"; else echo "[4] Chmsee"; fi
-    echo "[5] GCStar"
-    echo "[6] Wunderlist"
-    echo "[7] Xmind"
-    echo "[8] Zathura"
-    echo "[9] Impressive"
+    echo " 1) LibreOffice"
+    echo " 2) GnomeOffice [Abiword, Gnumeric]"
+    echo " 3) Latex"
+    if [ "$KDE" -eq 1 ]; then echo " 4) Kchmviewer"; else echo " 4) Chmsee"; fi
+    echo " 5) GCStar"
+    echo " 6) Wunderlist"
+    echo " 7) Xmind"
+    echo " 8) Zathura"
+    echo " 9) Impressive"
     echo ""
-    echo "[n] NEXT"
+    echo " b) BACK"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1270,17 +1343,20 @@ do
             else
                 pacman -S --noconfirm --needed libreoffice-gnome
             fi
+            pause_function
             ;;
         2)
             pacman -S --noconfirm --needed gnumeric abiword abiword-plugins
+            pause_function
             ;;
         3)
             pacman -S --noconfirm --needed texlive-latexextra texlive-langextra
-            pacman -S --noconfirm --needed lyx texmaker
+            aurhelper_install "texmaker"
             aurhelper_install "latex-template-springer latex-template-ieee latex-beamer"
             if [ $LOCATION = "pt_BR" ]; then
                 aurhelper_install "abntex"
             fi
+            pause_function
             ;;
         4)
             if [ "$KDE" -eq 1 ]; then
@@ -1288,48 +1364,57 @@ do
             else
                 pacman -S --noconfirm --needed chmsee
             fi
+            pause_function
             ;;
         5)
             pacman -S --noconfirm --needed gcstar
+            pause_function
             ;;
         6)
             aurhelper_install "wunderlist"
+            pause_function
             ;;
         7)
             aurhelper_install "xmind"
+            pause_function
             ;;
         8)
             pacman -S --noconfirm --needed zathura
+            pause_function
             ;;
         9)
             pacman -S --noconfirm --needed impressive
+            pause_function
             ;;
         *)
             LOOP=0
             ;;
     esac
-    pause_function
 done
+}
 #}}}
 #SYSTEM TOOLS {{{
+function install_system_apps(){
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "SYSTEM TOOLS APPS"
-    echo "[1] Grsync"
-    echo "[2] Htop"
-    echo "[3] Virtualbox"
-    echo "[4] Wine"
+    echo " 1) Grsync"
+    echo " 2) Htop"
+    echo " 3) Virtualbox"
+    echo " 4) Wine"
     echo ""
-    echo "[n] NEXT"
+    echo " b) BACK"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed grsync
+            pause_function
             ;;
         2)
             pacman -S --noconfirm --needed htop
+            pause_function
             ;;
         3)
             pacman -S --noconfirm --needed virtualbox virtualbox-additions
@@ -1338,78 +1423,88 @@ do
             groupadd vboxusers
             gpasswd -a $USERNAME vboxusers
             add_module "vboxdrv"
+            pause_function
             ;;
         4)
             pacman -S --noconfirm --needed wine wine_gecko winetricks
+            pause_function
             ;;
         *)
             LOOP=0
             ;;
     esac
-    pause_function
 done
+}
 #}}}
 #GRAPHICS {{{
+function install_graphics_apps(){
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "GRAPHICS APPS"
-    echo "[1] Blender"
-    echo "[2] Gimp"
-    echo "[3] Gimp-plugins"
-    echo "[4] Inkscape"
-    echo "[5] MComix"
-    echo "[6] Shotwell"
+    echo " 1) Blender"
+    echo " 2) Gimp"
+    echo " 3) Gimp-plugins"
+    echo " 4) Inkscape"
+    echo " 5) MComix"
+    echo " 6) Shotwell"
     echo ""
-    echo "[n] NEXT"
+    echo " b) BACK"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed blender
+            pause_function
             ;;
         2)
             pacman -S --noconfirm --needed gimp
+            pause_function
             ;;
         3)
             aurhelper_install "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
+            pause_function
             ;;
         4)
             pacman -S --noconfirm --needed inkscape uniconvertor python2-numpy python-lxml
             aurhelper_install "sozi"
+            pause_function
             ;;
         5)
             pacman -S --noconfirm --needed mcomix
+            pause_function
             ;;
         6)
             pacman -S --noconfirm --needed shotwell
+            pause_function
             ;;
         *)
             LOOP=0
             ;;
     esac
-    pause_function
 done
+}
 #}}}
 #INTERNET {{{
+function install_internet_apps(){
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "INTERNET APPS"
-    echo "[1]  Dropbox"
-    echo "[2]  Google Earth"
-    echo "[3]  Google Chrome"
-    echo "[4]  Jdownloader"
-    echo "[5]  Mozilla Firefox"
-    echo "[6]  Mozilla Thunderbird"
-    echo "[7]  Pidgin"
-    echo "[8]  Skype"
-    echo "[9]  TeamSpeak"
-    echo "[10] Teamviewer"
-    echo "[11] Trasmission"
-    if [ "$KDE" -eq 1 ]; then echo "[12] Konversation"; else echo "[12] X-Chat"; fi
+    echo " 1) Dropbox"
+    echo " 2) Google Earth"
+    echo " 3) Google Chrome"
+    echo " 4) Jdownloader"
+    echo " 5) Mozilla Firefox"
+    echo " 6) Mozilla Thunderbird"
+    echo " 7) Pidgin"
+    echo " 8) Skype"
+    echo " 9) TeamSpeak"
+    echo "10) Teamviewer"
+    echo "11) Trasmission"
+    if [ "$KDE" -eq 1 ]; then echo "12) Konversation"; else echo "12) X-Chat"; fi
     echo ""
-    echo "[n] NEXT"
+    echo " b) BACK"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1424,40 +1519,50 @@ do
             else
                 aurhelper_install "dropbox-cli"
             fi
+            pause_function
             ;;
         2)
             aurhelper_install "google-earth"
+            pause_function
             ;;
         3)
             pacman -S --noconfirm --needed flashplugin
             aurhelper_install "google-chrome"
+            pause_function
             ;;
         4)
             aurhelper_install "jdownloader"
+            pause_function
             ;;
         5)
             pacman -S --noconfirm --needed firefox flashplugin
             if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "pt_PT" ]; then
                 pacman -S --noconfirm --needed firefox-i18n-$LOCATION_GNOME
             fi
+            pause_function
             ;;
         6)
             pacman -S --noconfirm --needed thunderbird
             if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "pt_PT" ]; then
                 pacman -S --noconfirm --needed thunderbird-i18n-$LOCATION_GNOME
             fi
+            pause_function
             ;;
         7)
             pacman -S --noconfirm --needed pidgin
+            pause_function
             ;;
         8)
             pacman -S --noconfirm --needed skype
+            pause_function
             ;;
         9)
             aurhelper_install "teamspeak3"
+            pause_function
             ;;
         10)
             aurhelper_install "teamviewer"
+            pause_function
             ;;
         11)
             if [ "$KDE" -eq 1 ]; then
@@ -1465,6 +1570,7 @@ do
             else
                 aurhelper_install "transmission-gtk"
             fi
+            pause_function
             ;;
         12)
             if [ "$KDE" -eq 1 ]; then
@@ -1472,15 +1578,17 @@ do
             else
                 pacman -S --noconfirm --needed xchat
             fi
+            pause_function
             ;;
         *)
             LOOP=0
             ;;
     esac
-    pause_function
 done
+}
 #}}}
 #LAMP #{{{
+function install_lamp(){
     print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlinux.org/index.php/LAMP"
     question_for_answer "Install LAMP"
     case "$OPTION" in
@@ -1519,205 +1627,187 @@ done
             ;;
     esac
     sumary "LAMP installation"
-    pause_function
+}
 #}}}
-#MULTIMEDIA {{{
+#AUDIO {{{
+function install_audio_apps(){
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
-    print_title "MULTIMEDIA APPS "
-    echo "[1] Audio apps"
-    echo "[2] Video apps"
+    print_title "AUDIO APPS "
+    echo " 1) Amarok"
+    echo " 2) Banshee"
+    echo " 3) Beatbox"
+    echo " 4) Clementine"
+    echo " 5) Exaile"
+    echo " 6) Nuvola"
+    echo " 7) Rhythmbox"
+    echo " 8) Puddletag"
+    echo " 9) MIDI"
+    echo "10) Codecs"
+    echo "11) Audacity"
     echo ""
-    echo "[n] NEXT"
+    echo " b) BACK"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
-            #AUDIO {{{
-            while [ "$LOOP" -ne 0 ]
-            do
-                print_title "AUDIO APPS "
-                echo "[1]  Amarok"
-                echo "[2]  Banshee"
-                echo "[3]  Beatbox"
-                echo "[4]  Clementine"
-                echo "[5]  Exaile"
-                echo "[6]  Nuvola"
-                echo "[7]  Rhythmbox"
-                echo "[8]  Puddletag"
-                echo "[9]  MIDI"
-                echo "[10] Codecs"
-                echo "[11] Audacity"
-                echo ""
-                echo "[b] BACK"
-                echo ""
-                read -p "Option: " OPTION
-                case "$OPTION" in
-                    1)
-                        pacman -S --noconfirm --needed amarok
-                        pause_function
-                        ;;
-                    2)
-                        pacman -S --noconfirm --needed banshee
-                        pause_function
-                        ;;
-                    3)
-                        aurhelper_install "beatbox-bzr"
-                        pause_function
-                        ;;
-                    4)
-                        pacman -S --noconfirm --needed clementine
-                        pause_function
-                        ;;
-                    5)
-                        aurhelper_install "exaile"
-                        pause_function
-                        ;;
-                    6)
-                        aurhelper_install "nuvola-bzr-stable"
-                        pause_function
-                        ;;
-                    7)
-                        pacman -S --noconfirm --needed rhythmbox
-                        pause_function
-                        ;;
-                    8)
-                        aurhelper_install "puddletag"
-                        pause_function
-                        ;;
-                    9)
-                        aurhelper_install "timidity++ fluidr3"
-                        echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
-                        pause_function
-                        ;;
-                    10)
-                        pacman -S --noconfirm --needed gstreamer0.10-plugins
-                        pause_function
-                        ;;
-                    11)
-                        pacman -S --noconfirm --needed audacity
-                        pause_function
-                        ;;
-                    *)
-                        LOOP=0
-                        ;;
-                esac
-            done
-            LOOP=1
+            pacman -S --noconfirm --needed amarok
+            pause_function
             ;;
-            #}}}
         2)
-            #VIDEO {{{
-            while [ "$LOOP" -ne 0 ]
-            do
-                print_title "VIDEO APPS "
-                echo "[1]  Gnome Mplayer"
-                echo "[2]  Parole"
-                echo "[3]  Rosa Media Player"
-                echo "[4]  SMplayer"
-                echo "[5]  VLC"
-                echo "[6]  XBMC"
-                echo "[7]  Arista"
-                echo "[8]  Transmageddon"
-                echo "[9]  Codecs"
-                echo "[10] Kdenlive"
-                echo "[11] Openshot"
-                echo "[12] Pitivi"
-                echo ""
-                echo "[b] BACK"
-                echo ""
-                read -p "Option: " OPTION
-                case "$OPTION" in
-                    1)
-                        pacman -S --noconfirm --needed gnome-mplayer
-                        pause_function
-                        ;;
-                    2)
-                        pacman -S --noconfirm --needed parole
-                        pause_function
-                        ;;
-                    3)
-                        aurhelper_install "rosa-media-player"
-                        pause_function
-                        ;;
-                    4)
-                        pacman -S --noconfirm --needed smplayer smplayer-themes
-                        pause_function
-                        ;;
-                    5)
-                        pacman -S --noconfirm --needed vlc
-                        if [ "$KDE" -eq 1 ]; then
-                            pacman -S --noconfirm --needed phonon-vlc
-                        fi
-                        pause_function
-                        ;;
-                    6)
-                        pacman -S --noconfirm --needed xbmc
-                        pause_function
-                        ;;
-                    7)
-                        aurhelper_install "arista-transcoder"
-                        pause_function
-                        ;;
-                    8)
-                        aurhelper_install "transmageddon"
-                        pause_function
-                        ;;
-                    9)
-                        aurhelper_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
-                        if [ "$ARCHI" = "i686" ]; then
-                            aurhelper_install "codecs"
-                        else
-                            aurhelper_install "codecs64"
-                        fi
-                        pause_function
-                        ;;
-                    10)
-                        pacman -S --noconfirm --needed kdenlive
-                        pause_function
-                        ;;
-                    11)
-                        pacman -S --noconfirm --needed openshot
-                        pause_function
-                        ;;
-                    12)
-                        pacman -S --noconfirm --needed pitivi
-                        pause_function
-                        ;;
-                    *)
-                        LOOP=0
-                        ;;
-                esac
-            done
-            LOOP=1
+            pacman -S --noconfirm --needed banshee
+            pause_function
             ;;
-            #}}}
+        3)
+            aurhelper_install "beatbox-bzr"
+            pause_function
+            ;;
+        4)
+            pacman -S --noconfirm --needed clementine
+            pause_function
+            ;;
+        5)
+            aurhelper_install "exaile"
+            pause_function
+            ;;
+        6)
+            aurhelper_install "nuvola-bzr-stable"
+            pause_function
+            ;;
+        7)
+            pacman -S --noconfirm --needed rhythmbox
+            pause_function
+            ;;
+        8)
+            aurhelper_install "puddletag"
+            pause_function
+            ;;
+        9)
+            aurhelper_install "timidity++ fluidr3"
+            echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
+            pause_function
+            ;;
+        10)
+            pacman -S --noconfirm --needed gstreamer0.10-plugins
+            pause_function
+            ;;
+        11)
+            pacman -S --noconfirm --needed audacity
+            pause_function
+            ;;
         *)
             LOOP=0
             ;;
     esac
 done
-pause_function
+}
+#}}}
+#VIDEO {{{
+function install_video_apps(){
+LOOP=1
+while [ "$LOOP" -ne 0 ]
+do
+    print_title "VIDEO APPS "
+    echo " 1) Gnome Mplayer"
+    echo " 2) Parole"
+    echo " 3) Rosa Media Player"
+    echo " 4) SMplayer"
+    echo " 5) VLC"
+    echo " 6) XBMC"
+    echo " 7) Arista"
+    echo " 8) Transmageddon"
+    echo " 9) Codecs"
+    echo "10) Kdenlive"
+    echo "11) Openshot"
+    echo "12) Pitivi"
+    echo ""
+    echo " b) BACK"
+    echo ""
+    read -p "Option: " OPTION
+    case "$OPTION" in
+        1)
+            pacman -S --noconfirm --needed gnome-mplayer
+            pause_function
+            ;;
+        2)
+            pacman -S --noconfirm --needed parole
+            pause_function
+            ;;
+        3)
+            aurhelper_install "rosa-media-player-bin"
+            pause_function
+            ;;
+        4)
+            pacman -S --noconfirm --needed smplayer smplayer-themes
+            pause_function
+            ;;
+        5)
+            pacman -S --noconfirm --needed vlc
+            if [ "$KDE" -eq 1 ]; then
+                pacman -S --noconfirm --needed phonon-vlc
+            fi
+            pause_function
+            ;;
+        6)
+            pacman -S --noconfirm --needed xbmc
+            pause_function
+            ;;
+        7)
+            aurhelper_install "arista-transcoder"
+            pause_function
+            ;;
+        8)
+            aurhelper_install "transmageddon"
+            pause_function
+            ;;
+        9)
+            aurhelper_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
+            if [ "$ARCHI" = "i686" ]; then
+                aurhelper_install "codecs"
+            else
+                aurhelper_install "codecs64"
+            fi
+            pause_function
+            ;;
+        10)
+            pacman -S --noconfirm --needed kdenlive
+            pause_function
+            ;;
+        11)
+            pacman -S --noconfirm --needed openshot
+            pause_function
+            ;;
+        12)
+            pacman -S --noconfirm --needed pitivi
+            pause_function
+            ;;
+        *)
+            LOOP=0
+            ;;
+    esac
+done
+}
 #}}}
 #GAMES {{{
+function install_games(){
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "GAMES - https://wiki.archlinux.org/index.php/Games"
-    echo "[1]  Action/Adventure"
-    echo "[2]  Arcade/Platformer"
-    echo "[3]  Dungeon"
-    echo "[4]  Emulators"
-    echo "[5]  FPS"
-    echo "[6]  MMO"
-    echo "[7]  Puzzle"
-    echo "[8]  RPG"
-    echo "[9]  Racing"
-    echo "[10] Simulation"
-    echo "[11] Strategy"
+    echo " 1) Action/Adventure"
+    echo " 2) Arcade/Platformer"
+    echo " 3) Dungeon"
+    echo " 4) Emulators"
+    echo " 5) FPS"
+    echo " 6) MMO"
+    echo " 7) Puzzle"
+    echo " 8) RPG"
+    echo " 9) Racing"
+    echo "10) Simulation"
+    echo "11) Strategy"
     echo ""
-    echo "[n] NEXT"
+    echo " b) BACK"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -1726,13 +1816,13 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "ACTION AND ADVENTURE"
-            echo "[1] Astromenace"
-            echo "[2] OpenTyrian"
-            echo "[3] M.A.R.S."
-            echo "[4] Yo Frankie!"
-            echo "[5] Counter-Strike 2D"
+            echo " 1) Astromenace"
+            echo " 2) OpenTyrian"
+            echo " 3) M.A.R.S."
+            echo " 4) Yo Frankie!"
+            echo " 5) Counter-Strike 2D"
             echo ""
-            echo "[b] BACK"
+            echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
@@ -1769,15 +1859,15 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "ARCADE AND PLATFORMER"
-            echo "[1] Opensonic"
-            echo "[2] Frogatto"
-            echo "[3] Bomberclone"
-            echo "[4] Goonies"
-            echo "[5] Neverball"
-            echo "[6] Super Mario Chronicles"
-            echo "[7] X-Moto"
+            echo " 1) Opensonic"
+            echo " 2) Frogatto"
+            echo " 3) Bomberclone"
+            echo " 4) Goonies"
+            echo " 5) Neverball"
+            echo " 6) Super Mario Chronicles"
+            echo " 7) X-Moto"
             echo ""
-            echo "[b] BACK"
+            echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
@@ -1822,11 +1912,11 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "DUNGEON"
-            echo "[1] Tales of Maj'Eyal"
-            echo "[2] Lost Labyrinth"
-            echo "[3] S.C.O.U.R.G.E."
+            echo " 1) Tales of Maj'Eyal"
+            echo " 2) Lost Labyrinth"
+            echo " 3) S.C.O.U.R.G.E."
             echo ""
-            echo "[b] BACK"
+            echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
@@ -1855,9 +1945,9 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "EMULATORS"
-            echo "[1] ZSNES"
+            echo " 1) ZSNES"
             echo ""
-            echo "[b] BACK"
+            echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
@@ -1878,10 +1968,10 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "FPS"
-            echo "[1] World of Padman"
-            echo "[2] Warsow"
+            echo " 1) World of Padman"
+            echo " 2) Warsow"
             echo ""
-            echo "[b] BACK"
+            echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
@@ -1910,10 +2000,10 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "MMO"
-            echo "[1] Heroes of Newerth"
-            echo "[2] Spiral Knights"
+            echo " 1) Heroes of Newerth"
+            echo " 2) Spiral Knights"
             echo ""
-            echo "[b] BACK"
+            echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
@@ -1938,9 +2028,9 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "PUZZLE"
-            echo "[1] Numptyphysics"
+            echo " 1) Numptyphysics"
             echo ""
-            echo "[b] BACK"
+            echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
@@ -1961,9 +2051,9 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "RPG"
-            echo "[1] Ardentryst"
+            echo " 1) Ardentryst"
             echo ""
-            echo "[b] BACK"
+            echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
@@ -1984,12 +2074,12 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "RACING"
-            echo "[1] Maniadrive"
-            echo "[2] Death Rally"
-            echo "[3] SupertuxKart"
-            echo "[4] Speed Dreams"
+            echo " 1) Maniadrive"
+            echo " 2) Death Rally"
+            echo " 3) SupertuxKart"
+            echo " 4) Speed Dreams"
             echo ""
-            echo "[b] BACK"
+            echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
@@ -2022,11 +2112,11 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "SIMULATION"
-            echo "[1] Simultrans"
-            echo "[2] Theme Hospital"
-            echo "[3] OpenTTD"
+            echo " 1) Simultrans"
+            echo " 2) Theme Hospital"
+            echo " 3) OpenTTD"
             echo ""
-            echo "[b] BACK"
+            echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
@@ -2055,14 +2145,14 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "STRATEGY"
-            echo "[1] Wesnoth"
-            echo "[3] 0ad"
-            echo "[4] Hedgewars"
-            echo "[5] Warzone 2100"
-            echo "[6] MegaGlest"
-            echo "[7] Zod"
+            echo " 1) Wesnoth"
+            echo " 3) 0ad"
+            echo " 4) Hedgewars"
+            echo " 5) Warzone 2100"
+            echo " 6) MegaGlest"
+            echo " 7) Zod"
             echo ""
-            echo "[b] BACK"
+            echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
@@ -2103,68 +2193,78 @@ do
         ;;
     esac
 done
-pause_function
+}
 #}}}
 #FONTS {{{
+function install_fonts(){
 LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
-    echo "[1] ttf-dejavu"
-    echo "[2] ttf-google-webfonts"
-    echo "[3] ttf-kochi-substitute (Japanese Support)"
-    echo "[4] ttf-liberation"
-    echo "[5] ttf-ms-fonts"
-    echo "[6] ttf-roboto"
-    echo "[7] ttf-vista-fonts"
+    echo " 1) ttf-dejavu"
+    echo " 2) ttf-google-webfonts"
+    echo " 3) ttf-kochi-substitute (Japanese Support)"
+    echo " 4) ttf-liberation"
+    echo " 5) ttf-ms-fonts"
+    echo " 6) ttf-roboto"
+    echo " 7) ttf-vista-fonts"
     echo ""
-    echo "[a] ALL"
-    echo "[n] NEXT"
+    echo " a) ALL"
+    echo " b) BACK"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed ttf-dejavu
+            pause_function
             ;;
         2)
             pacman -Rdd --noconfirm ttf-droid
             pacman -Rdd --noconfirm ttf-ubuntu-font-family
             aurhelper_install "ttf-google-webfonts"
+            pause_function
             ;;
         3)
             aurhelper_install "ttf-kochi-substitute"
+            pause_function
             ;;
         4)
             pacman -S --noconfirm --needed ttf-liberation
+            pause_function
             ;;
         5)
             aurhelper_install "ttf-ms-fonts"
+            pause_function
             ;;
         6)
             aurhelper_install "ttf-roboto"
+            pause_function
             ;;
         7)
             aurhelper_install "ttf-vista-fonts"
+            pause_function
             ;;
         "a")
             pacman -Rdd --noconfirm ttf-droid
             pacman -Rdd --noconfirm ttf-ubuntu-font-family
             aurhelper_install "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts"
+            pause_function
             LOOP=0
             ;;
         *)
             LOOP=0
             ;;
     esac
-    pause_function
 done
+}
 #}}}
 #FONTS CONFIGURATION {{{
+function configure_fonts(){
     print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
-    echo "[1] Ubuntu patched packages"
-    echo "[2] Cleartype patched packages"
+    echo " 1) Ubuntu patched packages"
+    echo " 2) Cleartype patched packages"
     echo ""
-    echo "[n] NEXT"
+    echo " b) BACK"
     echo ""
     read -p "Option: " OPTION
     case "$OPTION" in
@@ -2183,17 +2283,132 @@ done
             ;;
     esac
     sumary "Patched Fonts Configuration installation"
-    pause_function
+}
 #}}}
 #CLEAN ORPHAN PACKAGES {{{
+function clean_orphan_packages(){
     print_title "CLEAN ORPHAN PACKAGES"
-    sudo pacman -Rsc --noconfirm $(pacman -Qqdt)
-    #sudo pacman -S --noconfirm --neededc --noconfirm
+    pacman -Rsc --noconfirm $(pacman -Qqdt)
+    #pacman -Sc --noconfirm
     pacman-optimize
+}
 #}}}
-#END {{{
+#FINISH {{{
+function finish(){
     print_title "INSTALL COMPLETED"
     reboot_now
     echo "Thanks for using the Archlinux Ultimate Install script by helmuthdu"
     exit 0
+}
+#}}}
+
+#MAIN {{{
+welcome
+check_root
+language_selector
+system_upgrade
+create_user
+choose_aurhelper
+
+MAINLOOP=1
+while [ "$MAINLOOP" -ne 0 ]
+do
+    print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
+    echo " 1) `checkbox "$BASICSETUP"` Basic Setup"
+    echo " 2) `checkbox "$DESKTOPENVIRONMENT"` Desktop Environment"
+    echo " 3) `checkbox "$DEVELOPMENTAPPS"` Development Apps"
+    echo " 4) `checkbox "$OFFICEAPPS"` Office Apps"
+    echo " 5) `checkbox "$SYSTEMAPPS"` System Apps"
+    echo " 6) `checkbox "$GRAPHICSAPPS"` Graphics Apps"
+    echo " 7) `checkbox "$INTERNETAPPS"` Internet Apps"
+    echo " 8) `checkbox "$AUDIOAPPS"` Audio Apps"
+    echo " 9) `checkbox "$VIDEOAPPS"` Video Apps"
+    echo "10) `checkbox "$LAMP"` LAMP"
+    echo "11) `checkbox "$GAMES"` Games"
+    echo "12) `checkbox "$FONTS"` Fonts"
+    echo "13) `checkbox "$FONTCONFIG"` Fonts Configuration"
+    echo "14) `checkbox "$CLEANPACKAGES"` Clean Orphan Packages"
+    echo ""
+    echo " q) Quit"
+    echo ""
+    read -p "Option: " OPTION
+    case "$OPTION" in
+        1)
+            rankmirror
+            pacman_package_signing
+            install_basic_setup
+            install_tlp
+            install_xorg
+            install_video_cards
+            install_cups
+            install_additional_firmwares
+            install_git_tor
+            install_status
+            pause_function
+            sumary "Basic setup installation"
+            BASICSETUP=1
+            ;;
+        2)
+            install_desktop_environment
+            install_nm_wicd
+            DESKTOPENVIRONMENT=1
+            ;;
+        3)
+            install_development_apps
+            DEVELOPMENTAPPS=1
+            ;;
+        4)
+            install_office_apps
+            OFFICEAPPS=1
+            ;;
+        5)
+            install_system_apps
+            SYSTEMAPPS=1
+            ;;
+        6)
+            install_graphics_apps
+            GRAPHICSAPPS=1
+            ;;
+        7)
+            install_internet_apps
+            INTERNETAPPS=1
+            ;;
+        8)
+            install_audio_apps
+            AUDIOAPPS=1
+            ;;
+        9)
+            install_video_apps
+            VIDEOAPPS=1
+            ;;
+        10)
+            install_lamp
+            LAMP=1
+            ;;
+        11)
+            install_games
+            GAMES=1
+            ;;
+        12)
+            install_fonts
+            FONTS=1
+            ;;
+        13)
+            configure_fonts
+            FONTSCONFIG=1
+            ;;
+        14)
+            clean_orphan_packages
+            CLEANPACKAGES=1
+            ;;
+        "q")
+            finish
+            ;;
+        *)
+            print_line
+            echo "WRONG OPTION"
+            pause_function
+            ;;
+    esac
+done
 #}}}
