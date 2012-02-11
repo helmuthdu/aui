@@ -1731,6 +1731,7 @@ do
     echo "10) Kdenlive"
     echo "11) Openshot"
     echo "12) Pitivi"
+    echo "13) Kazam"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1790,6 +1791,11 @@ do
             ;;
         12)
             pacman -S --noconfirm --needed pitivi
+            pause_function
+            ;;
+        12)
+            pacman -S --noconfirm --needed python-rsvg
+            aurhelper_install "kazam-bzr"
             pause_function
             ;;
         *)
