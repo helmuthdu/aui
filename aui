@@ -1639,13 +1639,15 @@ do
     echo " 2) Banshee"
     echo " 3) Beatbox"
     echo " 4) Clementine"
-    echo " 5) Exaile"
-    echo " 6) Nuvola"
-    echo " 7) Rhythmbox"
-    echo " 8) Puddletag"
-    echo " 9) MIDI"
-    echo "10) Codecs"
-    echo "11) Audacity"
+    echo " 5) Decibel"
+    echo " 6) Exaile"
+    echo " 7) Gmusicbrowser"
+    echo " 8) Nuvola"
+    echo " 9) Rhythmbox"
+    echo "10) Puddletag"
+    echo "11) MIDI"
+    echo "12) Codecs"
+    echo "13) Audacity"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1668,31 +1670,39 @@ do
             pause_function
             ;;
         5)
-            aurhelper_install "exaile"
+            aurhelper_install "decibel-audio-player2"
             pause_function
             ;;
         6)
-            aurhelper_install "nuvola-bzr-stable"
+            aurhelper_install "exaile"
             pause_function
             ;;
         7)
-            pacman -S --noconfirm --needed rhythmbox
+            aurhelper_install "gmusicbrowser-development"
             pause_function
             ;;
         8)
-            aurhelper_install "puddletag"
+            aurhelper_install "nuvola-bzr-stable"
             pause_function
             ;;
         9)
+            pacman -S --noconfirm --needed rhythmbox
+            pause_function
+            ;;
+        10)
+            aurhelper_install "puddletag"
+            pause_function
+            ;;
+        11)
             aurhelper_install "timidity++ fluidr3"
             echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
             pause_function
             ;;
-        10)
+        12)
             pacman -S --noconfirm --needed gstreamer0.10-plugins
             pause_function
             ;;
-        11)
+        13)
             pacman -S --noconfirm --needed audacity
             pause_function
             ;;
