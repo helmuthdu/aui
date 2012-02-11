@@ -777,7 +777,6 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed kde kde-l10n-$LOCATION_KDE kipi-plugins
             pacman -Rcsn kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
             pacman -S --noconfirm --needed kdeadmin-system-config-printer-kde xdg-user-dirs
-            aurhelper_install "kcm-wacomtablet"
             aurhelper_install "kde-gtk-config-git"
             aurhelper_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
             #FAVORITE KDE APPS {{{
