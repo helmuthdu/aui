@@ -61,7 +61,7 @@ LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | cut -c9-13`
     elif [ $LOCATION = "en_US" ]; then
         LOCATION_FF="en-gb"
     else
-        LOCATION_FF=`echo $LOCATION | cut -d\- -f1`
+        LOCATION_FF=`echo $LOCATION | cut -d\_ -f1`
     fi
 #}}}
 #HUNSPELL #{{{
@@ -70,7 +70,7 @@ LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | cut -c9-13`
     elif [ $LOCATION = "pt_PT" ]; then
         LOCATION_HS="pt_pt"
     else
-        LOCATION_HS=`echo $LOCATION | cut -d\- -f1`
+        LOCATION_HS=`echo $LOCATION | cut -d\_ -f1`
     fi
 #}}}
 #LIBREOFFICE #{{{
@@ -227,38 +227,38 @@ function language_selector(){
         "n")
             read -p "New system language [ex: en_US]: " LOCATION
             #KDE #{{{
-                if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "zh_CN" ]; then
-                    LOCATION_KDE=`echo $LOCATION | tr '[:upper:]' '[:lower:]'`
-                elif [ $LOCATION = "en_US" ]; then
-                    LOCATION_KDE="en_gb"
-                else
-                    LOCATION_KDE=`echo $LOCATION | cut -d\_ -f1`
-                fi
+            if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "zh_CN" ]; then
+                LOCATION_KDE=`echo $LOCATION | tr '[:upper:]' '[:lower:]'`
+            elif [ $LOCATION = "en_US" ]; then
+                LOCATION_KDE="en_gb"
+            else
+                LOCATION_KDE=`echo $LOCATION | cut -d\_ -f1`
+            fi
             #}}}
             #FIREFOX #{{{
-                if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "pt_PT" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "es_AR" ] || [ $LOCATION = "es_ES" ] || [ $LOCATION = "zh_CN" ]; then
-                    LOCATION_FF=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-                elif [ $LOCATION = "en_US" ]; then
-                    LOCATION_FF="en-gb"
-                else
-                    LOCATION_FF=`echo $LOCATION | cut -d\- -f1`
-                fi
+            if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "pt_PT" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "es_AR" ] || [ $LOCATION = "es_ES" ] || [ $LOCATION = "zh_CN" ]; then
+                LOCATION_FF=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+            elif [ $LOCATION = "en_US" ]; then
+                LOCATION_FF="en-gb"
+            else
+                LOCATION_FF=`echo $LOCATION | cut -d\_ -f1`
+            fi
             #}}}
             #HUNSPELL #{{{
-                if [ $LOCATION = "pt_BR" ]; then
-                    LOCATION_HS=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-                elif [ $LOCATION = "pt_PT" ]; then
-                    LOCATION_HS="pt_pt"
-                else
-                    LOCATION_HS=`echo $LOCATION | cut -d\- -f1`
-                fi
+            if [ $LOCATION = "pt_BR" ]; then
+                LOCATION_HS=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+            elif [ $LOCATION = "pt_PT" ]; then
+                LOCATION_HS="pt_pt"
+            else
+                LOCATION_HS=`echo $LOCATION | cut -d\_ -f1`
+            fi
             #}}}
             #LIBREOFFICE #{{{
-                if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "en_US" ] || [ $LOCATION = "zh_CN" ]; then
-                    LOCATION_LO=`echo $LOCATION | sed 's/_/-/'`
-                else
-                    LOCATION_LO=`echo $LOCATION | cut -d\_ -f1`
-                fi
+            if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "en_US" ] || [ $LOCATION = "zh_CN" ]; then
+                LOCATION_LO=`echo $LOCATION | sed 's/_/-/'`
+            else
+                LOCATION_LO=`echo $LOCATION | cut -d\_ -f1`
+            fi
             #}}}
             ;;
         *)
