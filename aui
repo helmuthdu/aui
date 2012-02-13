@@ -855,7 +855,7 @@ function install_desktop_environment(){
                 echo " 6) KDE Icons [KFaenza]"
                 echo " 7) Minitube"
                 echo " 8) Musique"
-                echo " 9) Plasma Themes [Caledonia]"
+                echo " 9) Plasma Themes [Caledonia, Produkt]"
                 echo "10) QtCurve Themes [Kawai, Sweet]"
                 echo "11) Speedcrunch"
                 echo "12) Yakuake"
@@ -890,7 +890,7 @@ function install_desktop_environment(){
                         aurhelper_install "musique"
                         ;;
                     9)
-                        aurhelper_install "caledonia-bundle"
+                        aurhelper_install "caledonia-bundle plasma-theme-produkt"
                         ;;
                     10)
                         #QtCurve Themes #{{{
@@ -924,7 +924,7 @@ function install_desktop_environment(){
                         pacman -S --noconfirm --needed yakuake
                         aurhelper_install "apper"
                         aurhelper_install "bangarang"
-                        aurhelper_install "caledonia-bundle"
+                        aurhelper_install "caledonia-bundle plasma-theme-produkt"
                         aurhelper_install "kfaenza-icon-theme"
                         aurhelper_install "minitube"
                         aurhelper_install "musique"
