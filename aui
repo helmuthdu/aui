@@ -138,7 +138,7 @@ function aurhelper_install(){ #{{{
                 if [ "$YAOURT" -eq 1 ]; then
                     su -l $USERNAME --command="yaourt -S $PACKAGE"
                 else
-                    su -l $USERNAME --command="packer -S $PACKAGE"
+                    su -l $USERNAME --command="packer -S --skipinteg $PACKAGE"
                 fi
             fi
         fi
@@ -2280,6 +2280,7 @@ do
     echo " 5) ttf-ms-fonts"
     echo " 6) ttf-roboto"
     echo " 7) ttf-vista-fonts"
+    echo " 8) ttf-mac-fonts"
     echo ""
     echo " a) ALL"
     echo " b) BACK"
@@ -2316,10 +2317,14 @@ do
             aurhelper_install "ttf-vista-fonts"
             pause_function
             ;;
+        8)
+            aurhelper_install "ttf-mac-fonts"
+            pause_function
+            ;;
         "a")
             pacman -Rdd --noconfirm ttf-droid
             pacman -Rdd --noconfirm ttf-ubuntu-font-family
-            aurhelper_install "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts"
+            aurhelper_install "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts ttf-mac-fonts"
             pause_function
             LOOP=0
             ;;
@@ -2347,7 +2352,7 @@ function configure_fonts(){
             ;;
         2)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
-            aurhelper_install "freetype2-cleartype libxft-cleartype cairo-cleartype fontconfig-cleartype"
+            aurhelper_install "freetype2-cleartype libxft-cleartype cairo-cleartype"
             install_status
             ;;
         *)
