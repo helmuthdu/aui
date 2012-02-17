@@ -971,7 +971,7 @@ function install_desktop_environment(){
             LOOP=1
             while [ "$LOOP" -ne 0 ]
             do
-                print_title "FAVORITE GNOME APPS"
+                print_title "FAVORITE XFCE APPS"
                 echo " 1) Cairo Dock"
                 echo " 2) Conky + CONKY-colors"
                 echo " 3) Icons [Faience, Faenza, Elementary]"
