@@ -42,9 +42,6 @@ FONTS=0
 FONTSCONFIG=0
 CLEANPACKAGES=0
 
-TRUE=1
-FALSE=0
-
 ARCHI=`uname -m`
 
 # Automatically detects the system language based on your rc.conf#{{{
@@ -127,9 +124,9 @@ function checkbox(){ #{{{
 } #}}}
 function checkbox_package(){ #{{{
     if checkpackage $1; then
-        checkbox $TRUE
+        checkbox 1
     else
-        checkbox $FALSE
+        checkbox 0
     fi
 } #}}}
 function aurhelper_install(){ #{{{
