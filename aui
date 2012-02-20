@@ -42,6 +42,9 @@ FONTS=0
 FONTSCONFIG=0
 CLEANPACKAGES=0
 
+TRUE=1
+FALSE=0
+
 ARCHI=`uname -m`
 
 # Automatically detects the system language based on your rc.conf#{{{
@@ -97,13 +100,6 @@ function print_title (){ #{{{
     print_line
     echo ""
 } #}}}
-function checkbox(){ #{{{
-    if [[ $1 -eq 1 ]]; then
-        echo "[X]"
-    else
-        echo "[ ]"
-    fi
-} #}}}
 function add_daemon(){ #{{{
     remove_daemon "$1"
     sed -i '/DAEMONS[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
@@ -119,9 +115,26 @@ function add_module(){ #{{{
 function remove_module(){ #{{{
     sed -i '/MODULES[=]/s/'"$1"' //' /etc/rc.conf
 } #}}}
+function checkpackage(){ #{{{
+    if pacman -Q $1 &>/dev/null ; then
+        return 0
+    else
+        return 1
+    fi
+} #}}}
+function checkbox(){ #{{{
+    [[ $1 -eq 1 ]] && echo "[X]" || echo "[ ]"
+} #}}}
+function checkbox_package(){ #{{{
+    if checkpackage $1; then
+        checkbox $TRUE
+    else
+        checkbox $FALSE
+    fi
+} #}}}
 function aurhelper_install(){ #{{{
     for PACKAGE in $1; do
-        if !(pacman -Q $PACKAGE &>/dev/null) ; then
+        if ! checkpackage "$PACKAGE" ; then
             if [ "$YAOURT" -eq 1 ]; then
                 su -l $USERNAME --command="yaourt -S --noconfirm $PACKAGE"
             else
@@ -132,7 +145,7 @@ function aurhelper_install(){ #{{{
         fi
     done
     for PACKAGE in $1; do
-        if !(pacman -Q $PACKAGE &>/dev/null) ; then
+        if ! checkpackage "$PACKAGE" ; then
             question_for_answer "Package $PACKAGE not installed, try install again?"
             if [ $OPTION = "y" ]; then
                 if [ "$YAOURT" -eq 1 ]; then
@@ -378,7 +391,7 @@ function choose_aurhelper(){
         read -p "Option: " OPTION
         case "$OPTION" in
             1)
-                if !(pacman -Q yaourt &>/dev/null) ; then
+                if ! checkpackage "yaourt" ; then
                     pacman -S --noconfirm --needed base-devel yajl
                     su -l $USERNAME --command="
                         wget http://aur.archlinux.org/packages/package-query/package-query.tar.gz;
@@ -396,7 +409,7 @@ function choose_aurhelper(){
                         cd ..;
                         rm -fr yaourt*
                     "
-                    if !(pacman -Q yaourt &>/dev/null) ; then
+                    if ! checkpackage "yaourt" ; then
                         echo "Yaourt not installed. EXIT now"
                         pause_function
                         exit 0
@@ -407,7 +420,7 @@ function choose_aurhelper(){
                 LOOP=0
                 ;;
             2)
-                if !(pacman -Q packer &>/dev/null) ; then
+                if ! checkpackage "packer" ; then
                     pacman -S --noconfirm --needed git jshon curl
                     su -l $USERNAME --command="
                         wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
@@ -417,7 +430,7 @@ function choose_aurhelper(){
                         cd ..;
                         rm -fr packer*
                     "
-                    if !(pacman -Q packer &>/dev/null) ; then
+                    if ! checkpackage "packer" ; then
                         echo "Packer not installed. EXIT now"
                         pause_function
                         exit 0
@@ -750,17 +763,17 @@ function install_desktop_environment(){
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE GNOME APPS"
-                echo " 1) Cairo Dock"
-                echo " 2) Conky + CONKY-colors"
-                echo " 3) Gnome Icons [Faience, Faenza, Elementary]"
-                echo " 4) Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
-                echo " 5) GnomeShell Extensions"
-                echo " 6) GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
-                echo " 7) Gnome Activity Journal "
-                echo " 8) Packagekit"
-                echo " 9) Shutter"
-                echo "10) Synapse"
-                echo "11) Terminator"
+                echo " 1) $(checkbox_package "cairo-dock-bzr") Cairo Dock"
+                echo " 2) $(checkbox_package "conky") Conky + CONKY-colors"
+                echo " 3) $(checkbox_package "faenza-icon-theme") Gnome Icons [Faience, Faenza, Elementary]"
+                echo " 4) $(checkbox_package "zukitwo-themes") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
+                echo " 5) $(checkbox_package "gpaste") GnomeShell Extensions"
+                echo " 6) $(checkbox_package "gnome-shell-theme-eos") GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
+                echo " 7) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
+                echo " 8) $(checkbox_package "gnome-packagekit") Packagekit"
+                echo " 9) $(checkbox_package "shutter") Shutter"
+                echo "10) $(checkbox_package "synapse") Synapse"
+                echo "11) $(checkbox_package "terminator") Terminator"
                 echo ""
                 echo " a) ALL"
                 echo " d) DONE"
@@ -842,23 +855,38 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed kdeadmin-system-config-printer-kde xdg-user-dirs
             aurhelper_install "kde-gtk-config-git"
             aurhelper_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
+            #QTCURVE THEMES #{{{
+            wget http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
+            wget http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
+            tar zxvf 144205-Sweet.tar.gz
+            tar zxvf 141920-Kawai.tar.gz
+            rm 144205-Sweet.tar.gz
+            rm 141920-Kawai.tar.gz
+            mkdir -p /home/$USERNAME/.kde4/share/apps/color-schemes
+            mv Sweet/Sweet.colors /home/$USERNAME/.kde4/share/apps/color-schemes
+            mv Kawai/Kawai.colors /home/$USERNAME/.kde4/share/apps/color-schemes
+            mkdir -p /home/$USERNAME/.kde4/share/apps/QtCurve
+            mv Sweet/Sweet.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
+            mv Kawai/Kawai.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
+            chown -R $USERNAME:users /home/$USERNAME/.kde4
+            rm -fr Kawai Sweet
+            #}}}
             #FAVORITE KDE APPS {{{
             LOOP=1
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE KDE APPS"
-                echo " 1) Apper"
-                echo " 2) Bangarang"
-                echo " 3) Choqok"
-                echo " 4) Digikam"
-                echo " 5) K3b"
-                echo " 6) KDE Icons [KFaenza]"
-                echo " 7) Minitube"
-                echo " 8) Musique"
-                echo " 9) Plasma Themes [Caledonia, Produkt, Ronak]"
-                echo "10) QtCurve Themes [Kawai, Sweet]"
-                echo "11) Speedcrunch"
-                echo "12) Yakuake"
+                echo " 1) $(checkbox_package "apper") Apper"
+                echo " 2) $(checkbox_package "bangarang") Bangarang"
+                echo " 3) $(checkbox_package "choqok") Choqok"
+                echo " 4) $(checkbox_package "digikam") Digikam"
+                echo " 5) $(checkbox_package "k3b") K3b"
+                echo " 6) $(checkbox_package "kfaenza-icon-theme") KDE Icons [KFaenza]"
+                echo " 7) $(checkbox_package "minitube") Minitube"
+                echo " 8) $(checkbox_package "musique") Musique"
+                echo " 9) $(checkbox_package "plasma-theme-produkt") Plasma Themes [Caledonia, Produkt, Ronak]"
+                echo "10) $(checkbox_package "speedcrunch") Speedcrunch"
+                echo "11) $(checkbox_package "yakuake") Yakuake"
                 echo ""
                 echo " a) ALL"
                 echo " d) DONE"
@@ -893,27 +921,9 @@ function install_desktop_environment(){
                         aurhelper_install "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
                         ;;
                     10)
-                        #QtCurve Themes #{{{
-                        wget http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
-                        wget http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
-                        tar zxvf 144205-Sweet.tar.gz
-                        tar zxvf 141920-Kawai.tar.gz
-                        rm 144205-Sweet.tar.gz
-                        rm 141920-Kawai.tar.gz
-                        mkdir -p /home/$USERNAME/.kde4/share/apps/color-schemes
-                        mv Sweet/Sweet.colors /home/$USERNAME/.kde4/share/apps/color-schemes
-                        mv Kawai/Kawai.colors /home/$USERNAME/.kde4/share/apps/color-schemes
-                        mkdir -p /home/$USERNAME/.kde4/share/apps/QtCurve
-                        mv Sweet/Sweet.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
-                        mv Kawai/Kawai.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
-                        chown -R $USERNAME:users /home/$USERNAME/.kde4
-                        rm -fr Kawai Sweet
-                        #}}}
-                        ;;
-                    11)
                         aurhelper_install "speedcrunch"
                         ;;
-                    12)
+                    11)
                         pacman -S --noconfirm --needed yakuake
                         aurhelper_install "yakuake-skin-plasma-oxygen-panel"
                         ;;
@@ -930,22 +940,6 @@ function install_desktop_environment(){
                         aurhelper_install "musique"
                         aurhelper_install "speedcrunch"
                         aurhelper_install "yakuake-skin-plasma-oxygen-panel"
-                        #QTCURVE THEMES #{{{
-                        wget http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
-                        wget http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
-                        tar zxvf 144205-Sweet.tar.gz
-                        tar zxvf 141920-Kawai.tar.gz
-                        rm 144205-Sweet.tar.gz
-                        rm 141920-Kawai.tar.gz
-                        mkdir -p /home/$USERNAME/.kde4/share/apps/color-schemes
-                        mv Sweet/Sweet.colors /home/$USERNAME/.kde4/share/apps/color-schemes
-                        mv Kawai/Kawai.colors /home/$USERNAME/.kde4/share/apps/color-schemes
-                        mkdir -p /home/$USERNAME/.kde4/share/apps/QtCurve
-                        mv Sweet/Sweet.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
-                        mv Kawai/Kawai.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
-                        chown -R $USERNAME:users /home/$USERNAME/.kde4
-                        rm -fr Kawai Sweet
-                        #}}}
                         LOOP=0
                         ;;
                     *)
@@ -972,13 +966,13 @@ function install_desktop_environment(){
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE XFCE APPS"
-                echo " 1) Cairo Dock"
-                echo " 2) Conky + CONKY-colors"
-                echo " 3) Icons [Faience, Faenza, Elementary]"
-                echo " 4) Kupfer"
-                echo " 5) Shutter"
-                echo " 6) Terminator"
-                echo " 7) Themes [Zukitwo]"
+                echo " 1) $(checkbox_package "cairo-dock-bzr") Cairo Dock"
+                echo " 2) $(checkbox_package "conky") Conky + CONKY-colors"
+                echo " 3) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
+                echo " 4) $(checkbox_package "kupfer") Kupfer"
+                echo " 5) $(checkbox_package "Shutter") Shutter"
+                echo " 6) $(checkbox_package "terminator") Terminator"
+                echo " 7) $(checkbox_package "zukitwo-themes") Themes [Zukitwo]"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1031,14 +1025,15 @@ function install_desktop_environment(){
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE LXDE APPS"
-                echo " 1) Conky + CONKY-colors"
-                echo " 2) Galculator"
-                echo " 3) Icons [Faience, Faenza, Elementary]"
-                echo " 4) Irssi"
-                echo " 5) Kupfer"
-                echo " 6) Shutter"
-                echo " 7) Terminator"
-                echo " 8) Xfburn"
+                echo " 1) $(checkbox_package "conky") Conky + CONKY-colors"
+                echo " 2) $(checkbox_package "dockbarx") Dockbar"
+                echo " 3) $(checkbox_package "galculator") Galculator"
+                echo " 4) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
+                echo " 5) $(checkbox_package "irssi") Irssi"
+                echo " 6) $(checkbox_package "kupfer") Kupfer"
+                echo " 7) $(checkbox_package "shutter") Shutter"
+                echo " 8) $(checkbox_package "terminator") Terminator"
+                echo " 9) $(checkbox_package "xfburn") Xfburn"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1049,25 +1044,28 @@ function install_desktop_environment(){
                         add_module "coretemp it87 acpi-cpufreq"
                         ;;
                     2)
-                        pacman -S --noconfirm --needed galculator
+                        aurhelper_install "dockbarx dockbarx-shinybar-theme"
                         ;;
                     3)
-                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                        pacman -S --noconfirm --needed galculator
                         ;;
                     4)
-                        pacman -S --noconfirm --needed irssi
+                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         ;;
                     5)
-                        aurhelper_install "kupfer"
+                        pacman -S --noconfirm --needed irssi
                         ;;
                     6)
-                        aurhelper_install "shutter"
+                        aurhelper_install "kupfer"
                         ;;
                     7)
+                        aurhelper_install "shutter"
+                        ;;
+                    8)
                         pacman -S --noconfirm --needed terminator
                         aurhelper_install "python-keybinder"
                         ;;
-                    8)
+                    9)
                         pacman -S --noconfirm --needed xfburn
                         ;;
                     *)
@@ -1102,18 +1100,19 @@ function install_desktop_environment(){
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "FAVORITE OPENBOX APPS"
-                echo " 1) Conky + CONKY-colors"
-                echo " 2) Galculator"
-                echo " 3) Gthumb"
-                echo " 4) Icons [Faience, Faenza, Elementary]"
-                echo " 5) Irssi"
-                echo " 6) Kupfer"
-                echo " 7) Shutter"
-                echo " 8) Terminator"
-                echo " 9) Thunar"
-                echo "10) Tint2"
-                echo "11) Volwheel"
-                echo "12) Xfburn"
+                echo " 1) $(checkbox_package "conky") Conky + CONKY-colors"
+                echo " 2) $(checkbox_package "dockbarx") Dockbar"
+                echo " 3) $(checkbox_package "galculator") Galculator"
+                echo " 4) $(checkbox_package "gthumb") Gthumb"
+                echo " 5) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
+                echo " 6) $(checkbox_package "irssi") Irssi"
+                echo " 7) $(checkbox_package "kupfer") Kupfer"
+                echo " 8) $(checkbox_package "shutter") Shutter"
+                echo " 9) $(checkbox_package "terminator") Terminator"
+                echo "10) $(checkbox_package "thunar") Thunar"
+                echo "11) $(checkbox_package "tint2") Tint2"
+                echo "12) $(checkbox_package "volwheel") Volwheel"
+                echo "13) $(checkbox_package "xfburn") Xfburn"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1124,37 +1123,40 @@ function install_desktop_environment(){
                         add_module "coretemp it87 acpi-cpufreq"
                         ;;
                     2)
-                        pacman -S --noconfirm --needed galculator
+                        aurhelper_install "dockbarx dockbarx-shinybar-theme"
                         ;;
                     3)
-                        pacman -S --noconfirm --needed gthumb
+                        pacman -S --noconfirm --needed galculator
                         ;;
                     4)
-                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                        pacman -S --noconfirm --needed gthumb
                         ;;
                     5)
-                        pacman -S --noconfirm --needed irssi
+                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         ;;
                     6)
-                        aurhelper_install "kupfer"
+                        pacman -S --noconfirm --needed irssi
                         ;;
                     7)
-                        aurhelper_install "shutter"
+                        aurhelper_install "kupfer"
                         ;;
                     8)
+                        aurhelper_install "shutter"
+                        ;;
+                    9)
                         pacman -S --noconfirm --needed terminator
                         aurhelper_install "python-keybinder"
                         ;;
-                    9)
+                    10)
                         pacman -S --noconfirm --needed polkit-gnome gvfs-smb thunar
                         ;;
-                    10)
+                    11)
                         pacman -S --noconfirm --needed tint2
                         ;;
-                    11)
+                    12)
                         pacman -S --noconfirm --needed volwheel
                         ;;
-                    12)
+                    13)
                         pacman -S --noconfirm --needed xfburn
                         ;;
                     *)
@@ -1228,18 +1230,18 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "DEVELOPMENT APPS"
-    echo " 1) Aptana Studio"
-    echo " 2) Eclipse"
-    echo " 3) Emacs"
-    echo " 4) Gvim"
-    echo " 5) IntelliJ IDEA"
-    echo " 6) Netbeans"
-    echo " 7) Oracle Java"
-    echo " 8) QT Creator"
-    echo " 9) Sublime Text 2"
-    echo "10) Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
-    echo "11) MySQL Workbench"
-    echo "12) Meld"
+    echo " 1) $(checkbox_package "aptana-studio") Aptana Studio"
+    echo " 2) $(checkbox_package "eclipse") Eclipse"
+    echo " 3) $(checkbox_package "emacs") Emacs"
+    echo " 4) $(checkbox_package "gvim") Gvim"
+    echo " 5) $(checkbox_package "intellij-idea-community-edition") IntelliJ IDEA"
+    echo " 6) $(checkbox_package "netbeans") Netbeans"
+    echo " 7) $(checkbox_package "jdk") Oracle Java"
+    echo " 8) $(checkbox_package "qtcreator") QT Creator"
+    echo " 9) $(checkbox_package "sublime-text") Sublime Text 2"
+    echo "10) $(checkbox_package "gdb") Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
+    echo "11) $(checkbox_package "mysql-workbench") MySQL Workbench"
+    echo "12) $(checkbox_package "meld") Meld"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1254,15 +1256,15 @@ do
             while [ "$LOOP" -ne 0 ]
             do
                 print_title "ECLIPSE - https://wiki.archlinux.org/index.php/Eclipse"
-                echo " 1) Eclipse Classic"
-                echo " 2) Eclipse IDE for C/C++ Developers "
-                echo " 3) Android Development Tools for Eclipse"
-                echo " 4) Web Development Tools for Eclipse"
-                echo " 5) PHP Development Tools for Eclipse"
-                echo " 6) Python Development Tools for Eclipse"
-                echo " 7) Aptana Studio plugin for Eclipse"
-                echo " 8) Vim-like editing plugin for Eclipse"
-                echo " 9) Git support plugin for Eclipse"
+                echo " 1) $(checkbox_package "eclipse") Eclipse Classic"
+                echo " 2) $(checkbox_package "eclipse-cdt") Eclipse IDE for C/C++ Developers "
+                echo " 3) $(checkbox_package "eclipse-android") Android Development Tools for Eclipse"
+                echo " 4) $(checkbox_package "eclipse-wtp-wst") Web Development Tools for Eclipse"
+                echo " 5) $(checkbox_package "eclipse-pdt") PHP Development Tools for Eclipse"
+                echo " 6) $(checkbox_package "eclipse-pydev") Python Development Tools for Eclipse"
+                echo " 7) $(checkbox_package "eclipse-aptana") Aptana Studio plugin for Eclipse"
+                echo " 8) $(checkbox_package "eclipse-vrapper") Vim-like editing plugin for Eclipse"
+                echo " 9) $(checkbox_package "eclipse-egit") Git support plugin for Eclipse"
                 echo ""
                 echo " b) BACK"
                 echo ""
@@ -1383,15 +1385,15 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "OFFICE APPS"
-    echo " 1) LibreOffice"
-    echo " 2) GnomeOffice [Abiword, Gnumeric]"
-    echo " 3) Latex"
-    if [ "$KDE" -eq 1 ]; then echo " 4) Kchmviewer"; else echo " 4) Chmsee"; fi
-    echo " 5) GCStar"
-    echo " 6) Wunderlist"
-    echo " 7) Xmind"
-    echo " 8) Zathura"
-    echo " 9) Impressive"
+    echo " 1) $(checkbox_package "libreoffice-base") LibreOffice"
+    echo " 2) $(checkbox_package "goffice") GnomeOffice [Abiword, Gnumeric]"
+    echo " 3) $(checkbox_package "texlive-core") Latex"
+    echo " 4) $(if [ "$KDE" -eq 1 ]; then  echo "$(checkbox_package "kchmviewer") Kchmviewer"; else echo "$(checkbox_package "chmsee") Chmsee"; fi)"
+    echo " 5) $(checkbox_package "gcstar") GCStar"
+    echo " 6) $(checkbox_package "wunderlist") Wunderlist"
+    echo " 7) $(checkbox_package "xmind") Xmind"
+    echo " 8) $(checkbox_package "zathura") Zathura"
+    echo " 9) $(checkbox_package "impressive") Impressive"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1412,7 +1414,8 @@ do
             pause_function
             ;;
         3)
-            pacman -S --noconfirm --needed texlive-latexextra texlive-langextra
+            print_title "LATEX - https://wiki.archlinux.org/index.php/LaTeX"
+            pacman -S --noconfirm --needed texlive-most
             aurhelper_install "texmaker"
             aurhelper_install "latex-template-springer latex-template-ieee latex-beamer"
             if [ $LOCATION = "pt_BR" ]; then
@@ -1461,10 +1464,10 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "SYSTEM TOOLS APPS"
-    echo " 1) Grsync"
-    echo " 2) Htop"
-    echo " 3) Virtualbox"
-    echo " 4) Wine"
+    echo " 1) $(checkbox_package "grsync") Grsync"
+    echo " 2) $(checkbox_package "htop") Htop"
+    echo " 3) $(checkbox_package "virtualbox") Virtualbox"
+    echo " 4) $(checkbox_package "wine") Wine"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1504,12 +1507,12 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "GRAPHICS APPS"
-    echo " 1) Blender"
-    echo " 2) Gimp"
-    echo " 3) Gimp-plugins"
-    echo " 4) Inkscape"
-    echo " 5) MComix"
-    echo " 6) Shotwell"
+    echo " 1) $(checkbox_package "blender") Blender"
+    echo " 2) $(checkbox_package "gimp") Gimp"
+    echo " 3) $(checkbox_package "gimp-paint-studio") Gimp-plugins"
+    echo " 4) $(checkbox_package "inkscape") Inkscape"
+    echo " 5) $(checkbox_package "mcomix") MComix"
+    echo " 6) $(checkbox_package "shotwell") Shotwell"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1553,18 +1556,18 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "INTERNET APPS"
-    echo " 1) Dropbox"
-    echo " 2) Google Earth"
-    echo " 3) Google Chrome"
-    echo " 4) Jdownloader"
-    echo " 5) Mozilla Firefox"
-    echo " 6) Mozilla Thunderbird"
-    echo " 7) Pidgin"
-    echo " 8) Skype"
-    echo " 9) TeamSpeak"
-    echo "10) Teamviewer"
-    echo "11) Trasmission"
-    if [ "$KDE" -eq 1 ]; then echo "12) Konversation"; else echo "12) X-Chat"; fi
+    echo " 1) $(checkbox_package "dropbox") Dropbox"
+    echo " 2) $(checkbox_package "google-earth") Google Earth"
+    echo " 3) $(checkbox_package "google-chrome") Google Chrome"
+    echo " 4) $(checkbox_package "jdownloader") Jdownloader"
+    echo " 5) $(checkbox_package "firefox") Mozilla Firefox"
+    echo " 6) $(checkbox_package "thunderbird") Mozilla Thunderbird"
+    echo " 7) $(checkbox_package "pidgin") Pidgin"
+    echo " 8) $(checkbox_package "skype") Skype"
+    echo " 9) $(checkbox_package "teamspeak3") TeamSpeak"
+    echo "10) $(checkbox_package "teamviewer") Teamviewer"
+    echo "11) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "transmission-qt")"; else echo "$(checkbox_package "transmission-gtk")"; fi) Trasmission"
+    echo "12) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "konversation") Konversation"; else echo "$(checkbox_package "xchat") X-Chat"; fi)"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1650,7 +1653,7 @@ function install_lamp(){
     case "$OPTION" in
         "y")
             pacman -S --noconfirm --needed apache mysql php php-apache php-mcrypt php-gd
-            if !(pacman -Q adminer &>/dev/null) ; then
+            if ! checkpackage "adminer" ; then
                 aurhelper_install "adminer"
                 rc.d start httpd mysqld
                 #CONFIGURE LAMP SERVER {{{
@@ -1691,19 +1694,19 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "AUDIO APPS "
-    echo " 1) Amarok"
-    echo " 2) Banshee"
-    echo " 3) Beatbox"
-    echo " 4) Clementine"
-    echo " 5) Decibel"
-    echo " 6) Exaile"
-    echo " 7) Gmusicbrowser"
-    echo " 8) Nuvola"
-    echo " 9) Rhythmbox"
-    echo "10) Puddletag"
-    echo "11) MIDI"
-    echo "12) Codecs"
-    echo "13) Audacity"
+    echo " 1) $(checkbox_package "amarok") Amarok"
+    echo " 2) $(checkbox_package "banshee") Banshee"
+    echo " 3) $(checkbox_package "beatbox-bzr") Beatbox"
+    echo " 4) $(checkbox_package "clementine") Clementine"
+    echo " 5) $(checkbox_package "decibel-audio-player2") Decibel"
+    echo " 6) $(checkbox_package "exaile") Exaile"
+    echo " 7) $(checkbox_package "gmusicbrowser-development") Gmusicbrowser"
+    echo " 8) $(checkbox_package "nuvola-bzr-stable") Nuvola"
+    echo " 9) $(checkbox_package "rhythmbox") Rhythmbox"
+    echo "10) $(checkbox_package "puddletag") Puddletag"
+    echo "11) $(checkbox_package "timidity") MIDI"
+    echo "12) $(checkbox_package "gstreamer0.10-ugly") Codecs"
+    echo "13) $(checkbox_package "audacity") Audacity"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1775,19 +1778,19 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "VIDEO APPS "
-    echo " 1) Gnome Mplayer"
-    echo " 2) Parole"
-    echo " 3) Rosa Media Player"
-    echo " 4) SMplayer"
-    echo " 5) VLC"
-    echo " 6) XBMC"
-    echo " 7) Arista"
-    echo " 8) Transmageddon"
-    echo " 9) Codecs"
-    echo "10) Kdenlive"
-    echo "11) Openshot"
-    echo "12) Pitivi"
-    echo "13) Kazam"
+    echo " 1) $(checkbox_package "gnome-mplayer") Gnome Mplayer"
+    echo " 2) $(checkbox_package "parole") Parole"
+    echo " 3) $(checkbox_package "rosa-media-player-bin") Rosa Media Player"
+    echo " 4) $(checkbox_package "smplayer") SMplayer"
+    echo " 5) $(checkbox_package "vlc") VLC"
+    echo " 6) $(checkbox_package "xbmc") XBMC"
+    echo " 7) $(checkbox_package "arista-transcoder") Arista"
+    echo " 8) $(checkbox_package "transmageddon") Transmageddon"
+    echo " 9) $(if [ "$ARCHI" = "i686" ]; then echo "$(checkbox_package "codecs")"; else echo "$(checkbox_package "codecs64")"; fi) Codecs"
+    echo "10) $(checkbox_package "kdenlive") Kdenlive"
+    echo "11) $(checkbox_package "openshot") Openshot"
+    echo "12) $(checkbox_package "pitivi") Pitivi"
+    echo "13) $(checkbox_package "kazam-bzr") Kazam"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1888,11 +1891,11 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "ACTION AND ADVENTURE"
-            echo " 1) Astromenace"
-            echo " 2) OpenTyrian"
-            echo " 3) M.A.R.S."
-            echo " 4) Yo Frankie!"
-            echo " 5) Counter-Strike 2D"
+            echo " 1) $(checkbox_package "astromenace") Astromenace"
+            echo " 2) $(checkbox_package "opentyrian-hg") OpenTyrian"
+            echo " 3) $(checkbox_package "mars-shooter") M.A.R.S."
+            echo " 4) $(checkbox_package "yofrankie") Yo Frankie!"
+            echo " 5) $(checkbox_package "counter-strike-2d") Counter-Strike 2D"
             echo ""
             echo " b) BACK"
             echo ""
@@ -1931,13 +1934,13 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "ARCADE AND PLATFORMER"
-            echo " 1) Opensonic"
-            echo " 2) Frogatto"
-            echo " 3) Bomberclone"
-            echo " 4) Goonies"
-            echo " 5) Neverball"
-            echo " 6) Super Mario Chronicles"
-            echo " 7) X-Moto"
+            echo " 1) $(checkbox_package "opensonic") Opensonic"
+            echo " 2) $(checkbox_package "frogatto") Frogatto"
+            echo " 3) $(checkbox_package "bomberclone") Bomberclone"
+            echo " 4) $(checkbox_package "goonies") Goonies"
+            echo " 5) $(checkbox_package "neverball") Neverball"
+            echo " 6) $(checkbox_package "smc") Super Mario Chronicles"
+            echo " 7) $(checkbox_package "xmoto") X-Moto"
             echo ""
             echo " b) BACK"
             echo ""
@@ -1984,9 +1987,9 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "DUNGEON"
-            echo " 1) Tales of Maj'Eyal"
-            echo " 2) Lost Labyrinth"
-            echo " 3) S.C.O.U.R.G.E."
+            echo " 1) $(checkbox_package "tome4") Tales of Maj Eyal"
+            echo " 2) $(checkbox_package "lostlabyrinth") Lost Labyrinth"
+            echo " 3) $(checkbox_package "scourge") S.C.O.U.R.G.E."
             echo ""
             echo " b) BACK"
             echo ""
@@ -2017,7 +2020,7 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "EMULATORS"
-            echo " 1) ZSNES"
+            echo " 1) $(checkbox_package "zsnes") ZSNES"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2040,8 +2043,8 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "FPS"
-            echo " 1) World of Padman"
-            echo " 2) Warsow"
+            echo " 1) $(checkbox_package "worldofpadman") World of Padman"
+            echo " 2) $(checkbox_package "warsow") Warsow"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2072,8 +2075,8 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "MMO"
-            echo " 1) Heroes of Newerth"
-            echo " 2) Spiral Knights"
+            echo " 1) $(checkbox_package "hon") Heroes of Newerth"
+            echo " 2) $(checkbox_package "spiral-knights") Spiral Knights"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2100,7 +2103,7 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "PUZZLE"
-            echo " 1) Numptyphysics"
+            echo " 1) $(checkbox_package "numptyphysics-svn") Numptyphysics"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2123,7 +2126,7 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "RPG"
-            echo " 1) Ardentryst"
+            echo " 1) $(checkbox_package "ardentryst") Ardentryst"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2146,10 +2149,10 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "RACING"
-            echo " 1) Maniadrive"
-            echo " 2) Death Rally"
-            echo " 3) SupertuxKart"
-            echo " 4) Speed Dreams"
+            echo " 1) $(checkbox_package "maniadrive") Maniadrive"
+            echo " 2) $(checkbox_package "death-rally") Death Rally"
+            echo " 3) $(checkbox_package "supertuxkart") SupertuxKart"
+            echo " 4) $(checkbox_package "speed-dreams") Speed Dreams"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2184,9 +2187,9 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "SIMULATION"
-            echo " 1) Simultrans"
-            echo " 2) Theme Hospital"
-            echo " 3) OpenTTD"
+            echo " 1) $(checkbox_package "simutrans") Simultrans"
+            echo " 2) $(checkbox_package "corsix-th") Theme Hospital"
+            echo " 3) $(checkbox_package "openttd") OpenTTD"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2217,12 +2220,12 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "STRATEGY"
-            echo " 1) Wesnoth"
-            echo " 3) 0ad"
-            echo " 4) Hedgewars"
-            echo " 5) Warzone 2100"
-            echo " 6) MegaGlest"
-            echo " 7) Zod"
+            echo " 1) $(checkbox_package "wesnoth") Wesnoth"
+            echo " 3) $(checkbox_package "0ad") 0ad"
+            echo " 4) $(checkbox_package "hedgewars") Hedgewars"
+            echo " 5) $(checkbox_package "warzone2100") Warzone 2100"
+            echo " 6) $(checkbox_package "megaglest") MegaGlest"
+            echo " 7) $(checkbox_package "zod") Zod"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2273,14 +2276,14 @@ LOOP=1
 while [ "$LOOP" -ne 0 ]
 do
     print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
-    echo " 1) ttf-dejavu"
-    echo " 2) ttf-google-webfonts"
-    echo " 3) ttf-kochi-substitute (Japanese Support)"
-    echo " 4) ttf-liberation"
-    echo " 5) ttf-ms-fonts"
-    echo " 6) ttf-roboto"
-    echo " 7) ttf-vista-fonts"
-    echo " 8) ttf-mac-fonts"
+    echo " 1) $(checkbox_package "ttf-dejavu") ttf-dejavu"
+    echo " 2) $(checkbox_package "ttf-google-webfonts") ttf-google-webfonts"
+    echo " 3) $(checkbox_package "ttf-kochi-substitute") ttf-kochi-substitute (Japanese Support)"
+    echo " 4) $(checkbox_package "ttf-liberation") ttf-liberation"
+    echo " 5) $(checkbox_package "ttf-ms-fonts") ttf-ms-fonts"
+    echo " 6) $(checkbox_package "ttf-roboto") ttf-roboto"
+    echo " 7) $(checkbox_package "ttf-vista-fonts") ttf-vista-fonts"
+    echo " 8) $(checkbox_package "ttf-mac-fonts") ttf-mac-fonts"
     echo ""
     echo " a) ALL"
     echo " b) BACK"
@@ -2391,20 +2394,20 @@ MAINLOOP=1
 while [ "$MAINLOOP" -ne 0 ]
 do
     print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
-    echo " 1) `checkbox "$BASICSETUP"` Basic Setup"
-    echo " 2) `checkbox "$DESKTOPENVIRONMENT"` Desktop Environment"
-    echo " 3) `checkbox "$DEVELOPMENTAPPS"` Development Apps"
-    echo " 4) `checkbox "$OFFICEAPPS"` Office Apps"
-    echo " 5) `checkbox "$SYSTEMAPPS"` System Apps"
-    echo " 6) `checkbox "$GRAPHICSAPPS"` Graphics Apps"
-    echo " 7) `checkbox "$INTERNETAPPS"` Internet Apps"
-    echo " 8) `checkbox "$AUDIOAPPS"` Audio Apps"
-    echo " 9) `checkbox "$VIDEOAPPS"` Video Apps"
-    echo "10) `checkbox "$LAMP"` LAMP"
-    echo "11) `checkbox "$GAMES"` Games"
-    echo "12) `checkbox "$FONTS"` Fonts"
-    echo "13) `checkbox "$FONTCONFIG"` Fonts Configuration"
-    echo "14) `checkbox "$CLEANPACKAGES"` Clean Orphan Packages"
+    echo " 1) $(checkbox "$BASICSETUP") Basic Setup"
+    echo " 2) $(checkbox "$DESKTOPENVIRONMENT") Desktop Environment"
+    echo " 3) $(checkbox "$DEVELOPMENTAPPS") Development Apps"
+    echo " 4) $(checkbox "$OFFICEAPPS") Office Apps"
+    echo " 5) $(checkbox "$SYSTEMAPPS") System Apps"
+    echo " 6) $(checkbox "$GRAPHICSAPPS") Graphics Apps"
+    echo " 7) $(checkbox "$INTERNETAPPS") Internet Apps"
+    echo " 8) $(checkbox "$AUDIOAPPS") Audio Apps"
+    echo " 9) $(checkbox "$VIDEOAPPS") Video Apps"
+    echo "10) $(checkbox "$LAMP") LAMP"
+    echo "11) $(checkbox "$GAMES") Games"
+    echo "12) $(checkbox "$FONTS") Fonts"
+    echo "13) $(checkbox "$FONTSCONFIG") Fonts Configuration"
+    echo "14) $(checkbox "$CLEANPACKAGES") Clean Orphan Packages"
     echo ""
     echo " q) Quit"
     echo ""
