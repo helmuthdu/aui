@@ -2391,20 +2391,20 @@ MAINLOOP=1
 while [ "$MAINLOOP" -ne 0 ]
 do
     print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
-    echo " 1) $(checkbox "$BASICSETUP") Basic Setup"
-    echo " 2) $(checkbox "$DESKTOPENVIRONMENT") Desktop Environment"
-    echo " 3) $(checkbox "$DEVELOPMENTAPPS") Development Apps"
-    echo " 4) $(checkbox "$OFFICEAPPS") Office Apps"
-    echo " 5) $(checkbox "$SYSTEMAPPS") System Apps"
-    echo " 6) $(checkbox "$GRAPHICSAPPS") Graphics Apps"
-    echo " 7) $(checkbox "$INTERNETAPPS") Internet Apps"
-    echo " 8) $(checkbox "$AUDIOAPPS") Audio Apps"
-    echo " 9) $(checkbox "$VIDEOAPPS") Video Apps"
-    echo "10) $(checkbox "$LAMP") LAMP"
-    echo "11) $(checkbox "$GAMES") Games"
-    echo "12) $(checkbox "$FONTS") Fonts"
-    echo "13) $(checkbox "$FONTSCONFIG") Fonts Configuration"
-    echo "14) $(checkbox "$CLEANPACKAGES") Clean Orphan Packages"
+    echo " 1) $(checkbox $BASICSETUP) Basic Setup"
+    echo " 2) $(checkbox $DESKTOPENVIRONMENT) Desktop Environment"
+    echo " 3) $(checkbox $DEVELOPMENTAPPS) Development Apps"
+    echo " 4) $(checkbox $OFFICEAPPS) Office Apps"
+    echo " 5) $(checkbox $SYSTEMAPPS) System Apps"
+    echo " 6) $(checkbox $GRAPHICSAPPS) Graphics Apps"
+    echo " 7) $(checkbox $INTERNETAPPS) Internet Apps"
+    echo " 8) $(checkbox $AUDIOAPPS) Audio Apps"
+    echo " 9) $(checkbox $VIDEOAPPS) Video Apps"
+    echo "10) $(checkbox $LAMP) LAMP"
+    echo "11) $(checkbox $GAMES) Games"
+    echo "12) $(checkbox $FONTS) Fonts"
+    echo "13) $(checkbox $FONTSCONFIG) Fonts Configuration"
+    echo "14) $(checkbox $CLEANPACKAGES) Clean Orphan Packages"
     echo ""
     echo " q) Quit"
     echo ""
@@ -2426,10 +2426,10 @@ do
             BASICSETUP=1
             ;;
         2)
-            if [ $BASICSETUP -eq 0 ] && !(pacman -Q xorg-server &>/dev/null); then
+            if [ $BASICSETUP -eq 0 ]; then
                 echo -e "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
-                pause_function
-                continue
+                question_for_answer "Do you want continue"
+                if [ $OPTION = "n" ]; then continue; fi
             fi
             install_desktop_environment
             install_nm_wicd
