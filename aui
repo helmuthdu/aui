@@ -1128,16 +1128,20 @@ do
     case "$OPTION" in
         1)
             aurhelper_install "cairo-dock-bzr cairo-dock-plugins-bzr"
+            pause_function
             ;;
         2)
             aurhelper_install "conky conky-colors"
             add_module "coretemp it87 acpi-cpufreq"
+            pause_function
             ;;
         3)
             aurhelper_install "dockbarx dockbarx-shinybar-theme"
+            pause_function
             ;;
         4)
             aurhelper_install "docky"
+            pause_function
             ;;
         5)
             if [ "$KDE" -eq 1 ]; then
@@ -1149,26 +1153,33 @@ do
             ;;
         6)
             aurhelper_install "gnome-pie"
+            pause_function
             ;;
         7)
             aurhelper_install "guake"
+            pause_function
             ;;
         8)
             aurhelper_install "kupfer"
+            pause_function
             ;;
         9)
             aurhelper_install "pyrenamer"
+            pause_function
             ;;
         10)
             aurhelper_install "shutter"
+            pause_function
             ;;
         11)
             aurhelper_install "zeitgeist libzeitgeist zeitgeist-datahub"
             aurhelper_install "synapse"
+            pause_function
             ;;
         12)
             aurhelper_install "python-keybinder"
             pacman -S --noconfirm --needed terminator
+            pause_function
             ;;
         *)
             LOOP=0
@@ -1989,6 +2000,8 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "EMULATORS"
+
+            echo " 1) $(checkbox_package "vba-m-gtk-svn") VisualBoyAdvanced"
             echo " 1) $(checkbox_package "zsnes") ZSNES"
             echo ""
             echo " b) BACK"
@@ -1996,6 +2009,10 @@ do
             read -p "Option: " OPTION
             case "$OPTION" in
                 1)
+                    aurhelper_install "vba-m-gtk-svn"
+                    pause_function
+                    ;;
+                2)
                     pacman -S --noconfirm --needed zsnes
                     pause_function
                     ;;
@@ -2012,23 +2029,29 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "FPS"
-            echo " 1) $(checkbox_package "worldofpadman") World of Padman"
-            echo " 2) $(checkbox_package "warsow") Warsow"
+            echo " 1) $(checkbox_package "alienarena") Alien Arena"
+            echo " 2) $(checkbox_package "enemy-territory") Wolfenstein: Enemy Territory"
+            echo " 3) $(checkbox_package "worldofpadman") World of Padman"
+            echo " 4) $(checkbox_package "warsow") Warsow"
             echo ""
             echo " b) BACK"
             echo ""
             read -p "Option: " OPTION
             case "$OPTION" in
                 1)
-                    aurhelper_install "worldofpadman"
+                    pacman -S --noconfirm --needed alienarena
                     pause_function
                     ;;
                 2)
-                    pacman -S --noconfirm --needed warsow
+                    aurhelper_install "enemy-territory"
                     pause_function
                     ;;
                 3)
-                    pacman -S --noconfirm --needed alienarena
+                    aurhelper_install "worldofpadman"
+                    pause_function
+                    ;;
+                4)
+                    pacman -S --noconfirm --needed warsow
                     pause_function
                     ;;
                 *)
@@ -2045,7 +2068,8 @@ do
         do
             print_title "MMO"
             echo " 1) $(checkbox_package "hon") Heroes of Newerth"
-            echo " 2) $(checkbox_package "spiral-knights") Spiral Knights"
+            echo " 2) $(checkbox_package "savage2") Savage II"
+            echo " 3) $(checkbox_package "spiral-knights") Spiral Knights"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2056,6 +2080,10 @@ do
                     pause_function
                     ;;
                 2)
+                    aurhelper_install "savage2"
+                    pause_function
+                    ;;
+                3)
                     aurhelper_install "spiral-knights"
                     pause_function
                     ;;
