@@ -1112,14 +1112,15 @@ do
     echo " 1) $(checkbox_package "cairo-dock-bzr") Cairo Dock"
     echo " 2) $(checkbox_package "conky") Conky + CONKY-colors"
     echo " 3) $(checkbox_package "dockbarx") Dockbarx"
-    echo " 4) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "speedcrunch") Speedcrunch"; else echo "$(checkbox_package "galculator") Galculator"; fi)"
-    echo " 5) $(checkbox_package "gnome-pie") Gnome-Pie"
-    echo " 6) $(checkbox_package "guake") Guake"
-    echo " 7) $(checkbox_package "kupfer") Kupfer"
-    echo " 8) $(checkbox_package "pyrenamer") Pyrenamer"
-    echo " 9) $(checkbox_package "shutter") Shutter"
-    echo "10) $(checkbox_package "synapse") Synapse"
-    echo "11) $(checkbox_package "terminator") Terminator"
+    echo " 4) $(checkbox_package "docky") Docky"
+    echo " 5) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "speedcrunch") Speedcrunch"; else echo "$(checkbox_package "galculator") Galculator"; fi)"
+    echo " 6) $(checkbox_package "gnome-pie") Gnome-Pie"
+    echo " 7) $(checkbox_package "guake") Guake"
+    echo " 8) $(checkbox_package "kupfer") Kupfer"
+    echo " 9) $(checkbox_package "pyrenamer") Pyrenamer"
+    echo "10) $(checkbox_package "shutter") Shutter"
+    echo "11) $(checkbox_package "synapse") Synapse"
+    echo "12) $(checkbox_package "terminator") Terminator"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1136,6 +1137,9 @@ do
             aurhelper_install "dockbarx dockbarx-shinybar-theme"
             ;;
         4)
+            aurhelper_install "docky"
+            ;;
+        5)
             if [ "$KDE" -eq 1 ]; then
                 aurhelper_install "speedcrunch"
             else
@@ -1143,26 +1147,26 @@ do
             fi
             pause_function
             ;;
-        5)
+        6)
             aurhelper_install "gnome-pie"
             ;;
-        6)
+        7)
             aurhelper_install "guake"
             ;;
-        7)
+        8)
             aurhelper_install "kupfer"
             ;;
-        8)
+        9)
             aurhelper_install "pyrenamer"
             ;;
-        9)
+        10)
             aurhelper_install "shutter"
             ;;
-        10)
+        11)
             aurhelper_install "zeitgeist libzeitgeist zeitgeist-datahub"
             aurhelper_install "synapse"
             ;;
-        11)
+        12)
             aurhelper_install "python-keybinder"
             pacman -S --noconfirm --needed terminator
             ;;
