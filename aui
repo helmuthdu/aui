@@ -1497,6 +1497,7 @@ do
             ;;
         4)
             pacman -S --noconfirm --needed gthumb
+            pause_function
             ;;
         5)
             pacman -S --noconfirm --needed inkscape uniconvertor python2-numpy python-lxml
