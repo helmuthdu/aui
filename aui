@@ -1716,6 +1716,7 @@ do
             ;;
         8)
             aurhelper_install "musique"
+            pause_function
             ;;
         9)
             aurhelper_install "nuvola-bzr-stable"
@@ -1784,6 +1785,7 @@ do
             ;;
         3)
             aurhelper_install "minitube"
+            pause_function
             ;;
         4)
             aurhelper_install "rosa-media-player-bin"
@@ -1968,7 +1970,7 @@ do
         while [ "$LOOP" -ne 0 ]
         do
             print_title "DUNGEON"
-            echo " 1) $(checkbox_package "tome4") Tales of Maj Eyal"
+            echo " 1) $(checkbox_package "tome4") Tales of MajEyal"
             echo " 2) $(checkbox_package "lostlabyrinth") Lost Labyrinth"
             echo " 3) $(checkbox_package "scourge") S.C.O.U.R.G.E."
             echo ""
