@@ -661,7 +661,6 @@ function install_additional_firmwares(){
                 echo " 4) $(checkbox_package "b43-firmware-legacy") b43legacy"
                 echo " 5) $(checkbox_package "broadcom-wl") broadcom-wl"
                 echo " 6) $(checkbox_package "bluez-firmware") bluez-firmware"
-                echo " 7) $(checkbox_package "wpa_supplicant") Wireless Tools"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -669,31 +668,21 @@ function install_additional_firmwares(){
                 case "$OPTION" in
                     1)
                         aurhelper_install "ipw2100-fw"
-                        pause_function
                         ;;
                     2)
                         aurhelper_install "ipw2200-fw"
-                        pause_function
                         ;;
                     3)
                         aurhelper_install "b43-firmware"
-                        pause_function
                         ;;
                     4)
                         aurhelper_install "b43-firmware-legacy"
-                        pause_function
                         ;;
                     5)
                         aurhelper_install "broadcom-wl"
-                        pause_function
                         ;;
                     6)
                         aurhelper_install "bluez-firmware"
-                        pause_function
-                        ;;
-                    7)
-                        aurhelper_install "wireless-regdb rfkill crda wpa_supplicant"
-                        pause_function
                         ;;
                     *)
                         LOOP=0
@@ -819,7 +808,6 @@ function install_desktop_environment(){
                         LOOP=0
                         ;;
                 esac
-                pause_function
             done
             #}}}
             add_daemon "gdm"
@@ -911,7 +899,6 @@ function install_desktop_environment(){
                         LOOP=0
                         ;;
                 esac
-                pause_function
             done
             #}}}
             add_daemon "kdm"
@@ -948,7 +935,6 @@ function install_desktop_environment(){
                         LOOP=0
                         ;;
                 esac
-                pause_function
             done
             #}}}
             install_status
@@ -985,7 +971,6 @@ function install_desktop_environment(){
                         LOOP=0
                         ;;
                 esac
-                pause_function
             done
             #}}}
             add_daemon "lxdm"
@@ -1042,7 +1027,6 @@ function install_desktop_environment(){
                         LOOP=0
                         ;;
                 esac
-                pause_function
             done
             #}}}
             install_status
@@ -1128,20 +1112,16 @@ do
     case "$OPTION" in
         1)
             aurhelper_install "cairo-dock-bzr cairo-dock-plugins-bzr"
-            pause_function
             ;;
         2)
             aurhelper_install "conky conky-colors"
             add_module "coretemp it87 acpi-cpufreq"
-            pause_function
             ;;
         3)
             aurhelper_install "dockbarx dockbarx-shinybar-theme"
-            pause_function
             ;;
         4)
             aurhelper_install "docky"
-            pause_function
             ;;
         5)
             if [ "$KDE" -eq 1 ]; then
@@ -1149,37 +1129,29 @@ do
             else
                 aurhelper_install "galculator"
             fi
-            pause_function
             ;;
         6)
             aurhelper_install "gnome-pie"
-            pause_function
             ;;
         7)
             aurhelper_install "guake"
-            pause_function
             ;;
         8)
             aurhelper_install "kupfer"
-            pause_function
             ;;
         9)
             aurhelper_install "pyrenamer"
-            pause_function
             ;;
         10)
             aurhelper_install "shutter"
-            pause_function
             ;;
         11)
             aurhelper_install "zeitgeist libzeitgeist zeitgeist-datahub"
             aurhelper_install "synapse"
-            pause_function
             ;;
         12)
             aurhelper_install "python-keybinder"
             pacman -S --noconfirm --needed terminator
-            pause_function
             ;;
         *)
             LOOP=0
@@ -1213,7 +1185,6 @@ do
     case "$OPTION" in
         1)
             aurhelper_install "aptana-studio"
-            pause_function
             ;;
         2)
             #ECLIPSE {{{
@@ -1236,39 +1207,30 @@ do
                 case "$OPTION" in
                     1)
                         pacman -S --noconfirm --needed eclipse
-                        pause_function
                         ;;
                     2)
                         pacman -S --noconfirm --needed eclipse-cdt
-                        pause_function
                         ;;
                     3)
                         aurhelper_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
-                        pause_function
                         ;;
                     4)
                         aurhelper_install "eclipse-wtp-wst"
-                        pause_function
                         ;;
                     5)
                         aurhelper_install "eclipse-pdt"
-                        pause_function
                         ;;
                     6)
                         aurhelper_install "eclipse-pydev"
-                        pause_function
                         ;;
                     7)
                         aurhelper_install "eclipse-aptana"
-                        pause_function
                         ;;
                     8)
                         aurhelper_install "eclipse-vrapper"
-                        pause_function
                         ;;
                     9)
                         aurhelper_install "eclipse-egit"
-                        pause_function
                         ;;
                     *)
                         LOOP=0
@@ -1280,7 +1242,6 @@ do
             ;;
         3)
             pacman -S --noconfirm --needed emacs
-            pause_function
             ;;
         4)
             pacman -Rdd --noconfirm vim
@@ -1295,21 +1256,17 @@ do
                 chown -R $USERNAME:users /home/$USERNAME/.vim
                 chown $USERNAME:users /home/$USERNAME/.vimrc
             #}}}
-            pause_function
             ;;
         5)
             pacman -S --noconfirm --needed intellij-idea-community-edition
-            pause_function
             ;;
         6)
             pacman -S --noconfirm --needed netbeans
-            pause_function
             ;;
         7)
             pacman -Rdd --noconfirm jre7-openjdk
             pacman -Rdd --noconfirm jdk7-openjdk
             aurhelper_install "jdk"
-            pause_function
             ;;
         8)
             pacman -S --noconfirm --needed qtcreator qt-doc
@@ -1317,24 +1274,19 @@ do
             wget http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
             mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
             chown -R $USERNAME:users /home/$USERNAME/.config
-            pause_function
             ;;
         9)
             aurhelper_install "sublime-text"
-            pause_function
             ;;
         10)
             pacman -S --noconfirm --needed valgrind gdb splint tidyhtml pyflakes
             aurhelper_install "jsl"
-            pause_function
             ;;
         11)
             aurhelper_install "mysql-workbench"
-            pause_function
             ;;
         12)
             pacman -S --noconfirm --needed meld
-            pause_function
             ;;
         *)
             LOOP=0
@@ -1371,11 +1323,9 @@ do
             else
                 pacman -S --noconfirm --needed libreoffice-gnome
             fi
-            pause_function
             ;;
         2)
             pacman -S --noconfirm --needed gnumeric abiword abiword-plugins
-            pause_function
             ;;
         3)
             print_title "LATEX - https://wiki.archlinux.org/index.php/LaTeX"
@@ -1385,7 +1335,6 @@ do
             if [ $LOCATION = "pt_BR" ]; then
                 aurhelper_install "abntex"
             fi
-            pause_function
             ;;
         4)
             if [ "$KDE" -eq 1 ]; then
@@ -1393,27 +1342,21 @@ do
             else
                 pacman -S --noconfirm --needed chmsee
             fi
-            pause_function
             ;;
         5)
             pacman -S --noconfirm --needed gcstar
-            pause_function
             ;;
         6)
             aurhelper_install "wunderlist"
-            pause_function
             ;;
         7)
             aurhelper_install "xmind"
-            pause_function
             ;;
         8)
             pacman -S --noconfirm --needed zathura
-            pause_function
             ;;
         9)
             pacman -S --noconfirm --needed impressive
-            pause_function
             ;;
         *)
             LOOP=0
@@ -1439,11 +1382,9 @@ do
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed grsync
-            pause_function
             ;;
         2)
             pacman -S --noconfirm --needed htop
-            pause_function
             ;;
         3)
             pacman -S --noconfirm --needed virtualbox virtualbox-additions
@@ -1452,11 +1393,9 @@ do
             groupadd vboxusers
             gpasswd -a $USERNAME vboxusers
             add_module "vboxdrv"
-            pause_function
             ;;
         4)
             pacman -S --noconfirm --needed wine wine_gecko winetricks
-            pause_function
             ;;
         *)
             LOOP=0
@@ -1485,32 +1424,25 @@ do
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed blender
-            pause_function
             ;;
         2)
             pacman -S --noconfirm --needed gimp
-            pause_function
             ;;
         3)
             aurhelper_install "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
-            pause_function
             ;;
         4)
             pacman -S --noconfirm --needed gthumb
-            pause_function
             ;;
         5)
             pacman -S --noconfirm --needed inkscape uniconvertor python2-numpy python-lxml
             aurhelper_install "sozi"
-            pause_function
             ;;
         6)
             pacman -S --noconfirm --needed mcomix
-            pause_function
             ;;
         7)
             pacman -S --noconfirm --needed shotwell
-            pause_function
             ;;
         *)
             LOOP=0
@@ -1554,47 +1486,37 @@ do
             else
                 aurhelper_install "dropbox-cli"
             fi
-            pause_function
             ;;
         2)
             aurhelper_install "google-earth"
-            pause_function
             ;;
         3)
             pacman -S --noconfirm --needed flashplugin
             aurhelper_install "google-chrome"
-            pause_function
             ;;
         4)
             aurhelper_install "jdownloader"
-            pause_function
             ;;
         5)
             pacman -S --noconfirm --needed irssi
             ;;
         6)
             pacman -S --noconfirm --needed firefox flashplugin firefox-i18n-$LOCATION_FF
-            pause_function
             ;;
         7)
             pacman -S --noconfirm --needed thunderbird thunderbird-i18n-$LOCATION_FF
-            pause_function
             ;;
         8)
             pacman -S --noconfirm --needed pidgin
-            pause_function
             ;;
         9)
             pacman -S --noconfirm --needed skype
-            pause_function
             ;;
         10)
             aurhelper_install "teamspeak3"
-            pause_function
             ;;
         11)
             aurhelper_install "teamviewer"
-            pause_function
             ;;
         12)
             if [ "$KDE" -eq 1 ]; then
@@ -1602,7 +1524,6 @@ do
             else
                 aurhelper_install "transmission-gtk"
             fi
-            pause_function
             ;;
         13)
             if [ "$KDE" -eq 1 ]; then
@@ -1610,7 +1531,6 @@ do
             else
                 pacman -S --noconfirm --needed xchat
             fi
-            pause_function
             ;;
         *)
             LOOP=0
@@ -1659,6 +1579,7 @@ function install_lamp(){
             ;;
     esac
     sumary "LAMP installation"
+    pause_function
 }
 #}}}
 #AUDIO {{{
@@ -1688,60 +1609,46 @@ do
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed amarok
-            pause_function
             ;;
         2)
             pacman -S --noconfirm --needed banshee
-            pause_function
             ;;
         3)
             aurhelper_install "beatbox-bzr"
-            pause_function
             ;;
         4)
             pacman -S --noconfirm --needed clementine
-            pause_function
             ;;
         5)
             aurhelper_install "decibel-audio-player2"
-            pause_function
             ;;
         6)
             aurhelper_install "exaile"
-            pause_function
             ;;
         7)
             aurhelper_install "gmusicbrowser-development"
-            pause_function
             ;;
         8)
             aurhelper_install "musique"
-            pause_function
             ;;
         9)
             aurhelper_install "nuvola-bzr-stable"
-            pause_function
             ;;
         10)
             pacman -S --noconfirm --needed rhythmbox
-            pause_function
             ;;
         11)
             aurhelper_install "puddletag"
-            pause_function
             ;;
         12)
             aurhelper_install "timidity++ fluidr3"
             echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
-            pause_function
             ;;
         13)
             pacman -S --noconfirm --needed gstreamer0.10-plugins
-            pause_function
             ;;
         14)
             pacman -S --noconfirm --needed audacity
-            pause_function
             ;;
         *)
             LOOP=0
@@ -1777,42 +1684,33 @@ do
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed gnome-mplayer
-            pause_function
             ;;
         2)
             pacman -S --noconfirm --needed parole
-            pause_function
             ;;
         3)
             aurhelper_install "minitube"
-            pause_function
             ;;
         4)
             aurhelper_install "rosa-media-player-bin"
-            pause_function
             ;;
         5)
             pacman -S --noconfirm --needed smplayer smplayer-themes
-            pause_function
             ;;
         6)
             pacman -S --noconfirm --needed vlc
             if [ "$KDE" -eq 1 ]; then
                 pacman -S --noconfirm --needed phonon-vlc
             fi
-            pause_function
             ;;
         7)
             pacman -S --noconfirm --needed xbmc
-            pause_function
             ;;
         8)
             aurhelper_install "arista-transcoder"
-            pause_function
             ;;
         9)
             aurhelper_install "transmageddon"
-            pause_function
             ;;
         10)
             aurhelper_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
@@ -1821,24 +1719,19 @@ do
             else
                 aurhelper_install "codecs64"
             fi
-            pause_function
             ;;
         11)
             pacman -S --noconfirm --needed kdenlive
-            pause_function
             ;;
         12)
             pacman -S --noconfirm --needed openshot
-            pause_function
             ;;
         13)
             pacman -S --noconfirm --needed pitivi
-            pause_function
             ;;
         14)
             pacman -S --noconfirm --needed python-rsvg
             aurhelper_install "kazam-bzr"
-            pause_function
             ;;
         *)
             LOOP=0
@@ -1886,23 +1779,18 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "astromenace"
-                    pause_function
                     ;;
                 2)
                     aurhelper_install "opentyrian-hg"
-                    pause_function
                     ;;
                 3)
                     aurhelper_install "mars-shooter"
-                    pause_function
                     ;;
                 4)
                     aurhelper_install "yofrankie"
-                    pause_function
                     ;;
                 5)
                     aurhelper_install "counter-strike-2d"
-                    pause_function
                     ;;
                 *)
                     LOOP=0
@@ -1931,31 +1819,24 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "opensonic"
-                    pause_function
                     ;;
                 2)
                     pacman -S --noconfirm --needed frogatto
-                    pause_function
                     ;;
                 3)
                     pacman -S --noconfirm --needed bomberclone
-                    pause_function
                     ;;
                 4)
                     aurhelper_install "goonies"
-                    pause_function
                     ;;
                 5)
                     pacman -S --noconfirm --needed neverball
-                    pause_function
                     ;;
                 6)
                     pacman -S --noconfirm --needed smc
-                    pause_function
                     ;;
                 7)
                     pacman -S --noconfirm --needed xmoto
-                    pause_function
                     ;;
                 *)
                     LOOP=0
@@ -1980,15 +1861,12 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "tome4"
-                    pause_function
                     ;;
                 2)
                     aurhelper_install "lostlabyrinth"
-                    pause_function
                     ;;
                 3)
                     aurhelper_install "scourge"
-                    pause_function
                     ;;
                 *)
                     LOOP=0
@@ -2013,11 +1891,9 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "vba-m-gtk-svn"
-                    pause_function
                     ;;
                 2)
                     pacman -S --noconfirm --needed zsnes
-                    pause_function
                     ;;
                 *)
                     LOOP=0
@@ -2043,19 +1919,15 @@ do
             case "$OPTION" in
                 1)
                     pacman -S --noconfirm --needed alienarena
-                    pause_function
                     ;;
                 2)
                     aurhelper_install "enemy-territory"
-                    pause_function
                     ;;
                 3)
                     aurhelper_install "worldofpadman"
-                    pause_function
                     ;;
                 4)
                     pacman -S --noconfirm --needed warsow
-                    pause_function
                     ;;
                 *)
                     LOOP=0
@@ -2080,15 +1952,12 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "hon"
-                    pause_function
                     ;;
                 2)
                     aurhelper_install "savage2"
-                    pause_function
                     ;;
                 3)
                     aurhelper_install "spiral-knights"
-                    pause_function
                     ;;
                 *)
                     LOOP=0
@@ -2111,7 +1980,6 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "numptyphysics-svn"
-                    pause_function
                     ;;
                 *)
                     LOOP=0
@@ -2134,7 +2002,6 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "ardentryst"
-                    pause_function
                     ;;
                 *)
                     LOOP=0
@@ -2160,19 +2027,15 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "maniadrive"
-                    pause_function
                     ;;
                 2)
                     aurhelper_install "death-rally"
-                    pause_function
                     ;;
                 3)
                     pacman -S --noconfirm --needed supertuxkart
-                    pause_function
                     ;;
                 4)
                     pacman -S --noconfirm --needed speed-dreams
-                    pause_function
                     ;;
                 *)
                     LOOP=0
@@ -2197,15 +2060,12 @@ do
             case "$OPTION" in
                 1)
                     aurhelper_install "simutrans"
-                    pause_function
                     ;;
                 2)
                     aurhelper_install "corsix-th"
-                    pause_function
                     ;;
                 3)
                     pacman -S --noconfirm --needed openttd
-                    pause_function
                     ;;
                 *)
                     LOOP=0
@@ -2233,27 +2093,21 @@ do
             case "$OPTION" in
                 1)
                     pacman -S --noconfirm --needed wesnoth
-                    pause_function
                     ;;
                 3)
                     aurhelper_install "0ad"
-                    pause_function
                     ;;
                 4)
                     pacman -S --noconfirm --needed hedgewars
-                    pause_function
                     ;;
                 5)
                     pacman -S --noconfirm --needed warzone2100
-                    pause_function
                     ;;
                 6)
                     pacman -S --noconfirm --needed megaglest
-                    pause_function
                     ;;
                 7)
                     aurhelper_install "commander-zod"
-                    pause_function
                     ;;
                 *)
                     LOOP=0
@@ -2292,43 +2146,34 @@ do
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed ttf-dejavu
-            pause_function
             ;;
         2)
             pacman -Rdd --noconfirm ttf-droid
             pacman -Rdd --noconfirm ttf-ubuntu-font-family
             aurhelper_install "ttf-google-webfonts"
-            pause_function
             ;;
         3)
             aurhelper_install "ttf-kochi-substitute"
-            pause_function
             ;;
         4)
             pacman -S --noconfirm --needed ttf-liberation
-            pause_function
             ;;
         5)
             aurhelper_install "ttf-ms-fonts"
-            pause_function
             ;;
         6)
             aurhelper_install "ttf-roboto"
-            pause_function
             ;;
         7)
             aurhelper_install "ttf-vista-fonts"
-            pause_function
             ;;
         8)
             aurhelper_install "ttf-mac-fonts"
-            pause_function
             ;;
         "a")
             pacman -Rdd --noconfirm ttf-droid
             pacman -Rdd --noconfirm ttf-ubuntu-font-family
             aurhelper_install "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts ttf-mac-fonts"
-            pause_function
             LOOP=0
             ;;
         *)
@@ -2363,6 +2208,7 @@ function configure_fonts(){
             ;;
     esac
     sumary "Patched Fonts Configuration installation"
+    pause_function
 }
 #}}}
 #CLEAN ORPHAN PACKAGES {{{
