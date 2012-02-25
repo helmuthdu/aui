@@ -2002,7 +2002,7 @@ do
             print_title "EMULATORS"
 
             echo " 1) $(checkbox_package "vba-m-gtk-svn") VisualBoyAdvanced"
-            echo " 1) $(checkbox_package "zsnes") ZSNES"
+            echo " 2) $(checkbox_package "zsnes") ZSNES"
             echo ""
             echo " b) BACK"
             echo ""
