@@ -45,9 +45,9 @@ CLEANPACKAGES=0
 
 ARCHI=`uname -m`
 
-# Automatically detects the system language based on your rc.conf#{{{
-LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | cut -c9-13`
-#KDE #{{{
+# AUTOMATICALLY DETECTS THE SYSTEM LANGUAGE BASED ON YOUR RC.CONF#{{{
+    LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | cut -c9-13`
+    #KDE #{{{
     if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "zh_CN" ]; then
         LOCATION_KDE=`echo $LOCATION | tr '[:upper:]' '[:lower:]'`
     elif [ $LOCATION = "en_US" ]; then
@@ -55,8 +55,8 @@ LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | cut -c9-13`
     else
         LOCATION_KDE=`echo $LOCATION | cut -d\_ -f1`
     fi
-#}}}
-#FIREFOX #{{{
+    #}}}
+    #FIREFOX #{{{
     if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "pt_PT" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "es_AR" ] || [ $LOCATION = "es_ES" ] || [ $LOCATION = "zh_CN" ]; then
         LOCATION_FF=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
     elif [ $LOCATION = "en_US" ]; then
@@ -64,8 +64,8 @@ LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | cut -c9-13`
     else
         LOCATION_FF=`echo $LOCATION | cut -d\_ -f1`
     fi
-#}}}
-#HUNSPELL #{{{
+    #}}}
+    #HUNSPELL #{{{
     if [ $LOCATION = "pt_BR" ]; then
         LOCATION_HS=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
     elif [ $LOCATION = "pt_PT" ]; then
@@ -73,14 +73,14 @@ LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | cut -c9-13`
     else
         LOCATION_HS=`echo $LOCATION | cut -d\_ -f1`
     fi
-#}}}
-#LIBREOFFICE #{{{
+    #}}}
+    #LIBREOFFICE #{{{
     if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "en_US" ] || [ $LOCATION = "zh_CN" ]; then
         LOCATION_LO=`echo $LOCATION | sed 's/_/-/'`
     else
         LOCATION_LO=`echo $LOCATION | cut -d\_ -f1`
     fi
-#}}}
+    #}}}
 #}}}
 
 function question_for_answer(){ #{{{
@@ -130,7 +130,35 @@ function checkbox_package(){ #{{{
         checkbox 0
     fi
 } #}}}
-function aurhelper_install(){ #{{{
+function package_manager(){ #{{{
+    if ! checkpackage $1; then
+        for PACKAGE in $1; do
+            if ! checkpackage "$PACKAGE" ; then
+                if [ "$YAOURT" -eq 1 ]; then
+                    su -l $USERNAME --command="yaourt -S --noconfirm $PACKAGE"
+                else
+                    su -l $USERNAME --command="packer -S --noconfirm $PACKAGE"
+                fi
+                #FORCE CHECK #{{{
+                if ! checkpackage "$PACKAGE" ; then
+                    question_for_answer "Package $PACKAGE not installed, try install again?"
+                    if [ $OPTION = "y" ]; then
+                        if [ "$YAOURT" -eq 1 ]; then
+                            su -l $USERNAME --command="yaourt -S $PACKAGE"
+                        else
+                            su -l $USERNAME --command="packer -S --skipinteg $PACKAGE"
+                        fi
+                    fi
+                fi
+                #}}}
+            fi
+        done
+    else
+        pacman -Rsn $1
+        pause_function
+    fi
+} #}}}
+function package_install(){ #{{{
     for PACKAGE in $1; do
         if ! checkpackage "$PACKAGE" ; then
             if [ "$YAOURT" -eq 1 ]; then
@@ -138,20 +166,20 @@ function aurhelper_install(){ #{{{
             else
                 su -l $USERNAME --command="packer -S --noconfirm $PACKAGE"
             fi
-        else
-            echo -e "Package $PACKAGE already installed"
-        fi
-    done
-    for PACKAGE in $1; do
-        if ! checkpackage "$PACKAGE" ; then
-            question_for_answer "Package $PACKAGE not installed, try install again?"
-            if [ $OPTION = "y" ]; then
-                if [ "$YAOURT" -eq 1 ]; then
-                    su -l $USERNAME --command="yaourt -S $PACKAGE"
-                else
-                    su -l $USERNAME --command="packer -S --skipinteg $PACKAGE"
+            #FORCE CHECK #{{{
+            if ! checkpackage "$PACKAGE" ; then
+                question_for_answer "Package $PACKAGE not installed, try install again?"
+                if [ $OPTION = "y" ]; then
+                    if [ "$YAOURT" -eq 1 ]; then
+                        su -l $USERNAME --command="yaourt -S $PACKAGE"
+                    else
+                        su -l $USERNAME --command="packer -S --skipinteg $PACKAGE"
+                    fi
                 fi
             fi
+            #}}}
+        else
+            echo -e "Package $PACKAGE already installed"
         fi
     done
 } #}}}
@@ -217,7 +245,6 @@ function welcome(){
     echo "This version is still in BETA. Send bugreports to: "
     echo "helmuthdu at gmail dot com"
     pause_function
-
 }
 #}}}
 #CHECK ROOT {{{
@@ -284,9 +311,8 @@ function custom_repositories(){
     question_for_answer "Add custom repositories"
     case "$OPTION" in
         "y")
-        #CUSTOM REPOSITORIES {{{
-            LOOP=1
-            while [ "$LOOP" -ne 0 ]
+            #CUSTOM REPOSITORIES {{{
+            while [ 1 ]
             do
                 print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
                 echo " 1) Ayatana"
@@ -297,7 +323,7 @@ function custom_repositories(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "Option: " OPTION
+                read -p "Please enter your choice: " OPTION
                 case "$OPTION" in
                     1)
                         echo -e '\n[ayatana]\nServer = http://repo.ayatana.info/' >> /etc/pacman.conf
@@ -318,14 +344,14 @@ function custom_repositories(){
                         pause_function
                         ;;
                     *)
-                        LOOP=0
+                        break
                         ;;
                 esac
             done
             pacman -Sy
             install_status
             ;;
-        #}}}
+            #}}}
         *)
             CURRENT_STATUS=0
             ;;
@@ -361,92 +387,125 @@ function system_upgrade(){
 }
 #}}}
 #CREATE A NEW USER {{{
-function create_user(){
-    print_title "CREATE USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
-    read -p "New username: " USERNAME
-    useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
-    passwd $USERNAME
-    #SET USER AS SUDO #{{{
-        print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
-        pacman -S --noconfirm --needed sudo
-        ## Uncomment to allow members of group wheel to execute any command
-        sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
-        ## Same thing without a password (not secure)
-        #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
-    #}}}
+function select_user(){
+    print_title "SELECT USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
+
+    avaliableusers() {
+        echo "Avaliable Users:"
+        if [ "$(ls -A "/home")" ]; then
+            for USER in ${USERS[@]}; do
+                echo " $(( ${#USERS[@]} ))) $USER"
+            done
+            echo -e " $(( ${#USERS[@]}+1 ))) Create new user\n"
+            echo -e "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES\n"
+        else
+            echo -e " 1) Create new user\n"
+        fi
+    }
+
+    create_new_user(){
+        read -p "Username: " USERNAME
+        useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
+        passwd $USERNAME
+        #SET USER AS SUDO #{{{
+            print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
+            pacman -S --noconfirm --needed sudo
+            ## Uncomment to allow members of group wheel to execute any command
+            sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
+            ## Same thing without a password (not secure)
+            #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
+        #}}}
+    }
+
+    cd /home
+    USERS=( * );
+
+    avaliableusers
+    read -p "Please enter your choice: " OPTION
+
+    if [ "$(ls -A "/home")" ]; then
+        if [ $OPTION -eq  $(( ${#USERS[@]}+1 )) ]; then
+            create_new_user
+        else
+            USERNAME=${USERS[$OPTION-1]}
+        fi
+    else
+        create_new_user
+    fi
+
+    cd ~
 }
 #}}}
 #AUR HELPER {{{
 function choose_aurhelper(){
-    LOOP=1
-    while [ "$LOOP" -ne 0 ]
-    do
-        print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
-        echo "Choose your default AUR helper to install"
-        echo " 1) Yaourt"
-        echo " 2) Packer"
-        echo ""
-        read -p "Option: " OPTION
-        case "$OPTION" in
-            1)
+while [ 1 ]
+do
+    print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
+    echo "Choose your default AUR helper to install"
+    echo " 1) Yaourt"
+    echo " 2) Packer"
+    echo ""
+    read -p "Please enter your choice: " OPTION
+    case "$OPTION" in
+        1)
+            if ! checkpackage "yaourt" ; then
+                pacman -S --noconfirm --needed base-devel yajl
+                su -l $USERNAME --command="
+                    wget http://aur.archlinux.org/packages/package-query/package-query.tar.gz;
+                    tar zxvf package-query.tar.gz;
+                    cd package-query;
+                    makepkg -si --noconfirm;
+                    cd ..;
+                    rm -fr package-query*
+                "
+                su -l $USERNAME --command="
+                    wget http://aur.archlinux.org/packages/yaourt/yaourt.tar.gz;
+                    tar zxvf yaourt.tar.gz;
+                    cd yaourt;
+                    makepkg -si --noconfirm;
+                    cd ..;
+                    rm -fr yaourt*
+                "
                 if ! checkpackage "yaourt" ; then
-                    pacman -S --noconfirm --needed base-devel yajl
-                    su -l $USERNAME --command="
-                        wget http://aur.archlinux.org/packages/package-query/package-query.tar.gz;
-                        tar zxvf package-query.tar.gz;
-                        cd package-query;
-                        makepkg -si --noconfirm;
-                        cd ..;
-                        rm -fr package-query*
-                    "
-                    su -l $USERNAME --command="
-                        wget http://aur.archlinux.org/packages/yaourt/yaourt.tar.gz;
-                        tar zxvf yaourt.tar.gz;
-                        cd yaourt;
-                        makepkg -si --noconfirm;
-                        cd ..;
-                        rm -fr yaourt*
-                    "
-                    if ! checkpackage "yaourt" ; then
-                        echo "Yaourt not installed. EXIT now"
-                        pause_function
-                        exit 0
-                    fi
+                    echo "Yaourt not installed. EXIT now"
+                    pause_function
+                    exit 0
                 fi
-                install_status
-                YAOURT=1
-                LOOP=0
-                ;;
-            2)
+            fi
+            install_status
+            YAOURT=1
+            break
+            ;;
+        2)
+            if ! checkpackage "packer" ; then
+                pacman -S --noconfirm --needed git jshon curl
+                su -l $USERNAME --command="
+                    wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
+                    tar zxvf packer.tar.gz;
+                    cd packer;
+                    makepkg -si --noconfirm;
+                    cd ..;
+                    rm -fr packer*
+                "
                 if ! checkpackage "packer" ; then
-                    pacman -S --noconfirm --needed git jshon curl
-                    su -l $USERNAME --command="
-                        wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
-                        tar zxvf packer.tar.gz;
-                        cd packer;
-                        makepkg -si --noconfirm;
-                        cd ..;
-                        rm -fr packer*
-                    "
-                    if ! checkpackage "packer" ; then
-                        echo "Packer not installed. EXIT now"
-                        pause_function
-                        exit 0
-                    fi
+                    echo "Packer not installed. EXIT now"
+                    pause_function
+                    exit 0
                 fi
-                install_status
-                PACKER=1
-                LOOP=0
-                ;;
-            *)
-                echo "Wrong option"
-                pause_function
-                LOOP=1
-                ;;
-        esac
-    done
-    sumary "AUR Helper installation"
-    pause_function
+            fi
+            install_status
+            PACKER=1
+            break
+            ;;
+        *)
+            print_line
+            echo "Invalid option. Try another one."
+            pause_function
+            ;;
+    esac
+done
+sumary "AUR Helper installation"
+pause_function
 }
 #}}}
 #PACKMAN PACKAGE SIGNING {{{
@@ -456,7 +515,7 @@ function pacman_package_signing(){
     case "$OPTION" in
         "y")
             pacman -S --noconfirm --needed base-devel
-            aurhelper_install "rng-tools"
+            package_install "rng-tools"
             sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
             rngd -f -r /dev/urandom &
             pacman-key --init
@@ -485,7 +544,7 @@ function install_basic_setup(){
     pacman -S --noconfirm --needed curl bc rsync mlocate bash-completion vim net-tools
     print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
     pacman -S --noconfirm --needed zip unzip unrar p7zip
-    aurhelper_install "rar"
+    package_install "rar"
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
     pacman -S --noconfirm --needed dbus
     add_daemon "dbus"
@@ -493,37 +552,37 @@ function install_basic_setup(){
     print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
     pacman -S --noconfirm --needed acpi acpid
     add_daemon "acpid"
-    print_title "NTFS/FAT - https://wiki.archlinux.org/index.php/Ntfs"
-    pacman -S --noconfirm --needed ntfs-3g ntfsprogs dosfstools
+    print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/Ntfs"
+    pacman -S --noconfirm --needed ntfs-3g ntfsprogs dosfstools exfat-utils fuse-exfat
     print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
     pacman -S --noconfirm --needed rssh openssh
     add_daemon "@sshd"
     #CONFIGURE SSH #{{{
-        echo -e "sshd: ALL\n# End of file" > /etc/hosts.allow
-        echo -e "ALL: ALL: DENY\n# End of file" > /etc/hosts.deny
-        #SSHD_CONF #{{{
-            sed -i '/ListenAddress/s/^#//' /etc/ssh/sshd_config
-            sed -i '/SyslogFacility/s/^#//' /etc/ssh/sshd_config
-            sed -i '/LogLevel/s/^#//' /etc/ssh/sshd_config
-            sed -i '/LoginGraceTime/s/^#//' /etc/ssh/sshd_config
-            sed -i '/PermitRootLogin/s/^#//' /etc/ssh/sshd_config
-            sed -i '/StrictModes/s/^#//' /etc/ssh/sshd_config
-            sed -i '/RSAAuthentication/s/^#//' /etc/ssh/sshd_config
-            sed -i '/PubkeyAuthentication/s/^#//' /etc/ssh/sshd_config
-            sed -i '/IgnoreRhosts/s/^#//' /etc/ssh/sshd_config
-            sed -i '/PermitEmptyPasswords/s/^#//' /etc/ssh/sshd_config
-            sed -i '/X11Forwarding/s/^#//' /etc/ssh/sshd_config
-            sed -i '/X11Forwarding/s/no/yes/' /etc/ssh/sshd_config
-            sed -i '/X11DisplayOffset/s/^#//' /etc/ssh/sshd_config
-            sed -i '/X11UseLocalhost/s/^#//' /etc/ssh/sshd_config
-            sed -i '/PrintMotd/s/^#//' /etc/ssh/sshd_config
-            sed -i '/PrintMotd/s/yes/no/' /etc/ssh/sshd_config
-            sed -i '/PrintLastLog/s/^#//' /etc/ssh/sshd_config
-            sed -i '/TCPKeepAlive/s/^#//' /etc/ssh/sshd_config
-            sed -i '/the setting of/s/^/#/' /etc/ssh/sshd_config
-            sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
-            sed -i '/ListenAddress\ ::/s/^/#/' /etc/ssh/sshd_config
-        #}}}
+    echo -e "sshd: ALL\n# End of file" > /etc/hosts.allow
+    echo -e "ALL: ALL: DENY\n# End of file" > /etc/hosts.deny
+    #SSHD_CONF #{{{
+        sed -i '/ListenAddress/s/^#//' /etc/ssh/sshd_config
+        sed -i '/SyslogFacility/s/^#//' /etc/ssh/sshd_config
+        sed -i '/LogLevel/s/^#//' /etc/ssh/sshd_config
+        sed -i '/LoginGraceTime/s/^#//' /etc/ssh/sshd_config
+        sed -i '/PermitRootLogin/s/^#//' /etc/ssh/sshd_config
+        sed -i '/StrictModes/s/^#//' /etc/ssh/sshd_config
+        sed -i '/RSAAuthentication/s/^#//' /etc/ssh/sshd_config
+        sed -i '/PubkeyAuthentication/s/^#//' /etc/ssh/sshd_config
+        sed -i '/IgnoreRhosts/s/^#//' /etc/ssh/sshd_config
+        sed -i '/PermitEmptyPasswords/s/^#//' /etc/ssh/sshd_config
+        sed -i '/X11Forwarding/s/^#//' /etc/ssh/sshd_config
+        sed -i '/X11Forwarding/s/no/yes/' /etc/ssh/sshd_config
+        sed -i '/X11DisplayOffset/s/^#//' /etc/ssh/sshd_config
+        sed -i '/X11UseLocalhost/s/^#//' /etc/ssh/sshd_config
+        sed -i '/PrintMotd/s/^#//' /etc/ssh/sshd_config
+        sed -i '/PrintMotd/s/yes/no/' /etc/ssh/sshd_config
+        sed -i '/PrintLastLog/s/^#//' /etc/ssh/sshd_config
+        sed -i '/TCPKeepAlive/s/^#//' /etc/ssh/sshd_config
+        sed -i '/the setting of/s/^/#/' /etc/ssh/sshd_config
+        sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
+        sed -i '/ListenAddress\ ::/s/^/#/' /etc/ssh/sshd_config
+    #}}}
     #}}}
     print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
     pacman -S --noconfirm --needed samba
@@ -542,7 +601,7 @@ function install_tlp(){
     question_for_answer "Install TLP (Battery Improvement on Laptops)"
     case "$OPTION" in
         "y")
-            aurhelper_install "tlp"
+            package_install "tlp"
             pacman -S --noconfirm --needed upower
             add_daemon "@tlp"
             install_status
@@ -578,7 +637,7 @@ function install_video_cards(){
     echo ""
     echo " s) SKIP"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed libgl xf86-video-intel
@@ -586,7 +645,7 @@ function install_video_cards(){
             sumary "Intel GPU driver installation"
             ;;
         2)
-            aurhelper_install "catalyst catalyst-utils"
+            package_install "catalyst catalyst-utils"
             install_status
             sumary "ATI GPU driver installation"
             ;;
@@ -650,9 +709,8 @@ function install_additional_firmwares(){
     question_for_answer "Install additional firmwares [Wireless,Bluetooth]"
     case "$OPTION" in
         "y")
-        #ADDITIONAL FIRMWARE {{{
-            LOOP=1
-            while [ "$LOOP" -ne 0 ]
+            #ADDITIONAL FIRMWARE {{{
+            while [ 1 ]
             do
                 print_title "INSTALL ADDITIONAL FIRMWARES"
                 echo " 1) $(checkbox_package "ipw2100-fw") ipw2100"
@@ -664,34 +722,34 @@ function install_additional_firmwares(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "Option: " OPTION
+                read -p "Please enter your choice: " OPTION
                 case "$OPTION" in
                     1)
-                        aurhelper_install "ipw2100-fw"
+                        package_manager "ipw2100-fw"
                         ;;
                     2)
-                        aurhelper_install "ipw2200-fw"
+                        package_manager "ipw2200-fw"
                         ;;
                     3)
-                        aurhelper_install "b43-firmware"
+                        package_manager "b43-firmware"
                         ;;
                     4)
-                        aurhelper_install "b43-firmware-legacy"
+                        package_manager "b43-firmware-legacy"
                         ;;
                     5)
-                        aurhelper_install "broadcom-wl"
+                        package_manager "broadcom-wl"
                         ;;
                     6)
-                        aurhelper_install "bluez-firmware"
+                        package_manager "bluez-firmware"
                         ;;
                     *)
-                        LOOP=0
+                        break
                         ;;
                 esac
             done
             install_status
             ;;
-        #}}}
+            #}}}
         *)
             CURRENT_STATUS=0
             ;;
@@ -706,7 +764,7 @@ function install_git_tor(){
     question_for_answer "Ensuring access to GIT through a firewall (bypass college firewall)"
     case "$OPTION" in
         "y")
-            aurhelper_install "gtk-doc openbsd-netcat vidalia privoxy git"
+            package_install "gtk-doc openbsd-netcat vidalia privoxy git"
             if [ ! -f /usr/bin/proxy-wrapper ]; then
                 echo 'forward-socks5   /               127.0.0.1:9050 .' >> /etc/privoxy/config
                 echo -e '#!/bin/bash\nnc.openbsd -xlocalhost:9050 -X5 $*' > /usr/bin/proxy-wrapper
@@ -743,7 +801,7 @@ function install_desktop_environment(){
     echo " 5) OpenBox"
     echo ""
     echo " b) BACK"
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
             #GNOME {{{
@@ -754,11 +812,10 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
             pacman -S --noconfirm --needed pulseaudio-gnome telepathy deja-dup
             pacman -S --noconfirm --needed system-config-printer-gnome
-            aurhelper_install "zeitgeist libzeitgeist zeitgeist-datahub"
-            aurhelper_install "automounter nautilus-open-terminal gnome-defaults-list"
+            package_install "zeitgeist libzeitgeist zeitgeist-datahub"
+            package_install "automounter nautilus-open-terminal gnome-defaults-list"
             #GNOME APPS {{{
-            LOOP=1
-            while [ "$LOOP" -ne 0 ]
+            while [ 1 ]
             do
                 print_title "GNOME APPS"
                 echo " 1) $(checkbox_package "faenza-icon-theme") Gnome Icons [Faience, Faenza, Elementary]"
@@ -771,41 +828,38 @@ function install_desktop_environment(){
                 echo " a) ALL"
                 echo " d) DONE"
                 echo ""
-                read -p "Option: " OPTION
+                read -p "Please enter your choice: " OPTION
                 case "$OPTION" in
                     1)
-                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                        package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         ;;
                     2)
-                        aurhelper_install "egtk-bzr"
-                        aurhelper_install "zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
+                        package_manager "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
                         ;;
                     3)
-                        aurhelper_install "libkeybinder3"
-                        aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
+                        package_manager "libkeybinder3"
+                        package_manager "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
                         ;;
                     4)
-                        aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
+                        package_manager "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
                         ;;
                     5)
-                        aurhelper_install "gnome-activity-journal"
+                        package_manager "gnome-activity-journal"
                         ;;
                     6)
-                        pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
+                        package_manager "gnome-packagekit gnome-settings-daemon-updates"
                         ;;
                     "a")
-                        pacman -S --noconfirm --needed gnome-packagekit gnome-settings-daemon-updates
-                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
-                        aurhelper_install "gnome-activity-journal"
-                        aurhelper_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
-                        aurhelper_install "libkeybinder3"
-                        aurhelper_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
-                        aurhelper_install "egtk-bzr"
-                        aurhelper_install "zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
-                        LOOP=0
+                        package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                        package_manager "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
+                        package_manager "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
+                        package_manager "libkeybinder3"
+                        package_manager "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
+                        package_manager "gnome-activity-journal"
+                        package_manager "gnome-packagekit gnome-settings-daemon-updates"
                         ;;
                     *)
-                        LOOP=0
+                        break
                         ;;
                 esac
             done
@@ -821,8 +875,8 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed kde kde-l10n-$LOCATION_KDE kipi-plugins
             pacman -Rcsn kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
             pacman -S --noconfirm --needed kdeadmin-system-config-printer-kde xdg-user-dirs
-            aurhelper_install "kde-gtk-config-git"
-            aurhelper_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
+            package_manager "kde-gtk-config-git"
+            package_manager "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
             #QTCURVE THEMES #{{{
             wget http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
             wget http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
@@ -840,8 +894,7 @@ function install_desktop_environment(){
             rm -fr Kawai Sweet
             #}}}
             #KDE APPS {{{
-            LOOP=1
-            while [ "$LOOP" -ne 0 ]
+            while [ 1 ]
             do
                 print_title "KDE APPS"
                 echo " 1) $(checkbox_package "apper") Apper"
@@ -856,47 +909,44 @@ function install_desktop_environment(){
                 echo " a) ALL"
                 echo " d) DONE"
                 echo ""
-                read -p "Option: " OPTION
+                read -p "Please enter your choice: " OPTION
                 case "$OPTION" in
                     1)
-                        aurhelper_install "apper"
+                        package_manager "apper"
                         ;;
                     2)
-                        aurhelper_install "bangarang"
+                        package_manager "bangarang"
                         ;;
                     3)
-                        pacman -S --noconfirm --needed choqok
+                        package_manager "choqok"
                         ;;
                     4)
-                        pacman -S --noconfirm --needed digikam
+                        package_manager "digikam"
                         ;;
                     5)
-                        pacman -S --noconfirm --needed k3b dvd+rw-tools
+                        package_manager "k3b dvd+rw-tools"
                         ;;
                     6)
-                        aurhelper_install "kfaenza-icon-theme"
+                        package_manager "kfaenza-icon-theme"
                         ;;
                     7)
-                        aurhelper_install "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
+                        package_manager "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
                         ;;
                     8)
-                        pacman -S --noconfirm --needed yakuake
-                        aurhelper_install "yakuake-skin-plasma-oxygen-panel"
+                        package_manager "yakuake yakuake-skin-plasma-oxygen-panel"
                         ;;
                     "a")
-                        pacman -S --noconfirm --needed choqok
-                        pacman -S --noconfirm --needed digikam
-                        pacman -S --noconfirm --needed k3b dvd+rw-tools
-                        pacman -S --noconfirm --needed yakuake
-                        aurhelper_install "apper"
-                        aurhelper_install "bangarang"
-                        aurhelper_install "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
-                        aurhelper_install "kfaenza-icon-theme"
-                        aurhelper_install "yakuake-skin-plasma-oxygen-panel"
-                        LOOP=0
+                        package_manager "choqok"
+                        package_manager "digikam"
+                        package_manager "k3b dvd+rw-tools"
+                        package_manager "apper"
+                        package_manager "bangarang"
+                        package_manager "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
+                        package_manager "kfaenza-icon-theme"
+                        package_manager "yakuake yakuake-skin-plasma-oxygen-panel"
                         ;;
                     *)
-                        LOOP=0
+                        break
                         ;;
                 esac
             done
@@ -911,11 +961,10 @@ function install_desktop_environment(){
             print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
             pacman -S --noconfirm --needed xfce4 xfce4-goodies
             pacman -S --noconfirm --needed polkit-gnome gvfs-smb xdg-user-dirs
-            aurhelper_install "automounter"
-            aurhelper_install "gnome-defaults-list"
+            package_manager "automounter"
+            package_manager "gnome-defaults-list"
             #XFCE APPS {{{
-            LOOP=1
-            while [ "$LOOP" -ne 0 ]
+            while [ 1 ]
             do
                 print_title "XFCE APPS"
                 echo " 1) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
@@ -923,16 +972,16 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "Option: " OPTION
+                read -p "Please enter your choice: " OPTION
                 case "$OPTION" in
                     1)
-                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                        package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         ;;
                     2)
-                        aurhelper_install "zukitwo-themes"
+                        package_manager "zukitwo-themes"
                         ;;
                     *)
-                        LOOP=0
+                        break
                         ;;
                 esac
             done
@@ -948,10 +997,9 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed leafpad xarchiver epdfview
             pacman -S --noconfirm --needed pm-utils upower
             pacman -S --noconfirm --needed polkit-gnome gvfs gvfs-smb xdg-user-dirs
-            aurhelper_install "gnome-defaults-list"
+            package_manager "gnome-defaults-list"
             #LXDE APPS {{{
-            LOOP=1
-            while [ "$LOOP" -ne 0 ]
+            while [ 1 ]
             do
                 print_title "LXDE APPS"
                 echo " 1) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
@@ -959,16 +1007,16 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "Option: " OPTION
+                read -p "Please enter your choice: " OPTION
                 case "$OPTION" in
                     1)
-                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                        package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         ;;
                     2)
-                        pacman -S --noconfirm --needed xfburn
+                        package_manager "xfburn"
                         ;;
                     *)
-                        LOOP=0
+                        break
                         ;;
                 esac
             done
@@ -985,7 +1033,7 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed lxappearance consolekit
             pacman -S --noconfirm --needed xdg-user-dirs
             pacman -S --noconfirm --needed leafpad xarchiver epdfview nitrogen
-            aurhelper_install "gnome-defaults-list"
+            package_manager "gnome-defaults-list"
             mkdir -p /home/$USERNAME/.config/openbox/
             cp /etc/xdg/openbox/rc.xml /home/$USERNAME/.config/openbox/
             cp /etc/xdg/openbox/menu.xml /home/$USERNAME/.config/openbox/
@@ -994,8 +1042,7 @@ function install_desktop_environment(){
             chown -R $USERNAME:users /home/$USERNAME/.config
             chown $USERNAME:users /home/$USERNAME/.xinitrc
             #OPENBOX APPS {{{
-            LOOP=1
-            while [ "$LOOP" -ne 0 ]
+            while [ 1 ]
             do
                 print_title "OPENBOX APPS"
                 echo " 1) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
@@ -1006,25 +1053,25 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "Option: " OPTION
+                read -p "Please enter your choice: " OPTION
                 case "$OPTION" in
                     1)
-                        aurhelper_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                        package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                         ;;
                     2)
-                        pacman -S --noconfirm --needed polkit-gnome gvfs-smb thunar
+                        package_manager "polkit-gnome gvfs-smb thunar"
                         ;;
                     3)
-                        pacman -S --noconfirm --needed tint2
+                        package_manager "tint2"
                         ;;
                     4)
-                        pacman -S --noconfirm --needed volwheel
+                        package_manager "volwheel"
                         ;;
                     5)
-                        pacman -S --noconfirm --needed xfburn
+                        package_manager "xfburn"
                         ;;
                     *)
-                        LOOP=0
+                        break
                         ;;
                 esac
             done
@@ -1049,7 +1096,7 @@ function install_nm_wicd(){
     echo ""
     echo " s) SKIP"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
             print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
@@ -1071,7 +1118,7 @@ function install_nm_wicd(){
             if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
                 pacman -S --noconfirm --needed wicd wicd-gtk
             elif [ "$KDE" -eq 1 ]; then
-                aurhelper_install "wicd wicd-kde"
+                package_manager "wicd wicd-kde"
             else
                 pacman -S --noconfirm --needed wicd
             fi
@@ -1080,6 +1127,9 @@ function install_nm_wicd(){
             install_status
             ;;
         *)
+            remove_daemon "@networkmanager"
+            remove_daemon "@wicd"
+            add_daemon "network"
             CURRENT_STATUS=0
             ;;
     esac
@@ -1089,8 +1139,7 @@ function install_nm_wicd(){
 #}}}
 #ACCESSORIES {{{
 function install_accessories_apps(){
-LOOP=1
-while [ "$LOOP" -ne 0 ]
+while [ 1 ]
 do
     print_title "ACCESSORIES APPS"
     echo " 1) $(checkbox_package "cairo-dock-bzr") Cairo Dock"
@@ -1108,53 +1157,52 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
-            aurhelper_install "cairo-dock-bzr cairo-dock-plugins-bzr"
+            package_manager "cairo-dock-bzr cairo-dock-plugins-bzr"
             ;;
         2)
-            aurhelper_install "conky conky-colors"
+            package_manager "conky conky-colors"
             add_module "coretemp it87 acpi-cpufreq"
             ;;
         3)
-            aurhelper_install "dockbarx dockbarx-shinybar-theme"
+            package_manager "dockbarx dockbarx-shinybar-theme"
             ;;
         4)
-            aurhelper_install "docky"
+            package_manager "docky"
             ;;
         5)
             if [ "$KDE" -eq 1 ]; then
-                aurhelper_install "speedcrunch"
+                package_manager "speedcrunch"
             else
-                aurhelper_install "galculator"
+                package_manager "galculator"
             fi
             ;;
         6)
-            aurhelper_install "gnome-pie"
+            package_manager "gnome-pie"
             ;;
         7)
-            aurhelper_install "guake"
+            package_manager "guake"
             ;;
         8)
-            aurhelper_install "kupfer"
+            package_manager "kupfer"
             ;;
         9)
-            aurhelper_install "pyrenamer"
+            package_manager "pyrenamer"
             ;;
         10)
-            aurhelper_install "shutter"
+            package_manager "shutter"
             ;;
         11)
-            aurhelper_install "zeitgeist libzeitgeist zeitgeist-datahub"
-            aurhelper_install "synapse"
+            package_manager "zeitgeist libzeitgeist zeitgeist-datahub"
+            package_manager "synapse"
             ;;
         12)
-            aurhelper_install "python-keybinder"
-            pacman -S --noconfirm --needed terminator
+            package_manager "terminator python-keybinder"
             ;;
         *)
-            LOOP=0
+            break
             ;;
     esac
 done
@@ -1162,8 +1210,7 @@ done
 #}}}
 #DEVELOPEMENT {{{
 function install_development_apps(){
-LOOP=1
-while [ "$LOOP" -ne 0 ]
+while [ 1 ]
 do
     print_title "DEVELOPMENT APPS"
     echo " 1) $(checkbox_package "aptana-studio") Aptana Studio"
@@ -1181,14 +1228,14 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
-            aurhelper_install "aptana-studio"
+            package_manager "aptana-studio"
             ;;
         2)
             #ECLIPSE {{{
-            while [ "$LOOP" -ne 0 ]
+            while [ 1 ]
             do
                 print_title "ECLIPSE - https://wiki.archlinux.org/index.php/Eclipse"
                 echo " 1) $(checkbox_package "eclipse") Eclipse Classic"
@@ -1203,93 +1250,90 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Option: " OPTION
+                read -p "Please enter your choice: " OPTION
                 case "$OPTION" in
                     1)
-                        pacman -S --noconfirm --needed eclipse
+                        package_manager "eclipse"
                         ;;
                     2)
-                        pacman -S --noconfirm --needed eclipse-cdt
+                        package_manager "eclipse-cdt"
                         ;;
                     3)
-                        aurhelper_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
+                        package_manager "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
                         ;;
                     4)
-                        aurhelper_install "eclipse-wtp-wst"
+                        package_manager "eclipse-wtp-wst"
                         ;;
                     5)
-                        aurhelper_install "eclipse-pdt"
+                        package_manager "eclipse-pdt"
                         ;;
                     6)
-                        aurhelper_install "eclipse-pydev"
+                        package_manager "eclipse-pydev"
                         ;;
                     7)
-                        aurhelper_install "eclipse-aptana"
+                        package_manager "eclipse-aptana"
                         ;;
                     8)
-                        aurhelper_install "eclipse-vrapper"
+                        package_manager "eclipse-vrapper"
                         ;;
                     9)
-                        aurhelper_install "eclipse-egit"
+                        package_manager "eclipse-egit"
                         ;;
                     *)
-                        LOOP=0
+                        break
                         ;;
                 esac
             done
-            LOOP=1
             #}}}
             ;;
         3)
-            pacman -S --noconfirm --needed emacs
+            package_manager "emacs"
             ;;
         4)
             pacman -Rdd --noconfirm vim
-            pacman -S --noconfirm --needed gvim wmctrl ctags
-            aurhelper_install "discount"
+            package_manager "gvim wmctrl ctags discount"
             #HELMUTHDU'S VIMRC {{{
-                pacman -S --noconfirm --needed git
-                git clone git://github.com/helmuthdu/vim.git
-                mv vim /home/$USERNAME/.vim
-                git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
-                ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
-                chown -R $USERNAME:users /home/$USERNAME/.vim
-                chown $USERNAME:users /home/$USERNAME/.vimrc
+            pacman -S --noconfirm --needed git
+            git clone git://github.com/helmuthdu/vim.git
+            mv vim /home/$USERNAME/.vim
+            git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
+            ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
+            chown -R $USERNAME:users /home/$USERNAME/.vim
+            chown $USERNAME:users /home/$USERNAME/.vimrc
             #}}}
             ;;
         5)
-            pacman -S --noconfirm --needed intellij-idea-community-edition
+            package_manager "intellij-idea-community-edition"
             ;;
         6)
-            pacman -S --noconfirm --needed netbeans
+            package_manager "netbeans"
             ;;
         7)
             pacman -Rdd --noconfirm jre7-openjdk
             pacman -Rdd --noconfirm jdk7-openjdk
-            aurhelper_install "jdk"
+            package_manager "jdk"
             ;;
         8)
-            pacman -S --noconfirm --needed qtcreator qt-doc
+            package_manager "qtcreator qt-doc"
             mkdir -p /home/$USERNAME/.config/Nokia/qtcreator/styles
             wget http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
             mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
             chown -R $USERNAME:users /home/$USERNAME/.config
             ;;
         9)
-            aurhelper_install "sublime-text"
+            package_manager "sublime-text"
             ;;
         10)
-            pacman -S --noconfirm --needed valgrind gdb splint tidyhtml pyflakes
-            aurhelper_install "jsl"
+            package_manager "valgrind gdb splint tidyhtml pyflakes jsl"
             ;;
         11)
-            aurhelper_install "mysql-workbench"
+            package_manager "mysql-workbench"
             ;;
         12)
-            pacman -S --noconfirm --needed meld
+            package_manager "meld"
             ;;
         *)
-            LOOP=0
+            break
             ;;
     esac
 done
@@ -1297,8 +1341,7 @@ done
 #}}}
 #OFFICE {{{
 function install_office_apps(){
-LOOP=1
-while [ "$LOOP" -ne 0 ]
+while [ 1 ]
 do
     print_title "OFFICE APPS"
     echo " 1) $(checkbox_package "libreoffice-base") LibreOffice"
@@ -1313,53 +1356,53 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm --needed libreoffice-$LOCATION_LO libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram
-            aurhelper_install "hunspell-$LOCATION_HS"
+            package_manager "libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram libreoffice-$LOCATION_LO"
+            package_manager "hunspell-$LOCATION_HS"
             if [ "$KDE" -eq 1 ]; then
-                pacman -S --noconfirm --needed libreoffice-kde4
+                package_manager "libreoffice-kde4"
             else
-                pacman -S --noconfirm --needed libreoffice-gnome
+                package_manager "libreoffice-gnome"
             fi
             ;;
         2)
-            pacman -S --noconfirm --needed gnumeric abiword abiword-plugins
+            package_manager "gnumeric abiword abiword-plugins"
             ;;
         3)
             print_title "LATEX - https://wiki.archlinux.org/index.php/LaTeX"
-            pacman -S --noconfirm --needed texlive-most
-            aurhelper_install "texmaker"
-            aurhelper_install "latex-template-springer latex-template-ieee latex-beamer"
+            package_manager "texlive-most"
+            package_manager "texmaker"
+            package_manager "latex-template-springer latex-template-ieee latex-beamer"
             if [ $LOCATION = "pt_BR" ]; then
-                aurhelper_install "abntex"
+                package_manager "abntex"
             fi
             ;;
         4)
             if [ "$KDE" -eq 1 ]; then
-                pacman -S --noconfirm --needed kchmviewer
+                package_manager "kchmviewer"
             else
-                pacman -S --noconfirm --needed chmsee
+                package_manager "chmsee"
             fi
             ;;
         5)
-            pacman -S --noconfirm --needed gcstar
+            package_manager "gcstar"
             ;;
         6)
-            aurhelper_install "wunderlist"
+            package_manager "wunderlist"
             ;;
         7)
-            aurhelper_install "xmind"
+            package_manager "xmind"
             ;;
         8)
-            pacman -S --noconfirm --needed zathura
+            package_manager "zathura"
             ;;
         9)
-            pacman -S --noconfirm --needed impressive
+            package_manager "impressive"
             ;;
         *)
-            LOOP=0
+            break
             ;;
     esac
 done
@@ -1367,8 +1410,7 @@ done
 #}}}
 #SYSTEM TOOLS {{{
 function install_system_apps(){
-LOOP=1
-while [ "$LOOP" -ne 0 ]
+while [ 1 ]
 do
     print_title "SYSTEM TOOLS APPS"
     echo " 1) $(checkbox_package "grsync") Grsync"
@@ -1378,27 +1420,26 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm --needed grsync
+            package_manager "grsync"
             ;;
         2)
-            pacman -S --noconfirm --needed htop
+            package_manager "htop"
             ;;
         3)
-            pacman -S --noconfirm --needed virtualbox virtualbox-additions
-            aurhelper_install "virtualbox-ext-oracle"
+            package_manager "virtualbox virtualbox-additions virtualbox-ext-oracle"
             modprobe vboxdrv
             groupadd vboxusers
             gpasswd -a $USERNAME vboxusers
             add_module "vboxdrv"
             ;;
         4)
-            pacman -S --noconfirm --needed wine wine_gecko winetricks
+            package_manager "wine wine_gecko winetricks"
             ;;
         *)
-            LOOP=0
+            break
             ;;
     esac
 done
@@ -1406,8 +1447,7 @@ done
 #}}}
 #GRAPHICS {{{
 function install_graphics_apps(){
-LOOP=1
-while [ "$LOOP" -ne 0 ]
+while [ 1 ]
 do
     print_title "GRAPHICS APPS"
     echo " 1) $(checkbox_package "blender") Blender"
@@ -1420,32 +1460,31 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm --needed blender
+            package_manager "blender"
             ;;
         2)
-            pacman -S --noconfirm --needed gimp
+            package_manager "gimp"
             ;;
         3)
-            aurhelper_install "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
+            package_manager "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
             ;;
         4)
-            pacman -S --noconfirm --needed gthumb
+            package_manager "gthumb"
             ;;
         5)
-            pacman -S --noconfirm --needed inkscape uniconvertor python2-numpy python-lxml
-            aurhelper_install "sozi"
+            package_manager "inkscape uniconvertor python2-numpy python-lxml sozi"
             ;;
         6)
-            pacman -S --noconfirm --needed mcomix
+            package_manager "mcomix"
             ;;
         7)
-            pacman -S --noconfirm --needed shotwell
+            package_manager "shotwell"
             ;;
         *)
-            LOOP=0
+            break
             ;;
     esac
 done
@@ -1453,8 +1492,7 @@ done
 #}}}
 #INTERNET {{{
 function install_internet_apps(){
-LOOP=1
-while [ "$LOOP" -ne 0 ]
+while [ 1 ]
 do
     print_title "INTERNET APPS"
     echo " 1) $(checkbox_package "dropbox") Dropbox"
@@ -1473,67 +1511,66 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
-            aurhelper_install "dropbox"
+            package_manager "dropbox"
             if [ "$GNOME" -eq 1 ]; then
-                aurhelper_install "nautilus-dropbox"
+                package_manager "nautilus-dropbox"
             elif [ "$XFCE" -eq 1 ]; then
-                aurhelper_install "thunar-dropbox"
+                package_manager "thunar-dropbox"
             elif [ "$KDE" -eq 1 ]; then
-                aurhelper_install "kfilebox"
+                package_manager "kfilebox"
             else
-                aurhelper_install "dropbox-cli"
+                package_manager "dropbox-cli"
             fi
             ;;
         2)
-            aurhelper_install "google-earth"
+            package_manager "google-earth"
             ;;
         3)
-            pacman -S --noconfirm --needed flashplugin
-            aurhelper_install "google-chrome"
+            package_manager "google-chrome flashplugin"
             ;;
         4)
-            aurhelper_install "jdownloader"
+            package_manager "jdownloader"
             ;;
         5)
-            pacman -S --noconfirm --needed irssi
+            package_manager "irssi"
             ;;
         6)
-            pacman -S --noconfirm --needed firefox flashplugin firefox-i18n-$LOCATION_FF
+            package_manager "firefox firefox-i18n-$LOCATION_FF flashplugin "
             ;;
         7)
-            pacman -S --noconfirm --needed thunderbird thunderbird-i18n-$LOCATION_FF
+            package_manager "thunderbird thunderbird-i18n-$LOCATION_FF"
             ;;
         8)
-            pacman -S --noconfirm --needed pidgin
+            package_manager "pidgin"
             ;;
         9)
-            pacman -S --noconfirm --needed skype
+            package_manager "skype"
             ;;
         10)
-            aurhelper_install "teamspeak3"
+            package_manager "teamspeak3"
             ;;
         11)
-            aurhelper_install "teamviewer"
+            package_manager "teamviewer"
             ;;
         12)
             if [ "$KDE" -eq 1 ]; then
-                aurhelper_install "transmission-qt"
+                package_manager "transmission-qt"
             else
-                aurhelper_install "transmission-gtk"
+                package_manager "transmission-gtk"
             fi
             ;;
         13)
             if [ "$KDE" -eq 1 ]; then
-                pacman -S --noconfirm --needed konversation
+                package_manager "konversation"
             else
-                pacman -S --noconfirm --needed xchat
+                package_manager "xchat"
             fi
             ;;
         *)
-            LOOP=0
+            break
             ;;
     esac
 done
@@ -1541,51 +1578,50 @@ done
 #}}}
 #LAMP #{{{
 function install_lamp(){
-    print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlinux.org/index.php/LAMP"
-    question_for_answer "Install LAMP"
-    case "$OPTION" in
-        "y")
-            pacman -S --noconfirm --needed apache mysql php php-apache php-mcrypt php-gd
-            if ! checkpackage "adminer" ; then
-                aurhelper_install "adminer"
-                rc.d start httpd mysqld
-                #CONFIGURE LAMP SERVER {{{
-                /usr/bin/mysql_secure_installation
-                echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
-                echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
-                sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
-                echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
-                sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
-                sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
-                sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
-                sed -i '/mysql.so/s/^;//' /etc/php/php.ini
-                sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
-                sed -i '/gd.so/s/^;//' /etc/php/php.ini
-                sed -i '/display_errors[=]/s/off/on/' /etc/php/php.ini
-                sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
-                #}}}
-            fi
-            su -l $USERNAME --command="mkdir -p ~/Sites"
-            su -l $USERNAME --command="chmod o+x ~/ && chmod -R g+xr-w ~/Sites"
-            rc.d restart httpd mysqld
-            add_daemon "httpd @mysqld"
-            install_status
-            print_line
-            echo "The folder \"Sites\" has been created in your home"
-            echo "You can access your projects at \"http://localhost/~username\""
-            ;;
-        *)
-            CURRENT_STATUS=0
-            ;;
-    esac
-    sumary "LAMP installation"
-    pause_function
+print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlinux.org/index.php/LAMP"
+question_for_answer "Install LAMP"
+case "$OPTION" in
+    "y")
+        pacman -S --noconfirm --needed apache mysql php php-apache php-mcrypt php-gd
+        if ! checkpackage "adminer" ; then
+            package_install "adminer"
+            rc.d start httpd mysqld
+            #CONFIGURE LAMP SERVER {{{
+            /usr/bin/mysql_secure_installation
+            echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
+            echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
+            sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
+            echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
+            sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
+            sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
+            sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
+            sed -i '/mysql.so/s/^;//' /etc/php/php.ini
+            sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
+            sed -i '/gd.so/s/^;//' /etc/php/php.ini
+            sed -i '/display_errors[=]/s/off/on/' /etc/php/php.ini
+            sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
+            #}}}
+        fi
+        su -l $USERNAME --command="mkdir -p ~/Sites"
+        su -l $USERNAME --command="chmod o+x ~/ && chmod -R g+xr-w ~/Sites"
+        rc.d restart httpd mysqld
+        add_daemon "httpd @mysqld"
+        install_status
+        print_line
+        echo "The folder \"Sites\" has been created in your home"
+        echo "You can access your projects at \"http://localhost/~username\""
+        ;;
+    *)
+        CURRENT_STATUS=0
+        ;;
+esac
+sumary "LAMP installation"
+pause_function
 }
 #}}}
 #AUDIO {{{
 function install_audio_apps(){
-LOOP=1
-while [ "$LOOP" -ne 0 ]
+while [ 1 ]
 do
     print_title "AUDIO APPS "
     echo " 1) $(checkbox_package "amarok") Amarok"
@@ -1605,53 +1641,53 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm --needed amarok
+            package_manager "amarok"
             ;;
         2)
-            pacman -S --noconfirm --needed banshee
+            package_manager "banshee"
             ;;
         3)
-            aurhelper_install "beatbox-bzr"
+            package_manager "beatbox-bzr"
             ;;
         4)
-            pacman -S --noconfirm --needed clementine
+            package_manager "clementine"
             ;;
         5)
-            aurhelper_install "decibel-audio-player2"
+            package_manager "decibel-audio-player2"
             ;;
         6)
-            aurhelper_install "exaile"
+            package_manager "exaile"
             ;;
         7)
-            aurhelper_install "gmusicbrowser-development"
+            package_manager "gmusicbrowser-development"
             ;;
         8)
-            aurhelper_install "musique"
+            package_manager "musique"
             ;;
         9)
-            aurhelper_install "nuvola-bzr-stable"
+            package_manager "nuvola-bzr-stable"
             ;;
         10)
-            pacman -S --noconfirm --needed rhythmbox
+            package_manager "rhythmbox"
             ;;
         11)
-            aurhelper_install "puddletag"
+            package_manager "puddletag"
             ;;
         12)
-            aurhelper_install "timidity++ fluidr3"
+            package_manager "timidity++ fluidr3"
             echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
             ;;
         13)
-            pacman -S --noconfirm --needed gstreamer0.10-plugins
+            package_manager "gstreamer0.10-plugins"
             ;;
         14)
-            pacman -S --noconfirm --needed audacity
+            package_manager "audacity"
             ;;
         *)
-            LOOP=0
+            break
             ;;
     esac
 done
@@ -1659,8 +1695,7 @@ done
 #}}}
 #VIDEO {{{
 function install_video_apps(){
-LOOP=1
-while [ "$LOOP" -ne 0 ]
+while [ 1 ]
 do
     print_title "VIDEO APPS "
     echo " 1) $(checkbox_package "gnome-mplayer") Gnome Mplayer"
@@ -1680,61 +1715,61 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm --needed gnome-mplayer
+            package_manager "gnome-mplayer"
             ;;
         2)
-            pacman -S --noconfirm --needed parole
+            package_manager "parole"
             ;;
         3)
-            aurhelper_install "minitube"
+            package_manager "minitube"
             ;;
         4)
-            aurhelper_install "rosa-media-player-bin"
+            package_manager "rosa-media-player-bin"
             ;;
         5)
-            pacman -S --noconfirm --needed smplayer smplayer-themes
+            package_manager "smplayer smplayer-themes"
             ;;
         6)
-            pacman -S --noconfirm --needed vlc
+            package_manager "vlc"
             if [ "$KDE" -eq 1 ]; then
-                pacman -S --noconfirm --needed phonon-vlc
+                package_manager "phonon-vlc"
             fi
             ;;
         7)
-            pacman -S --noconfirm --needed xbmc
+            package_manager "xbmc"
             ;;
         8)
-            aurhelper_install "arista-transcoder"
+            package_manager "arista-transcoder"
             ;;
         9)
-            aurhelper_install "transmageddon"
+            package_manager "transmageddon"
             ;;
         10)
-            aurhelper_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
+            package_manager "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
             if [ "$ARCHI" = "i686" ]; then
-                aurhelper_install "codecs"
+                package_manager "codecs"
             else
-                aurhelper_install "codecs64"
+                package_manager "codecs64"
             fi
             ;;
         11)
-            pacman -S --noconfirm --needed kdenlive
+            package_manager "kdenlive"
             ;;
         12)
-            pacman -S --noconfirm --needed openshot
+            package_manager "openshot"
             ;;
         13)
-            pacman -S --noconfirm --needed pitivi
+            package_manager "pitivi"
             ;;
         14)
-            pacman -S --noconfirm --needed python-rsvg
-            aurhelper_install "kazam-bzr"
+            package_manager "python-rsvg"
+            package_manager "kazam-bzr"
             ;;
         *)
-            LOOP=0
+            break
             ;;
     esac
 done
@@ -1742,8 +1777,7 @@ done
 #}}}
 #GAMES {{{
 function install_games(){
-LOOP=1
-while [ "$LOOP" -ne 0 ]
+while [ 1 ]
 do
     print_title "GAMES - https://wiki.archlinux.org/index.php/Games"
     echo " 1) Action/Adventure"
@@ -1760,378 +1794,366 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
-        #ACTION/ADVENTURE {{{
-        while [ "$LOOP" -ne 0 ]
-        do
-            print_title "ACTION AND ADVENTURE"
-            echo " 1) $(checkbox_package "astromenace") Astromenace"
-            echo " 2) $(checkbox_package "opentyrian-hg") OpenTyrian"
-            echo " 3) $(checkbox_package "mars-shooter") M.A.R.S."
-            echo " 4) $(checkbox_package "yofrankie") Yo Frankie!"
-            echo " 5) $(checkbox_package "counter-strike-2d") Counter-Strike 2D"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read -p "Option: " OPTION
-            case "$OPTION" in
-                1)
-                    aurhelper_install "astromenace"
-                    ;;
-                2)
-                    aurhelper_install "opentyrian-hg"
-                    ;;
-                3)
-                    aurhelper_install "mars-shooter"
-                    ;;
-                4)
-                    aurhelper_install "yofrankie"
-                    ;;
-                5)
-                    aurhelper_install "counter-strike-2d"
-                    ;;
-                *)
-                    LOOP=0
-                    ;;
-            esac
-        done
-        LOOP=1
-        ;;
-        #}}}
-        2)
-        #ARCADE/PLATFORMER {{{
-        while [ "$LOOP" -ne 0 ]
-        do
-            print_title "ARCADE AND PLATFORMER"
-            echo " 1) $(checkbox_package "opensonic") Opensonic"
-            echo " 2) $(checkbox_package "frogatto") Frogatto"
-            echo " 3) $(checkbox_package "bomberclone") Bomberclone"
-            echo " 4) $(checkbox_package "goonies") Goonies"
-            echo " 5) $(checkbox_package "neverball") Neverball"
-            echo " 6) $(checkbox_package "smc") Super Mario Chronicles"
-            echo " 7) $(checkbox_package "xmoto") X-Moto"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read -p "Option: " OPTION
-            case "$OPTION" in
-                1)
-                    aurhelper_install "opensonic"
-                    ;;
-                2)
-                    pacman -S --noconfirm --needed frogatto
-                    ;;
-                3)
-                    pacman -S --noconfirm --needed bomberclone
-                    ;;
-                4)
-                    aurhelper_install "goonies"
-                    ;;
-                5)
-                    pacman -S --noconfirm --needed neverball
-                    ;;
-                6)
-                    pacman -S --noconfirm --needed smc
-                    ;;
-                7)
-                    pacman -S --noconfirm --needed xmoto
-                    ;;
-                *)
-                    LOOP=0
-                    ;;
-            esac
-        done
-        LOOP=1
-        ;;
-        #}}}
-        3)
-        #DUNGEON {{{
-        while [ "$LOOP" -ne 0 ]
-        do
-            print_title "DUNGEON"
-            echo " 1) $(checkbox_package "tome4") Tales of MajEyal"
-            echo " 2) $(checkbox_package "lostlabyrinth") Lost Labyrinth"
-            echo " 3) $(checkbox_package "scourge") S.C.O.U.R.G.E."
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read -p "Option: " OPTION
-            case "$OPTION" in
-                1)
-                    aurhelper_install "tome4"
-                    ;;
-                2)
-                    aurhelper_install "lostlabyrinth"
-                    ;;
-                3)
-                    aurhelper_install "scourge"
-                    ;;
-                *)
-                    LOOP=0
-                    ;;
-            esac
-        done
-        LOOP=1
-        ;;
-        #}}}
-        4)
-        #EMULATORS {{{
-        while [ "$LOOP" -ne 0 ]
-        do
-            print_title "EMULATORS"
+            #ACTION/ADVENTURE {{{
+            while [ 1 ]
+            do
+                print_title "ACTION AND ADVENTURE"
+                echo " 1) $(checkbox_package "astromenace") Astromenace"
+                echo " 2) $(checkbox_package "opentyrian-hg") OpenTyrian"
+                echo " 3) $(checkbox_package "mars-shooter") M.A.R.S."
+                echo " 4) $(checkbox_package "yofrankie") Yo Frankie!"
+                echo " 5) $(checkbox_package "counter-strike-2d") Counter-Strike 2D"
+                echo ""
+                echo " b) BACK"
+                echo ""
+                read -p "Please enter your choice: " OPTION
+                case "$OPTION" in
+                    1)
+                        package_manager "astromenace"
+                        ;;
+                    2)
+                        package_manager "opentyrian-hg"
+                        ;;
+                    3)
+                        package_manager "mars-shooter"
+                        ;;
+                    4)
+                        package_manager "yofrankie"
+                        ;;
+                    5)
+                        package_manager "counter-strike-2d"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+            ;;
+            #}}}
+            2)
+            #ARCADE/PLATFORMER {{{
+            while [ 1 ]
+            do
+                print_title "ARCADE AND PLATFORMER"
+                echo " 1) $(checkbox_package "opensonic") Opensonic"
+                echo " 2) $(checkbox_package "frogatto") Frogatto"
+                echo " 3) $(checkbox_package "bomberclone") Bomberclone"
+                echo " 4) $(checkbox_package "goonies") Goonies"
+                echo " 5) $(checkbox_package "neverball") Neverball"
+                echo " 6) $(checkbox_package "smc") Super Mario Chronicles"
+                echo " 7) $(checkbox_package "xmoto") X-Moto"
+                echo ""
+                echo " b) BACK"
+                echo ""
+                read -p "Please enter your choice: " OPTION
+                case "$OPTION" in
+                    1)
+                        package_manager "opensonic"
+                        ;;
+                    2)
+                        package_manager "frogatto"
+                        ;;
+                    3)
+                        package_manager "bomberclone"
+                        ;;
+                    4)
+                        package_manager "goonies"
+                        ;;
+                    5)
+                        package_manager "neverball"
+                        ;;
+                    6)
+                        package_manager "smc"
+                        ;;
+                    7)
+                        package_manager "xmoto"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+            ;;
+            #}}}
+            3)
+            #DUNGEON {{{
+            while [ 1 ]
+            do
+                print_title "DUNGEON"
+                echo " 1) $(checkbox_package "tome4") Tales of MajEyal"
+                echo " 2) $(checkbox_package "lostlabyrinth") Lost Labyrinth"
+                echo " 3) $(checkbox_package "scourge") S.C.O.U.R.G.E."
+                echo ""
+                echo " b) BACK"
+                echo ""
+                read -p "Please enter your choice: " OPTION
+                case "$OPTION" in
+                    1)
+                        package_manager "tome4"
+                        ;;
+                    2)
+                        package_manager "lostlabyrinth"
+                        ;;
+                    3)
+                        package_manager "scourge"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+            ;;
+            #}}}
+            4)
+            #EMULATORS {{{
+            while [ 1 ]
+            do
+                print_title "EMULATORS"
 
-            echo " 1) $(checkbox_package "vba-m-gtk-svn") VisualBoyAdvanced"
-            echo " 2) $(checkbox_package "zsnes") ZSNES"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read -p "Option: " OPTION
-            case "$OPTION" in
-                1)
-                    aurhelper_install "vba-m-gtk-svn"
-                    ;;
-                2)
-                    pacman -S --noconfirm --needed zsnes
-                    ;;
-                *)
-                    LOOP=0
-                    ;;
-            esac
-        done
-        LOOP=1
-        ;;
-        #}}}
-        5)
-        #FPS {{{
-        while [ "$LOOP" -ne 0 ]
-        do
-            print_title "FPS"
-            echo " 1) $(checkbox_package "alienarena") Alien Arena"
-            echo " 2) $(checkbox_package "enemy-territory") Wolfenstein: Enemy Territory"
-            echo " 3) $(checkbox_package "worldofpadman") World of Padman"
-            echo " 4) $(checkbox_package "warsow") Warsow"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read -p "Option: " OPTION
-            case "$OPTION" in
-                1)
-                    pacman -S --noconfirm --needed alienarena
-                    ;;
-                2)
-                    aurhelper_install "enemy-territory"
-                    ;;
-                3)
-                    aurhelper_install "worldofpadman"
-                    ;;
-                4)
-                    pacman -S --noconfirm --needed warsow
-                    ;;
-                *)
-                    LOOP=0
-                    ;;
-            esac
-        done
-        LOOP=1
-        ;;
-        #}}}
-        6)
-        #MMO {{{
-        while [ "$LOOP" -ne 0 ]
-        do
-            print_title "MMO"
-            echo " 1) $(checkbox_package "hon") Heroes of Newerth"
-            echo " 2) $(checkbox_package "savage2") Savage II"
-            echo " 3) $(checkbox_package "spiral-knights") Spiral Knights"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read -p "Option: " OPTION
-            case "$OPTION" in
-                1)
-                    aurhelper_install "hon"
-                    ;;
-                2)
-                    aurhelper_install "savage2"
-                    ;;
-                3)
-                    aurhelper_install "spiral-knights"
-                    ;;
-                *)
-                    LOOP=0
-                    ;;
-            esac
-        done
-        LOOP=1
-        ;;
-        #}}}
-        7)
-        #PUZZLE {{{
-        while [ "$LOOP" -ne 0 ]
-        do
-            print_title "PUZZLE"
-            echo " 1) $(checkbox_package "numptyphysics-svn") Numptyphysics"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read -p "Option: " OPTION
-            case "$OPTION" in
-                1)
-                    aurhelper_install "numptyphysics-svn"
-                    ;;
-                *)
-                    LOOP=0
-                    ;;
-            esac
-        done
-        LOOP=1
-        ;;
-        #}}}
-        8)
-        #RPG {{{
-        while [ "$LOOP" -ne 0 ]
-        do
-            print_title "RPG"
-            echo " 1) $(checkbox_package "ardentryst") Ardentryst"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read -p "Option: " OPTION
-            case "$OPTION" in
-                1)
-                    aurhelper_install "ardentryst"
-                    ;;
-                *)
-                    LOOP=0
-                    ;;
-            esac
-        done
-        LOOP=1
-        ;;
-        #}}}
-        9)
-        #RACING {{{
-        while [ "$LOOP" -ne 0 ]
-        do
-            print_title "RACING"
-            echo " 1) $(checkbox_package "maniadrive") Maniadrive"
-            echo " 2) $(checkbox_package "death-rally") Death Rally"
-            echo " 3) $(checkbox_package "supertuxkart") SupertuxKart"
-            echo " 4) $(checkbox_package "speed-dreams") Speed Dreams"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read -p "Option: " OPTION
-            case "$OPTION" in
-                1)
-                    aurhelper_install "maniadrive"
-                    ;;
-                2)
-                    aurhelper_install "death-rally"
-                    ;;
-                3)
-                    pacman -S --noconfirm --needed supertuxkart
-                    ;;
-                4)
-                    pacman -S --noconfirm --needed speed-dreams
-                    ;;
-                *)
-                    LOOP=0
-                    ;;
-            esac
-        done
-        LOOP=1
-        ;;
-        #}}}
-        10)
-        #SIMULATION {{{
-        while [ "$LOOP" -ne 0 ]
-        do
-            print_title "SIMULATION"
-            echo " 1) $(checkbox_package "simutrans") Simultrans"
-            echo " 2) $(checkbox_package "corsix-th") Theme Hospital"
-            echo " 3) $(checkbox_package "openttd") OpenTTD"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read -p "Option: " OPTION
-            case "$OPTION" in
-                1)
-                    aurhelper_install "simutrans"
-                    ;;
-                2)
-                    aurhelper_install "corsix-th"
-                    ;;
-                3)
-                    pacman -S --noconfirm --needed openttd
-                    ;;
-                *)
-                    LOOP=0
-                    ;;
-            esac
-        done
-        LOOP=1
-        ;;
-        #}}}
-        11)
-        #STRATEGY {{{
-        while [ "$LOOP" -ne 0 ]
-        do
-            print_title "STRATEGY"
-            echo " 1) $(checkbox_package "wesnoth") Wesnoth"
-            echo " 3) $(checkbox_package "0ad") 0ad"
-            echo " 4) $(checkbox_package "hedgewars") Hedgewars"
-            echo " 5) $(checkbox_package "warzone2100") Warzone 2100"
-            echo " 6) $(checkbox_package "megaglest") MegaGlest"
-            echo " 7) $(checkbox_package "zod") Zod"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read -p "Option: " OPTION
-            case "$OPTION" in
-                1)
-                    pacman -S --noconfirm --needed wesnoth
-                    ;;
-                3)
-                    aurhelper_install "0ad"
-                    ;;
-                4)
-                    pacman -S --noconfirm --needed hedgewars
-                    ;;
-                5)
-                    pacman -S --noconfirm --needed warzone2100
-                    ;;
-                6)
-                    pacman -S --noconfirm --needed megaglest
-                    ;;
-                7)
-                    aurhelper_install "commander-zod"
-                    ;;
-                *)
-                    LOOP=0
-                    ;;
-            esac
-        done
-        LOOP=1
-        ;;
-        #}}}
-        *)
-        LOOP=0
-        ;;
+                echo " 1) $(checkbox_package "vba-m-gtk-svn") VisualBoyAdvanced"
+                echo " 2) $(checkbox_package "zsnes") ZSNES"
+                echo ""
+                echo " b) BACK"
+                echo ""
+                read -p "Please enter your choice: " OPTION
+                case "$OPTION" in
+                    1)
+                        package_manager "vba-m-gtk-svn"
+                        ;;
+                    2)
+                        package_manager "zsnes"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+            ;;
+            #}}}
+            5)
+            #FPS {{{
+            while [ 1 ]
+            do
+                print_title "FPS"
+                echo " 1) $(checkbox_package "alienarena") AlienArena"
+                echo " 2) $(checkbox_package "enemy-territory") Wolfenstein: Enemy Territory"
+                echo " 3) $(checkbox_package "worldofpadman") World of Padman"
+                echo " 4) $(checkbox_package "warsow") Warsow"
+                echo ""
+                echo " b) BACK"
+                echo ""
+                read -p "Please enter your choice: " OPTION
+                case "$OPTION" in
+                    1)
+                        package_manager "alienarena"
+                        ;;
+                    2)
+                        package_manager "enemy-territory"
+                        ;;
+                    3)
+                        package_manager "worldofpadman"
+                        ;;
+                    4)
+                        package_manager "warsow"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+            ;;
+            #}}}
+            6)
+            #MMO {{{
+            while [ 1 ]
+            do
+                print_title "MMO"
+                echo " 1) $(checkbox_package "hon") Heroes of Newerth"
+                echo " 2) $(checkbox_package "savage2") Savage II"
+                echo " 3) $(checkbox_package "spiral-knights") Spiral Knights"
+                echo ""
+                echo " b) BACK"
+                echo ""
+                read -p "Please enter your choice: " OPTION
+                case "$OPTION" in
+                    1)
+                        package_manager "hon"
+                        ;;
+                    2)
+                        package_manager "savage2"
+                        ;;
+                    3)
+                        package_manager "spiral-knights"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+            ;;
+            #}}}
+            7)
+            #PUZZLE {{{
+            while [ 1 ]
+            do
+                print_title "PUZZLE"
+                echo " 1) $(checkbox_package "numptyphysics-svn") Numptyphysics"
+                echo ""
+                echo " b) BACK"
+                echo ""
+                read -p "Please enter your choice: " OPTION
+                case "$OPTION" in
+                    1)
+                        package_manager "numptyphysics-svn"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+            ;;
+            #}}}
+            8)
+            #RPG {{{
+            while [ 1 ]
+            do
+                print_title "RPG"
+                echo " 1) $(checkbox_package "ardentryst") Ardentryst"
+                echo ""
+                echo " b) BACK"
+                echo ""
+                read -p "Please enter your choice: " OPTION
+                case "$OPTION" in
+                    1)
+                        package_manager "ardentryst"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+            ;;
+            #}}}
+            9)
+            #RACING {{{
+            while [ 1 ]
+            do
+                print_title "RACING"
+                echo " 1) $(checkbox_package "maniadrive") Maniadrive"
+                echo " 2) $(checkbox_package "death-rally") Death Rally"
+                echo " 3) $(checkbox_package "supertuxkart") SupertuxKart"
+                echo " 4) $(checkbox_package "speed-dreams") Speed Dreams"
+                echo ""
+                echo " b) BACK"
+                echo ""
+                read -p "Please enter your choice: " OPTION
+                case "$OPTION" in
+                    1)
+                        package_manager "maniadrive"
+                        ;;
+                    2)
+                        package_manager "death-rally"
+                        ;;
+                    3)
+                        package_manager "supertuxkart"
+                        ;;
+                    4)
+                        package_manager "speed-dreams"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+            ;;
+            #}}}
+            10)
+            #SIMULATION {{{
+            while [ 1 ]
+            do
+                print_title "SIMULATION"
+                echo " 1) $(checkbox_package "simutrans") Simultrans"
+                echo " 2) $(checkbox_package "corsix-th") Theme Hospital"
+                echo " 3) $(checkbox_package "openttd") OpenTTD"
+                echo ""
+                echo " b) BACK"
+                echo ""
+                read -p "Please enter your choice: " OPTION
+                case "$OPTION" in
+                    1)
+                        package_manager "simutrans"
+                        ;;
+                    2)
+                        package_manager "corsix-th"
+                        ;;
+                    3)
+                        package_manager "openttd"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+            ;;
+            #}}}
+            11)
+            #STRATEGY {{{
+            while [ 1 ]
+            do
+                print_title "STRATEGY"
+                echo " 1) $(checkbox_package "wesnoth") Wesnoth"
+                echo " 3) $(checkbox_package "0ad") 0ad"
+                echo " 4) $(checkbox_package "hedgewars") Hedgewars"
+                echo " 5) $(checkbox_package "warzone2100") Warzone 2100"
+                echo " 6) $(checkbox_package "megaglest") MegaGlest"
+                echo " 7) $(checkbox_package "zod") Zod"
+                echo ""
+                echo " b) BACK"
+                echo ""
+                read -p "Please enter your choice: " OPTION
+                case "$OPTION" in
+                    1)
+                        package_manager "wesnoth"
+                        ;;
+                    3)
+                        package_manager "0ad"
+                        ;;
+                    4)
+                        package_manager "hedgewars"
+                        ;;
+                    5)
+                        package_manager "warzone2100"
+                        ;;
+                    6)
+                        package_manager "megaglest"
+                        ;;
+                    7)
+                        package_manager "commander-zod"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+            ;;
+            #}}}
+            *)
+            break
+            ;;
     esac
 done
 }
 #}}}
 #FONTS {{{
 function install_fonts(){
-LOOP=1
-while [ "$LOOP" -ne 0 ]
+while [ 1 ]
 do
     print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
     echo " 1) $(checkbox_package "ttf-dejavu") ttf-dejavu"
-    echo " 2) $(checkbox_package "ttf-google-webfonts") ttf-google-webfonts"
+    echo " 2) $(checkbox_package "ttf-google-webfonts") ttf-google-webfonts (This may take a while)"
     echo " 3) $(checkbox_package "ttf-kochi-substitute") ttf-kochi-substitute (Japanese Support)"
     echo " 4) $(checkbox_package "ttf-liberation") ttf-liberation"
     echo " 5) $(checkbox_package "ttf-ms-fonts") ttf-ms-fonts"
@@ -2142,42 +2164,41 @@ do
     echo " a) ALL"
     echo " b) BACK"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
-            pacman -S --noconfirm --needed ttf-dejavu
+            package_manager "ttf-dejavu"
             ;;
         2)
             pacman -Rdd --noconfirm ttf-droid
             pacman -Rdd --noconfirm ttf-ubuntu-font-family
-            aurhelper_install "ttf-google-webfonts"
+            package_manager "ttf-google-webfonts"
             ;;
         3)
-            aurhelper_install "ttf-kochi-substitute"
+            package_manager "ttf-kochi-substitute"
             ;;
         4)
-            pacman -S --noconfirm --needed ttf-liberation
+            package_manager "ttf-liberation"
             ;;
         5)
-            aurhelper_install "ttf-ms-fonts"
+            package_manager "ttf-ms-fonts"
             ;;
         6)
-            aurhelper_install "ttf-roboto"
+            package_manager "ttf-roboto"
             ;;
         7)
-            aurhelper_install "ttf-vista-fonts"
+            package_manager "ttf-vista-fonts"
             ;;
         8)
-            aurhelper_install "ttf-mac-fonts"
+            package_manager "ttf-mac-fonts"
             ;;
         "a")
             pacman -Rdd --noconfirm ttf-droid
             pacman -Rdd --noconfirm ttf-ubuntu-font-family
-            aurhelper_install "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts ttf-mac-fonts"
-            LOOP=0
+            package_manager "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts ttf-mac-fonts"
             ;;
         *)
-            LOOP=0
+            break
             ;;
     esac
 done
@@ -2191,16 +2212,16 @@ function configure_fonts(){
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
-            aurhelper_install "cairo-ubuntu fontconfig-ubuntu freetype2-ubuntu"
+            package_manager "cairo-ubuntu fontconfig-ubuntu freetype2-ubuntu"
             install_status
             ;;
         2)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
-            aurhelper_install "freetype2-cleartype libxft-cleartype cairo-cleartype"
+            package_manager "freetype2-cleartype libxft-cleartype cairo-cleartype"
             install_status
             ;;
         *)
@@ -2212,7 +2233,7 @@ function configure_fonts(){
 }
 #}}}
 #CLEAN ORPHAN PACKAGES {{{
-function clean_orphan_packages(){
+    function clean_orphan_packages(){
     print_title "CLEAN ORPHAN PACKAGES"
     pacman -Rsc --noconfirm $(pacman -Qqdt)
     #pacman -Sc --noconfirm
@@ -2233,11 +2254,10 @@ welcome
 check_root
 language_selector
 system_upgrade
-create_user
+select_user
 choose_aurhelper
 
-MAINLOOP=1
-while [ "$MAINLOOP" -ne 0 ]
+while [ 1 ]
 do
     print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
     echo " 1) $(checkbox $BASICSETUP) Basic Setup"
@@ -2258,7 +2278,7 @@ do
     echo ""
     echo " q) Quit"
     echo ""
-    read -p "Option: " OPTION
+    read -p "Please enter your choice: " OPTION
     case "$OPTION" in
         1)
             rankmirror
@@ -2278,7 +2298,7 @@ do
         2)
             if [ $BASICSETUP -eq 0 ]; then
                 echo -e "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
-                question_for_answer "Do you want continue"
+                question_for_answer "Are you sure you want to continue?"
                 if [ $OPTION = "n" ]; then continue; fi
             fi
             install_desktop_environment
@@ -2342,7 +2362,7 @@ do
             ;;
         *)
             print_line
-            echo "WRONG OPTION"
+            echo "Invalid option. Try another one."
             pause_function
             ;;
     esac
