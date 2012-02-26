@@ -383,8 +383,8 @@ function rankmirror(){
 function system_upgrade(){
     print_title "UPDATING YOUR SYSTEM"
     rm -fr /etc/profile.d/locale.sh #http://www.archlinux.org/news/initscripts-update-manual-intervention-required/
-    pacman -S  --noconfirm --needed --force filesystem #http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required/
     pacman -Syuf
+    pacman -S  --noconfirm --needed --force filesystem #http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required/
     reboot_now
 }
 #}}}
@@ -393,10 +393,11 @@ function select_user(){
     print_title "SELECT USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
 
     avaliableusers() {
+        i=1
         echo "Avaliable Users:"
         if [ "$(ls -A "/home")" ]; then
             for USER in ${USERS[@]}; do
-                echo " $(( ${#USERS[@]} ))) $USER"
+                echo " $(( i++ ))) $USER"
             done
             echo -e " $(( ${#USERS[@]}+1 ))) Create new user\n"
             echo -e "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES\n"
@@ -419,11 +420,15 @@ function select_user(){
         #}}}
     }
 
-    cd /home
-    USERS=( * );
+    USERS=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
 
-    avaliableusers
-    read -p "Please enter your choice: " OPTION
+    prompt="Please enter your choice: "
+    while avaliableusers && read -rp "$prompt" OPTION && [[ "$OPTION" ]]; do
+        [[ "$OPTION" != *[![:digit:]]* ]] && (( $OPTION > 0 && $OPTION <= ${#USERS[@]}+1 )) || {
+        echo -e "Invalid option. Try another one.\n"; continue
+        }
+        break
+    done
 
     if [ "$(ls -A "/home")" ]; then
         if [ $OPTION -eq  $(( ${#USERS[@]}+1 )) ]; then
@@ -434,8 +439,6 @@ function select_user(){
     else
         create_new_user
     fi
-
-    cd ~
 }
 #}}}
 #AUR HELPER {{{
