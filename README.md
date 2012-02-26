@@ -38,13 +38,13 @@ You can try it first with a `virtualbox`
 - Install CUPS
 - Install Additional wireless/bluetooth firmwares
 - Ensuring access to GIT through a firewall
+- Install and configure LAMP Server
 - Install a Desktop Environment [GNOME, KDE, XFCE, LXDE, OpenBox]
 - Install Developement tools [Vim, Emacs, Eclipse...]
 - Install/Remove Office apps [LibreOffice, GNOME-Office, Latex...]
 - Install/Remove System tools [Wine, Virtualbox, Grsync, Htop]
 - Install/Remove Graphics apps [Inkscape, Gimp, Blender, MComix]
 - Install/Remove Internet apps [Firefox, Google-Chrome, Jdownloader...]
-- Install/Remove and configure LAMP Server
 - Install/Remove Multimedia apps [Rhythmbox, Clementine, Codecs...]
 - Install/Remove Games [HoN, World of Padman, Wesnoth...]
 - Install/Remove Fonts [Liberation, MS-Fonts, Google-webfonts...]

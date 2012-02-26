@@ -877,8 +877,8 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed kde kde-l10n-$LOCATION_KDE kipi-plugins
             pacman -Rcsn kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
             pacman -S --noconfirm --needed kdeadmin-system-config-printer-kde xdg-user-dirs
-            package_manager "kde-gtk-config-git"
-            package_manager "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
+            package_install "kde-gtk-config-git"
+            package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
             #QTCURVE THEMES #{{{
             wget http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
             wget http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
@@ -963,8 +963,8 @@ function install_desktop_environment(){
             print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
             pacman -S --noconfirm --needed xfce4 xfce4-goodies
             pacman -S --noconfirm --needed polkit-gnome gvfs-smb xdg-user-dirs
-            package_manager "automounter"
-            package_manager "gnome-defaults-list"
+            package_install "automounter"
+            package_install "gnome-defaults-list"
             #XFCE APPS {{{
             while [ 1 ]
             do
@@ -999,7 +999,7 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed leafpad xarchiver epdfview
             pacman -S --noconfirm --needed pm-utils upower
             pacman -S --noconfirm --needed polkit-gnome gvfs gvfs-smb xdg-user-dirs
-            package_manager "gnome-defaults-list"
+            package_install "gnome-defaults-list"
             #LXDE APPS {{{
             while [ 1 ]
             do
@@ -1035,7 +1035,7 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed lxappearance consolekit
             pacman -S --noconfirm --needed xdg-user-dirs
             pacman -S --noconfirm --needed leafpad xarchiver epdfview nitrogen
-            package_manager "gnome-defaults-list"
+            package_install "gnome-defaults-list"
             mkdir -p /home/$USERNAME/.config/openbox/
             cp /etc/xdg/openbox/rc.xml /home/$USERNAME/.config/openbox/
             cp /etc/xdg/openbox/menu.xml /home/$USERNAME/.config/openbox/
@@ -1500,16 +1500,17 @@ do
     echo " 1) $(checkbox_package "dropbox") Dropbox"
     echo " 2) $(checkbox_package "google-earth") Google Earth"
     echo " 3) $(checkbox_package "google-chrome") Google Chrome"
-    echo " 4) $(checkbox_package "jdownloader") Jdownloader"
-    echo " 5) $(checkbox_package "irssi") Irssi"
-    echo " 6) $(checkbox_package "firefox") Mozilla Firefox"
-    echo " 7) $(checkbox_package "thunderbird") Mozilla Thunderbird"
-    echo " 8) $(checkbox_package "pidgin") Pidgin"
-    echo " 9) $(checkbox_package "skype") Skype"
-    echo "10) $(checkbox_package "teamspeak3") TeamSpeak"
-    echo "11) $(checkbox_package "teamviewer") Teamviewer"
-    echo "12) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "transmission-qt")"; else echo "$(checkbox_package "transmission-gtk")"; fi) Trasmission"
-    echo "13) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "konversation") Konversation"; else echo "$(checkbox_package "xchat") X-Chat"; fi)"
+    echo " 4) $(checkbox_package "chromium") Google Chromium"
+    echo " 5) $(checkbox_package "jdownloader") Jdownloader"
+    echo " 6) $(checkbox_package "irssi") Irssi"
+    echo " 7) $(checkbox_package "firefox") Mozilla Firefox"
+    echo " 8) $(checkbox_package "thunderbird") Mozilla Thunderbird"
+    echo " 9) $(checkbox_package "pidgin") Pidgin"
+    echo "10) $(checkbox_package "skype") Skype"
+    echo "11) $(checkbox_package "teamspeak3") TeamSpeak"
+    echo "12) $(checkbox_package "teamviewer") Teamviewer"
+    echo "13) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "transmission-qt")"; else echo "$(checkbox_package "transmission-gtk")"; fi) Trasmission"
+    echo "14) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "konversation") Konversation"; else echo "$(checkbox_package "xchat") X-Chat"; fi)"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1534,37 +1535,40 @@ do
             package_manager "google-chrome flashplugin"
             ;;
         4)
-            package_manager "jdownloader"
+            package_manager "chromium flashplugin"
             ;;
         5)
-            package_manager "irssi"
+            package_manager "jdownloader"
             ;;
         6)
-            package_manager "firefox firefox-i18n-$LOCATION_FF flashplugin "
+            package_manager "irssi"
             ;;
         7)
-            package_manager "thunderbird thunderbird-i18n-$LOCATION_FF"
+            package_manager "firefox firefox-i18n-$LOCATION_FF flashplugin "
             ;;
         8)
-            package_manager "pidgin"
+            package_manager "thunderbird thunderbird-i18n-$LOCATION_FF"
             ;;
         9)
-            package_manager "skype"
+            package_manager "pidgin"
             ;;
         10)
-            package_manager "teamspeak3"
+            package_manager "skype"
             ;;
         11)
-            package_manager "teamviewer"
+            package_manager "teamspeak3"
             ;;
         12)
+            package_manager "teamviewer"
+            ;;
+        13)
             if [ "$KDE" -eq 1 ]; then
                 package_manager "transmission-qt"
             else
                 package_manager "transmission-gtk"
             fi
             ;;
-        13)
+        14)
             if [ "$KDE" -eq 1 ]; then
                 package_manager "konversation"
             else
@@ -1636,10 +1640,11 @@ do
     echo " 8) $(checkbox_package "musique") Musique"
     echo " 9) $(checkbox_package "nuvola-bzr-stable") Nuvola"
     echo "10) $(checkbox_package "rhythmbox") Rhythmbox"
-    echo "11) $(checkbox_package "puddletag") Puddletag"
-    echo "12) $(checkbox_package "timidity++") MIDI"
-    echo "13) $(checkbox_package "gstreamer0.10-ugly") Codecs"
-    echo "14) $(checkbox_package "audacity") Audacity"
+    echo "11) $(checkbox_package "spotify") Spotify"
+    echo "12) $(checkbox_package "puddletag") Puddletag"
+    echo "13) $(checkbox_package "timidity++") MIDI"
+    echo "14) $(checkbox_package "gstreamer0.10-ugly") Codecs"
+    echo "15) $(checkbox_package "audacity") Audacity"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1676,16 +1681,19 @@ do
             package_manager "rhythmbox"
             ;;
         11)
-            package_manager "puddletag"
+            package_manager "spotify"
             ;;
         12)
+            package_manager "puddletag"
+            ;;
+        13)
             package_manager "timidity++ fluidr3"
             echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
             ;;
-        13)
+        14)
             package_manager "gstreamer0.10-plugins"
             ;;
-        14)
+        15)
             package_manager "audacity"
             ;;
         *)
@@ -2218,12 +2226,12 @@ function configure_fonts(){
     case "$OPTION" in
         1)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
-            package_manager "cairo-ubuntu fontconfig-ubuntu freetype2-ubuntu"
+            package_install "cairo-ubuntu fontconfig-ubuntu freetype2-ubuntu"
             install_status
             ;;
         2)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
-            package_manager "freetype2-cleartype libxft-cleartype cairo-cleartype"
+            package_install "freetype2-cleartype libxft-cleartype cairo-cleartype"
             install_status
             ;;
         *)
