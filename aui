@@ -395,15 +395,11 @@ function select_user(){
     avaliableusers() {
         i=1
         echo "Avaliable Users:"
-        if [ "$(ls -A "/home")" ]; then
-            for USER in ${USERS[@]}; do
-                echo " $(( i++ ))) $USER"
-            done
-            echo -e " $(( ${#USERS[@]}+1 ))) Create new user\n"
-            echo -e "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES\n"
-        else
-            echo -e " 1) Create new user\n"
-        fi
+        for USER in ${USERS[@]}; do
+            echo " $(( i++ ))) $USER"
+        done
+        echo -e " $(( ${#USERS[@]}+1 ))) Create new user\n"
+        echo -e "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES\n"
     }
 
     create_new_user(){
@@ -431,14 +427,10 @@ function select_user(){
         break
     done
 
-    if [ "$(ls -A "/home")" ]; then
-        if [ $OPTION -eq  $(( ${#USERS[@]}+1 )) ]; then
-            create_new_user
-        else
-            USERNAME=${USERS[$OPTION-1]}
-        fi
-    else
+    if [ $OPTION -eq  $(( ${#USERS[@]}+1 )) ]; then
         create_new_user
+    else
+        USERNAME=${USERS[$OPTION-1]}
     fi
 }
 #}}}
