@@ -422,8 +422,9 @@ function select_user(){
 
     USERS=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
 
+    avaliableusers
     prompt="Please enter your choice: "
-    while avaliableusers && read -rp "$prompt" OPTION && [[ "$OPTION" ]]; do
+    while read -rp "$prompt" OPTION && [[ "$OPTION" ]]; do
         [[ "$OPTION" != *[![:digit:]]* ]] && (( $OPTION > 0 && $OPTION <= ${#USERS[@]}+1 )) || {
         echo -e "Invalid option. Try another one.\n"; continue
         }
