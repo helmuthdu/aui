@@ -200,15 +200,15 @@ function sumary(){ #{{{
     case $CURRENT_STATUS in
         0)
             print_line
-            echo "$1 not successfull (Canceled)"
+            echo "$1 not successful (Canceled)"
             ;;
         -1)
             print_line
-            echo "$1 not successfull (Error)"
+            echo "$1 not successful (Error)"
             ;;
         1)
             print_line
-            echo "$1 successfull"
+            echo "$1 successful"
             ;;
         *)
             print_line
@@ -241,9 +241,9 @@ function welcome(){
     echo "-> Run script as root user"
     echo "-> Working internet connection"
     print_line
-    echo "Script can be canceled all the time with CTRL+C"
+    echo "Script can be cancelled at any time with CTRL+C"
     print_line
-    echo "it's highly recommended you read this script before use it"
+    echo "it's highly recommended that you read this script before using it"
     echo "This version is still in BETA. Send bugreports to: "
     echo "helmuthdu at gmail dot com"
     pause_function
@@ -1075,10 +1075,14 @@ function install_desktop_environment(){
             do
                 print_title "OPENBOX APPS"
                 echo " 1) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "thunar") Thunar"
-                echo " 3) $(checkbox_package "tint2") Tint2"
-                echo " 4) $(checkbox_package "volwheel") Volwheel"
-                echo " 5) $(checkbox_package "xfburn") Xfburn"
+                echo " 2) $(checkbox_package "geeqie") Geeqie"
+                echo " 3) $(checkbox_package "gmrun") Gmrun"
+                echo " 4) $(checkbox_package "rxvt-unicode") rxvt-unicode"
+                echo " 5) $(checkbox_package "scrot") Scrot"
+                echo " 6) $(checkbox_package "thunar") Thunar"
+                echo " 7) $(checkbox_package "tint2") Tint2"
+                echo " 8) $(checkbox_package "volwheel") Volwheel"
+                echo " 9) $(checkbox_package "xfburn") Xfburn"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1089,15 +1093,27 @@ function install_desktop_environment(){
                             package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                             ;;
                         2)
-                            package_manager "polkit-gnome gvfs-smb thunar"
+                            package_manager "geeqie"
                             ;;
                         3)
-                            package_manager "tint2"
+                            package_manager "gmrum"
                             ;;
                         4)
-                            package_manager "volwheel"
+                            package_manager "rxvt-unicode"
                             ;;
                         5)
+                            package_manager "scrot"
+                            ;;
+                        6)
+                            package_manager "polkit-gnome gvfs-smb thunar"
+                            ;;
+                        7)
+                            package_manager "tint2"
+                            ;;
+                        8)
+                            package_manager "volwheel"
+                            ;;
+                        9)
                             package_manager "xfburn"
                             ;;
                         "d")
@@ -1259,17 +1275,19 @@ while [ 1 ]
 do
     print_title "DEVELOPMENT APPS"
     echo " 1) $(checkbox_package "aptana-studio") Aptana Studio"
-    echo " 2) $(checkbox_package "eclipse") Eclipse"
-    echo " 3) $(checkbox_package "emacs") Emacs"
-    echo " 4) $(checkbox_package "gvim") Gvim"
-    echo " 5) $(checkbox_package "intellij-idea-community-edition") IntelliJ IDEA"
-    echo " 6) $(checkbox_package "netbeans") Netbeans"
-    echo " 7) $(checkbox_package "jdk") Oracle Java"
-    echo " 8) $(checkbox_package "qtcreator") QT Creator"
-    echo " 9) $(checkbox_package "sublime-text") Sublime Text 2"
-    echo "10) $(checkbox_package "gdb") Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
-    echo "11) $(checkbox_package "mysql-workbench") MySQL Workbench"
-    echo "12) $(checkbox_package "meld") Meld"
+    echo " 2) $(checkbox_package "bluefish") Bluefish"
+    echo " 3) $(checkbox_package "eclipse") Eclipse"
+    echo " 4) $(checkbox_package "emacs") Emacs"
+    echo " 5) $(checkbox_package "gvim") Gvim"
+    echo " 6) $(checkbox_package "geany") Geany"
+    echo " 7) $(checkbox_package "intellij-idea-community-edition") IntelliJ IDEA"
+    echo " 8) $(checkbox_package "netbeans") Netbeans"
+    echo " 9) $(checkbox_package "jdk") Oracle Java"
+    echo "10) $(checkbox_package "qtcreator") QT Creator"
+    echo "11) $(checkbox_package "sublime-text") Sublime Text 2"
+    echo "12) $(checkbox_package "gdb") Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
+    echo "13) $(checkbox_package "mysql-workbench") MySQL Workbench"
+    echo "14) $(checkbox_package "meld") Meld"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1280,6 +1298,9 @@ do
                 package_manager "aptana-studio"
                 ;;
             2)
+                package_manager "bluefish"
+                ;;
+            3)
                 #ECLIPSE {{{
                 while [ 1 ]
                 do
@@ -1339,10 +1360,10 @@ do
                 done
                 #}}}
                 ;;
-            3)
+            4)
                 package_manager "emacs"
                 ;;
-            4)
+            5)
                 pacman -Rdd --noconfirm vim
                 package_manager "gvim wmctrl ctags discount"
                 #HELMUTHDU'S VIMRC {{{
@@ -1355,34 +1376,37 @@ do
                 chown $USERNAME:users /home/$USERNAME/.vimrc
                 #}}}
                 ;;
-            5)
-                package_manager "intellij-idea-community-edition"
-                ;;
             6)
-                package_manager "netbeans"
+                package_manager "geany"
                 ;;
             7)
+                package_manager "intellij-idea-community-edition"
+                ;;
+            8)
+                package_manager "netbeans"
+                ;;
+            9)
                 pacman -Rdd --noconfirm jre7-openjdk
                 pacman -Rdd --noconfirm jdk7-openjdk
                 package_manager "jdk"
                 ;;
-            8)
+            10)
                 package_manager "qtcreator qt-doc"
                 mkdir -p /home/$USERNAME/.config/Nokia/qtcreator/styles
                 wget http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
                 mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
                 chown -R $USERNAME:users /home/$USERNAME/.config
                 ;;
-            9)
+            11)
                 package_manager "sublime-text"
                 ;;
-            10)
+            12)
                 package_manager "valgrind gdb splint tidyhtml pyflakes jsl"
                 ;;
-            11)
+            13)
                 package_manager "mysql-workbench"
                 ;;
-            12)
+            14)
                 package_manager "meld"
                 ;;
             "b")
@@ -1481,7 +1505,8 @@ function install_system_apps(){
 while [ 1 ]
 do
     print_title "SYSTEM TOOLS APPS"
-    echo " 1) $(checkbox_package "grsync") Grsync"
+    echo " 1) $(checkbox_package "gparted") Gparted"
+    echo " 2) $(checkbox_package "grsync") Grsync"
     echo " 2) $(checkbox_package "htop") Htop"
     echo " 3) $(checkbox_package "virtualbox") Virtualbox"
     echo " 4) $(checkbox_package "wine") Wine"
@@ -1492,19 +1517,22 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
-                package_manager "grsync"
+                package_manager "gparted"
                 ;;
             2)
-                package_manager "htop"
+                package_manager "grsync"
                 ;;
             3)
+                package_manager "htop"
+                ;;
+            4)
                 package_manager "virtualbox virtualbox-additions virtualbox-ext-oracle"
                 modprobe vboxdrv
                 groupadd vboxusers
                 gpasswd -a $USERNAME vboxusers
                 add_module "vboxdrv"
                 ;;
-            4)
+            5)
                 package_manager "wine wine_gecko winetricks"
                 ;;
             "b")
@@ -2440,6 +2468,7 @@ function configure_fonts(){
         3)
             pacman -Rdd --noconfirm fontconfig freetype2
             package_install "freetype2-infinality fontconfig-infinality"
+            ./etc/profile.d/infinality-settings.sh
             install_status
             ;;
         *)
