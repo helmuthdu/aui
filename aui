@@ -45,6 +45,8 @@ CLEANPACKAGES=0
 
 ARCHI=`uname -m`
 
+prompt="Please enter your choice: "
+
 # AUTOMATICALLY DETECTS THE SYSTEM LANGUAGE BASED ON YOUR RC.CONF#{{{
     LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | cut -c9-13`
     #KDE #{{{
@@ -323,7 +325,7 @@ function custom_repositories(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "Please enter your choice: " OPTION
+                read -p "$prompt" OPTION
                 case "$OPTION" in
                     1)
                         echo -e '\n[ayatana]\nServer = http://repo.ayatana.info/' >> /etc/pacman.conf
@@ -388,11 +390,9 @@ function system_upgrade(){
     reboot_now
 }
 #}}}
-#CREATE A NEW USER {{{
+#SELECT USER {{{
 function select_user(){
-    print_title "SELECT USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
-
-    avaliableusers() {
+    avaliableusers(){ #{{{
         i=1
         echo "Avaliable Users:"
         for USER in ${USERS[@]}; do
@@ -400,13 +400,12 @@ function select_user(){
         done
         echo -e " $(( ${#USERS[@]}+1 ))) Create new user\n"
         echo -e "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES\n"
-    }
-
-    create_new_user(){
+    } #}}}
+    create_new_user(){ #{{{
         read -p "Username: " USERNAME
         useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
         passwd $USERNAME
-        #SET USER AS SUDO #{{{
+        #ENABLE SUDO #{{{
             print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
             pacman -S --noconfirm --needed sudo
             ## Uncomment to allow members of group wheel to execute any command
@@ -414,12 +413,12 @@ function select_user(){
             ## Same thing without a password (not secure)
             #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
         #}}}
-    }
+    } #}}}
 
     USERS=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
 
+    print_title "SELECT USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
     avaliableusers
-    prompt="Please enter your choice: "
     while read -rp "$prompt" OPTION && [[ "$OPTION" ]]; do
         [[ "$OPTION" != *[![:digit:]]* ]] && (( $OPTION > 0 && $OPTION <= ${#USERS[@]}+1 )) || {
         echo -e "Invalid option. Try another one.\n"; continue
@@ -443,7 +442,7 @@ do
     echo " 1) Yaourt"
     echo " 2) Packer"
     echo ""
-    read -p "Please enter your choice: " OPTION
+    read -p "$prompt" OPTION
     case "$OPTION" in
         1)
             if ! checkpackage "yaourt" ; then
@@ -635,7 +634,7 @@ function install_video_cards(){
     echo ""
     echo " s) SKIP"
     echo ""
-    read -p "Please enter your choice: " OPTION
+    read -p "$prompt" OPTION
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed libgl xf86-video-intel
@@ -720,7 +719,7 @@ function install_additional_firmwares(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "Please enter your choice: " OPTION
+                read -p "$prompt" OPTION
                 case "$OPTION" in
                     1)
                         package_manager "ipw2100-fw"
@@ -799,7 +798,7 @@ function install_desktop_environment(){
     echo " 5) OpenBox"
     echo ""
     echo " b) BACK"
-    read -p "Please enter your choice: " OPTION
+    read -p "$prompt" OPTION
     case "$OPTION" in
         1)
             #GNOME {{{
@@ -826,40 +825,48 @@ function install_desktop_environment(){
                 echo " a) ALL"
                 echo " d) DONE"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
-                        ;;
-                    2)
-                        package_manager "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
-                        ;;
-                    3)
-                        package_manager "libkeybinder3"
-                        package_manager "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
-                        ;;
-                    4)
-                        package_manager "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
-                        ;;
-                    5)
-                        package_manager "gnome-activity-journal"
-                        ;;
-                    6)
-                        package_manager "gnome-packagekit gnome-settings-daemon-updates"
-                        ;;
-                    "a")
-                        package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
-                        package_manager "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
-                        package_manager "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
-                        package_manager "libkeybinder3"
-                        package_manager "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
-                        package_manager "gnome-activity-journal"
-                        package_manager "gnome-packagekit gnome-settings-daemon-updates"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            ;;
+                        2)
+                            package_manager "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
+                            ;;
+                        3)
+                            package_manager "libkeybinder3"
+                            package_manager "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
+                            ;;
+                        4)
+                            package_manager "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
+                            ;;
+                        5)
+                            package_manager "gnome-activity-journal"
+                            ;;
+                        6)
+                            package_manager "gnome-packagekit gnome-settings-daemon-updates"
+                            ;;
+                        "a")
+                            package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            package_manager "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
+                            package_manager "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
+                            package_manager "libkeybinder3"
+                            package_manager "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
+                            package_manager "gnome-activity-journal"
+                            package_manager "gnome-packagekit gnome-settings-daemon-updates"
+                            ;;
+                        "d")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "d" ];then break;fi
             done
             #}}}
             add_daemon "gdm"
@@ -907,46 +914,54 @@ function install_desktop_environment(){
                 echo " a) ALL"
                 echo " d) DONE"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "apper"
-                        ;;
-                    2)
-                        package_manager "bangarang"
-                        ;;
-                    3)
-                        package_manager "choqok"
-                        ;;
-                    4)
-                        package_manager "digikam"
-                        ;;
-                    5)
-                        package_manager "k3b dvd+rw-tools"
-                        ;;
-                    6)
-                        package_manager "kfaenza-icon-theme"
-                        ;;
-                    7)
-                        package_manager "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
-                        ;;
-                    8)
-                        package_manager "yakuake yakuake-skin-plasma-oxygen-panel"
-                        ;;
-                    "a")
-                        package_manager "choqok"
-                        package_manager "digikam"
-                        package_manager "k3b dvd+rw-tools"
-                        package_manager "apper"
-                        package_manager "bangarang"
-                        package_manager "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
-                        package_manager "kfaenza-icon-theme"
-                        package_manager "yakuake yakuake-skin-plasma-oxygen-panel"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "apper"
+                            ;;
+                        2)
+                            package_manager "bangarang"
+                            ;;
+                        3)
+                            package_manager "choqok"
+                            ;;
+                        4)
+                            package_manager "digikam"
+                            ;;
+                        5)
+                            package_manager "k3b dvd+rw-tools"
+                            ;;
+                        6)
+                            package_manager "kfaenza-icon-theme"
+                            ;;
+                        7)
+                            package_manager "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
+                            ;;
+                        8)
+                            package_manager "yakuake yakuake-skin-plasma-oxygen-panel"
+                            ;;
+                        "a")
+                            package_manager "choqok"
+                            package_manager "digikam"
+                            package_manager "k3b dvd+rw-tools"
+                            package_manager "apper"
+                            package_manager "bangarang"
+                            package_manager "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
+                            package_manager "kfaenza-icon-theme"
+                            package_manager "yakuake yakuake-skin-plasma-oxygen-panel"
+                            ;;
+                        "d")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "d" ];then break;fi
             done
             #}}}
             add_daemon "kdm"
@@ -970,18 +985,26 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
-                        ;;
-                    2)
-                        package_manager "zukitwo-themes"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            ;;
+                        2)
+                            package_manager "zukitwo-themes"
+                            ;;
+                        "d")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "d" ];then break;fi
             done
             #}}}
             install_status
@@ -1005,18 +1028,26 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
-                        ;;
-                    2)
-                        package_manager "xfburn"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            ;;
+                        2)
+                            package_manager "xfburn"
+                            ;;
+                        "d")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "d" ];then break;fi
             done
             #}}}
             add_daemon "lxdm"
@@ -1051,27 +1082,35 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
-                        ;;
-                    2)
-                        package_manager "polkit-gnome gvfs-smb thunar"
-                        ;;
-                    3)
-                        package_manager "tint2"
-                        ;;
-                    4)
-                        package_manager "volwheel"
-                        ;;
-                    5)
-                        package_manager "xfburn"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            ;;
+                        2)
+                            package_manager "polkit-gnome gvfs-smb thunar"
+                            ;;
+                        3)
+                            package_manager "tint2"
+                            ;;
+                        4)
+                            package_manager "volwheel"
+                            ;;
+                        5)
+                            package_manager "xfburn"
+                            ;;
+                        "d")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "d" ];then break;fi
             done
             #}}}
             install_status
@@ -1094,7 +1133,7 @@ function install_nm_wicd(){
     echo ""
     echo " s) SKIP"
     echo ""
-    read -p "Please enter your choice: " OPTION
+    read -p "$prompt" OPTION
     case "$OPTION" in
         1)
             print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
@@ -1155,54 +1194,62 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Please enter your choice: " OPTION
-    case "$OPTION" in
-        1)
-            package_manager "cairo-dock-bzr cairo-dock-plugins-bzr"
-            ;;
-        2)
-            package_manager "conky conky-colors"
-            add_module "coretemp it87 acpi-cpufreq"
-            ;;
-        3)
-            package_manager "dockbarx dockbarx-shinybar-theme"
-            ;;
-        4)
-            package_manager "docky"
-            ;;
-        5)
-            if [ "$KDE" -eq 1 ]; then
-                package_manager "speedcrunch"
-            else
-                package_manager "galculator"
-            fi
-            ;;
-        6)
-            package_manager "gnome-pie"
-            ;;
-        7)
-            package_manager "guake"
-            ;;
-        8)
-            package_manager "kupfer"
-            ;;
-        9)
-            package_manager "pyrenamer"
-            ;;
-        10)
-            package_manager "shutter"
-            ;;
-        11)
-            package_manager "zeitgeist libzeitgeist zeitgeist-datahub"
-            package_manager "synapse"
-            ;;
-        12)
-            package_manager "terminator python-keybinder"
-            ;;
-        *)
-            break
-            ;;
-    esac
+    read -p "$prompt" OPTION
+    for OPT in $OPTION; do
+        case "$OPT" in
+            1)
+                package_manager "cairo-dock-bzr cairo-dock-plugins-bzr"
+                ;;
+            2)
+                package_manager "conky conky-colors"
+                add_module "coretemp it87 acpi-cpufreq"
+                ;;
+            3)
+                package_manager "dockbarx dockbarx-shinybar-theme"
+                ;;
+            4)
+                package_manager "docky"
+                ;;
+            5)
+                if [ "$KDE" -eq 1 ]; then
+                    package_manager "speedcrunch"
+                else
+                    package_manager "galculator"
+                fi
+                ;;
+            6)
+                package_manager "gnome-pie"
+                ;;
+            7)
+                package_manager "guake"
+                ;;
+            8)
+                package_manager "kupfer"
+                ;;
+            9)
+                package_manager "pyrenamer"
+                ;;
+            10)
+                package_manager "shutter"
+                ;;
+            11)
+                package_manager "zeitgeist libzeitgeist zeitgeist-datahub"
+                package_manager "synapse"
+                ;;
+            12)
+                package_manager "terminator python-keybinder"
+                ;;
+            "b")
+                break
+                ;;
+            *)
+                print_line
+                echo "Invalid option. Try another one."
+                pause_function
+                ;;
+        esac
+    done
+    if [ $OPT = "b" ];then break;fi
 done
 }
 #}}}
@@ -1226,114 +1273,129 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Please enter your choice: " OPTION
-    case "$OPTION" in
-        1)
-            package_manager "aptana-studio"
-            ;;
-        2)
-            #ECLIPSE {{{
-            while [ 1 ]
-            do
-                print_title "ECLIPSE - https://wiki.archlinux.org/index.php/Eclipse"
-                echo " 1) $(checkbox_package "eclipse") Eclipse Classic"
-                echo " 2) $(checkbox_package "eclipse-cdt") Eclipse IDE for C/C++ Developers "
-                echo " 3) $(checkbox_package "eclipse-android") Android Development Tools for Eclipse"
-                echo " 4) $(checkbox_package "eclipse-wtp-wst") Web Development Tools for Eclipse"
-                echo " 5) $(checkbox_package "eclipse-pdt") PHP Development Tools for Eclipse"
-                echo " 6) $(checkbox_package "eclipse-pydev") Python Development Tools for Eclipse"
-                echo " 7) $(checkbox_package "eclipse-aptana") Aptana Studio plugin for Eclipse"
-                echo " 8) $(checkbox_package "eclipse-vrapper") Vim-like editing plugin for Eclipse"
-                echo " 9) $(checkbox_package "eclipse-egit") Git support plugin for Eclipse"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "eclipse"
-                        ;;
-                    2)
-                        package_manager "eclipse-cdt"
-                        ;;
-                    3)
-                        package_manager "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
-                        ;;
-                    4)
-                        package_manager "eclipse-wtp-wst"
-                        ;;
-                    5)
-                        package_manager "eclipse-pdt"
-                        ;;
-                    6)
-                        package_manager "eclipse-pydev"
-                        ;;
-                    7)
-                        package_manager "eclipse-aptana"
-                        ;;
-                    8)
-                        package_manager "eclipse-vrapper"
-                        ;;
-                    9)
-                        package_manager "eclipse-egit"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
-            done
-            #}}}
-            ;;
-        3)
-            package_manager "emacs"
-            ;;
-        4)
-            pacman -Rdd --noconfirm vim
-            package_manager "gvim wmctrl ctags discount"
-            #HELMUTHDU'S VIMRC {{{
-            pacman -S --noconfirm --needed git
-            git clone git://github.com/helmuthdu/vim.git
-            mv vim /home/$USERNAME/.vim
-            git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
-            ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
-            chown -R $USERNAME:users /home/$USERNAME/.vim
-            chown $USERNAME:users /home/$USERNAME/.vimrc
-            #}}}
-            ;;
-        5)
-            package_manager "intellij-idea-community-edition"
-            ;;
-        6)
-            package_manager "netbeans"
-            ;;
-        7)
-            pacman -Rdd --noconfirm jre7-openjdk
-            pacman -Rdd --noconfirm jdk7-openjdk
-            package_manager "jdk"
-            ;;
-        8)
-            package_manager "qtcreator qt-doc"
-            mkdir -p /home/$USERNAME/.config/Nokia/qtcreator/styles
-            wget http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
-            mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
-            chown -R $USERNAME:users /home/$USERNAME/.config
-            ;;
-        9)
-            package_manager "sublime-text"
-            ;;
-        10)
-            package_manager "valgrind gdb splint tidyhtml pyflakes jsl"
-            ;;
-        11)
-            package_manager "mysql-workbench"
-            ;;
-        12)
-            package_manager "meld"
-            ;;
-        *)
-            break
-            ;;
-    esac
+    read -p "$prompt" OPTION
+    for OPT in $OPTION; do
+        case "$OPT" in
+            1)
+                package_manager "aptana-studio"
+                ;;
+            2)
+                #ECLIPSE {{{
+                while [ 1 ]
+                do
+                    print_title "ECLIPSE - https://wiki.archlinux.org/index.php/Eclipse"
+                    echo " 1) $(checkbox_package "eclipse") Eclipse Classic"
+                    echo " 2) $(checkbox_package "eclipse-cdt") Eclipse IDE for C/C++ Developers "
+                    echo " 3) $(checkbox_package "eclipse-android") Android Development Tools for Eclipse"
+                    echo " 4) $(checkbox_package "eclipse-wtp-wst") Web Development Tools for Eclipse"
+                    echo " 5) $(checkbox_package "eclipse-pdt") PHP Development Tools for Eclipse"
+                    echo " 6) $(checkbox_package "eclipse-pydev") Python Development Tools for Eclipse"
+                    echo " 7) $(checkbox_package "eclipse-aptana") Aptana Studio plugin for Eclipse"
+                    echo " 8) $(checkbox_package "eclipse-vrapper") Vim-like editing plugin for Eclipse"
+                    echo " 9) $(checkbox_package "eclipse-egit") Git support plugin for Eclipse"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read -p "$prompt" OPTION
+                    for OPT in $OPTION; do
+                        case "$OPT" in
+                            1)
+                                package_manager "eclipse"
+                                ;;
+                            2)
+                                package_manager "eclipse-cdt"
+                                ;;
+                            3)
+                                package_manager "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
+                                ;;
+                            4)
+                                package_manager "eclipse-wtp-wst"
+                                ;;
+                            5)
+                                package_manager "eclipse-pdt"
+                                ;;
+                            6)
+                                package_manager "eclipse-pydev"
+                                ;;
+                            7)
+                                package_manager "eclipse-aptana"
+                                ;;
+                            8)
+                                package_manager "eclipse-vrapper"
+                                ;;
+                            9)
+                                package_manager "eclipse-egit"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                print_line
+                                echo "Invalid option. Try another one."
+                                pause_function
+                                ;;
+                        esac
+                    done
+                done
+                #}}}
+                ;;
+            3)
+                package_manager "emacs"
+                ;;
+            4)
+                pacman -Rdd --noconfirm vim
+                package_manager "gvim wmctrl ctags discount"
+                #HELMUTHDU'S VIMRC {{{
+                pacman -S --noconfirm --needed git
+                git clone git://github.com/helmuthdu/vim.git
+                mv vim /home/$USERNAME/.vim
+                git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
+                ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
+                chown -R $USERNAME:users /home/$USERNAME/.vim
+                chown $USERNAME:users /home/$USERNAME/.vimrc
+                #}}}
+                ;;
+            5)
+                package_manager "intellij-idea-community-edition"
+                ;;
+            6)
+                package_manager "netbeans"
+                ;;
+            7)
+                pacman -Rdd --noconfirm jre7-openjdk
+                pacman -Rdd --noconfirm jdk7-openjdk
+                package_manager "jdk"
+                ;;
+            8)
+                package_manager "qtcreator qt-doc"
+                mkdir -p /home/$USERNAME/.config/Nokia/qtcreator/styles
+                wget http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
+                mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
+                chown -R $USERNAME:users /home/$USERNAME/.config
+                ;;
+            9)
+                package_manager "sublime-text"
+                ;;
+            10)
+                package_manager "valgrind gdb splint tidyhtml pyflakes jsl"
+                ;;
+            11)
+                package_manager "mysql-workbench"
+                ;;
+            12)
+                package_manager "meld"
+                ;;
+            "b")
+                break
+                ;;
+            *)
+                print_line
+                echo "Invalid option. Try another one."
+                pause_function
+                ;;
+        esac
+    done
+    if [ $OPT = "b" ];then break;fi
 done
 }
 #}}}
@@ -1354,55 +1416,63 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Please enter your choice: " OPTION
-    case "$OPTION" in
-        1)
-            package_manager "libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram libreoffice-$LOCATION_LO"
-            package_manager "hunspell-$LOCATION_HS"
-            if [ "$KDE" -eq 1 ]; then
-                package_manager "libreoffice-kde4"
-            else
-                package_manager "libreoffice-gnome"
-            fi
-            ;;
-        2)
-            package_manager "gnumeric abiword abiword-plugins"
-            ;;
-        3)
-            print_title "LATEX - https://wiki.archlinux.org/index.php/LaTeX"
-            package_manager "texlive-most"
-            package_manager "texmaker"
-            package_manager "latex-template-springer latex-template-ieee latex-beamer"
-            if [ $LOCATION = "pt_BR" ]; then
-                package_manager "abntex"
-            fi
-            ;;
-        4)
-            if [ "$KDE" -eq 1 ]; then
-                package_manager "kchmviewer"
-            else
-                package_manager "chmsee"
-            fi
-            ;;
-        5)
-            package_manager "gcstar"
-            ;;
-        6)
-            package_manager "wunderlist"
-            ;;
-        7)
-            package_manager "xmind"
-            ;;
-        8)
-            package_manager "zathura"
-            ;;
-        9)
-            package_manager "impressive"
-            ;;
-        *)
-            break
-            ;;
-    esac
+    read -p "$prompt" OPTION
+    for OPT in $OPTION; do
+        case "$OPT" in
+            1)
+                package_manager "libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram libreoffice-$LOCATION_LO"
+                package_manager "hunspell-$LOCATION_HS"
+                if [ "$KDE" -eq 1 ]; then
+                    package_manager "libreoffice-kde4"
+                else
+                    package_manager "libreoffice-gnome"
+                fi
+                ;;
+            2)
+                package_manager "gnumeric abiword abiword-plugins"
+                ;;
+            3)
+                print_title "LATEX - https://wiki.archlinux.org/index.php/LaTeX"
+                package_manager "texlive-most"
+                package_manager "texmaker"
+                package_manager "latex-template-springer latex-template-ieee latex-beamer"
+                if [ $LOCATION = "pt_BR" ]; then
+                    package_manager "abntex"
+                fi
+                ;;
+            4)
+                if [ "$KDE" -eq 1 ]; then
+                    package_manager "kchmviewer"
+                else
+                    package_manager "chmsee"
+                fi
+                ;;
+            5)
+                package_manager "gcstar"
+                ;;
+            6)
+                package_manager "wunderlist"
+                ;;
+            7)
+                package_manager "xmind"
+                ;;
+            8)
+                package_manager "zathura"
+                ;;
+            9)
+                package_manager "impressive"
+                ;;
+            "b")
+                break
+                ;;
+            *)
+                print_line
+                echo "Invalid option. Try another one."
+                pause_function
+                ;;
+        esac
+    done
+    if [ $OPT = "b" ];then break;fi
 done
 }
 #}}}
@@ -1418,28 +1488,36 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Please enter your choice: " OPTION
-    case "$OPTION" in
-        1)
-            package_manager "grsync"
-            ;;
-        2)
-            package_manager "htop"
-            ;;
-        3)
-            package_manager "virtualbox virtualbox-additions virtualbox-ext-oracle"
-            modprobe vboxdrv
-            groupadd vboxusers
-            gpasswd -a $USERNAME vboxusers
-            add_module "vboxdrv"
-            ;;
-        4)
-            package_manager "wine wine_gecko winetricks"
-            ;;
-        *)
-            break
-            ;;
-    esac
+    read -p "$prompt" OPTION
+    for OPT in $OPTION; do
+        case "$OPT" in
+            1)
+                package_manager "grsync"
+                ;;
+            2)
+                package_manager "htop"
+                ;;
+            3)
+                package_manager "virtualbox virtualbox-additions virtualbox-ext-oracle"
+                modprobe vboxdrv
+                groupadd vboxusers
+                gpasswd -a $USERNAME vboxusers
+                add_module "vboxdrv"
+                ;;
+            4)
+                package_manager "wine wine_gecko winetricks"
+                ;;
+            "b")
+                break
+                ;;
+            *)
+                print_line
+                echo "Invalid option. Try another one."
+                pause_function
+                ;;
+        esac
+    done
+    if [ $OPT = "b" ];then break;fi
 done
 }
 #}}}
@@ -1458,33 +1536,41 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Please enter your choice: " OPTION
-    case "$OPTION" in
-        1)
-            package_manager "blender"
-            ;;
-        2)
-            package_manager "gimp"
-            ;;
-        3)
-            package_manager "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
-            ;;
-        4)
-            package_manager "gthumb"
-            ;;
-        5)
-            package_manager "inkscape uniconvertor python2-numpy python-lxml sozi"
-            ;;
-        6)
-            package_manager "mcomix"
-            ;;
-        7)
-            package_manager "shotwell"
-            ;;
-        *)
-            break
-            ;;
-    esac
+    read -p "$prompt" OPTION
+    for OPT in $OPTION; do
+        case "$OPT" in
+            1)
+                package_manager "blender"
+                ;;
+            2)
+                package_manager "gimp"
+                ;;
+            3)
+                package_manager "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
+                ;;
+            4)
+                package_manager "gthumb"
+                ;;
+            5)
+                package_manager "inkscape uniconvertor python2-numpy python-lxml sozi"
+                ;;
+            6)
+                package_manager "mcomix"
+                ;;
+            7)
+                package_manager "shotwell"
+                ;;
+            "b")
+                break
+                ;;
+            *)
+                print_line
+                echo "Invalid option. Try another one."
+                pause_function
+                ;;
+        esac
+    done
+    if [ $OPT = "b" ];then break;fi
 done
 }
 #}}}
@@ -1510,71 +1596,79 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Please enter your choice: " OPTION
-    case "$OPTION" in
-        1)
-            package_manager "dropbox"
-            if [ "$GNOME" -eq 1 ]; then
-                package_manager "nautilus-dropbox"
-            elif [ "$XFCE" -eq 1 ]; then
-                package_manager "thunar-dropbox"
-            elif [ "$KDE" -eq 1 ]; then
-                package_manager "kfilebox"
-            else
-                package_manager "dropbox-cli"
-            fi
-            ;;
-        2)
-            package_manager "google-earth"
-            ;;
-        3)
-            package_manager "google-chrome flashplugin"
-            ;;
-        4)
-            package_manager "chromium flashplugin"
-            ;;
-        5)
-            package_manager "jdownloader"
-            ;;
-        6)
-            package_manager "irssi"
-            ;;
-        7)
-            package_manager "firefox firefox-i18n-$LOCATION_FF flashplugin "
-            ;;
-        8)
-            package_manager "thunderbird thunderbird-i18n-$LOCATION_FF"
-            ;;
-        9)
-            package_manager "pidgin"
-            ;;
-        10)
-            package_manager "skype"
-            ;;
-        11)
-            package_manager "teamspeak3"
-            ;;
-        12)
-            package_manager "teamviewer"
-            ;;
-        13)
-            if [ "$KDE" -eq 1 ]; then
-                package_manager "transmission-qt"
-            else
-                package_manager "transmission-gtk"
-            fi
-            ;;
-        14)
-            if [ "$KDE" -eq 1 ]; then
-                package_manager "konversation"
-            else
-                package_manager "xchat"
-            fi
-            ;;
-        *)
-            break
-            ;;
-    esac
+    read -p "$prompt" OPTION
+    for OPT in $OPTION; do
+        case "$OPT" in
+            1)
+                package_manager "dropbox"
+                if [ "$GNOME" -eq 1 ]; then
+                    package_manager "nautilus-dropbox"
+                elif [ "$XFCE" -eq 1 ]; then
+                    package_manager "thunar-dropbox"
+                elif [ "$KDE" -eq 1 ]; then
+                    package_manager "kfilebox"
+                else
+                    package_manager "dropbox-cli"
+                fi
+                ;;
+            2)
+                package_manager "google-earth"
+                ;;
+            3)
+                package_manager "google-chrome flashplugin"
+                ;;
+            4)
+                package_manager "chromium flashplugin"
+                ;;
+            5)
+                package_manager "jdownloader"
+                ;;
+            6)
+                package_manager "irssi"
+                ;;
+            7)
+                package_manager "firefox firefox-i18n-$LOCATION_FF flashplugin "
+                ;;
+            8)
+                package_manager "thunderbird thunderbird-i18n-$LOCATION_FF"
+                ;;
+            9)
+                package_manager "pidgin"
+                ;;
+            10)
+                package_manager "skype"
+                ;;
+            11)
+                package_manager "teamspeak3"
+                ;;
+            12)
+                package_manager "teamviewer"
+                ;;
+            13)
+                if [ "$KDE" -eq 1 ]; then
+                    package_manager "transmission-qt"
+                else
+                    package_manager "transmission-gtk"
+                fi
+                ;;
+            14)
+                if [ "$KDE" -eq 1 ]; then
+                    package_manager "konversation"
+                else
+                    package_manager "xchat"
+                fi
+                ;;
+            "b")
+                break
+                ;;
+            *)
+                print_line
+                echo "Invalid option. Try another one."
+                pause_function
+                ;;
+        esac
+    done
+    if [ $OPT = "b" ];then break;fi
 done
 }
 #}}}
@@ -1644,58 +1738,66 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Please enter your choice: " OPTION
-    case "$OPTION" in
-        1)
-            package_manager "amarok"
-            ;;
-        2)
-            package_manager "banshee"
-            ;;
-        3)
-            package_manager "beatbox-bzr"
-            ;;
-        4)
-            package_manager "clementine"
-            ;;
-        5)
-            package_manager "decibel-audio-player2"
-            ;;
-        6)
-            package_manager "exaile"
-            ;;
-        7)
-            package_manager "gmusicbrowser-development"
-            ;;
-        8)
-            package_manager "musique"
-            ;;
-        9)
-            package_manager "nuvola-bzr-stable"
-            ;;
-        10)
-            package_manager "rhythmbox"
-            ;;
-        11)
-            package_manager "spotify"
-            ;;
-        12)
-            package_manager "puddletag"
-            ;;
-        13)
-            package_manager "timidity++ fluidr3"
-            echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
-            ;;
-        14)
-            package_manager "gstreamer0.10-plugins"
-            ;;
-        15)
-            package_manager "audacity"
-            ;;
-        *)
-            break
-            ;;
-    esac
+    read -p "$prompt" OPTION
+    for OPT in $OPTION; do
+        case "$OPT" in
+            1)
+                package_manager "amarok"
+                ;;
+            2)
+                package_manager "banshee"
+                ;;
+            3)
+                package_manager "beatbox-bzr"
+                ;;
+            4)
+                package_manager "clementine"
+                ;;
+            5)
+                package_manager "decibel-audio-player2"
+                ;;
+            6)
+                package_manager "exaile"
+                ;;
+            7)
+                package_manager "gmusicbrowser-development"
+                ;;
+            8)
+                package_manager "musique"
+                ;;
+            9)
+                package_manager "nuvola-bzr-stable"
+                ;;
+            10)
+                package_manager "rhythmbox"
+                ;;
+            11)
+                package_manager "spotify"
+                ;;
+            12)
+                package_manager "puddletag"
+                ;;
+            13)
+                package_manager "timidity++ fluidr3"
+                echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
+                ;;
+            14)
+                package_manager "gstreamer0.10-plugins"
+                ;;
+            15)
+                package_manager "audacity"
+                ;;
+            "b")
+                break
+                ;;
+            *)
+                print_line
+                echo "Invalid option. Try another one."
+                pause_function
+                ;;
+        esac
+    done
+    if [ $OPT = "b" ];then break;fi
 done
 }
 #}}}
@@ -1703,7 +1805,7 @@ done
 function install_video_apps(){
 while [ 1 ]
 do
-    print_title "VIDEO APPS "
+    print_title "VIDEO APPS"
     echo " 1) $(checkbox_package "gnome-mplayer") Gnome Mplayer"
     echo " 2) $(checkbox_package "parole") Parole"
     echo " 3) $(checkbox_package "minitube") Minitube"
@@ -1721,63 +1823,71 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Please enter your choice: " OPTION
-    case "$OPTION" in
-        1)
-            package_manager "gnome-mplayer"
-            ;;
-        2)
-            package_manager "parole"
-            ;;
-        3)
-            package_manager "minitube"
-            ;;
-        4)
-            package_manager "rosa-media-player-bin"
-            ;;
-        5)
-            package_manager "smplayer smplayer-themes"
-            ;;
-        6)
-            package_manager "vlc"
-            if [ "$KDE" -eq 1 ]; then
-                package_manager "phonon-vlc"
-            fi
-            ;;
-        7)
-            package_manager "xbmc"
-            ;;
-        8)
-            package_manager "arista-transcoder"
-            ;;
-        9)
-            package_manager "transmageddon"
-            ;;
-        10)
-            package_manager "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
-            if [ "$ARCHI" = "i686" ]; then
-                package_manager "codecs"
-            else
-                package_manager "codecs64"
-            fi
-            ;;
-        11)
-            package_manager "kdenlive"
-            ;;
-        12)
-            package_manager "openshot"
-            ;;
-        13)
-            package_manager "pitivi"
-            ;;
-        14)
-            package_manager "python-rsvg"
-            package_manager "kazam-bzr"
-            ;;
-        *)
-            break
-            ;;
-    esac
+    read -p "$prompt" OPTION
+    for OPT in $OPTION; do
+        case "$OPT" in
+            1)
+                package_manager "gnome-mplayer"
+                ;;
+            2)
+                package_manager "parole"
+                ;;
+            3)
+                package_manager "minitube"
+                ;;
+            4)
+                package_manager "rosa-media-player-bin"
+                ;;
+            5)
+                package_manager "smplayer smplayer-themes"
+                ;;
+            6)
+                package_manager "vlc"
+                if [ "$KDE" -eq 1 ]; then
+                    package_manager "phonon-vlc"
+                fi
+                ;;
+            7)
+                package_manager "xbmc"
+                ;;
+            8)
+                package_manager "arista-transcoder"
+                ;;
+            9)
+                package_manager "transmageddon"
+                ;;
+            10)
+                package_manager "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
+                if [ "$ARCHI" = "i686" ]; then
+                    package_manager "codecs"
+                else
+                    package_manager "codecs64"
+                fi
+                ;;
+            11)
+                package_manager "kdenlive"
+                ;;
+            12)
+                package_manager "openshot"
+                ;;
+            13)
+                package_manager "pitivi"
+                ;;
+            14)
+                package_manager "python-rsvg"
+                package_manager "kazam-bzr"
+                ;;
+            "b")
+                break
+                ;;
+            *)
+                print_line
+                echo "Invalid option. Try another one."
+                pause_function
+                ;;
+        esac
+    done
+    if [ $OPT = "b" ];then break;fi
 done
 }
 #}}}
@@ -1800,7 +1910,7 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Please enter your choice: " OPTION
+    read -p "$prompt" OPTION
     case "$OPTION" in
         1)
             #ACTION/ADVENTURE {{{
@@ -1815,31 +1925,39 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "astromenace"
-                        ;;
-                    2)
-                        package_manager "opentyrian-hg"
-                        ;;
-                    3)
-                        package_manager "mars-shooter"
-                        ;;
-                    4)
-                        package_manager "yofrankie"
-                        ;;
-                    5)
-                        package_manager "counter-strike-2d"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "astromenace"
+                            ;;
+                        2)
+                            package_manager "opentyrian-hg"
+                            ;;
+                        3)
+                            package_manager "mars-shooter"
+                            ;;
+                        4)
+                            package_manager "yofrankie"
+                            ;;
+                        5)
+                            package_manager "counter-strike-2d"
+                            ;;
+                        "b")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "b" ];then break;fi
             done
             ;;
             #}}}
-            2)
+        2)
             #ARCADE/PLATFORMER {{{
             while [ 1 ]
             do
@@ -1854,37 +1972,45 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "opensonic"
-                        ;;
-                    2)
-                        package_manager "frogatto"
-                        ;;
-                    3)
-                        package_manager "bomberclone"
-                        ;;
-                    4)
-                        package_manager "goonies"
-                        ;;
-                    5)
-                        package_manager "neverball"
-                        ;;
-                    6)
-                        package_manager "smc"
-                        ;;
-                    7)
-                        package_manager "xmoto"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "opensonic"
+                            ;;
+                        2)
+                            package_manager "frogatto"
+                            ;;
+                        3)
+                            package_manager "bomberclone"
+                            ;;
+                        4)
+                            package_manager "goonies"
+                            ;;
+                        5)
+                            package_manager "neverball"
+                            ;;
+                        6)
+                            package_manager "smc"
+                            ;;
+                        7)
+                            package_manager "xmoto"
+                            ;;
+                        "b")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "b" ];then break;fi
             done
             ;;
             #}}}
-            3)
+        3)
             #DUNGEON {{{
             while [ 1 ]
             do
@@ -1895,51 +2021,66 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "tome4"
-                        ;;
-                    2)
-                        package_manager "lostlabyrinth"
-                        ;;
-                    3)
-                        package_manager "scourge"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "tome4"
+                            ;;
+                        2)
+                            package_manager "lostlabyrinth"
+                            ;;
+                        3)
+                            package_manager "scourge"
+                            ;;
+                        "b")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "b" ];then break;fi
             done
             ;;
             #}}}
-            4)
+        4)
             #EMULATORS {{{
             while [ 1 ]
             do
                 print_title "EMULATORS"
-
                 echo " 1) $(checkbox_package "vba-m-gtk-svn") VisualBoyAdvanced"
                 echo " 2) $(checkbox_package "zsnes") ZSNES"
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "vba-m-gtk-svn"
-                        ;;
-                    2)
-                        package_manager "zsnes"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "vba-m-gtk-svn"
+                            ;;
+                        2)
+                            package_manager "zsnes"
+                            ;;
+                        "b")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "b" ];then break;fi
             done
             ;;
             #}}}
-            5)
+        5)
             #FPS {{{
             while [ 1 ]
             do
@@ -1951,28 +2092,37 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "alienarena"
-                        ;;
-                    2)
-                        package_manager "enemy-territory"
-                        ;;
-                    3)
-                        package_manager "worldofpadman"
-                        ;;
-                    4)
-                        package_manager "warsow"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "alienarena"
+                            ;;
+                        2)
+                            package_manager "enemy-territory"
+                            ;;
+                        3)
+                            package_manager "worldofpadman"
+                            ;;
+                        4)
+                            package_manager "warsow"
+                            ;;
+
+                        "b")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "b" ];then break;fi
             done
             ;;
             #}}}
-            6)
+        6)
             #MMO {{{
             while [ 1 ]
             do
@@ -1983,25 +2133,33 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "hon"
-                        ;;
-                    2)
-                        package_manager "savage2"
-                        ;;
-                    3)
-                        package_manager "spiral-knights"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "hon"
+                            ;;
+                        2)
+                            package_manager "savage2"
+                            ;;
+                        3)
+                            package_manager "spiral-knights"
+                            ;;
+                        "b")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "b" ];then break;fi
             done
             ;;
             #}}}
-            7)
+        7)
             #PUZZLE {{{
             while [ 1 ]
             do
@@ -2010,19 +2168,27 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "numptyphysics-svn"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "numptyphysics-svn"
+                            ;;
+                        "b")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "b" ];then break;fi
             done
             ;;
             #}}}
-            8)
+        8)
             #RPG {{{
             while [ 1 ]
             do
@@ -2031,19 +2197,27 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "ardentryst"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "ardentryst"
+                            ;;
+                        "b")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "b" ];then break;fi
             done
             ;;
             #}}}
-            9)
+        9)
             #RACING {{{
             while [ 1 ]
             do
@@ -2055,28 +2229,36 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "maniadrive"
-                        ;;
-                    2)
-                        package_manager "death-rally"
-                        ;;
-                    3)
-                        package_manager "supertuxkart"
-                        ;;
-                    4)
-                        package_manager "speed-dreams"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "maniadrive"
+                            ;;
+                        2)
+                            package_manager "death-rally"
+                            ;;
+                        3)
+                            package_manager "supertuxkart"
+                            ;;
+                        4)
+                            package_manager "speed-dreams"
+                            ;;
+                        "b")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "b" ];then break;fi
             done
             ;;
             #}}}
-            10)
+        10)
             #SIMULATION {{{
             while [ 1 ]
             do
@@ -2087,25 +2269,33 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "simutrans"
-                        ;;
-                    2)
-                        package_manager "corsix-th"
-                        ;;
-                    3)
-                        package_manager "openttd"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "simutrans"
+                            ;;
+                        2)
+                            package_manager "corsix-th"
+                            ;;
+                        3)
+                            package_manager "openttd"
+                            ;;
+                        "b")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "b" ];then break;fi
             done
             ;;
             #}}}
-            11)
+        11)
             #STRATEGY {{{
             while [ 1 ]
             do
@@ -2119,34 +2309,42 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "Please enter your choice: " OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "wesnoth"
-                        ;;
-                    3)
-                        package_manager "0ad"
-                        ;;
-                    4)
-                        package_manager "hedgewars"
-                        ;;
-                    5)
-                        package_manager "warzone2100"
-                        ;;
-                    6)
-                        package_manager "megaglest"
-                        ;;
-                    7)
-                        package_manager "commander-zod"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read -p "$prompt" OPTION
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "wesnoth"
+                            ;;
+                        3)
+                            package_manager "0ad"
+                            ;;
+                        4)
+                            package_manager "hedgewars"
+                            ;;
+                        5)
+                            package_manager "warzone2100"
+                            ;;
+                        6)
+                            package_manager "megaglest"
+                            ;;
+                        7)
+                            package_manager "commander-zod"
+                            ;;
+                        "b")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "b" ];then break;fi
             done
             ;;
             #}}}
-            *)
+        *)
             break
             ;;
     esac
@@ -2170,43 +2368,51 @@ do
     echo " a) ALL"
     echo " b) BACK"
     echo ""
-    read -p "Please enter your choice: " OPTION
-    case "$OPTION" in
-        1)
-            package_manager "ttf-dejavu"
-            ;;
-        2)
-            pacman -Rdd --noconfirm ttf-droid
-            pacman -Rdd --noconfirm ttf-ubuntu-font-family
-            package_manager "ttf-google-webfonts"
-            ;;
-        3)
-            package_manager "ttf-kochi-substitute"
-            ;;
-        4)
-            package_manager "ttf-liberation"
-            ;;
-        5)
-            package_manager "ttf-ms-fonts"
-            ;;
-        6)
-            package_manager "ttf-roboto"
-            ;;
-        7)
-            package_manager "ttf-vista-fonts"
-            ;;
-        8)
-            package_manager "ttf-mac-fonts"
-            ;;
-        "a")
-            pacman -Rdd --noconfirm ttf-droid
-            pacman -Rdd --noconfirm ttf-ubuntu-font-family
-            package_manager "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts ttf-mac-fonts"
-            ;;
-        *)
-            break
-            ;;
-    esac
+    read -p "$prompt" OPTION
+    for OPT in $OPTION; do
+        case "$OPT" in
+            1)
+                package_manager "ttf-dejavu"
+                ;;
+            2)
+                pacman -Rdd --noconfirm ttf-droid
+                pacman -Rdd --noconfirm ttf-ubuntu-font-family
+                package_manager "ttf-google-webfonts"
+                ;;
+            3)
+                package_manager "ttf-kochi-substitute"
+                ;;
+            4)
+                package_manager "ttf-liberation"
+                ;;
+            5)
+                package_manager "ttf-ms-fonts"
+                ;;
+            6)
+                package_manager "ttf-roboto"
+                ;;
+            7)
+                package_manager "ttf-vista-fonts"
+                ;;
+            8)
+                package_manager "ttf-mac-fonts"
+                ;;
+            "a")
+                pacman -Rdd --noconfirm ttf-droid
+                pacman -Rdd --noconfirm ttf-ubuntu-font-family
+                package_manager "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts ttf-mac-fonts"
+                ;;
+            "b")
+                break
+                ;;
+            *)
+                print_line
+                echo "Invalid option. Try another one."
+                pause_function
+                ;;
+        esac
+    done
+    if [ $OPT = "b" ];then break;fi
 done
 }
 #}}}
@@ -2215,10 +2421,11 @@ function configure_fonts(){
     print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
     echo " 1) Ubuntu patched packages"
     echo " 2) Cleartype patched packages"
+    echo " 3) Infinality patched packages"
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "Please enter your choice: " OPTION
+    read -p "$prompt" OPTION
     case "$OPTION" in
         1)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
@@ -2228,6 +2435,11 @@ function configure_fonts(){
         2)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
             package_install "freetype2-cleartype libxft-cleartype cairo-cleartype"
+            install_status
+            ;;
+        3)
+            pacman -Rdd --noconfirm fontconfig freetype2
+            package_install "freetype2-infinality fontconfig-infinality"
             install_status
             ;;
         *)
@@ -2284,93 +2496,95 @@ do
     echo ""
     echo " q) Quit"
     echo ""
-    read -p "Please enter your choice: " OPTION
-    case "$OPTION" in
-        1)
-            rankmirror
-            pacman_package_signing
-            install_basic_setup
-            install_tlp
-            install_xorg
-            install_video_cards
-            install_cups
-            install_additional_firmwares
-            install_git_tor
-            install_status
-            sumary "Basic setup installation"
-            pause_function
-            BASICSETUP=1
-            ;;
-        2)
-            if [ $BASICSETUP -eq 0 ]; then
-                echo -e "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
-                question_for_answer "Are you sure you want to continue?"
-                if [ $OPTION = "n" ]; then continue; fi
-            fi
-            install_desktop_environment
-            install_nm_wicd
-            DESKTOPENVIRONMENT=1
-            ;;
-        3)
-            install_accessories_apps
-            ACCESSORIESAPPS=1
-            ;;
-        4)
-            install_development_apps
-            DEVELOPMENTAPPS=1
-            ;;
-        5)
-            install_office_apps
-            OFFICEAPPS=1
-            ;;
-        6)
-            install_system_apps
-            SYSTEMAPPS=1
-            ;;
-        7)
-            install_graphics_apps
-            GRAPHICSAPPS=1
-            ;;
-        8)
-            install_internet_apps
-            INTERNETAPPS=1
-            ;;
-        9)
-            install_audio_apps
-            AUDIOAPPS=1
-            ;;
-        10)
-            install_video_apps
-            VIDEOAPPS=1
-            ;;
-        11)
-            install_lamp
-            LAMP=1
-            ;;
-        12)
-            install_games
-            GAMES=1
-            ;;
-        13)
-            install_fonts
-            FONTS=1
-            ;;
-        14)
-            configure_fonts
-            FONTSCONFIG=1
-            ;;
-        15)
-            clean_orphan_packages
-            CLEANPACKAGES=1
-            ;;
-        "q")
-            finish
-            ;;
-        *)
-            print_line
-            echo "Invalid option. Try another one."
-            pause_function
-            ;;
-    esac
+    read -p "$prompt" OPTION
+    for OPT in $OPTION; do
+        case "$OPT" in
+            1)
+                rankmirror
+                pacman_package_signing
+                install_basic_setup
+                install_tlp
+                install_xorg
+                install_video_cards
+                install_cups
+                install_additional_firmwares
+                install_git_tor
+                install_status
+                sumary "Basic setup installation"
+                pause_function
+                BASICSETUP=1
+                ;;
+            2)
+                if [ $BASICSETUP -eq 0 ]; then
+                    echo -e "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
+                    question_for_answer "Are you sure you want to continue?"
+                    if [ $OPTION = "n" ]; then continue; fi
+                fi
+                install_desktop_environment
+                install_nm_wicd
+                DESKTOPENVIRONMENT=1
+                ;;
+            3)
+                install_accessories_apps
+                ACCESSORIESAPPS=1
+                ;;
+            4)
+                install_development_apps
+                DEVELOPMENTAPPS=1
+                ;;
+            5)
+                install_office_apps
+                OFFICEAPPS=1
+                ;;
+            6)
+                install_system_apps
+                SYSTEMAPPS=1
+                ;;
+            7)
+                install_graphics_apps
+                GRAPHICSAPPS=1
+                ;;
+            8)
+                install_internet_apps
+                INTERNETAPPS=1
+                ;;
+            9)
+                install_audio_apps
+                AUDIOAPPS=1
+                ;;
+            10)
+                install_video_apps
+                VIDEOAPPS=1
+                ;;
+            11)
+                install_lamp
+                LAMP=1
+                ;;
+            12)
+                install_games
+                GAMES=1
+                ;;
+            13)
+                install_fonts
+                FONTS=1
+                ;;
+            14)
+                configure_fonts
+                FONTSCONFIG=1
+                ;;
+            15)
+                clean_orphan_packages
+                CLEANPACKAGES=1
+                ;;
+            "q")
+                finish
+                ;;
+            *)
+                print_line
+                echo "Invalid option. Try another one."
+                pause_function
+                ;;
+        esac
+    done
 done
 #}}}
