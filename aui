@@ -383,7 +383,7 @@ function rankmirror(){
 function system_upgrade(){
     print_title "UPDATING YOUR SYSTEM"
     rm -fr /etc/profile.d/locale.sh #http://www.archlinux.org/news/initscripts-update-manual-intervention-required/
-    pacman -S filesystem --force #http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required/
+    pacman -S  --noconfirm --needed --force filesystem #http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required/
     pacman -Syuf
     reboot_now
 }
