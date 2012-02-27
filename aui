@@ -245,7 +245,7 @@ function welcome(){
     print_line
     echo "it's highly recommended that you read this script before using it"
     echo "This version is still in BETA. Send bugreports to: "
-    echo "helmuthdu at gmail dot com"
+    echo "www.github.com/helmuthdu/aui"
     pause_function
 }
 #}}}
