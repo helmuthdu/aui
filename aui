@@ -185,6 +185,9 @@ function package_install(){ #{{{
         fi
     done
 } #}}}
+function contains_element(){ #{{{
+    for e in "${@:2}"; do [[ "$e" = "$1" ]] && break; done;
+} #}}}
 function install_status(){ #{{{
     if [ $? -ne 0 ] ; then
         CURRENT_STATUS=-1
@@ -392,15 +395,6 @@ function system_upgrade(){
 #}}}
 #SELECT USER {{{
 function select_user(){
-    avaliableusers(){ #{{{
-        i=1
-        echo "Avaliable Users:"
-        for USER in ${USERS[@]}; do
-            echo " $(( i++ ))) $USER"
-        done
-        echo -e " $(( ${#USERS[@]}+1 ))) Create new user\n"
-        echo -e "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES\n"
-    } #}}}
     create_new_user(){ #{{{
         read -p "Username: " USERNAME
         useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
@@ -414,23 +408,25 @@ function select_user(){
             #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
         #}}}
     } #}}}
-
-    USERS=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
-
     print_title "SELECT USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
-    avaliableusers
-    while read -rp "$prompt" OPTION && [[ "$OPTION" ]]; do
-        [[ "$OPTION" != *[![:digit:]]* ]] && (( $OPTION > 0 && $OPTION <= ${#USERS[@]}+1 )) || {
-        echo -e "Invalid option. Try another one.\n"; continue
-        }
-        break
-    done
-
-    if [ $OPTION -eq  $(( ${#USERS[@]}+1 )) ]; then
-        create_new_user
-    else
-        USERNAME=${USERS[$OPTION-1]}
+    users=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
+    PS3="$prompt"
+    echo "Avaliable Users:"
+    if [ $(( ${#users[@]} )) -gt 0 ]; then
+        echo -e "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES\n"
     fi
+    select OPT in "${users[@]}" "Create new user"; do
+        if contains_element "$OPT" "${users[@]}"; then
+            USERNAME=$OPT
+            break
+        elif [ "$OPT" == "Create new user" ]; then
+            create_new_user
+        else
+            print_line
+            echo "Invalid option. Try another one."
+            pause_function
+        fi
+    done
 }
 #}}}
 #AUR HELPER {{{
@@ -2475,7 +2471,20 @@ function configure_fonts(){
         3)
             pacman -Rdd --noconfirm fontconfig freetype2
             package_install "freetype2-infinality fontconfig-infinality"
-            ./etc/profile.d/infinality-settings.sh
+            /etc/profile.d/infinality-settings.sh
+            infctl=("infinality" "linux" "osx" "osx2" "win7" "winxp")
+            PS3="$prompt"
+            echo ""
+            select OPT in "${infctl[@]}"; do
+                if contains_element "$OPT" "${infctl[@]}"; then
+                    /etc/fonts/infinality/infctl.sh setstyle $OPT
+                    break
+                else
+                    print_line
+                    echo "Invalid option. Try another one."
+                    pause_function
+                fi
+            done
             install_status
             ;;
         *)
