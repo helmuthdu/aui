@@ -720,29 +720,37 @@ function install_additional_firmwares(){
                 echo " d) DONE"
                 echo ""
                 read -p "$prompt" OPTION
-                case "$OPTION" in
-                    1)
-                        package_manager "ipw2100-fw"
-                        ;;
-                    2)
-                        package_manager "ipw2200-fw"
-                        ;;
-                    3)
-                        package_manager "b43-firmware"
-                        ;;
-                    4)
-                        package_manager "b43-firmware-legacy"
-                        ;;
-                    5)
-                        package_manager "broadcom-wl"
-                        ;;
-                    6)
-                        package_manager "bluez-firmware"
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                for OPT in $OPTION; do
+                    case "$OPT" in
+                        1)
+                            package_manager "ipw2100-fw"
+                            ;;
+                        2)
+                            package_manager "ipw2200-fw"
+                            ;;
+                        3)
+                            package_manager "b43-firmware"
+                            ;;
+                        4)
+                            package_manager "b43-firmware-legacy"
+                            ;;
+                        5)
+                            package_manager "broadcom-wl"
+                            ;;
+                        6)
+                            package_manager "bluez-firmware"
+                            ;;
+                        "d")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
+                if [ $OPT = "d" ];then break;fi
             done
             install_status
             ;;
@@ -2529,6 +2537,7 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
+                custom_repositories
                 rankmirror
                 pacman_package_signing
                 install_basic_setup
