@@ -1226,7 +1226,6 @@ do
                 ;;
             2)
                 package_manager "conky conky-colors"
-                add_module "coretemp it87 acpi-cpufreq"
                 ;;
             3)
                 package_manager "dockbarx dockbarx-shinybar-theme"
