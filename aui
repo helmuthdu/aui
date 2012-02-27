@@ -421,6 +421,7 @@ function select_user(){
             break
         elif [ "$OPT" == "Create new user" ]; then
             create_new_user
+            break
         else
             print_line
             echo "Invalid option. Try another one."
