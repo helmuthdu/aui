@@ -45,7 +45,7 @@ CLEANPACKAGES=0
 
 ARCHI=`uname -m`
 
-prompt="Please enter your choice: "
+prompt="Please enter your choice(s): "
 
 # AUTOMATICALLY DETECTS THE SYSTEM LANGUAGE BASED ON YOUR RC.CONF#{{{
     LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | cut -c9-13`
