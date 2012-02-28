@@ -16,7 +16,7 @@ You can try it first with a `virtualbox`
 ### With git
 - Install git: `pacman -Sy git`
 - get the script: `git clone git://github.com/helmuthdu/aui.git`
-- run the script: `./aui`
+- run the script: `cd aui && ./aui`
 
 ### Without git
 - get the script: ` wget --no-check-certificate https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
