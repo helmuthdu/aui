@@ -2327,7 +2327,7 @@ while [ 1 ]
 do
     print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
     echo " 1) $(checkbox_package "ttf-dejavu") ttf-dejavu"
-    echo " 2) $(checkbox_package "ttf-google-webfonts") ttf-google-webfonts (WARNING: install time can be >= 20min)"
+    echo " 2) $(checkbox_package "ttf-google-webfonts") ttf-google-webfonts"
     echo " 3) $(checkbox_package "ttf-kochi-substitute") ttf-kochi-substitute (Japanese Support)"
     echo " 4) $(checkbox_package "ttf-liberation") ttf-liberation"
     echo " 5) $(checkbox_package "ttf-ms-fonts") ttf-ms-fonts"
@@ -2344,6 +2344,9 @@ do
                 package_install "ttf-dejavu"
                 ;;
             2)
+                echo -e "\nWARNING: Install time can be > 20min"
+                question_for_answer "Are you sure you want to continue?"
+                if [ $OPTION = "n" ]; then continue; fi
                 pacman -Rdd --noconfirm ttf-droid
                 pacman -Rdd --noconfirm ttf-ubuntu-font-family
                 package_install "ttf-google-webfonts"
