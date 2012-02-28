@@ -399,8 +399,8 @@ function select_user(){
         read -p "Username: " USERNAME
         useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
         passwd $USERNAME
-        pacman -S --noconfirm --needed git
         #BASHRC {{{
+            pacman -S --noconfirm --needed git
             git clone git://github.com/helmuthdu/dotfiles
             cp dotfiles/.* ~
             cp dotfiles/.* /home/$USERNAME/
@@ -1770,7 +1770,7 @@ do
                 echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                 ;;
             14)
-                package_install "gstreamer0.10-plugins"
+                pacman -S --noconfirm --needed gstreamer0.10-plugins
                 ;;
             15)
                 package_install "audacity"
