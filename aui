@@ -2201,6 +2201,7 @@ do
             do
                 print_title "RPG"
                 echo " 1) $(checkbox_package "ardentryst") Ardentryst"
+                echo " 1) $(checkbox_package "freedroidrpg") Freedroid RPG"
                 echo ""
                 echo " b) BACK"
                 echo ""
@@ -2209,6 +2210,9 @@ do
                     case "$OPT" in
                         1)
                             package_install "ardentryst"
+                            ;;
+                        2)
+                            package_install "freedroidrpg"
                             ;;
                         "b")
                             break
@@ -2231,7 +2235,7 @@ do
                 print_title "RACING"
                 echo " 1) $(checkbox_package "maniadrive") Maniadrive"
                 echo " 2) $(checkbox_package "death-rally") Death Rally"
-                echo " 3) $(checkbox_package "supertuxkart") Stuntrally"
+                echo " 3) $(checkbox_package "stuntrally") Stuntrally"
                 echo " 4) $(checkbox_package "supertuxkart") SupertuxKart"
                 echo " 5) $(checkbox_package "speed-dreams") Speed Dreams"
                 echo ""
