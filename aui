@@ -153,7 +153,7 @@ function package_install(){ #{{{
             fi
             #}}}
         else
-            echo -e "Package $PACKAGE already installed"
+            echo -e "Warning: $PACKAGE is up to date --skipping"
         fi
     done
 } #}}}
@@ -1406,7 +1406,7 @@ function install_office_apps(){
 while [ 1 ]
 do
     print_title "OFFICE APPS"
-    echo " 1) $(checkbox_package "libreoffice-base") LibreOffice"
+    echo " 1) $(checkbox_package "libreoffice-common") LibreOffice"
     echo " 2) $(checkbox_package "goffice") GnomeOffice [Abiword, Gnumeric]"
     echo " 3) $(checkbox_package "texlive-core") Latex"
     echo " 4) $(if [ "$KDE" -eq 1 ]; then  echo "$(checkbox_package "kchmviewer") Kchmviewer"; else echo "$(checkbox_package "chmsee") Chmsee"; fi)"
@@ -1422,7 +1422,8 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
-                package_install "libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram libreoffice-$LOCATION_LO"
+                print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
+                package_install "libreoffice-$LOCATION_LO libreoffice-common libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram"
                 package_install "hunspell-$LOCATION_HS"
                 if [ "$KDE" -eq 1 ]; then
                     package_install "libreoffice-kde4"
@@ -2230,8 +2231,9 @@ do
                 print_title "RACING"
                 echo " 1) $(checkbox_package "maniadrive") Maniadrive"
                 echo " 2) $(checkbox_package "death-rally") Death Rally"
-                echo " 3) $(checkbox_package "supertuxkart") SupertuxKart"
-                echo " 4) $(checkbox_package "speed-dreams") Speed Dreams"
+                echo " 3) $(checkbox_package "supertuxkart") Stuntrally"
+                echo " 4) $(checkbox_package "supertuxkart") SupertuxKart"
+                echo " 5) $(checkbox_package "speed-dreams") Speed Dreams"
                 echo ""
                 echo " b) BACK"
                 echo ""
@@ -2245,9 +2247,12 @@ do
                             package_install "death-rally"
                             ;;
                         3)
-                            package_install "supertuxkart"
+                            package_install "stuntrally"
                             ;;
                         4)
+                            package_install "supertuxkart"
+                            ;;
+                        5)
                             package_install "speed-dreams"
                             ;;
                         "b")
