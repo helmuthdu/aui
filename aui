@@ -427,74 +427,72 @@ function select_user(){
 #}}}
 #AUR HELPER {{{
 function choose_aurhelper(){
-while [ 1 ]
-do
     print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
-    echo "Choose your default AUR helper to install"
-    echo " 1) Yaourt"
-    echo " 2) Packer"
-    echo ""
-    read -p "$prompt1" OPTION
-    case "$OPTION" in
-        1)
-            if ! checkpackage "yaourt" ; then
-                pacman -S --noconfirm --needed base-devel yajl
-                su -l $USERNAME --command="
-                    wget http://aur.archlinux.org/packages/package-query/package-query.tar.gz;
-                    tar zxvf package-query.tar.gz;
-                    cd package-query;
-                    makepkg -si --noconfirm;
-                    cd ..;
-                    rm -fr package-query*
-                "
-                su -l $USERNAME --command="
-                    wget http://aur.archlinux.org/packages/yaourt/yaourt.tar.gz;
-                    tar zxvf yaourt.tar.gz;
-                    cd yaourt;
-                    makepkg -si --noconfirm;
-                    cd ..;
-                    rm -fr yaourt*
-                "
+    aurhelper=("Yaourt" "Packer")
+    PS3="$prompt1"
+    echo -e "Choose your default AUR helper to install\n"
+    select OPT in "${aurhelper[@]}"; do
+        case "$REPLY" in
+            1)
                 if ! checkpackage "yaourt" ; then
-                    echo "Yaourt not installed. EXIT now"
-                    pause_function
-                    exit 0
+                    pacman -S --noconfirm --needed base-devel yajl
+                    su -l $USERNAME --command="
+                        wget http://aur.archlinux.org/packages/package-query/package-query.tar.gz;
+                        tar zxvf package-query.tar.gz;
+                        cd package-query;
+                        makepkg -si --noconfirm;
+                        cd ..;
+                        rm -fr package-query*
+                    "
+                    su -l $USERNAME --command="
+                        wget http://aur.archlinux.org/packages/yaourt/yaourt.tar.gz;
+                        tar zxvf yaourt.tar.gz;
+                        cd yaourt;
+                        makepkg -si --noconfirm;
+                        cd ..;
+                        rm -fr yaourt*
+                    "
+                    if ! checkpackage "yaourt" ; then
+                        echo "Yaourt not installed. EXIT now"
+                        pause_function
+                        exit 0
+                    fi
                 fi
-            fi
-            install_status
-            YAOURT=1
-            break
-            ;;
-        2)
-            if ! checkpackage "packer" ; then
-                pacman -S --noconfirm --needed git jshon curl
-                su -l $USERNAME --command="
-                    wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
-                    tar zxvf packer.tar.gz;
-                    cd packer;
-                    makepkg -si --noconfirm;
-                    cd ..;
-                    rm -fr packer*
-                "
+                install_status
+                YAOURT=1
+                break
+                ;;
+            2)
                 if ! checkpackage "packer" ; then
-                    echo "Packer not installed. EXIT now"
-                    pause_function
-                    exit 0
+                    pacman -S --noconfirm --needed git jshon curl
+                    su -l $USERNAME --command="
+                        wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
+                        tar zxvf packer.tar.gz;
+                        cd packer;
+                        makepkg -si --noconfirm;
+                        cd ..;
+                        rm -fr packer*
+                    "
+                    if ! checkpackage "packer" ; then
+                        echo "Packer not installed. EXIT now"
+                        pause_function
+                        exit 0
+                    fi
                 fi
-            fi
-            install_status
-            PACKER=1
-            break
-            ;;
-        *)
-            print_line
-            echo "Invalid option. Try another one."
-            pause_function
-            ;;
-    esac
-done
-sumary "AUR Helper installation"
-pause_function
+                install_status
+                PACKER=1
+                break
+                ;;
+            *)
+                print_line
+                echo "Invalid option. Try another one."
+                pause_function
+                continue
+                ;;
+        esac
+    done
+    sumary "AUR Helper installation"
+    pause_function
 }
 #}}}
 #PACKMAN PACKAGE SIGNING {{{
