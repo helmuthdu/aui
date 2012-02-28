@@ -1101,7 +1101,7 @@ function install_desktop_environment(){
                             package_manager "geeqie"
                             ;;
                         3)
-                            package_manager "gmrum"
+                            package_manager "gmrun"
                             ;;
                         4)
                             package_manager "rxvt-unicode"
@@ -1511,9 +1511,9 @@ do
     print_title "SYSTEM TOOLS APPS"
     echo " 1) $(checkbox_package "gparted") Gparted"
     echo " 2) $(checkbox_package "grsync") Grsync"
-    echo " 2) $(checkbox_package "htop") Htop"
-    echo " 3) $(checkbox_package "virtualbox") Virtualbox"
-    echo " 4) $(checkbox_package "wine") Wine"
+    echo " 3) $(checkbox_package "htop") Htop"
+    echo " 4) $(checkbox_package "virtualbox") Virtualbox"
+    echo " 5) $(checkbox_package "wine") Wine"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1612,9 +1612,9 @@ while [ 1 ]
 do
     print_title "INTERNET APPS"
     echo " 1) $(checkbox_package "dropbox") Dropbox"
-    echo " 2) $(checkbox_package "google-earth") Google Earth"
-    echo " 3) $(checkbox_package "google-chrome") Google Chrome"
-    echo " 4) $(checkbox_package "chromium") Google Chromium"
+    echo " 2) $(checkbox_package "chromium") Chromium"
+    echo " 3) $(checkbox_package "google-earth") Google Earth"
+    echo " 4) $(checkbox_package "google-chrome") Google Chrome"
     echo " 5) $(checkbox_package "jdownloader") Jdownloader"
     echo " 6) $(checkbox_package "irssi") Irssi"
     echo " 7) $(checkbox_package "firefox") Mozilla Firefox"
@@ -1644,13 +1644,13 @@ do
                 fi
                 ;;
             2)
-                package_manager "google-earth"
+                package_manager "chromium flashplugin"
                 ;;
             3)
-                package_manager "google-chrome flashplugin"
+                package_manager "google-earth"
                 ;;
             4)
-                package_manager "chromium flashplugin"
+                package_manager "google-chrome flashplugin"
                 ;;
             5)
                 package_manager "jdownloader"
@@ -2389,7 +2389,7 @@ while [ 1 ]
 do
     print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
     echo " 1) $(checkbox_package "ttf-dejavu") ttf-dejavu"
-    echo " 2) $(checkbox_package "ttf-google-webfonts") ttf-google-webfonts (This may take a while)"
+    echo " 2) $(checkbox_package "ttf-google-webfonts") ttf-google-webfonts (WARNING: install time can be >= 20min)"
     echo " 3) $(checkbox_package "ttf-kochi-substitute") ttf-kochi-substitute (Japanese Support)"
     echo " 4) $(checkbox_package "ttf-liberation") ttf-liberation"
     echo " 5) $(checkbox_package "ttf-ms-fonts") ttf-ms-fonts"
