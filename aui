@@ -832,17 +832,185 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
-                            package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            #ICONS {{{
+                            while [ 1 ]
+                            do
+                                print_title "GNOME ICONS"
+                                echo " 1) $(checkbox_package "awoken-icons") Awoken"
+                                echo " 2) $(checkbox_package "faenza-icon-theme") Faenza"
+                                echo " 3) $(checkbox_package "faenza-cupertino-icon-theme") Faenza-Cupertino"
+                                echo " 4) $(checkbox_package "faience-icon-theme") Faience"
+                                echo " 5) $(checkbox_package "elementary-icons") Elementary"
+                                echo ""
+                                echo " b) BACK"
+                                echo ""
+                                read_option
+                                for OPT in ${OPTIONS[@]}; do
+                                    case "$OPT" in
+                                        1)
+                                            package_install "awoken-icons"
+                                            ;;
+                                        2)
+                                            package_install "faenza-icon-theme"
+                                            ;;
+                                        3)
+                                            package_install "faenza-cupertino-icon-theme"
+                                            ;;
+                                        4)
+                                            package_install "faience-icon-theme"
+                                            ;;
+                                        5)
+                                            package_install "elementary-icons"
+                                            ;;
+                                        "b")
+                                            break
+                                            ;;
+                                        *)
+                                            invalid_option
+                                            ;;
+                                    esac
+                                done
+                                if [ $OPT = "b" ];then break;fi
+                            done
+                            #}}}
                             ;;
                         2)
-                            package_install "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
+                            #THEMES {{{
+                            while [ 1 ]
+                            do
+                                print_title "GNOME THEMES"
+                                echo " 1) $(checkbox_package "gtk-theme-aldabra") Aldabra"
+                                echo " 2) $(checkbox_package "egtk-bzr") eGTK"
+                                echo " 3) $(checkbox_package "light-themes") Light (aka Ambiance/Radiance)"
+                                echo " 4) $(checkbox_package "orion-gtk-theme") Orion"
+                                echo " 5) $(checkbox_package "zukitwo-themes") Zukitwo"
+                                echo ""
+                                echo " b) BACK"
+                                echo ""
+                                read_option
+                                for OPT in ${OPTIONS[@]}; do
+                                    case "$OPT" in
+                                        1)
+                                            package_install "gtk-theme-aldabra"
+                                            ;;
+                                        2)
+                                            package_install "egtk-bzr"
+                                            ;;
+                                        3)
+                                            package_install "light-themes"
+                                            ;;
+                                        4)
+                                            package_install "orion-gtk-theme"
+                                            ;;
+                                        5)
+                                            package_install "zukitwo-themes"
+                                            ;;
+                                        "b")
+                                            break
+                                            ;;
+                                        *)
+                                            invalid_option
+                                            ;;
+                                    esac
+                                done
+                                if [ $OPT = "b" ];then break;fi
+                            done
+                            #}}}
                             ;;
                         3)
-                            package_install "libkeybinder3"
-                            package_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
+                            #GNOMESHELL EXTENSIONS {{{
+                            while [ 1 ]
+                            do
+                                print_title "GNOMESHELL EXTENSIONS"
+                                echo " 1) $(checkbox_package "gpaste") gpaste"
+                                echo " 2) $(checkbox_package "gnome-shell-extension-gtile-git") gtile"
+                                echo " 3) $(checkbox_package "gnome-shell-extension-mediaplayer-git") media-player"
+                                echo " 4) $(checkbox_package "gnome-shell-extension-noa11y-git") noa11y"
+                                echo " 5) $(checkbox_package "gnome-shell-extension-pomodoro") pomodoro"
+                                echo " 6) $(checkbox_package "gnome-shell-system-monitor-applet-git") system-monitor"
+                                echo " 7) $(checkbox_package "gnome-shell-extension-user-theme") user-theme"
+                                echo " 8) $(checkbox_package "gnome-shell-extension-weather-git") weather"
+                                echo ""
+                                echo " b) BACK"
+                                echo ""
+                                read_option
+                                for OPT in ${OPTIONS[@]}; do
+                                    case "$OPT" in
+                                        1)
+                                            package_install "gpaste"
+                                            ;;
+                                        2)
+                                            package_install "gnome-shell-extension-gtile-git"
+                                            ;;
+                                        3)
+                                            package_install "gnome-shell-extension-mediaplayer-git"
+                                            ;;
+                                        4)
+                                            package_install "gnome-shell-extension-noa11y-git"
+                                            ;;
+                                        5)
+                                            package_install "libkeybinder3"
+                                            package_install "gnome-shell-extension-pomodoro"
+                                            ;;
+                                        6)
+                                            package_install "gnome-shell-system-monitor-applet-git"
+                                            ;;
+                                        7)
+                                            package_install "gnome-shell-extension-user-theme"
+                                            ;;
+                                        8)
+                                            package_install "gnome-shell-extension-weather-git"
+                                            ;;
+                                        "b")
+                                            break
+                                            ;;
+                                        *)
+                                            invalid_option
+                                            ;;
+                                    esac
+                                done
+                                if [ $OPT = "b" ];then break;fi
+                            done
+                            #}}}
                             ;;
                         4)
-                            package_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
+                            #GNOMESHELL THEMES {{{
+                            while [ 1 ]
+                            do
+                                print_title "GNOMESHELL THEMES"
+                                echo " 1) $(checkbox_package "gnome-shell-theme-eos") eOS"
+                                echo " 2) $(checkbox_package "gnome-shell-theme-dark-shine") Dark Shine"
+                                echo " 3) $(checkbox_package "gnome-shell-theme-faience") Faience"
+                                echo " 4) $(checkbox_package "gnome-shell-theme-nord") Nord"
+                                echo ""
+                                echo " b) BACK"
+                                echo ""
+                                read_option
+                                for OPT in ${OPTIONS[@]}; do
+                                    case "$OPT" in
+                                        1)
+                                            package_install "gnome-shell-theme-eos"
+                                            ;;
+                                        2)
+                                            package_install "gnome-shell-theme-dark-shine"
+                                            ;;
+                                        3)
+                                            package_install "gnome-shell-theme-faience"
+                                            ;;
+                                        4)
+                                            package_install "gnome-shell-theme-nord"
+                                            ;;
+                                        "b")
+                                            break
+                                            ;;
+                                        *)
+                                            invalid_option
+                                            ;;
+                                    esac
+                                done
+                                if [ $OPT = "b" ];then break;fi
+                            done
+                            #}}}
                             ;;
                         5)
                             package_install "gnome-activity-journal"
@@ -968,7 +1136,47 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
-                            package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            #ICONS {{{
+                            while [ 1 ]
+                            do
+                                print_title "ICONS"
+                                echo " 1) $(checkbox_package "awoken-icons") Awoken"
+                                echo " 2) $(checkbox_package "faenza-icon-theme") Faenza"
+                                echo " 3) $(checkbox_package "faenza-cupertino-icon-theme") Faenza-Cupertino"
+                                echo " 4) $(checkbox_package "faience-icon-theme") Faience"
+                                echo " 5) $(checkbox_package "elementary-icons") Elementary"
+                                echo ""
+                                echo " b) BACK"
+                                echo ""
+                                read_option
+                                for OPT in ${OPTIONS[@]}; do
+                                    case "$OPT" in
+                                        1)
+                                            package_install "awoken-icons"
+                                            ;;
+                                        2)
+                                            package_install "faenza-icon-theme"
+                                            ;;
+                                        3)
+                                            package_install "faenza-cupertino-icon-theme"
+                                            ;;
+                                        4)
+                                            package_install "faience-icon-theme"
+                                            ;;
+                                        5)
+                                            package_install "elementary-icons"
+                                            ;;
+                                        "b")
+                                            break
+                                            ;;
+                                        *)
+                                            invalid_option
+                                            ;;
+                                    esac
+                                done
+                                if [ $OPT = "b" ];then break;fi
+                            done
+                            #}}}
                             ;;
                         2)
                             package_install "zukitwo-themes"
@@ -1009,7 +1217,47 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
-                            package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            #ICONS {{{
+                            while [ 1 ]
+                            do
+                                print_title "ICONS"
+                                echo " 1) $(checkbox_package "awoken-icons") Awoken"
+                                echo " 2) $(checkbox_package "faenza-icon-theme") Faenza"
+                                echo " 3) $(checkbox_package "faenza-cupertino-icon-theme") Faenza-Cupertino"
+                                echo " 4) $(checkbox_package "faience-icon-theme") Faience"
+                                echo " 5) $(checkbox_package "elementary-icons") Elementary"
+                                echo ""
+                                echo " b) BACK"
+                                echo ""
+                                read_option
+                                for OPT in ${OPTIONS[@]}; do
+                                    case "$OPT" in
+                                        1)
+                                            package_install "awoken-icons"
+                                            ;;
+                                        2)
+                                            package_install "faenza-icon-theme"
+                                            ;;
+                                        3)
+                                            package_install "faenza-cupertino-icon-theme"
+                                            ;;
+                                        4)
+                                            package_install "faience-icon-theme"
+                                            ;;
+                                        5)
+                                            package_install "elementary-icons"
+                                            ;;
+                                        "b")
+                                            break
+                                            ;;
+                                        *)
+                                            invalid_option
+                                            ;;
+                                    esac
+                                done
+                                if [ $OPT = "b" ];then break;fi
+                            done
+                            #}}}
                             ;;
                         2)
                             package_install "xfburn"
@@ -1065,7 +1313,47 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
-                            package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            #ICONS {{{
+                            while [ 1 ]
+                            do
+                                print_title "ICONS"
+                                echo " 1) $(checkbox_package "awoken-icons") Awoken"
+                                echo " 2) $(checkbox_package "faenza-icon-theme") Faenza"
+                                echo " 3) $(checkbox_package "faenza-cupertino-icon-theme") Faenza-Cupertino"
+                                echo " 4) $(checkbox_package "faience-icon-theme") Faience"
+                                echo " 5) $(checkbox_package "elementary-icons") Elementary"
+                                echo ""
+                                echo " b) BACK"
+                                echo ""
+                                read_option
+                                for OPT in ${OPTIONS[@]}; do
+                                    case "$OPT" in
+                                        1)
+                                            package_install "awoken-icons"
+                                            ;;
+                                        2)
+                                            package_install "faenza-icon-theme"
+                                            ;;
+                                        3)
+                                            package_install "faenza-cupertino-icon-theme"
+                                            ;;
+                                        4)
+                                            package_install "faience-icon-theme"
+                                            ;;
+                                        5)
+                                            package_install "elementary-icons"
+                                            ;;
+                                        "b")
+                                            break
+                                            ;;
+                                        *)
+                                            invalid_option
+                                            ;;
+                                    esac
+                                done
+                                if [ $OPT = "b" ];then break;fi
+                            done
+                            #}}}
                             ;;
                         2)
                             package_install "geeqie"
