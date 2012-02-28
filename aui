@@ -132,34 +132,6 @@ function checkbox_package(){ #{{{
         checkbox 0
     fi
 } #}}}
-function package_manager(){ #{{{
-    if ! checkpackage $1; then
-        for PACKAGE in $1; do
-            if ! checkpackage "$PACKAGE" ; then
-                if [ "$YAOURT" -eq 1 ]; then
-                    su -l $USERNAME --command="yaourt -S --noconfirm $PACKAGE"
-                else
-                    su -l $USERNAME --command="packer -S --noconfirm $PACKAGE"
-                fi
-                #FORCE CHECK #{{{
-                if ! checkpackage "$PACKAGE" ; then
-                    question_for_answer "Package $PACKAGE not installed, try install again?"
-                    if [ $OPTION = "y" ]; then
-                        if [ "$YAOURT" -eq 1 ]; then
-                            su -l $USERNAME --command="yaourt -S $PACKAGE"
-                        else
-                            su -l $USERNAME --command="packer -S --skipinteg $PACKAGE"
-                        fi
-                    fi
-                fi
-                #}}}
-            fi
-        done
-    else
-        pacman -Rsn $1
-        pause_function
-    fi
-} #}}}
 function package_install(){ #{{{
     for PACKAGE in $1; do
         if ! checkpackage "$PACKAGE" ; then
@@ -720,22 +692,22 @@ function install_additional_firmwares(){
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "ipw2100-fw"
+                            package_install "ipw2100-fw"
                             ;;
                         2)
-                            package_manager "ipw2200-fw"
+                            package_install "ipw2200-fw"
                             ;;
                         3)
-                            package_manager "b43-firmware"
+                            package_install "b43-firmware"
                             ;;
                         4)
-                            package_manager "b43-firmware-legacy"
+                            package_install "b43-firmware-legacy"
                             ;;
                         5)
-                            package_manager "broadcom-wl"
+                            package_install "broadcom-wl"
                             ;;
                         6)
-                            package_manager "bluez-firmware"
+                            package_install "bluez-firmware"
                             ;;
                         "d")
                             break
@@ -834,32 +806,32 @@ function install_desktop_environment(){
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                             ;;
                         2)
-                            package_manager "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
+                            package_install "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
                             ;;
                         3)
-                            package_manager "libkeybinder3"
-                            package_manager "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
+                            package_install "libkeybinder3"
+                            package_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
                             ;;
                         4)
-                            package_manager "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
+                            package_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos gnome-shell-theme-dark-shine"
                             ;;
                         5)
-                            package_manager "gnome-activity-journal"
+                            package_install "gnome-activity-journal"
                             ;;
                         6)
-                            package_manager "gnome-packagekit gnome-settings-daemon-updates"
+                            package_install "gnome-packagekit gnome-settings-daemon-updates"
                             ;;
                         "a")
-                            package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
-                            package_manager "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
-                            package_manager "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
-                            package_manager "libkeybinder3"
-                            package_manager "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
-                            package_manager "gnome-activity-journal"
-                            package_manager "gnome-packagekit gnome-settings-daemon-updates"
+                            package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            package_install "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
+                            package_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
+                            package_install "libkeybinder3"
+                            package_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
+                            package_install "gnome-activity-journal"
+                            package_install "gnome-packagekit gnome-settings-daemon-updates"
                             ;;
                         "d")
                             break
@@ -923,38 +895,38 @@ function install_desktop_environment(){
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "apper"
+                            package_install "apper"
                             ;;
                         2)
-                            package_manager "bangarang"
+                            package_install "bangarang"
                             ;;
                         3)
-                            package_manager "choqok"
+                            package_install "choqok"
                             ;;
                         4)
-                            package_manager "digikam"
+                            package_install "digikam"
                             ;;
                         5)
-                            package_manager "k3b dvd+rw-tools"
+                            package_install "k3b dvd+rw-tools"
                             ;;
                         6)
-                            package_manager "kfaenza-icon-theme"
+                            package_install "kfaenza-icon-theme"
                             ;;
                         7)
-                            package_manager "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
+                            package_install "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
                             ;;
                         8)
-                            package_manager "yakuake yakuake-skin-plasma-oxygen-panel"
+                            package_install "yakuake yakuake-skin-plasma-oxygen-panel"
                             ;;
                         "a")
-                            package_manager "choqok"
-                            package_manager "digikam"
-                            package_manager "k3b dvd+rw-tools"
-                            package_manager "apper"
-                            package_manager "bangarang"
-                            package_manager "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
-                            package_manager "kfaenza-icon-theme"
-                            package_manager "yakuake yakuake-skin-plasma-oxygen-panel"
+                            package_install "choqok"
+                            package_install "digikam"
+                            package_install "k3b dvd+rw-tools"
+                            package_install "apper"
+                            package_install "bangarang"
+                            package_install "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
+                            package_install "kfaenza-icon-theme"
+                            package_install "yakuake yakuake-skin-plasma-oxygen-panel"
                             ;;
                         "d")
                             break
@@ -994,10 +966,10 @@ function install_desktop_environment(){
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                             ;;
                         2)
-                            package_manager "zukitwo-themes"
+                            package_install "zukitwo-themes"
                             ;;
                         "d")
                             break
@@ -1037,10 +1009,10 @@ function install_desktop_environment(){
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                             ;;
                         2)
-                            package_manager "xfburn"
+                            package_install "xfburn"
                             ;;
                         "d")
                             break
@@ -1095,31 +1067,31 @@ function install_desktop_environment(){
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
+                            package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
                             ;;
                         2)
-                            package_manager "geeqie"
+                            package_install "geeqie"
                             ;;
                         3)
-                            package_manager "gmrun"
+                            package_install "gmrun"
                             ;;
                         4)
-                            package_manager "rxvt-unicode"
+                            package_install "rxvt-unicode"
                             ;;
                         5)
-                            package_manager "scrot"
+                            package_install "scrot"
                             ;;
                         6)
-                            package_manager "polkit-gnome gvfs-smb thunar"
+                            package_install "polkit-gnome gvfs-smb thunar"
                             ;;
                         7)
-                            package_manager "tint2"
+                            package_install "tint2"
                             ;;
                         8)
-                            package_manager "volwheel"
+                            package_install "volwheel"
                             ;;
                         9)
-                            package_manager "xfburn"
+                            package_install "xfburn"
                             ;;
                         "d")
                             break
@@ -1176,7 +1148,7 @@ function install_nm_wicd(){
             if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
                 pacman -S --noconfirm --needed wicd wicd-gtk
             elif [ "$KDE" -eq 1 ]; then
-                package_manager "wicd wicd-kde"
+                package_install "wicd wicd-kde"
             else
                 pacman -S --noconfirm --needed wicd
             fi
@@ -1219,47 +1191,47 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
-                package_manager "cairo-dock-bzr cairo-dock-plugins-bzr"
+                package_install "cairo-dock-bzr cairo-dock-plugins-bzr"
                 ;;
             2)
-                package_manager "conky conky-colors"
+                package_install "conky conky-colors"
                 sensors-detect
                 add_daemon "sensors"
                 ;;
             3)
-                package_manager "dockbarx dockbarx-shinybar-theme"
+                package_install "dockbarx dockbarx-shinybar-theme"
                 ;;
             4)
-                package_manager "docky"
+                package_install "docky"
                 ;;
             5)
                 if [ "$KDE" -eq 1 ]; then
-                    package_manager "speedcrunch"
+                    package_install "speedcrunch"
                 else
-                    package_manager "galculator"
+                    package_install "galculator"
                 fi
                 ;;
             6)
-                package_manager "gnome-pie"
+                package_install "gnome-pie"
                 ;;
             7)
-                package_manager "guake"
+                package_install "guake"
                 ;;
             8)
-                package_manager "kupfer"
+                package_install "kupfer"
                 ;;
             9)
-                package_manager "pyrenamer"
+                package_install "pyrenamer"
                 ;;
             10)
-                package_manager "shutter"
+                package_install "shutter"
                 ;;
             11)
-                package_manager "zeitgeist libzeitgeist zeitgeist-datahub"
-                package_manager "synapse"
+                package_install "zeitgeist libzeitgeist zeitgeist-datahub"
+                package_install "synapse"
                 ;;
             12)
-                package_manager "terminator python-keybinder"
+                package_install "terminator python-keybinder"
                 ;;
             "b")
                 break
@@ -1301,10 +1273,10 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
-                package_manager "aptana-studio"
+                package_install "aptana-studio"
                 ;;
             2)
-                package_manager "bluefish"
+                package_install "bluefish"
                 ;;
             3)
                 #ECLIPSE {{{
@@ -1327,31 +1299,31 @@ do
                     for OPT in $OPTION; do
                         case "$OPT" in
                             1)
-                                package_manager "eclipse"
+                                package_install "eclipse"
                                 ;;
                             2)
-                                package_manager "eclipse-cdt"
+                                package_install "eclipse-cdt"
                                 ;;
                             3)
-                                package_manager "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
+                                package_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
                                 ;;
                             4)
-                                package_manager "eclipse-wtp-wst"
+                                package_install "eclipse-wtp-wst"
                                 ;;
                             5)
-                                package_manager "eclipse-pdt"
+                                package_install "eclipse-pdt"
                                 ;;
                             6)
-                                package_manager "eclipse-pydev"
+                                package_install "eclipse-pydev"
                                 ;;
                             7)
-                                package_manager "eclipse-aptana"
+                                package_install "eclipse-aptana"
                                 ;;
                             8)
-                                package_manager "eclipse-vrapper"
+                                package_install "eclipse-vrapper"
                                 ;;
                             9)
-                                package_manager "eclipse-egit"
+                                package_install "eclipse-egit"
                                 ;;
                             "b")
                                 break
@@ -1367,11 +1339,11 @@ do
                 #}}}
                 ;;
             4)
-                package_manager "emacs"
+                package_install "emacs"
                 ;;
             5)
                 pacman -Rdd --noconfirm vim
-                package_manager "gvim wmctrl ctags discount"
+                package_install "gvim wmctrl ctags discount"
                 #HELMUTHDU'S VIMRC {{{
                 pacman -S --noconfirm --needed git
                 git clone git://github.com/helmuthdu/vim.git
@@ -1383,37 +1355,37 @@ do
                 #}}}
                 ;;
             6)
-                package_manager "geany"
+                package_install "geany"
                 ;;
             7)
-                package_manager "intellij-idea-community-edition"
+                package_install "intellij-idea-community-edition"
                 ;;
             8)
-                package_manager "netbeans"
+                package_install "netbeans"
                 ;;
             9)
                 pacman -Rdd --noconfirm jre7-openjdk
                 pacman -Rdd --noconfirm jdk7-openjdk
-                package_manager "jdk"
+                package_install "jdk"
                 ;;
             10)
-                package_manager "qtcreator qt-doc"
+                package_install "qtcreator qt-doc"
                 mkdir -p /home/$USERNAME/.config/Nokia/qtcreator/styles
                 wget http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
                 mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
                 chown -R $USERNAME:users /home/$USERNAME/.config
                 ;;
             11)
-                package_manager "sublime-text"
+                package_install "sublime-text"
                 ;;
             12)
-                package_manager "valgrind gdb splint tidyhtml pyflakes jsl"
+                package_install "valgrind gdb splint tidyhtml pyflakes jsl"
                 ;;
             13)
-                package_manager "mysql-workbench"
+                package_install "mysql-workbench"
                 ;;
             14)
-                package_manager "meld"
+                package_install "meld"
                 ;;
             "b")
                 break
@@ -1450,47 +1422,47 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
-                package_manager "libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram libreoffice-$LOCATION_LO"
-                package_manager "hunspell-$LOCATION_HS"
+                package_install "libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram libreoffice-$LOCATION_LO"
+                package_install "hunspell-$LOCATION_HS"
                 if [ "$KDE" -eq 1 ]; then
-                    package_manager "libreoffice-kde4"
+                    package_install "libreoffice-kde4"
                 else
-                    package_manager "libreoffice-gnome"
+                    package_install "libreoffice-gnome"
                 fi
                 ;;
             2)
-                package_manager "gnumeric abiword abiword-plugins"
+                package_install "gnumeric abiword abiword-plugins"
                 ;;
             3)
                 print_title "LATEX - https://wiki.archlinux.org/index.php/LaTeX"
-                package_manager "texlive-most"
-                package_manager "texmaker"
-                package_manager "latex-template-springer latex-template-ieee latex-beamer"
+                package_install "texlive-most"
+                package_install "texmaker"
+                package_install "latex-template-springer latex-template-ieee latex-beamer"
                 if [ $LOCATION = "pt_BR" ]; then
-                    package_manager "abntex"
+                    package_install "abntex"
                 fi
                 ;;
             4)
                 if [ "$KDE" -eq 1 ]; then
-                    package_manager "kchmviewer"
+                    package_install "kchmviewer"
                 else
-                    package_manager "chmsee"
+                    package_install "chmsee"
                 fi
                 ;;
             5)
-                package_manager "gcstar"
+                package_install "gcstar"
                 ;;
             6)
-                package_manager "wunderlist"
+                package_install "wunderlist"
                 ;;
             7)
-                package_manager "xmind"
+                package_install "xmind"
                 ;;
             8)
-                package_manager "zathura"
+                package_install "zathura"
                 ;;
             9)
-                package_manager "impressive"
+                package_install "impressive"
                 ;;
             "b")
                 break
@@ -1523,23 +1495,23 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
-                package_manager "gparted"
+                package_install "gparted"
                 ;;
             2)
-                package_manager "grsync"
+                package_install "grsync"
                 ;;
             3)
-                package_manager "htop"
+                package_install "htop"
                 ;;
             4)
-                package_manager "virtualbox virtualbox-additions virtualbox-ext-oracle"
+                package_install "virtualbox virtualbox-additions virtualbox-ext-oracle"
                 modprobe vboxdrv
                 groupadd vboxusers
                 gpasswd -a $USERNAME vboxusers
                 add_module "vboxdrv"
                 ;;
             5)
-                package_manager "wine wine_gecko winetricks"
+                package_install "wine wine_gecko winetricks"
                 ;;
             "b")
                 break
@@ -1574,25 +1546,25 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
-                package_manager "blender"
+                package_install "blender"
                 ;;
             2)
-                package_manager "gimp"
+                package_install "gimp"
                 ;;
             3)
-                package_manager "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
+                package_install "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
                 ;;
             4)
-                package_manager "gthumb"
+                package_install "gthumb"
                 ;;
             5)
-                package_manager "inkscape uniconvertor python2-numpy python-lxml sozi"
+                package_install "inkscape uniconvertor python2-numpy python-lxml sozi"
                 ;;
             6)
-                package_manager "mcomix"
+                package_install "mcomix"
                 ;;
             7)
-                package_manager "shotwell"
+                package_install "shotwell"
                 ;;
             "b")
                 break
@@ -1634,62 +1606,62 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
-                package_manager "dropbox"
+                package_install "dropbox"
                 if [ "$GNOME" -eq 1 ]; then
-                    package_manager "nautilus-dropbox"
+                    package_install "nautilus-dropbox"
                 elif [ "$XFCE" -eq 1 ]; then
-                    package_manager "thunar-dropbox"
+                    package_install "thunar-dropbox"
                 elif [ "$KDE" -eq 1 ]; then
-                    package_manager "kfilebox"
+                    package_install "kfilebox"
                 else
-                    package_manager "dropbox-cli"
+                    package_install "dropbox-cli"
                 fi
                 ;;
             2)
-                package_manager "chromium flashplugin"
+                package_install "chromium flashplugin"
                 ;;
             3)
-                package_manager "google-earth"
+                package_install "google-earth"
                 ;;
             4)
-                package_manager "google-chrome flashplugin"
+                package_install "google-chrome flashplugin"
                 ;;
             5)
-                package_manager "jdownloader"
+                package_install "jdownloader"
                 ;;
             6)
-                package_manager "irssi"
+                package_install "irssi"
                 ;;
             7)
-                package_manager "firefox firefox-i18n-$LOCATION_FF flashplugin "
+                package_install "firefox firefox-i18n-$LOCATION_FF flashplugin "
                 ;;
             8)
-                package_manager "thunderbird thunderbird-i18n-$LOCATION_FF"
+                package_install "thunderbird thunderbird-i18n-$LOCATION_FF"
                 ;;
             9)
-                package_manager "pidgin"
+                package_install "pidgin"
                 ;;
             10)
-                package_manager "skype"
+                package_install "skype"
                 ;;
             11)
-                package_manager "teamspeak3"
+                package_install "teamspeak3"
                 ;;
             12)
-                package_manager "teamviewer"
+                package_install "teamviewer"
                 ;;
             13)
                 if [ "$KDE" -eq 1 ]; then
-                    package_manager "transmission-qt"
+                    package_install "transmission-qt"
                 else
-                    package_manager "transmission-gtk"
+                    package_install "transmission-gtk"
                 fi
                 ;;
             14)
                 if [ "$KDE" -eq 1 ]; then
-                    package_manager "konversation"
+                    package_install "konversation"
                 else
-                    package_manager "xchat"
+                    package_install "xchat"
                 fi
                 ;;
             "b")
@@ -1776,50 +1748,50 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
-                package_manager "amarok"
+                package_install "amarok"
                 ;;
             2)
-                package_manager "banshee"
+                package_install "banshee"
                 ;;
             3)
-                package_manager "beatbox-bzr"
+                package_install "beatbox-bzr"
                 ;;
             4)
-                package_manager "clementine"
+                package_install "clementine"
                 ;;
             5)
-                package_manager "decibel-audio-player2"
+                package_install "decibel-audio-player2"
                 ;;
             6)
-                package_manager "exaile"
+                package_install "exaile"
                 ;;
             7)
-                package_manager "gmusicbrowser-development"
+                package_install "gmusicbrowser-development"
                 ;;
             8)
-                package_manager "musique"
+                package_install "musique"
                 ;;
             9)
-                package_manager "nuvola-bzr-stable"
+                package_install "nuvola-bzr-stable"
                 ;;
             10)
-                package_manager "rhythmbox"
+                package_install "rhythmbox"
                 ;;
             11)
-                package_manager "spotify"
+                package_install "spotify"
                 ;;
             12)
-                package_manager "puddletag"
+                package_install "puddletag"
                 ;;
             13)
-                package_manager "timidity++ fluidr3"
+                package_install "timidity++ fluidr3"
                 echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                 ;;
             14)
-                package_manager "gstreamer0.10-plugins"
+                package_install "gstreamer0.10-plugins"
                 ;;
             15)
-                package_manager "audacity"
+                package_install "audacity"
                 ;;
             "b")
                 break
@@ -1861,55 +1833,55 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
-                package_manager "gnome-mplayer"
+                package_install "gnome-mplayer"
                 ;;
             2)
-                package_manager "parole"
+                package_install "parole"
                 ;;
             3)
-                package_manager "minitube"
+                package_install "minitube"
                 ;;
             4)
-                package_manager "rosa-media-player-bin"
+                package_install "rosa-media-player-bin"
                 ;;
             5)
-                package_manager "smplayer smplayer-themes"
+                package_install "smplayer smplayer-themes"
                 ;;
             6)
-                package_manager "vlc"
+                package_install "vlc"
                 if [ "$KDE" -eq 1 ]; then
-                    package_manager "phonon-vlc"
+                    package_install "phonon-vlc"
                 fi
                 ;;
             7)
-                package_manager "xbmc"
+                package_install "xbmc"
                 ;;
             8)
-                package_manager "arista-transcoder"
+                package_install "arista-transcoder"
                 ;;
             9)
-                package_manager "transmageddon"
+                package_install "transmageddon"
                 ;;
             10)
-                package_manager "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
+                package_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
                 if [ "$ARCHI" = "i686" ]; then
-                    package_manager "codecs"
+                    package_install "codecs"
                 else
-                    package_manager "codecs64"
+                    package_install "codecs64"
                 fi
                 ;;
             11)
-                package_manager "kdenlive"
+                package_install "kdenlive"
                 ;;
             12)
-                package_manager "openshot"
+                package_install "openshot"
                 ;;
             13)
-                package_manager "pitivi"
+                package_install "pitivi"
                 ;;
             14)
-                package_manager "python-rsvg"
-                package_manager "kazam-bzr"
+                package_install "python-rsvg"
+                package_install "kazam-bzr"
                 ;;
             "b")
                 break
@@ -1963,19 +1935,19 @@ do
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "astromenace"
+                            package_install "astromenace"
                             ;;
                         2)
-                            package_manager "opentyrian-hg"
+                            package_install "opentyrian-hg"
                             ;;
                         3)
-                            package_manager "mars-shooter"
+                            package_install "mars-shooter"
                             ;;
                         4)
-                            package_manager "yofrankie"
+                            package_install "yofrankie"
                             ;;
                         5)
-                            package_manager "counter-strike-2d"
+                            package_install "counter-strike-2d"
                             ;;
                         "b")
                             break
@@ -2010,25 +1982,25 @@ do
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "opensonic"
+                            package_install "opensonic"
                             ;;
                         2)
-                            package_manager "frogatto"
+                            package_install "frogatto"
                             ;;
                         3)
-                            package_manager "bomberclone"
+                            package_install "bomberclone"
                             ;;
                         4)
-                            package_manager "goonies"
+                            package_install "goonies"
                             ;;
                         5)
-                            package_manager "neverball"
+                            package_install "neverball"
                             ;;
                         6)
-                            package_manager "smc"
+                            package_install "smc"
                             ;;
                         7)
-                            package_manager "xmoto"
+                            package_install "xmoto"
                             ;;
                         "b")
                             break
@@ -2059,13 +2031,13 @@ do
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "tome4"
+                            package_install "tome4"
                             ;;
                         2)
-                            package_manager "lostlabyrinth"
+                            package_install "lostlabyrinth"
                             ;;
                         3)
-                            package_manager "scourge"
+                            package_install "scourge"
                             ;;
                         "b")
                             break
@@ -2095,10 +2067,10 @@ do
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "vba-m-gtk-svn"
+                            package_install "vba-m-gtk-svn"
                             ;;
                         2)
-                            package_manager "zsnes"
+                            package_install "zsnes"
                             ;;
                         "b")
                             break
@@ -2130,16 +2102,16 @@ do
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "alienarena"
+                            package_install "alienarena"
                             ;;
                         2)
-                            package_manager "enemy-territory"
+                            package_install "enemy-territory"
                             ;;
                         3)
-                            package_manager "worldofpadman"
+                            package_install "worldofpadman"
                             ;;
                         4)
-                            package_manager "warsow"
+                            package_install "warsow"
                             ;;
 
                         "b")
@@ -2171,13 +2143,13 @@ do
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "hon"
+                            package_install "hon"
                             ;;
                         2)
-                            package_manager "savage2"
+                            package_install "savage2"
                             ;;
                         3)
-                            package_manager "spiral-knights"
+                            package_install "spiral-knights"
                             ;;
                         "b")
                             break
@@ -2206,7 +2178,7 @@ do
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "numptyphysics-svn"
+                            package_install "numptyphysics-svn"
                             ;;
                         "b")
                             break
@@ -2235,7 +2207,7 @@ do
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "ardentryst"
+                            package_install "ardentryst"
                             ;;
                         "b")
                             break
@@ -2267,16 +2239,16 @@ do
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "maniadrive"
+                            package_install "maniadrive"
                             ;;
                         2)
-                            package_manager "death-rally"
+                            package_install "death-rally"
                             ;;
                         3)
-                            package_manager "supertuxkart"
+                            package_install "supertuxkart"
                             ;;
                         4)
-                            package_manager "speed-dreams"
+                            package_install "speed-dreams"
                             ;;
                         "b")
                             break
@@ -2307,13 +2279,13 @@ do
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "simutrans"
+                            package_install "simutrans"
                             ;;
                         2)
-                            package_manager "corsix-th"
+                            package_install "corsix-th"
                             ;;
                         3)
-                            package_manager "openttd"
+                            package_install "openttd"
                             ;;
                         "b")
                             break
@@ -2347,22 +2319,22 @@ do
                 for OPT in $OPTION; do
                     case "$OPT" in
                         1)
-                            package_manager "wesnoth"
+                            package_install "wesnoth"
                             ;;
                         3)
-                            package_manager "0ad"
+                            package_install "0ad"
                             ;;
                         4)
-                            package_manager "hedgewars"
+                            package_install "hedgewars"
                             ;;
                         5)
-                            package_manager "warzone2100"
+                            package_install "warzone2100"
                             ;;
                         6)
-                            package_manager "megaglest"
+                            package_install "megaglest"
                             ;;
                         7)
-                            package_manager "commander-zod"
+                            package_install "commander-zod"
                             ;;
                         "b")
                             break
@@ -2406,35 +2378,35 @@ do
     for OPT in $OPTION; do
         case "$OPT" in
             1)
-                package_manager "ttf-dejavu"
+                package_install "ttf-dejavu"
                 ;;
             2)
                 pacman -Rdd --noconfirm ttf-droid
                 pacman -Rdd --noconfirm ttf-ubuntu-font-family
-                package_manager "ttf-google-webfonts"
+                package_install "ttf-google-webfonts"
                 ;;
             3)
-                package_manager "ttf-kochi-substitute"
+                package_install "ttf-kochi-substitute"
                 ;;
             4)
-                package_manager "ttf-liberation"
+                package_install "ttf-liberation"
                 ;;
             5)
-                package_manager "ttf-ms-fonts"
+                package_install "ttf-ms-fonts"
                 ;;
             6)
-                package_manager "ttf-roboto"
+                package_install "ttf-roboto"
                 ;;
             7)
-                package_manager "ttf-vista-fonts"
+                package_install "ttf-vista-fonts"
                 ;;
             8)
-                package_manager "ttf-mac-fonts"
+                package_install "ttf-mac-fonts"
                 ;;
             "a")
                 pacman -Rdd --noconfirm ttf-droid
                 pacman -Rdd --noconfirm ttf-ubuntu-font-family
-                package_manager "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts ttf-mac-fonts"
+                package_install "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts ttf-mac-fonts"
                 ;;
             "b")
                 break

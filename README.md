@@ -39,13 +39,13 @@ You can try it first with a `virtualbox`
 - Install Additional wireless/bluetooth firmwares
 - Ensuring access to GIT through a firewall
 - Install a Desktop Environment [GNOME, KDE, XFCE, LXDE, OpenBox]
-- Install/Remove Developement tools [Vim, Emacs, Eclipse...]
-- Install/Remove Office apps [LibreOffice, GNOME-Office, Latex...]
-- Install/Remove System tools [Wine, Virtualbox, Grsync, Htop]
-- Install/Remove Graphics apps [Inkscape, Gimp, Blender, MComix]
-- Install/Remove Internet apps [Firefox, Google-Chrome, Jdownloader...]
-- Install/Remove Multimedia apps [Rhythmbox, Clementine, Codecs...]
-- Install/Remove Games [HoN, World of Padman, Wesnoth...]
-- Install/Remove Fonts [Liberation, MS-Fonts, Google-webfonts...]
+- Install Developement tools [Vim, Emacs, Eclipse...]
+- Install Office apps [LibreOffice, GNOME-Office, Latex...]
+- Install System tools [Wine, Virtualbox, Grsync, Htop]
+- Install Graphics apps [Inkscape, Gimp, Blender, MComix]
+- Install Internet apps [Firefox, Google-Chrome, Jdownloader...]
+- Install Multimedia apps [Rhythmbox, Clementine, Codecs...]
+- Install Games [HoN, World of Padman, Wesnoth...]
+- Install Fonts [Liberation, MS-Fonts, Google-webfonts...]
 - Install and configure LAMP Server
 - Many More...
