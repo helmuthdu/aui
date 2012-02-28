@@ -399,7 +399,15 @@ function select_user(){
         read -p "Username: " USERNAME
         useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
         passwd $USERNAME
-        #ENABLE SUDO #{{{
+        pacman -S --noconfirm --needed git
+        #BASHRC {{{
+            git clone git://github.com/helmuthdu/dotfiles
+            cp dotfiles/.* ~
+            cp dotfiles/.* /home/$USERNAME/
+            chown $USERNAME:users /home/$USERNAME/.*
+            rm -fr dotfiles
+        #}}}
+        #ENABLE SUDO {{{
             print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
             pacman -S --noconfirm --needed sudo
             ## Uncomment to allow members of group wheel to execute any command
@@ -416,11 +424,11 @@ function select_user(){
         echo -e "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES\n"
     fi
     select OPT in "${users[@]}" "Create new user"; do
-        if contains_element "$OPT" "${users[@]}"; then
-            USERNAME=$OPT
-            break
-        elif [ "$OPT" == "Create new user" ]; then
+        if [ "$OPT" == "Create new user" ]; then
             create_new_user
+            break
+        elif contains_element "$OPT" "${users[@]}"; then
+            USERNAME=$OPT
             break
         else
             invalid_option
@@ -1334,8 +1342,7 @@ do
                 mv vim /home/$USERNAME/.vim
                 git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
                 ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
-                chown -R $USERNAME:users /home/$USERNAME/.vim
-                chown $USERNAME:users /home/$USERNAME/.vimrc
+                chown -R $USERNAME:users /home/$USERNAME/.vim*
                 #}}}
                 ;;
             6)
@@ -1405,7 +1412,7 @@ do
         case "$OPT" in
             1)
                 print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
-                package_install "libreoffice-$LOCATION_LO libreoffice-common libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram"
+                pacman -S --noconfirm --needed libreoffice-$LOCATION_LO libreoffice-common libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram
                 package_install "hunspell-$LOCATION_HS"
                 if [ "$KDE" -eq 1 ]; then
                     package_install "libreoffice-kde4"
@@ -1418,7 +1425,7 @@ do
                 ;;
             3)
                 print_title "LATEX - https://wiki.archlinux.org/index.php/LaTeX"
-                package_install "texlive-most"
+                pacman -S --noconfirm --needed texlive-most
                 package_install "texmaker"
                 package_install "latex-template-springer latex-template-ieee latex-beamer"
                 if [ $LOCATION = "pt_BR" ]; then
