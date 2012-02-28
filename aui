@@ -45,7 +45,8 @@ CLEANPACKAGES=0
 
 ARCHI=`uname -m`
 
-prompt="Please enter your choice(s): "
+prompt1="Please enter your choice(s): "
+prompt2="Enter n° of options to install (ex: 1 2 3 or 1-3): "
 
 # AUTOMATICALLY DETECTS THE SYSTEM LANGUAGE BASED ON YOUR RC.CONF#{{{
     LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | cut -c9-13`
@@ -160,6 +161,21 @@ function package_install(){ #{{{
 function contains_element(){ #{{{
     for e in "${@:2}"; do [[ "$e" = "$1" ]] && break; done;
 } #}}}
+function read_option(){ #{{{
+    local line packages
+    read -p "$prompt2" OPTION
+    option=($OPTION)
+    for line in ${option[@]/,/ }; do
+        if [[ ${line/-/} != $line ]]; then
+            for ((i=${line%-*}; i<=${line#*-}; i++)); do
+                packages+=($i);
+            done
+        else
+            packages+=($line)
+        fi
+    done
+    OPTIONS=("${packages[@]}")
+} #}}}
 function install_status(){ #{{{
     if [ $? -ne 0 ] ; then
         CURRENT_STATUS=-1
@@ -220,7 +236,7 @@ function welcome(){
     print_line
     echo "it's highly recommended that you read this script before using it"
     echo "This version is still in BETA. Send bugreports to: "
-    echo "www.github.com/helmuthdu/aui"
+    echo "http://www.github.com/helmuthdu/aui"
     pause_function
 }
 #}}}
@@ -300,30 +316,37 @@ function custom_repositories(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "$prompt" OPTION
-                case "$OPTION" in
-                    1)
-                        echo -e '\n[ayatana]\nServer = http://repo.ayatana.info/' >> /etc/pacman.conf
-                        pause_function
-                        ;;
-                    2)
-                        echo -e '\n[archlinuxfr]\nServer = http://repo.archlinux.fr/$arch' >> /etc/pacman.conf
-                        pause_function
-                        ;;
-                    3)
-                        echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
-                        pause_function
-                        ;;
-                    "a")
-                        read -p "Repository Name [ex: custom]: " REPONAME
-                        read -p "Repository Address [ex: file:///media/backup/Archlinux/]: " REPOADDRESS
-                        echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"'$arch' >> /etc/pacman.conf
-                        pause_function
-                        ;;
-                    *)
-                        break
-                        ;;
-                esac
+                read_option
+                for OPT in ${OPTIONS[@]}; do
+                    case $OPT in
+                        1)
+                            echo -e '\n[ayatana]\nServer = http://repo.ayatana.info/' >> /etc/pacman.conf
+                            pause_function
+                            ;;
+                        2)
+                            echo -e '\n[archlinuxfr]\nServer = http://repo.archlinux.fr/$arch' >> /etc/pacman.conf
+                            pause_function
+                            ;;
+                        3)
+                            echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+                            pause_function
+                            ;;
+                        "a")
+                            read -p "Repository Name [ex: custom]: " REPONAME
+                            read -p "Repository Address [ex: file:///media/backup/Archlinux/]: " REPOADDRESS
+                            echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"'$arch' >> /etc/pacman.conf
+                            pause_function
+                            ;;
+                        "d")
+                            break
+                            ;;
+                        *)
+                            print_line
+                            echo "Invalid option. Try another one."
+                            pause_function
+                            ;;
+                    esac
+                done
             done
             pacman -Sy
             install_status
@@ -382,7 +405,7 @@ function select_user(){
     } #}}}
     print_title "SELECT USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
     users=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
-    PS3="$prompt"
+    PS3="$prompt1"
     echo "Avaliable Users:"
     if [ $(( ${#users[@]} )) -gt 0 ]; then
         echo -e "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES\n"
@@ -411,7 +434,7 @@ do
     echo " 1) Yaourt"
     echo " 2) Packer"
     echo ""
-    read -p "$prompt" OPTION
+    read -p "$prompt1" OPTION
     case "$OPTION" in
         1)
             if ! checkpackage "yaourt" ; then
@@ -603,7 +626,7 @@ function install_video_cards(){
     echo ""
     echo " s) SKIP"
     echo ""
-    read -p "$prompt" OPTION
+    read -p "$prompt1" OPTION
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed libgl xf86-video-intel
@@ -688,8 +711,8 @@ function install_additional_firmwares(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "ipw2100-fw"
@@ -775,7 +798,7 @@ function install_desktop_environment(){
     echo " 5) OpenBox"
     echo ""
     echo " b) BACK"
-    read -p "$prompt" OPTION
+    read -p "$prompt1" OPTION
     case "$OPTION" in
         1)
             #GNOME {{{
@@ -799,11 +822,10 @@ function install_desktop_environment(){
                 echo " 5) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
                 echo " 6) $(checkbox_package "gnome-packagekit") Packagekit"
                 echo ""
-                echo " a) ALL"
                 echo " d) DONE"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
@@ -822,15 +844,6 @@ function install_desktop_environment(){
                             package_install "gnome-activity-journal"
                             ;;
                         6)
-                            package_install "gnome-packagekit gnome-settings-daemon-updates"
-                            ;;
-                        "a")
-                            package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
-                            package_install "egtk-bzr zukitwo-themes orion-gtk-theme light-themes gtk-theme-aldabra"
-                            package_install "gnome-shell-theme-faience gnome-shell-theme-nord gnome-shell-theme-eos"
-                            package_install "libkeybinder3"
-                            package_install "gpaste gnome-shell-system-monitor-applet-git gnome-shell-extension-noa11y-git gnome-shell-extension-weather-git gnome-shell-extension-user-theme gnome-shell-extension-pomodoro gnome-shell-extension-mediaplayer-git gnome-shell-extension-gtile-git"
-                            package_install "gnome-activity-journal"
                             package_install "gnome-packagekit gnome-settings-daemon-updates"
                             ;;
                         "d")
@@ -888,11 +901,10 @@ function install_desktop_environment(){
                 echo " 7) $(checkbox_package "plasma-theme-produkt") Plasma Themes [Caledonia, Produkt, Ronak]"
                 echo " 8) $(checkbox_package "yakuake") Yakuake"
                 echo ""
-                echo " a) ALL"
                 echo " d) DONE"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "apper"
@@ -916,16 +928,6 @@ function install_desktop_environment(){
                             package_install "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
                             ;;
                         8)
-                            package_install "yakuake yakuake-skin-plasma-oxygen-panel"
-                            ;;
-                        "a")
-                            package_install "choqok"
-                            package_install "digikam"
-                            package_install "k3b dvd+rw-tools"
-                            package_install "apper"
-                            package_install "bangarang"
-                            package_install "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
-                            package_install "kfaenza-icon-theme"
                             package_install "yakuake yakuake-skin-plasma-oxygen-panel"
                             ;;
                         "d")
@@ -962,8 +964,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
@@ -1005,8 +1007,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
@@ -1063,8 +1065,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "faenza-icon-theme faience-icon-theme faenza-cupertino-icon-theme elementary-icons"
@@ -1126,7 +1128,7 @@ function install_nm_wicd(){
     echo ""
     echo " s) SKIP"
     echo ""
-    read -p "$prompt" OPTION
+    read -p "$prompt1" OPTION
     case "$OPTION" in
         1)
             print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
@@ -1187,8 +1189,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt" OPTION
-    for OPT in $OPTION; do
+    read_option
+    for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
                 package_install "cairo-dock-bzr cairo-dock-plugins-bzr"
@@ -1269,8 +1271,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt" OPTION
-    for OPT in $OPTION; do
+    read_option
+    for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
                 package_install "aptana-studio"
@@ -1295,8 +1297,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read -p "$prompt" OPTION
-                    for OPT in $OPTION; do
+                    read_option
+                    for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
                                 package_install "eclipse"
@@ -1418,8 +1420,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt" OPTION
-    for OPT in $OPTION; do
+    read_option
+    for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
                 print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
@@ -1492,8 +1494,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt" OPTION
-    for OPT in $OPTION; do
+    read_option
+    for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
                 package_install "gparted"
@@ -1543,8 +1545,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt" OPTION
-    for OPT in $OPTION; do
+    read_option
+    for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
                 package_install "blender"
@@ -1603,8 +1605,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt" OPTION
-    for OPT in $OPTION; do
+    read_option
+    for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
                 package_install "dropbox"
@@ -1745,8 +1747,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt" OPTION
-    for OPT in $OPTION; do
+    read_option
+    for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
                 package_install "amarok"
@@ -1830,8 +1832,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt" OPTION
-    for OPT in $OPTION; do
+    read_option
+    for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
                 package_install "gnome-mplayer"
@@ -1917,7 +1919,7 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt" OPTION
+    read -p "$prompt1" OPTION
     case "$OPTION" in
         1)
             #ACTION/ADVENTURE {{{
@@ -1932,8 +1934,8 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "astromenace"
@@ -1979,8 +1981,8 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "opensonic"
@@ -2028,8 +2030,8 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "tome4"
@@ -2064,8 +2066,8 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "vba-m-gtk-svn"
@@ -2099,8 +2101,8 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "alienarena"
@@ -2140,8 +2142,8 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "hon"
@@ -2175,8 +2177,8 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "numptyphysics-svn"
@@ -2205,8 +2207,8 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "ardentryst"
@@ -2241,8 +2243,8 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "maniadrive"
@@ -2284,8 +2286,8 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "simutrans"
@@ -2324,8 +2326,8 @@ do
                 echo ""
                 echo " b) BACK"
                 echo ""
-                read -p "$prompt" OPTION
-                for OPT in $OPTION; do
+                read_option
+                for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
                             package_install "wesnoth"
@@ -2380,11 +2382,10 @@ do
     echo " 7) $(checkbox_package "ttf-vista-fonts") ttf-vista-fonts"
     echo " 8) $(checkbox_package "ttf-mac-fonts") ttf-mac-fonts"
     echo ""
-    echo " a) ALL"
     echo " b) BACK"
     echo ""
-    read -p "$prompt" OPTION
-    for OPT in $OPTION; do
+    read_option
+    for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
                 package_install "ttf-dejavu"
@@ -2412,11 +2413,6 @@ do
             8)
                 package_install "ttf-mac-fonts"
                 ;;
-            "a")
-                pacman -Rdd --noconfirm ttf-droid
-                pacman -Rdd --noconfirm ttf-ubuntu-font-family
-                package_install "ttf-ms-fonts ttf-dejavu ttf-liberation ttf-kochi-substitute ttf-roboto ttf-google-webfonts ttf-vista-fonts ttf-mac-fonts"
-                ;;
             "b")
                 break
                 ;;
@@ -2440,7 +2436,7 @@ function configure_fonts(){
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt" OPTION
+    read -p "$prompt1" OPTION
     case "$OPTION" in
         1)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
@@ -2457,7 +2453,7 @@ function configure_fonts(){
             package_install "freetype2-infinality fontconfig-infinality"
             /etc/profile.d/infinality-settings.sh
             infctl=("infinality" "linux" "osx" "osx2" "win7" "winxp")
-            PS3="$prompt"
+            PS3="$prompt1"
             echo ""
             select OPT in "${infctl[@]}"; do
                 if contains_element "$OPT" "${infctl[@]}"; then
@@ -2525,8 +2521,8 @@ do
     echo ""
     echo " q) Quit"
     echo ""
-    read -p "$prompt" OPTION
-    for OPT in $OPTION; do
+    read_option
+    for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
                 custom_repositories
