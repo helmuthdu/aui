@@ -15,7 +15,7 @@ You can try it first with a `virtualbox`
 
 ### With git
 - Install git: `pacman -Sy git`
-- get the script: `git clone git://github.com/helmuthdu/aui.git`
+- get the script: `git clone git://github.com/helmuthdu/aui`
 - run the script: `cd aui && ./aui`
 
 ### Without git
