@@ -1630,7 +1630,7 @@ do
                 ;;
             5)
                 pacman -Rdd --noconfirm vim
-                package_install "gvim wmctrl ctags discount"
+                package_install "gvim wmctrl ctags ack discount"
                 #HELMUTHDU'S VIMRC {{{
                 pacman -S --noconfirm --needed git
                 git clone git://github.com/helmuthdu/vim.git
@@ -1692,7 +1692,7 @@ do
     print_title "OFFICE APPS"
     echo " 1) $(checkbox_package "libreoffice-common") LibreOffice"
     echo " 2) $(checkbox_package "goffice") GnomeOffice [Abiword, Gnumeric]"
-    echo " 3) $(checkbox_package "texlive-core") Latex"
+    echo " 3) $(checkbox_package "texlive-core") Latex + Texmaker"
     echo " 4) $(if [ "$KDE" -eq 1 ]; then  echo "$(checkbox_package "kchmviewer") Kchmviewer"; else echo "$(checkbox_package "chmsee") Chmsee"; fi)"
     echo " 5) $(checkbox_package "gcstar") GCStar"
     echo " 6) $(checkbox_package "wunderlist") Wunderlist"
@@ -1819,7 +1819,8 @@ do
     echo " 4) $(checkbox_package "gthumb") Gthumb"
     echo " 5) $(checkbox_package "inkscape") Inkscape"
     echo " 6) $(checkbox_package "mcomix") MComix"
-    echo " 7) $(checkbox_package "shotwell") Shotwell"
+    echo " 7) $(checkbox_package "mypaint") Mypaint"
+    echo " 8) $(checkbox_package "shotwell") Shotwell"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1845,6 +1846,9 @@ do
                 package_install "mcomix"
                 ;;
             7)
+                package_install "mypaint"
+                ;;
+            8)
                 package_install "shotwell"
                 ;;
             "b")
@@ -1873,11 +1877,12 @@ do
     echo " 7) $(checkbox_package "firefox") Mozilla Firefox"
     echo " 8) $(checkbox_package "thunderbird") Mozilla Thunderbird"
     echo " 9) $(checkbox_package "pidgin") Pidgin"
-    echo "10) $(checkbox_package "skype") Skype"
-    echo "11) $(checkbox_package "teamspeak3") TeamSpeak"
-    echo "12) $(checkbox_package "teamviewer") Teamviewer"
-    echo "13) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "transmission-qt")"; else echo "$(checkbox_package "transmission-gtk")"; fi) Trasmission"
-    echo "14) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "konversation") Konversation"; else echo "$(checkbox_package "xchat") X-Chat"; fi)"
+    echo "10) $(checkbox_package "remmina") Remmina"
+    echo "11) $(checkbox_package "skype") Skype"
+    echo "12) $(checkbox_package "teamspeak3") Teamspeak"
+    echo "13) $(checkbox_package "teamviewer") Teamviewer"
+    echo "14) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "transmission-qt")"; else echo "$(checkbox_package "transmission-gtk")"; fi) Trasmission"
+    echo "15) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "konversation") Konversation"; else echo "$(checkbox_package "xchat") X-Chat"; fi)"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1921,22 +1926,25 @@ do
                 package_install "pidgin"
                 ;;
             10)
-                package_install "skype"
+                package_install "remmina"
                 ;;
             11)
-                package_install "teamspeak3"
+                package_install "skype"
                 ;;
             12)
-                package_install "teamviewer"
+                package_install "teamspeak3"
                 ;;
             13)
+                package_install "teamviewer"
+                ;;
+            14)
                 if [ "$KDE" -eq 1 ]; then
                     package_install "transmission-qt"
                 else
                     package_install "transmission-gtk"
                 fi
                 ;;
-            14)
+            15)
                 if [ "$KDE" -eq 1 ]; then
                     package_install "konversation"
                 else
