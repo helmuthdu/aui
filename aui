@@ -400,6 +400,7 @@ function select_user(){
         useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
         passwd $USERNAME
         #BASHRC {{{
+            print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
             pacman -S --noconfirm --needed git
             git clone git://github.com/helmuthdu/dotfiles
             cp dotfiles/.* ~
@@ -1299,15 +1300,16 @@ function install_desktop_environment(){
             while [ 1 ]
             do
                 print_title "OPENBOX APPS"
-                echo " 1) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "geeqie") Geeqie"
-                echo " 3) $(checkbox_package "gmrun") Gmrun"
-                echo " 4) $(checkbox_package "rxvt-unicode") rxvt-unicode"
-                echo " 5) $(checkbox_package "scrot") Scrot"
-                echo " 6) $(checkbox_package "thunar") Thunar"
-                echo " 7) $(checkbox_package "tint2") Tint2"
-                echo " 8) $(checkbox_package "volwheel") Volwheel"
-                echo " 9) $(checkbox_package "xfburn") Xfburn"
+                echo " 1) $(checkbox_package "compton") Compton [xcompmgr fork]"
+                echo " 2) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
+                echo " 3) $(checkbox_package "geeqie") Geeqie"
+                echo " 4) $(checkbox_package "gmrun") Gmrun"
+                echo " 5) $(checkbox_package "rxvt-unicode") rxvt-unicode"
+                echo " 6) $(checkbox_package "scrot") Scrot"
+                echo " 7) $(checkbox_package "thunar") Thunar"
+                echo " 8) $(checkbox_package "tint2") Tint2"
+                echo " 9) $(checkbox_package "volwheel") Volwheel"
+                echo "10) $(checkbox_package "xfburn") Xfburn"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1315,6 +1317,9 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
+                            package_install "compton-git"
+                            ;;
+                        2)
                             #ICONS {{{
                             while [ 1 ]
                             do
@@ -1357,28 +1362,28 @@ function install_desktop_environment(){
                             done
                             #}}}
                             ;;
-                        2)
+                        3)
                             package_install "geeqie"
                             ;;
-                        3)
+                        4)
                             package_install "gmrun"
                             ;;
-                        4)
+                        5)
                             package_install "rxvt-unicode"
                             ;;
-                        5)
+                        6)
                             package_install "scrot"
                             ;;
-                        6)
+                        7)
                             package_install "polkit-gnome gvfs-smb thunar"
                             ;;
-                        7)
+                        8)
                             package_install "tint2"
                             ;;
-                        8)
+                        9)
                             package_install "volwheel"
                             ;;
-                        9)
+                        10)
                             package_install "xfburn"
                             ;;
                         "d")
