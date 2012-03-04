@@ -226,6 +226,11 @@ function reboot_now(){ #{{{
             ;;
     esac
 } #}}}
+function elihw() { #{{{
+    if [ $OPT = "b" ] || [ $OPT = "d" ];then
+        break;
+    fi
+} #}}}
 
 #WELCOME {{{
 function welcome(){
@@ -326,22 +331,26 @@ function custom_repositories(){
                     case $OPT in
                         1)
                             echo -e '\n[ayatana]\nServer = http://repo.ayatana.info/' >> /etc/pacman.conf
+                            echo -e '\nAyatana repository added into pacman.conf file'
                             pause_function
                             ;;
                         2)
                             echo -e '\n[archlinuxfr]\nServer = http://repo.archlinux.fr/$arch' >> /etc/pacman.conf
+                            echo -e '\nArchlinuxfr repository added into pacman.conf file'
                             pause_function
                             ;;
                         3)
                             if [ "$ARCHI" = "x86_64" ]; then
                                 echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+                                echo -e '\nMultilib repository added into pacman.conf file'
                                 pause_function
                             fi
                             ;;
                         "a")
                             read -p "Repository Name [ex: custom]: " REPONAME
-                            read -p "Repository Address [ex: file:///media/backup/Archlinux/]: " REPOADDRESS
-                            echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"'$arch' >> /etc/pacman.conf
+                            read -p "Repository Address [ex: file:///media/backup/Archlinux]: " REPOADDRESS
+                            echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"/'$arch' >> /etc/pacman.conf
+                            echo -e '\nCustom repository added into pacman.conf file'
                             pause_function
                             ;;
                         "d")
@@ -352,6 +361,7 @@ function custom_repositories(){
                             ;;
                     esac
                 done
+                elihw
             done
             pacman -Sy
             install_status
@@ -361,7 +371,7 @@ function custom_repositories(){
             CURRENT_STATUS=0
             ;;
     esac
-    sumary "Custom repositories installation"
+    sumary "Custom repositories configuration"
     pause_function
 }
 #}}}
@@ -399,6 +409,7 @@ function select_user(){
         read -p "Username: " USERNAME
         useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
         passwd $USERNAME
+        cp /etc/skel/.* /home/$USERNAME/
         #BASHRC {{{
             print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
             pacman -S --noconfirm --needed git
@@ -582,10 +593,23 @@ function install_basic_setup(){
         sed -i '/ListenAddress\ ::/s/^/#/' /etc/ssh/sshd_config
     #}}}
     #}}}
+    #SAMBA #{{{
     print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
-    pacman -S --noconfirm --needed samba
-    cp /etc/samba/smb.conf.default /etc/samba/smb.conf
-    add_daemon "@samba"
+    question_for_answer "Install Samba"
+    case "$OPTION" in
+        "y")
+            pacman -S --noconfirm --needed samba
+            cp /etc/samba/smb.conf.default /etc/samba/smb.conf
+            add_daemon "@samba"
+            install_status
+            ;;
+        *)
+            CURRENT_STATUS=0
+            ;;
+    esac
+    sumary "Samba installation"
+    pause_function
+    #}}}
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
     pacman -S --noconfirm --needed alsa-utils alsa-plugins
     sed -i '/MODULES[=]/s/snd-usb-audio//' /etc/rc.conf
@@ -749,7 +773,7 @@ function install_additional_firmwares(){
                             ;;
                     esac
                 done
-                if [ $OPT = "d" ];then break;fi
+                elihw
             done
             install_status
             ;;
@@ -818,6 +842,7 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed system-config-printer-gnome
             package_install "zeitgeist libzeitgeist zeitgeist-datahub"
             package_install "automounter nautilus-open-terminal gnome-defaults-list"
+            echo -e 'exec ck-launch-session gnome-session' >> /home/$USERNAME/.xinitrc
             #GNOME APPS {{{
             while [ 1 ]
             do
@@ -873,7 +898,7 @@ function install_desktop_environment(){
                                             ;;
                                     esac
                                 done
-                                if [ $OPT = "b" ];then break;fi
+                                elihw
                             done
                             #}}}
                             ;;
@@ -916,7 +941,7 @@ function install_desktop_environment(){
                                             ;;
                                     esac
                                 done
-                                if [ $OPT = "b" ];then break;fi
+                                elihw
                             done
                             #}}}
                             ;;
@@ -972,7 +997,7 @@ function install_desktop_environment(){
                                             ;;
                                     esac
                                 done
-                                if [ $OPT = "b" ];then break;fi
+                                elihw
                             done
                             #}}}
                             ;;
@@ -1011,7 +1036,7 @@ function install_desktop_environment(){
                                             ;;
                                     esac
                                 done
-                                if [ $OPT = "b" ];then break;fi
+                                elihw
                             done
                             #}}}
                             ;;
@@ -1029,7 +1054,7 @@ function install_desktop_environment(){
                             ;;
                     esac
                 done
-                if [ $OPT = "d" ];then break;fi
+                elihw
             done
             #}}}
             add_daemon "gdm"
@@ -1045,6 +1070,7 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed kdeadmin-system-config-printer-kde xdg-user-dirs
             package_install "kde-gtk-config-git"
             package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
+            echo -e 'exec ck-launch-session startkde' >> /home/$USERNAME/.xinitrc
             #QTCURVE THEMES #{{{
             wget http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
             wget http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
@@ -1111,7 +1137,7 @@ function install_desktop_environment(){
                             ;;
                     esac
                 done
-                if [ $OPT = "d" ];then break;fi
+                elihw
             done
             #}}}
             add_daemon "kdm"
@@ -1126,6 +1152,7 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed polkit-gnome gvfs-smb xdg-user-dirs
             package_install "automounter"
             package_install "gnome-defaults-list"
+            echo -e 'exec ck-launch-session startxfce4' >> /home/$USERNAME/.xinitrc
             #XFCE APPS {{{
             while [ 1 ]
             do
@@ -1177,7 +1204,7 @@ function install_desktop_environment(){
                                             ;;
                                     esac
                                 done
-                                if [ $OPT = "b" ];then break;fi
+                                elihw
                             done
                             #}}}
                             ;;
@@ -1192,7 +1219,7 @@ function install_desktop_environment(){
                             ;;
                     esac
                 done
-                if [ $OPT = "d" ];then break;fi
+                elihw
             done
             #}}}
             install_status
@@ -1207,6 +1234,7 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed pm-utils upower
             pacman -S --noconfirm --needed polkit-gnome gvfs gvfs-smb xdg-user-dirs
             package_install "gnome-defaults-list"
+            echo -e 'exec ck-launch-session startlxde' >> /home/$USERNAME/.xinitrc
             #LXDE APPS {{{
             while [ 1 ]
             do
@@ -1258,7 +1286,7 @@ function install_desktop_environment(){
                                             ;;
                                     esac
                                 done
-                                if [ $OPT = "b" ];then break;fi
+                                elihw
                             done
                             #}}}
                             ;;
@@ -1273,7 +1301,7 @@ function install_desktop_environment(){
                             ;;
                     esac
                 done
-                if [ $OPT = "d" ];then break;fi
+                elihw
             done
             #}}}
             add_daemon "lxdm"
@@ -1293,9 +1321,8 @@ function install_desktop_environment(){
             cp /etc/xdg/openbox/rc.xml /home/$USERNAME/.config/openbox/
             cp /etc/xdg/openbox/menu.xml /home/$USERNAME/.config/openbox/
             cp /etc/xdg/openbox/autostart /home/$USERNAME/.config/openbox/
-            echo -e 'exec ck-launch-session dbus-launch openbox-session' >> /home/$USERNAME/.xinitrc
             chown -R $USERNAME:users /home/$USERNAME/.config
-            chown $USERNAME:users /home/$USERNAME/.xinitrc
+            echo -e 'exec ck-launch-session openbox-session' >> /home/$USERNAME/.xinitrc
             #OPENBOX APPS {{{
             while [ 1 ]
             do
@@ -1358,7 +1385,7 @@ function install_desktop_environment(){
                                             ;;
                                     esac
                                 done
-                                if [ $OPT = "b" ];then break;fi
+                                elihw
                             done
                             #}}}
                             ;;
@@ -1394,7 +1421,7 @@ function install_desktop_environment(){
                             ;;
                     esac
                 done
-                if [ $OPT = "d" ];then break;fi
+                elihw
             done
             #}}}
             install_status
@@ -1532,7 +1559,7 @@ do
                 ;;
         esac
     done
-    if [ $OPT = "b" ];then break;fi
+    elihw
 done
 }
 #}}}
@@ -1622,7 +1649,9 @@ do
                                 ;;
                         esac
                     done
+                    elihw
                 done
+                OPT=3
                 #}}}
                 ;;
             4)
@@ -1681,7 +1710,7 @@ do
                 ;;
         esac
     done
-    if [ $OPT = "b" ];then break;fi
+    elihw
 done
 }
 #}}}
@@ -1757,7 +1786,7 @@ do
                 ;;
         esac
     done
-    if [ $OPT = "b" ];then break;fi
+    elihw
 done
 }
 #}}}
@@ -1804,7 +1833,7 @@ do
                 ;;
         esac
     done
-    if [ $OPT = "b" ];then break;fi
+    elihw
 done
 }
 #}}}
@@ -1859,7 +1888,7 @@ do
                 ;;
         esac
     done
-    if [ $OPT = "b" ];then break;fi
+    elihw
 done
 }
 #}}}
@@ -1959,7 +1988,7 @@ do
                 ;;
         esac
     done
-    if [ $OPT = "b" ];then break;fi
+    elihw
 done
 }
 #}}}
@@ -2086,7 +2115,7 @@ do
                 ;;
         esac
     done
-    if [ $OPT = "b" ];then break;fi
+    elihw
 done
 }
 #}}}
@@ -2174,7 +2203,7 @@ do
                 ;;
         esac
     done
-    if [ $OPT = "b" ];then break;fi
+    elihw
 done
 }
 #}}}
@@ -2238,7 +2267,7 @@ do
                             ;;
                     esac
                 done
-                if [ $OPT = "b" ];then break;fi
+                elihw
             done
             ;;
             #}}}
@@ -2289,7 +2318,7 @@ do
                             ;;
                     esac
                 done
-                if [ $OPT = "b" ];then break;fi
+                elihw
             done
             ;;
             #}}}
@@ -2324,7 +2353,7 @@ do
                             ;;
                     esac
                 done
-                if [ $OPT = "b" ];then break;fi
+                elihw
             done
             ;;
             #}}}
@@ -2355,7 +2384,7 @@ do
                             ;;
                     esac
                 done
-                if [ $OPT = "b" ];then break;fi
+                elihw
             done
             ;;
             #}}}
@@ -2395,7 +2424,7 @@ do
                             ;;
                     esac
                 done
-                if [ $OPT = "b" ];then break;fi
+                elihw
             done
             ;;
             #}}}
@@ -2430,7 +2459,7 @@ do
                             ;;
                     esac
                 done
-                if [ $OPT = "b" ];then break;fi
+                elihw
             done
             ;;
             #}}}
@@ -2457,7 +2486,7 @@ do
                             ;;
                     esac
                 done
-                if [ $OPT = "b" ];then break;fi
+                elihw
             done
             ;;
             #}}}
@@ -2488,7 +2517,7 @@ do
                             ;;
                     esac
                 done
-                if [ $OPT = "b" ];then break;fi
+                elihw
             done
             ;;
             #}}}
@@ -2531,7 +2560,7 @@ do
                             ;;
                     esac
                 done
-                if [ $OPT = "b" ];then break;fi
+                elihw
             done
             ;;
             #}}}
@@ -2566,7 +2595,7 @@ do
                             ;;
                     esac
                 done
-                if [ $OPT = "b" ];then break;fi
+                elihw
             done
             ;;
             #}}}
@@ -2613,7 +2642,7 @@ do
                             ;;
                     esac
                 done
-                if [ $OPT = "b" ];then break;fi
+                elihw
             done
             ;;
             #}}}
@@ -2680,7 +2709,7 @@ do
                 ;;
         esac
     done
-    if [ $OPT = "b" ];then break;fi
+    elihw
 done
 }
 #}}}
