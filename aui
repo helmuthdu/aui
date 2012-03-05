@@ -127,10 +127,18 @@ function checkpackage(){ #{{{
     fi
 } #}}}
 function checkbox(){ #{{{
-    [[ $1 -eq 1 ]] && echo "[X]" || echo "[ ]"
+    if [ $1 -eq 1 ]; then
+        echo "[X]"
+    elif [ $1 -eq 2 ]; then
+        echo "[*]"
+    else
+        echo "[ ]"
+    fi
 } #}}}
 function checkbox_package(){ #{{{
-    if checkpackage $1; then
+    if [ "$1" = "many" ]; then
+        checkbox 2
+    elif checkpackage $1; then
         checkbox 1
     else
         checkbox 0
@@ -402,7 +410,9 @@ function rankmirror(){
 #SYSTEM UPDATE {{{
 function system_upgrade(){
     print_title "UPDATING YOUR SYSTEM"
-    rm -fr /etc/profile.d/locale.sh #http://www.archlinux.org/news/initscripts-update-manual-intervention-required/
+    if [ -f /etc/profile.d/locale.sh ]; then
+        pacman -S  --noconfirm --force initscripts
+    fi
     pacman -S  --noconfirm --needed --force filesystem #http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required/
     pacman -Syuf
     reboot_now
@@ -421,7 +431,6 @@ function select_user(){
             git clone git://github.com/helmuthdu/dotfiles
             cp dotfiles/.* ~
             cp dotfiles/.* /home/$USERNAME/
-            chown $USERNAME:users /home/$USERNAME/.*
             rm -fr dotfiles
             print_title "DEFAULT EDITOR"
             EDITOR=("Nano" "Vim [Default]");
@@ -435,6 +444,11 @@ function select_user(){
                         break
                         ;;
                     2)
+                        package_install "vim ctags ack discount"
+                        git clone git://github.com/helmuthdu/vim
+                        mv vim /home/$USERNAME/.vim
+                        git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
+                        ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
                         break
                         ;;
                     *)
@@ -442,6 +456,7 @@ function select_user(){
                         ;;
                 esac
             done
+            chown -R $USERNAME:users /home/$USERNAME/.*
         #}}}
 
     } #}}}
@@ -929,10 +944,10 @@ function install_desktop_environment(){
             while [ 1 ]
             do
                 print_title "GNOME CUSTOMIZATION"
-                echo " 1) $(checkbox_package "faenza-icon-theme") Gnome Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "zukitwo-themes") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
-                echo " 3) $(checkbox_package "gpaste") GnomeShell Extensions"
-                echo " 4) $(checkbox_package "gnome-shell-theme-eos") GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
+                echo " 1) $(checkbox_package "many") Gnome Icons [Faience, Faenza, Elementary]"
+                echo " 2) $(checkbox_package "many") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
+                echo " 3) $(checkbox_package "many") GnomeShell Extensions"
+                echo " 4) $(checkbox_package "many") GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
                 echo " 5) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
                 echo " 6) $(checkbox_package "gnome-packagekit") Packagekit"
                 echo ""
@@ -1203,7 +1218,7 @@ function install_desktop_environment(){
             while [ 1 ]
             do
                 print_title "XFCE CUSTOMIZATION"
-                echo " 1) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
+                echo " 1) $(checkbox_package "many") Icons [Faience, Faenza, Elementary]"
                 echo " 2) $(checkbox_package "zukitwo-themes") Themes [Zukitwo]"
                 echo " 3) $(checkbox_package "lightdm") LightDM"
                 echo ""
@@ -1251,7 +1266,7 @@ function install_desktop_environment(){
             while [ 1 ]
             do
                 print_title "LXDE CUSTOMIZATION"
-                echo " 1) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
+                echo " 1) $(checkbox_package "many") Icons [Faience, Faenza, Elementary]"
                 echo " 2) $(checkbox_package "lxdm") LXDM"
                 echo " 3) $(checkbox_package "xfburn") Xfburn"
                 echo ""
@@ -1306,7 +1321,7 @@ function install_desktop_environment(){
             do
                 print_title "OPENBOX CUSTOMIZATION"
                 echo " 1) $(checkbox_package "compton") Compton [xcompmgr fork]"
-                echo " 2) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
+                echo " 2) $(checkbox_package "many") Icons [Faience, Faenza, Elementary]"
                 echo " 3) $(checkbox_package "geeqie") Geeqie"
                 echo " 4) $(checkbox_package "gmrun") Gmrun"
                 echo " 5) $(checkbox_package "lightdm") LightDM"
@@ -1594,23 +1609,15 @@ do
                     done
                 elihw
                 done
-                OPT=3
                 #}}}
+                OPT=3
                 ;;
             4)
                 package_install "emacs"
                 ;;
             5)
                 pacman -Rdd --noconfirm vim
-                package_install "gvim wmctrl ctags ack discount"
-                #HELMUTHDU'S VIMRC {{{
-                pacman -S --noconfirm --needed git
-                git clone git://github.com/helmuthdu/vim.git
-                mv vim /home/$USERNAME/.vim
-                git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
-                ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
-                chown -R $USERNAME:users /home/$USERNAME/.vim*
-                #}}}
+                package_install "gvim"
                 ;;
             6)
                 package_install "geany"
