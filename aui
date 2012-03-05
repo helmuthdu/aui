@@ -701,8 +701,9 @@ function install_xorg(){
     pacman -S --noconfirm --needed gamin
     #CONFIGURE QWERTY KEYBOARD IN XORG {{{
     file="/etc/X11/xorg.conf.d/10-evdev.conf"
-    checkpatch=`cat $file | sed '18!d'`
-    line=17
+    line=`grep -n "keyboard" $file | cut -f1 -d:`
+    line=$(( $line + 2 ))
+    checkpatch=`cat $file | sed ''$(( $line + 1 ))'!d'`
     if [[ "$checkpatch" != *"XkbLayout"* ]]; then
         if [ $LOCATION = "pt_BR" ]; then
             kblayout="\\\tOption \"XkbLayout\" \"br\""
