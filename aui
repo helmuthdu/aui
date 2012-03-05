@@ -1432,8 +1432,8 @@ function install_nm_wicd(){
             fi
             groupadd networkmanager
             gpasswd -a $USERNAME networkmanager
-            replace_daemon "networkmanager" "network"
-            replace_daemon "network" "networkmanager"
+            remove_daemon "network"
+            add_daemon "networkmanager"
             install_status
             sumary "Networkmanager installation"
             ;;
@@ -1446,18 +1446,24 @@ function install_nm_wicd(){
             else
                 pacman -S --noconfirm --needed wicd
             fi
-            replace_daemon "wicd" "network"
-            replace_daemon "network" "wicd"
+            remove_daemon "network"
+            add_daemon "wicd"
             install_status
             sumary "Wicd installation"
             ;;
         *)
-            replace_daemon "networkmanager" "network"
-            replace_daemon "wicd" "network"
+            remove_daemon "networkmanager"
+            remove_daemon "wicd"
+            add_daemon "network"
             CURRENT_STATUS=0
             sumary "Network manager installation"
             ;;
     esac
+    if check_package "nfs-utils" ; then
+        add_daemon "rpcbind"
+        add_daemon "nfs-common"
+        add_daemon "nfs-server"
+    fi
     pause_function
 }
 #}}}
