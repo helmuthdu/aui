@@ -344,6 +344,8 @@ function custom_repositories(){
                                 echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
                                 echo -e '\nMultilib repository added into pacman.conf file'
                                 pause_function
+                            else
+                                invalid_option
                             fi
                             ;;
                         "a")
@@ -361,7 +363,7 @@ function custom_repositories(){
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             pacman -Sy
             install_status
@@ -418,7 +420,27 @@ function select_user(){
             cp dotfiles/.* /home/$USERNAME/
             chown $USERNAME:users /home/$USERNAME/.*
             rm -fr dotfiles
+            print_title "DEFAULT EDITOR"
+            EDITOR=("Nano" "Vim [Default]");
+            PS3="$prompt1"
+            echo -e "Choose your default editor\n"
+            select OPT in "${EDITOR[@]}"; do
+                case "$REPLY" in
+                    1)
+                        sed -i '/EDITOR/s/vim/nano/' /home/$USERNAME/.bashrc
+                        sed -i '/VISUAL/s/vim/nano/' /home/$USERNAME/.bashrc
+                        break
+                        ;;
+                    2)
+                        break
+                        ;;
+                    *)
+                        invalid_option
+                        ;;
+                esac
+            done
         #}}}
+
     } #}}}
     print_title "SELECT USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
     users=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
@@ -442,11 +464,11 @@ function select_user(){
     if ! checkpackage "sudo" ; then
         print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
         pacman -S --noconfirm --needed sudo
-        ## Uncomment to allow members of group wheel to execute any command
-        sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
-        ## Same thing without a password (not secure)
-        #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
     fi
+    ## Uncomment to allow members of group wheel to execute any command
+    sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
+    ## Same thing without a password (not secure)
+    #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
     #}}}
 }
 #}}}
@@ -773,7 +795,7 @@ function install_additional_firmwares(){
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             install_status
             ;;
@@ -820,6 +842,47 @@ function install_git_tor(){
 #}}}
 #DESKTOP ENVIRONMENT {{{
 function install_desktop_environment(){
+    function install_icons() { #{{{
+    while [ 1 ]
+    do
+        print_title "GNOME ICONS"
+        echo " 1) $(checkbox_package "awoken-icons") Awoken"
+        echo " 2) $(checkbox_package "faenza-icon-theme") Faenza"
+        echo " 3) $(checkbox_package "faenza-cupertino-icon-theme") Faenza-Cupertino"
+        echo " 4) $(checkbox_package "faience-icon-theme") Faience"
+        echo " 5) $(checkbox_package "elementary-icons") Elementary"
+        echo ""
+        echo " b) BACK"
+        echo ""
+        read_option
+        for OPT in ${OPTIONS[@]}; do
+            case "$OPT" in
+                1)
+                    package_install "awoken-icons"
+                    ;;
+                2)
+                    package_install "faenza-icon-theme"
+                    ;;
+                3)
+                    package_install "faenza-cupertino-icon-theme"
+                    ;;
+                4)
+                    package_install "faience-icon-theme"
+                    ;;
+                5)
+                    package_install "elementary-icons"
+                    ;;
+                "b")
+                    break
+                    ;;
+                *)
+                    invalid_option
+                    ;;
+            esac
+        done
+        elihw
+    done
+    } #}}}
     print_title "DESKTOP ENVIRONMENT - https://wiki.archlinux.org/index.php/Desktop_Environment"
     echo "Choose your desktop-environment:"
     echo " 1) GNOME"
@@ -843,10 +906,10 @@ function install_desktop_environment(){
             package_install "zeitgeist libzeitgeist zeitgeist-datahub"
             package_install "automounter nautilus-open-terminal gnome-defaults-list"
             echo -e 'exec ck-launch-session gnome-session' >> /home/$USERNAME/.xinitrc
-            #GNOME APPS {{{
+            #GNOME CUSTOMIZATION {{{
             while [ 1 ]
             do
-                print_title "GNOME APPS"
+                print_title "GNOME CUSTOMIZATION"
                 echo " 1) $(checkbox_package "faenza-icon-theme") Gnome Icons [Faience, Faenza, Elementary]"
                 echo " 2) $(checkbox_package "zukitwo-themes") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
                 echo " 3) $(checkbox_package "gpaste") GnomeShell Extensions"
@@ -860,47 +923,8 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
-                            #ICONS {{{
-                            while [ 1 ]
-                            do
-                                print_title "GNOME ICONS"
-                                echo " 1) $(checkbox_package "awoken-icons") Awoken"
-                                echo " 2) $(checkbox_package "faenza-icon-theme") Faenza"
-                                echo " 3) $(checkbox_package "faenza-cupertino-icon-theme") Faenza-Cupertino"
-                                echo " 4) $(checkbox_package "faience-icon-theme") Faience"
-                                echo " 5) $(checkbox_package "elementary-icons") Elementary"
-                                echo ""
-                                echo " b) BACK"
-                                echo ""
-                                read_option
-                                for OPT in ${OPTIONS[@]}; do
-                                    case "$OPT" in
-                                        1)
-                                            package_install "awoken-icons"
-                                            ;;
-                                        2)
-                                            package_install "faenza-icon-theme"
-                                            ;;
-                                        3)
-                                            package_install "faenza-cupertino-icon-theme"
-                                            ;;
-                                        4)
-                                            package_install "faience-icon-theme"
-                                            ;;
-                                        5)
-                                            package_install "elementary-icons"
-                                            ;;
-                                        "b")
-                                            break
-                                            ;;
-                                        *)
-                                            invalid_option
-                                            ;;
-                                    esac
-                                done
-                                elihw
-                            done
-                            #}}}
+                            install_icons
+                            OPT=1
                             ;;
                         2)
                             #THEMES {{{
@@ -941,9 +965,10 @@ function install_desktop_environment(){
                                             ;;
                                     esac
                                 done
-                                elihw
+                            elihw
                             done
                             #}}}
+                            OPT=2
                             ;;
                         3)
                             #GNOMESHELL EXTENSIONS {{{
@@ -997,9 +1022,10 @@ function install_desktop_environment(){
                                             ;;
                                     esac
                                 done
-                                elihw
+                            elihw
                             done
                             #}}}
+                            OPT=3
                             ;;
                         4)
                             #GNOMESHELL THEMES {{{
@@ -1036,9 +1062,10 @@ function install_desktop_environment(){
                                             ;;
                                     esac
                                 done
-                                elihw
+                            elihw
                             done
                             #}}}
+                            OPT=4
                             ;;
                         5)
                             package_install "gnome-activity-journal"
@@ -1054,7 +1081,7 @@ function install_desktop_environment(){
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             #}}}
             add_daemon "gdm"
@@ -1087,10 +1114,10 @@ function install_desktop_environment(){
             chown -R $USERNAME:users /home/$USERNAME/.kde4
             rm -fr Kawai Sweet
             #}}}
-            #KDE APPS {{{
+            #KDE CUSTOMIZATION {{{
             while [ 1 ]
             do
-                print_title "KDE APPS"
+                print_title "KDE CUSTOMIZATION"
                 echo " 1) $(checkbox_package "apper") Apper"
                 echo " 2) $(checkbox_package "bangarang") Bangarang"
                 echo " 3) $(checkbox_package "choqok") Choqok"
@@ -1137,7 +1164,7 @@ function install_desktop_environment(){
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             #}}}
             add_daemon "kdm"
@@ -1153,12 +1180,13 @@ function install_desktop_environment(){
             package_install "automounter"
             package_install "gnome-defaults-list"
             echo -e 'exec ck-launch-session startxfce4' >> /home/$USERNAME/.xinitrc
-            #XFCE APPS {{{
+            #XFCE CUSTOMIZATION{{{
             while [ 1 ]
             do
-                print_title "XFCE APPS"
+                print_title "XFCE CUSTOMIZATION"
                 echo " 1) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
                 echo " 2) $(checkbox_package "zukitwo-themes") Themes [Zukitwo]"
+                echo " 3) $(checkbox_package "lightdm") LightDM"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1166,50 +1194,15 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
-                            #ICONS {{{
-                            while [ 1 ]
-                            do
-                                print_title "ICONS"
-                                echo " 1) $(checkbox_package "awoken-icons") Awoken"
-                                echo " 2) $(checkbox_package "faenza-icon-theme") Faenza"
-                                echo " 3) $(checkbox_package "faenza-cupertino-icon-theme") Faenza-Cupertino"
-                                echo " 4) $(checkbox_package "faience-icon-theme") Faience"
-                                echo " 5) $(checkbox_package "elementary-icons") Elementary"
-                                echo ""
-                                echo " b) BACK"
-                                echo ""
-                                read_option
-                                for OPT in ${OPTIONS[@]}; do
-                                    case "$OPT" in
-                                        1)
-                                            package_install "awoken-icons"
-                                            ;;
-                                        2)
-                                            package_install "faenza-icon-theme"
-                                            ;;
-                                        3)
-                                            package_install "faenza-cupertino-icon-theme"
-                                            ;;
-                                        4)
-                                            package_install "faience-icon-theme"
-                                            ;;
-                                        5)
-                                            package_install "elementary-icons"
-                                            ;;
-                                        "b")
-                                            break
-                                            ;;
-                                        *)
-                                            invalid_option
-                                            ;;
-                                    esac
-                                done
-                                elihw
-                            done
-                            #}}}
+                            install_icons
+                            OPT=1
                             ;;
                         2)
                             package_install "zukitwo-themes"
+                            ;;
+                        3)
+                            package_install "lightdm"
+                            add_daemon "lightdm"
                             ;;
                         "d")
                             break
@@ -1219,7 +1212,7 @@ function install_desktop_environment(){
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             #}}}
             install_status
@@ -1235,12 +1228,13 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed polkit-gnome gvfs gvfs-smb xdg-user-dirs
             package_install "gnome-defaults-list"
             echo -e 'exec ck-launch-session startlxde' >> /home/$USERNAME/.xinitrc
-            #LXDE APPS {{{
+            #LXDE CUSTOMIZATION{{{
             while [ 1 ]
             do
-                print_title "LXDE APPS"
+                print_title "LXDE CUSTOMIZATION"
                 echo " 1) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "xfburn") Xfburn"
+                echo " 2) $(checkbox_package "lxdm") LXDM"
+                echo " 3) $(checkbox_package "xfburn") Xfburn"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1248,49 +1242,14 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
-                            #ICONS {{{
-                            while [ 1 ]
-                            do
-                                print_title "ICONS"
-                                echo " 1) $(checkbox_package "awoken-icons") Awoken"
-                                echo " 2) $(checkbox_package "faenza-icon-theme") Faenza"
-                                echo " 3) $(checkbox_package "faenza-cupertino-icon-theme") Faenza-Cupertino"
-                                echo " 4) $(checkbox_package "faience-icon-theme") Faience"
-                                echo " 5) $(checkbox_package "elementary-icons") Elementary"
-                                echo ""
-                                echo " b) BACK"
-                                echo ""
-                                read_option
-                                for OPT in ${OPTIONS[@]}; do
-                                    case "$OPT" in
-                                        1)
-                                            package_install "awoken-icons"
-                                            ;;
-                                        2)
-                                            package_install "faenza-icon-theme"
-                                            ;;
-                                        3)
-                                            package_install "faenza-cupertino-icon-theme"
-                                            ;;
-                                        4)
-                                            package_install "faience-icon-theme"
-                                            ;;
-                                        5)
-                                            package_install "elementary-icons"
-                                            ;;
-                                        "b")
-                                            break
-                                            ;;
-                                        *)
-                                            invalid_option
-                                            ;;
-                                    esac
-                                done
-                                elihw
-                            done
-                            #}}}
+                            install_icons
+                            OPT=1
                             ;;
                         2)
+                            package_install "lxdm"
+                            add_daemon "lxdm"
+                            ;;
+                        3)
                             package_install "xfburn"
                             ;;
                         "d")
@@ -1301,7 +1260,7 @@ function install_desktop_environment(){
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             #}}}
             add_daemon "lxdm"
@@ -1323,20 +1282,21 @@ function install_desktop_environment(){
             cp /etc/xdg/openbox/autostart /home/$USERNAME/.config/openbox/
             chown -R $USERNAME:users /home/$USERNAME/.config
             echo -e 'exec ck-launch-session openbox-session' >> /home/$USERNAME/.xinitrc
-            #OPENBOX APPS {{{
+            #OPENBOX CUSTOMIZATION {{{
             while [ 1 ]
             do
-                print_title "OPENBOX APPS"
+                print_title "OPENBOX CUSTOMIZATION"
                 echo " 1) $(checkbox_package "compton") Compton [xcompmgr fork]"
                 echo " 2) $(checkbox_package "faenza-icon-theme") Icons [Faience, Faenza, Elementary]"
                 echo " 3) $(checkbox_package "geeqie") Geeqie"
                 echo " 4) $(checkbox_package "gmrun") Gmrun"
-                echo " 5) $(checkbox_package "rxvt-unicode") rxvt-unicode"
-                echo " 6) $(checkbox_package "scrot") Scrot"
-                echo " 7) $(checkbox_package "thunar") Thunar"
-                echo " 8) $(checkbox_package "tint2") Tint2"
-                echo " 9) $(checkbox_package "volwheel") Volwheel"
-                echo "10) $(checkbox_package "xfburn") Xfburn"
+                echo " 5) $(checkbox_package "lightdm") LightDM"
+                echo " 6) $(checkbox_package "rxvt-unicode") rxvt-unicode"
+                echo " 7) $(checkbox_package "scrot") Scrot"
+                echo " 8) $(checkbox_package "thunar") Thunar"
+                echo " 9) $(checkbox_package "tint2") Tint2"
+                echo "10) $(checkbox_package "volwheel") Volwheel"
+                echo "11) $(checkbox_package "xfburn") Xfburn"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1347,47 +1307,8 @@ function install_desktop_environment(){
                             package_install "compton-git"
                             ;;
                         2)
-                            #ICONS {{{
-                            while [ 1 ]
-                            do
-                                print_title "ICONS"
-                                echo " 1) $(checkbox_package "awoken-icons") Awoken"
-                                echo " 2) $(checkbox_package "faenza-icon-theme") Faenza"
-                                echo " 3) $(checkbox_package "faenza-cupertino-icon-theme") Faenza-Cupertino"
-                                echo " 4) $(checkbox_package "faience-icon-theme") Faience"
-                                echo " 5) $(checkbox_package "elementary-icons") Elementary"
-                                echo ""
-                                echo " b) BACK"
-                                echo ""
-                                read_option
-                                for OPT in ${OPTIONS[@]}; do
-                                    case "$OPT" in
-                                        1)
-                                            package_install "awoken-icons"
-                                            ;;
-                                        2)
-                                            package_install "faenza-icon-theme"
-                                            ;;
-                                        3)
-                                            package_install "faenza-cupertino-icon-theme"
-                                            ;;
-                                        4)
-                                            package_install "faience-icon-theme"
-                                            ;;
-                                        5)
-                                            package_install "elementary-icons"
-                                            ;;
-                                        "b")
-                                            break
-                                            ;;
-                                        *)
-                                            invalid_option
-                                            ;;
-                                    esac
-                                done
-                                elihw
-                            done
-                            #}}}
+                            install_icons
+                            OPT=2
                             ;;
                         3)
                             package_install "geeqie"
@@ -1396,21 +1317,25 @@ function install_desktop_environment(){
                             package_install "gmrun"
                             ;;
                         5)
-                            package_install "rxvt-unicode"
+                            package_install "lightdm"
+                            add_daemon "lightdm"
                             ;;
                         6)
-                            package_install "scrot"
+                            package_install "rxvt-unicode"
                             ;;
                         7)
-                            package_install "polkit-gnome gvfs-smb thunar"
+                            package_install "scrot"
                             ;;
                         8)
-                            package_install "tint2"
+                            package_install "polkit-gnome gvfs-smb thunar"
                             ;;
                         9)
-                            package_install "volwheel"
+                            package_install "tint2"
                             ;;
                         10)
+                            package_install "volwheel"
+                            ;;
+                        11)
                             package_install "xfburn"
                             ;;
                         "d")
@@ -1421,7 +1346,7 @@ function install_desktop_environment(){
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             #}}}
             install_status
@@ -1559,7 +1484,7 @@ do
                 ;;
         esac
     done
-    elihw
+elihw
 done
 }
 #}}}
@@ -1649,7 +1574,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 OPT=3
                 #}}}
@@ -1710,7 +1635,7 @@ do
                 ;;
         esac
     done
-    elihw
+elihw
 done
 }
 #}}}
@@ -1786,7 +1711,7 @@ do
                 ;;
         esac
     done
-    elihw
+elihw
 done
 }
 #}}}
@@ -1833,7 +1758,7 @@ do
                 ;;
         esac
     done
-    elihw
+elihw
 done
 }
 #}}}
@@ -1888,7 +1813,7 @@ do
                 ;;
         esac
     done
-    elihw
+elihw
 done
 }
 #}}}
@@ -1988,7 +1913,7 @@ do
                 ;;
         esac
     done
-    elihw
+elihw
 done
 }
 #}}}
@@ -2115,7 +2040,7 @@ do
                 ;;
         esac
     done
-    elihw
+elihw
 done
 }
 #}}}
@@ -2203,7 +2128,7 @@ do
                 ;;
         esac
     done
-    elihw
+elihw
 done
 }
 #}}}
@@ -2267,7 +2192,7 @@ do
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             ;;
             #}}}
@@ -2318,7 +2243,7 @@ do
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             ;;
             #}}}
@@ -2353,7 +2278,7 @@ do
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             ;;
             #}}}
@@ -2384,7 +2309,7 @@ do
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             ;;
             #}}}
@@ -2424,7 +2349,7 @@ do
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             ;;
             #}}}
@@ -2459,7 +2384,7 @@ do
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             ;;
             #}}}
@@ -2486,7 +2411,7 @@ do
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             ;;
             #}}}
@@ -2517,7 +2442,7 @@ do
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             ;;
             #}}}
@@ -2560,7 +2485,7 @@ do
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             ;;
             #}}}
@@ -2595,7 +2520,7 @@ do
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             ;;
             #}}}
@@ -2642,7 +2567,7 @@ do
                             ;;
                     esac
                 done
-                elihw
+            elihw
             done
             ;;
             #}}}
@@ -2709,7 +2634,7 @@ do
                 ;;
         esac
     done
-    elihw
+elihw
 done
 }
 #}}}
