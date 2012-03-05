@@ -108,6 +108,9 @@ function add_daemon(){ #{{{
 function remove_daemon(){ #{{{
     sed -i '/DAEMONS[=]/s/'"$1"' //' /etc/rc.conf
 } #}}}
+function replace_daemon(){ #{{{
+    sed -i '/DAEMONS[=]/s/'"$1"'/'"$2"'/' /etc/rc.conf
+} #}}}
 function add_module(){ #{{{
     remove_module "$1"
     sed -i '/MODULES[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
@@ -630,6 +633,22 @@ function install_basic_setup(){
             ;;
     esac
     sumary "Samba installation"
+    pause_function
+    #}}}
+    #NFS #{{{
+    print_title "NFS - https://wiki.archlinux.org/index.php/Nfs"
+    question_for_answer "Install nfs"
+    case "$OPTION" in
+        "y")
+            pacman -S --noconfirm --needed nfs-utils
+            add_daemon "rpcbind nfs-common nfs-server"
+            install_status
+            ;;
+        *)
+            CURRENT_STATUS=0
+            ;;
+    esac
+    sumary "Nfs installation"
     pause_function
     #}}}
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
@@ -1367,7 +1386,7 @@ function install_nm_wicd(){
     echo " 1) Networkmanager"
     echo " 2) Wicd"
     echo ""
-    echo " s) SKIP"
+    echo " n) NONE"
     echo ""
     read -p "$prompt1" OPTION
     case "$OPTION" in
@@ -1382,9 +1401,9 @@ function install_nm_wicd(){
             fi
             groupadd networkmanager
             gpasswd -a $USERNAME networkmanager
-            remove_daemon "network"
-            add_daemon "@networkmanager"
+            replace_daemon "network" "networkmanager"
             install_status
+            sumary "Networkmanager installation"
             ;;
         2)
             print_title "WICD - https://wiki.archlinux.org/index.php/Wicd"
@@ -1395,18 +1414,17 @@ function install_nm_wicd(){
             else
                 pacman -S --noconfirm --needed wicd
             fi
-            remove_daemon "network"
-            add_daemon "@wicd"
+            replace_daemon "network" "wicd"
             install_status
+            sumary "Wicd installation"
             ;;
         *)
-            remove_daemon "@networkmanager"
-            remove_daemon "@wicd"
-            add_daemon "network"
+            replace_daemon "networkmanager" "network"
+            replace_daemon "wicd" "network"
             CURRENT_STATUS=0
+            sumary "Network manager installation"
             ;;
     esac
-    sumary "Network Connection Manager installation"
     pause_function
 }
 #}}}
