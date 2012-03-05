@@ -432,7 +432,7 @@ function select_user(){
             print_title "DEFAULT EDITOR"
             EDITOR=("Nano" "Vim [Default]");
             PS3="$prompt1"
-            echo -e "Choose your default editor\n"
+            echo -e "Choose default editor\n"
             select OPT in "${EDITOR[@]}"; do
                 case "$REPLY" in
                     1)
@@ -455,7 +455,6 @@ function select_user(){
             done
             chown -R $USERNAME:users /home/$USERNAME/.*
         #}}}
-
     } #}}}
     print_title "SELECT USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
     users=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
