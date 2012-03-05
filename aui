@@ -101,25 +101,25 @@ function print_title (){ #{{{
     print_line
     echo ""
 } #}}}
+function remove_daemon(){ #{{{
+    sed -i '/DAEMONS[=]/s/ '"$1"'//' /etc/rc.conf
+} #}}}
+function replace_daemon(){ #{{{
+    sed -i '/DAEMONS[=]/s/'"$1"'/'"$2"'/' /etc/rc.conf
+} #}}}
 function add_daemon(){ #{{{
     remove_daemon "$1"
     sed -i '/DAEMONS[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
 } #}}}
-function remove_daemon(){ #{{{
-    sed -i '/DAEMONS[=]/s/'"$1"' //' /etc/rc.conf
-} #}}}
-function replace_daemon(){ #{{{
-    sed -i '/DAEMONS[=]/s/'"$1"'/'"$2"'/' /etc/rc.conf
+function remove_module(){ #{{{
+    sed -i '/MODULES[=]/s/ '"$1"'//' /etc/rc.conf
 } #}}}
 function add_module(){ #{{{
     remove_module "$1"
     sed -i '/MODULES[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
     #sed -i '/MODULES[=]/s/^[^ ]*\>/& '"$1"'/' /etc/rc.conf
 } #}}}
-function remove_module(){ #{{{
-    sed -i '/MODULES[=]/s/'"$1"' //' /etc/rc.conf
-} #}}}
-function checkpackage(){ #{{{
+function check_package(){ #{{{
     if pacman -Q $1 &>/dev/null ; then
         return 0
     else
@@ -138,7 +138,7 @@ function checkbox(){ #{{{
 function checkbox_package(){ #{{{
     if [ "$1" = "many" ]; then
         checkbox 2
-    elif checkpackage $1; then
+    elif check_package $1; then
         checkbox 1
     else
         checkbox 0
@@ -146,14 +146,14 @@ function checkbox_package(){ #{{{
 } #}}}
 function package_install(){ #{{{
     for PACKAGE in $1; do
-        if ! checkpackage "$PACKAGE" ; then
+        if ! check_package "$PACKAGE" ; then
             if [ "$YAOURT" -eq 1 ]; then
                 su -l $USERNAME --command="yaourt -S --noconfirm $PACKAGE"
             else
                 su -l $USERNAME --command="packer -S --noconfirm $PACKAGE"
             fi
             #FORCE CHECK #{{{
-            if ! checkpackage "$PACKAGE" ; then
+            if ! check_package "$PACKAGE" ; then
                 question_for_answer "Package $PACKAGE not installed, try install again?"
                 if [ $OPTION = "y" ]; then
                     if [ "$YAOURT" -eq 1 ]; then
@@ -479,7 +479,7 @@ function select_user(){
         fi
     done
     #ENABLE SUDO {{{
-    if ! checkpackage "sudo" ; then
+    if ! check_package "sudo" ; then
         print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
         pacman -S --noconfirm --needed sudo
     fi
@@ -499,7 +499,7 @@ function choose_aurhelper(){
     select OPT in "${aurhelper[@]}"; do
         case "$REPLY" in
             1)
-                if ! checkpackage "yaourt" ; then
+                if ! check_package "yaourt" ; then
                     pacman -S --noconfirm --needed base-devel yajl
                     su -l $USERNAME --command="
                         wget http://aur.archlinux.org/packages/package-query/package-query.tar.gz;
@@ -517,7 +517,7 @@ function choose_aurhelper(){
                         cd ..;
                         rm -fr yaourt*
                     "
-                    if ! checkpackage "yaourt" ; then
+                    if ! check_package "yaourt" ; then
                         echo "Yaourt not installed. EXIT now"
                         pause_function
                         exit 0
@@ -528,7 +528,7 @@ function choose_aurhelper(){
                 break
                 ;;
             2)
-                if ! checkpackage "packer" ; then
+                if ! check_package "packer" ; then
                     pacman -S --noconfirm --needed git jshon curl
                     su -l $USERNAME --command="
                         wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
@@ -538,7 +538,7 @@ function choose_aurhelper(){
                         cd ..;
                         rm -fr packer*
                     "
-                    if ! checkpackage "packer" ; then
+                    if ! check_package "packer" ; then
                         echo "Packer not installed. EXIT now"
                         pause_function
                         exit 0
@@ -590,7 +590,7 @@ function pacman_package_signing(){
 #BASIC SETUP{{{
 function install_basic_setup(){
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-    pacman -S --noconfirm --needed curl bc rsync mlocate bash-completion vim net-tools
+    pacman -S --noconfirm --needed curl bc rsync mlocate bash-completion net-tools
     print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
     pacman -S --noconfirm --needed zip unzip unrar p7zip
     package_install "rar"
@@ -656,7 +656,9 @@ function install_basic_setup(){
     case "$OPTION" in
         "y")
             pacman -S --noconfirm --needed nfs-utils
-            add_daemon "rpcbind nfs-common nfs-server"
+            add_daemon "rpcbind"
+            add_daemon "nfs-common"
+            add_daemon "nfs-server"
             install_status
             ;;
         *)
@@ -700,6 +702,21 @@ function install_xorg(){
     pacman -S --noconfirm --needed xf86-input-synaptics xf86-input-mouse xf86-input-keyboard
     pacman -S --noconfirm --needed mesa
     pacman -S --noconfirm --needed gamin
+    #CONFIGURE QWERTY KEYBOARD IN XORG {{{
+    file="/etc/X11/xorg.conf.d/10-evdev.conf"
+    checkpatch=`cat $file | sed '18!d'`
+    line=17
+    if [[ "$checkpatch" != *"XkbLayout"* ]]; then
+        if [ $LOCATION = "pt_BR" ]; then
+            kblayout="\\\tOption \"XkbLayout\" \"br\""
+            kblayout="${kblayout}\n\\tOption \"XkbVariant\" \"abnt2\""
+            sed -i "${line}a $kblayout" $file
+        elif [ $LOCATION = "fr_FR" ]; then
+            kblayout="\\\tOption \"XkbLayout\" \"fr\""
+            sed -i "${line}a $kblayout" $file
+        fi
+    fi
+    #}}}
 }
 #}}}
 #VIDEO CARDS {{{
@@ -743,7 +760,9 @@ function install_video_cards(){
         5)
             pacman -S --noconfirm --needed virtualbox-archlinux-additions
             modprobe -a vboxguest vboxsf vboxvideo
-            add_module "vboxguest vboxsf vboxvideo"
+            add_module "vboxguest"
+            add_module "vboxsf"
+            add_module "vboxvideo"
             groupadd vboxsf
             gpasswd -a $USERNAME vboxsf
             install_status
@@ -877,45 +896,45 @@ function install_git_tor(){
 #DESKTOP ENVIRONMENT {{{
 function install_desktop_environment(){
     function install_icons() { #{{{
-    while [ 1 ]
-    do
-        print_title "GNOME ICONS"
-        echo " 1) $(checkbox_package "awoken-icons") Awoken"
-        echo " 2) $(checkbox_package "faenza-icon-theme") Faenza"
-        echo " 3) $(checkbox_package "faenza-cupertino-icon-theme") Faenza-Cupertino"
-        echo " 4) $(checkbox_package "faience-icon-theme") Faience"
-        echo " 5) $(checkbox_package "elementary-icons") Elementary"
-        echo ""
-        echo " b) BACK"
-        echo ""
-        read_option
-        for OPT in ${OPTIONS[@]}; do
-            case "$OPT" in
-                1)
-                    package_install "awoken-icons"
-                    ;;
-                2)
-                    package_install "faenza-icon-theme"
-                    ;;
-                3)
-                    package_install "faenza-cupertino-icon-theme"
-                    ;;
-                4)
-                    package_install "faience-icon-theme"
-                    ;;
-                5)
-                    package_install "elementary-icons"
-                    ;;
-                "b")
-                    break
-                    ;;
-                *)
-                    invalid_option
-                    ;;
-            esac
-        done
+        while [ 1 ]
+        do
+            print_title "GNOME ICONS"
+            echo " 1) $(checkbox_package "awoken-icons") Awoken"
+            echo " 2) $(checkbox_package "faenza-icon-theme") Faenza"
+            echo " 3) $(checkbox_package "faenza-cupertino-icon-theme") Faenza-Cupertino"
+            echo " 4) $(checkbox_package "faience-icon-theme") Faience"
+            echo " 5) $(checkbox_package "elementary-icons") Elementary"
+            echo ""
+            echo " b) BACK"
+            echo ""
+            read_option
+            for OPT in ${OPTIONS[@]}; do
+                case "$OPT" in
+                    1)
+                        package_install "awoken-icons"
+                        ;;
+                    2)
+                        package_install "faenza-icon-theme"
+                        ;;
+                    3)
+                        package_install "faenza-cupertino-icon-theme"
+                        ;;
+                    4)
+                        package_install "faience-icon-theme"
+                        ;;
+                    5)
+                        package_install "elementary-icons"
+                        ;;
+                    "b")
+                        break
+                        ;;
+                    *)
+                        invalid_option
+                        ;;
+                esac
+            done
         elihw
-    done
+        done
     } #}}}
     print_title "DESKTOP ENVIRONMENT - https://wiki.archlinux.org/index.php/Desktop_Environment"
     echo "Choose your desktop-environment:"
@@ -1416,6 +1435,7 @@ function install_nm_wicd(){
             fi
             groupadd networkmanager
             gpasswd -a $USERNAME networkmanager
+            replace_daemon "networkmanager" "network"
             replace_daemon "network" "networkmanager"
             install_status
             sumary "Networkmanager installation"
@@ -1429,6 +1449,7 @@ function install_nm_wicd(){
             else
                 pacman -S --noconfirm --needed wicd
             fi
+            replace_daemon "wicd" "network"
             replace_daemon "network" "wicd"
             install_status
             sumary "Wicd installation"
@@ -1949,7 +1970,7 @@ question_for_answer "Install LAMP"
 case "$OPTION" in
     "y")
         pacman -S --noconfirm --needed apache mysql php php-apache php-mcrypt php-gd
-        if ! checkpackage "adminer" ; then
+        if ! check_package "adminer" ; then
             package_install "adminer"
             rc.d start httpd mysqld
             #CONFIGURE LAMP SERVER {{{
