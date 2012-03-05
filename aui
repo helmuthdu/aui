@@ -430,7 +430,7 @@ function select_user(){
             cp dotfiles/.* /home/$USERNAME/
             rm -fr dotfiles
             print_title "DEFAULT EDITOR"
-            EDITOR=("Nano" "Vim [Default]");
+            EDITOR=("Nano" "Vim");
             PS3="$prompt1"
             echo -e "Choose default editor\n"
             select OPT in "${EDITOR[@]}"; do
@@ -462,6 +462,8 @@ function select_user(){
     echo "Avaliable Users:"
     if [ $(( ${#users[@]} )) -gt 0 ]; then
         echo -e "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES\n"
+    else
+        echo ""
     fi
     select OPT in "${users[@]}" "Create new user"; do
         if [ "$OPT" == "Create new user" ]; then
@@ -703,15 +705,28 @@ function install_xorg(){
     line=`grep -n "keyboard" $file | cut -f1 -d:`
     line=$(( $line + 2 ))
     checkpatch=`cat $file | sed ''$(( $line + 1 ))'!d'`
-    if [[ "$checkpatch" != *"XkbLayout"* ]]; then
-        if [ $LOCATION = "pt_BR" ]; then
-            kblayout="\\\tOption \"XkbLayout\" \"br\""
-            kblayout="${kblayout}\n\\tOption \"XkbVariant\" \"abnt2\""
-            sed -i "${line}a $kblayout" $file
-        elif [ $LOCATION = "fr_FR" ]; then
-            kblayout="\\\tOption \"XkbLayout\" \"fr\""
-            sed -i "${line}a $kblayout" $file
-        fi
+    if [[ "$checkpatch" != *"XkbLayout"* ]] && [ $LOCATION != "en_US" ]; then
+    OPTIONS=("fr_FR" "pt_BR [ABNT2]");
+    PS3="$prompt1"
+    echo -e "\nATTENTION: Patch 10-evdev.conf with following keyboard configuration\n"
+    select OPT in "${OPTIONS[@]}" "Skip"; do
+        case "$REPLY" in
+            1)
+                kblayout="\\\tOption \"XkbLayout\" \"fr\""
+                sed -i "${line}a $kblayout" $file
+                break
+                ;;
+            2)
+                kblayout="\\\tOption \"XkbLayout\" \"br\""
+                kblayout="${kblayout}\n\\tOption \"XkbVariant\" \"abnt2\""
+                sed -i "${line}a $kblayout" $file
+                break
+                ;;
+            $(( ${#OPTIONS[@]}+1 )))
+                break
+                ;;
+        esac
+    done
     fi
     #}}}
 }
