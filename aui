@@ -120,25 +120,22 @@ function add_module(){ #{{{
     #sed -i '/MODULES[=]/s/^[^ ]*\>/& '"$1"'/' /etc/rc.conf
 } #}}}
 function check_package(){ #{{{
-    if pacman -Q $1 &>/dev/null ; then
-        return 0
-    else
-        return 1
-    fi
+    for PACKAGE in $1; do
+        if pacman -Q $PACKAGE &>/dev/null; then
+            return 0
+        fi
+    done
+    return 1
 } #}}}
 function checkbox(){ #{{{
     if [ $1 -eq 1 ]; then
         echo "[X]"
-    elif [ $1 -eq 2 ]; then
-        echo "[*]"
     else
         echo "[ ]"
     fi
 } #}}}
 function checkbox_package(){ #{{{
-    if [ "$1" = "many" ]; then
-        checkbox 2
-    elif check_package $1; then
+    if check_package "$1"; then
         checkbox 1
     else
         checkbox 0
@@ -963,10 +960,10 @@ function install_desktop_environment(){
             while [ 1 ]
             do
                 print_title "GNOME CUSTOMIZATION"
-                echo " 1) $(checkbox_package "many") Gnome Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "many") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
-                echo " 3) $(checkbox_package "many") GnomeShell Extensions"
-                echo " 4) $(checkbox_package "many") GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
+                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons [Faience, Faenza, Elementary]"
+                echo " 2) $(checkbox_package "gtk-theme-aldabra egtk-bzr light-themes orion-gtk-theme zukitwo-themes") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
+                echo " 3) $(checkbox_package "gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro gnome-shell-extension-user-theme gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git") GnomeShell Extensions"
+                echo " 4) $(checkbox_package "gnome-shell-theme-eos gnome-shell-theme-dark-shine gnome-shell-theme-faience gnome-shell-theme-nord") GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
                 echo " 5) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
                 echo " 6) $(checkbox_package "gnome-packagekit") Packagekit"
                 echo ""
@@ -1237,7 +1234,7 @@ function install_desktop_environment(){
             while [ 1 ]
             do
                 print_title "XFCE CUSTOMIZATION"
-                echo " 1) $(checkbox_package "many") Icons [Faience, Faenza, Elementary]"
+                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons [Faience, Faenza, Elementary]"
                 echo " 2) $(checkbox_package "zukitwo-themes") Themes [Zukitwo]"
                 echo " 3) $(checkbox_package "lightdm") LightDM"
                 echo ""
@@ -1285,7 +1282,7 @@ function install_desktop_environment(){
             while [ 1 ]
             do
                 print_title "LXDE CUSTOMIZATION"
-                echo " 1) $(checkbox_package "many") Icons [Faience, Faenza, Elementary]"
+                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons [Faience, Faenza, Elementary]"
                 echo " 2) $(checkbox_package "lxdm") LXDM"
                 echo " 3) $(checkbox_package "xfburn") Xfburn"
                 echo ""
@@ -1340,7 +1337,7 @@ function install_desktop_environment(){
             do
                 print_title "OPENBOX CUSTOMIZATION"
                 echo " 1) $(checkbox_package "compton") Compton [xcompmgr fork]"
-                echo " 2) $(checkbox_package "many") Icons [Faience, Faenza, Elementary]"
+                echo " 2) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons [Faience, Faenza, Elementary]"
                 echo " 3) $(checkbox_package "geeqie") Geeqie"
                 echo " 4) $(checkbox_package "gmrun") Gmrun"
                 echo " 5) $(checkbox_package "lightdm") LightDM"
