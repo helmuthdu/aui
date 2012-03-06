@@ -48,44 +48,6 @@ ARCHI=`uname -m`
 prompt1="Enter your option: "
 prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
 
-# AUTOMATICALLY DETECTS THE SYSTEM LANGUAGE BASED ON YOUR RC.CONF#{{{
-    LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | sed 's/.*"\(.*\)".*/\1/g' | cut -c1-5`
-    #KDE #{{{
-    if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "zh_CN" ]; then
-        LOCATION_KDE=`echo $LOCATION | tr '[:upper:]' '[:lower:]'`
-    elif [ $LOCATION = "en_US" ]; then
-        LOCATION_KDE="en_gb"
-    else
-        LOCATION_KDE=`echo $LOCATION | cut -d\_ -f1`
-    fi
-    #}}}
-    #FIREFOX #{{{
-    if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "pt_PT" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "es_AR" ] || [ $LOCATION = "es_ES" ] || [ $LOCATION = "zh_CN" ]; then
-        LOCATION_FF=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-    elif [ $LOCATION = "en_US" ]; then
-        LOCATION_FF="en-gb"
-    else
-        LOCATION_FF=`echo $LOCATION | cut -d\_ -f1`
-    fi
-    #}}}
-    #HUNSPELL #{{{
-    if [ $LOCATION = "pt_BR" ]; then
-        LOCATION_HS=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-    elif [ $LOCATION = "pt_PT" ]; then
-        LOCATION_HS="pt_pt"
-    else
-        LOCATION_HS=`echo $LOCATION | cut -d\_ -f1`
-    fi
-    #}}}
-    #LIBREOFFICE #{{{
-    if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "en_US" ] || [ $LOCATION = "zh_CN" ]; then
-        LOCATION_LO=`echo $LOCATION | sed 's/_/-/'`
-    else
-        LOCATION_LO=`echo $LOCATION | cut -d\_ -f1`
-    fi
-    #}}}
-#}}}
-
 function question_for_answer(){ #{{{
     read -p "$1 [y][N]: " OPTION
     OPTION=`echo "$OPTION" | tr '[:upper:]' '[:lower:]'`
@@ -270,6 +232,44 @@ function check_root() {
 #}}}
 #LANGUAGE SELECTOR {{{
 function language_selector(){
+    #DETECTS THE SYSTEM LANGUAGE {{{
+    #automatically detects the system language based on your rc.conf
+    LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | sed 's/.*"\(.*\)".*/\1/g' | cut -c1-5`
+    #KDE #{{{
+    if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "zh_CN" ]; then
+        LOCATION_KDE=`echo $LOCATION | tr '[:upper:]' '[:lower:]'`
+    elif [ $LOCATION = "en_US" ]; then
+        LOCATION_KDE="en_gb"
+    else
+        LOCATION_KDE=`echo $LOCATION | cut -d\_ -f1`
+    fi
+    #}}}
+    #FIREFOX #{{{
+    if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "pt_PT" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "es_AR" ] || [ $LOCATION = "es_ES" ] || [ $LOCATION = "zh_CN" ]; then
+        LOCATION_FF=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+    elif [ $LOCATION = "en_US" ]; then
+        LOCATION_FF="en-gb"
+    else
+        LOCATION_FF=`echo $LOCATION | cut -d\_ -f1`
+    fi
+    #}}}
+    #HUNSPELL #{{{
+    if [ $LOCATION = "pt_BR" ]; then
+        LOCATION_HS=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+    elif [ $LOCATION = "pt_PT" ]; then
+        LOCATION_HS="pt_pt"
+    else
+        LOCATION_HS=`echo $LOCATION | cut -d\_ -f1`
+    fi
+    #}}}
+    #LIBREOFFICE #{{{
+    if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "en_US" ] || [ $LOCATION = "zh_CN" ]; then
+        LOCATION_LO=`echo $LOCATION | sed 's/_/-/'`
+    else
+        LOCATION_LO=`echo $LOCATION | cut -d\_ -f1`
+    fi
+    #}}}
+    #}}}
     print_title "LANGUAGE - https://wiki.archlinux.org/index.php/Locale"
     question_for_answer "Default system language: \"$LOCATION\""
     case "$OPTION" in
