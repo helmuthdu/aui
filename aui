@@ -2269,9 +2269,10 @@ do
                 echo " 2) $(checkbox_package "frogatto") Frogatto"
                 echo " 3) $(checkbox_package "bomberclone") Bomberclone"
                 echo " 4) $(checkbox_package "goonies") Goonies"
-                echo " 5) $(checkbox_package "neverball") Neverball"
-                echo " 6) $(checkbox_package "smc") Super Mario Chronicles"
-                echo " 7) $(checkbox_package "xmoto") X-Moto"
+                echo " 5) $(checkbox_package "mari0") Mari0"
+                echo " 6) $(checkbox_package "neverball") Neverball"
+                echo " 7) $(checkbox_package "smc") Super Mario Chronicles"
+                echo " 8) $(checkbox_package "xmoto") X-Moto"
                 echo ""
                 echo " b) BACK"
                 echo ""
@@ -2291,12 +2292,15 @@ do
                             package_install "goonies"
                             ;;
                         5)
-                            package_install "neverball"
+                            package_install "mari0"
                             ;;
                         6)
-                            package_install "smc"
+                            package_install "neverball"
                             ;;
                         7)
+                            package_install "smc"
+                            ;;
+                        8)
                             package_install "xmoto"
                             ;;
                         "b")
