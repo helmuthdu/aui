@@ -701,6 +701,7 @@ function install_xorg(){
     pacman -S --noconfirm --needed mesa
     pacman -S --noconfirm --needed gamin
     pacman -S --noconfirm --needed numlockx
+    echo -e "if [ -x /usr/bin/numlockx ]; then\n\t/usr/bin/numlockx on\nfi" >> /etc/rc.local
     #CONFIGURE QWERTY KEYBOARD IN XORG {{{
     local file="/etc/X11/xorg.conf.d/10-evdev.conf"
     local line=`grep -n "keyboard" $file | cut -f1 -d:`
