@@ -709,7 +709,7 @@ function install_xorg(){
     local keymap=`cat /etc/rc.conf | sed -n '/KEYMAP[=]/p' | sed 's/.*"\(.*\)".*/\1/g'`
 
     if [[ "$patch" != *"XkbLayout"* ]]; then
-        if [ $keymap = "us-acento" ]; then
+        if [ $keymap = "us-acentos" ]; then
             kblayout="\\\tOption \"XkbLayout\" \"us_intl\""
             sed -i "${line}a $kblayout" $file
         else
