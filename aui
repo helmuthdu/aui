@@ -700,25 +700,27 @@ function install_xorg(){
     pacman -S --noconfirm --needed xf86-input-synaptics xf86-input-mouse xf86-input-keyboard
     pacman -S --noconfirm --needed mesa
     pacman -S --noconfirm --needed gamin
+
     #CONFIGURE QWERTY KEYBOARD IN XORG {{{
-    file="/etc/X11/xorg.conf.d/10-evdev.conf"
-    line=`grep -n "keyboard" $file | cut -f1 -d:`
-    line=$(( $line + 2 ))
-    checkpatch=`cat $file | sed ''$(( $line + 1 ))'!d'`
-    keymap=`cat /etc/rc.conf | sed -n '/KEYMAP[=]/p' | sed 's/.*"\(.*\)".*/\1/g'`
-    if [[ "$checkpatch" != *"XkbLayout"* ]]; then
-        if [ $LOCATION = "pt_BR" ]; then
-            if [ $keymap = "br-abnt2" ]; then
+    local file="/etc/X11/xorg.conf.d/10-evdev.conf"
+    local line=`grep -n "keyboard" $file | cut -f1 -d:`
+    local line=$(( $line + 2 ))
+    local patch=`cat $file | sed ''$(( $line + 1 ))'!d'`
+    local keymap=`cat /etc/rc.conf | sed -n '/KEYMAP[=]/p' | sed 's/.*"\(.*\)".*/\1/g'`
+
+    if [[ "$patch" != *"XkbLayout"* ]]; then
+        if [ $keymap = "us-acento" ]; then
+            kblayout="\\\tOption \"XkbLayout\" \"us_intl\""
+            sed -i "${line}a $kblayout" $file
+        else
+            if [ $LOCATION = "pt_BR" ]; then
                 kblayout="\\\tOption \"XkbLayout\" \"br\""
                 kblayout="${kblayout}\n\\tOption \"XkbVariant\" \"abnt2\""
                 sed -i "${line}a $kblayout" $file
-            elif [ $keymap = "us-acento" ]; then
-                kblayout="\\\tOption \"XkbLayout\" \"us_intl\""
+            elif [ $LOCATION = "fr_FR" ]; then
+                kblayout="\\\tOption \"XkbLayout\" \"fr\""
                 sed -i "${line}a $kblayout" $file
             fi
-        elif [ $LOCATION = "fr_FR" ]; then
-            kblayout="\\\tOption \"XkbLayout\" \"fr\""
-            sed -i "${line}a $kblayout" $file
         fi
     fi
     #}}}
