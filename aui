@@ -700,7 +700,7 @@ function install_xorg(){
     pacman -S --noconfirm --needed xf86-input-synaptics xf86-input-mouse xf86-input-keyboard
     pacman -S --noconfirm --needed mesa
     pacman -S --noconfirm --needed gamin
-
+    pacman -S --noconfirm --needed numlockx
     #CONFIGURE QWERTY KEYBOARD IN XORG {{{
     local file="/etc/X11/xorg.conf.d/10-evdev.conf"
     local line=`grep -n "keyboard" $file | cut -f1 -d:`
