@@ -1269,6 +1269,7 @@ function install_desktop_environment(){
                         3)
                             package_install "lightdm"
                             add_daemon "lightdm"
+                            sed -i 's/# greeter-session [=] .*$/greeter-session = lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
                             ;;
                         "d")
                             break
@@ -1385,6 +1386,7 @@ function install_desktop_environment(){
                         5)
                             package_install "lightdm"
                             add_daemon "lightdm"
+                            sed -i 's/# greeter-session [=] .*$/greeter-session = lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
                             ;;
                         6)
                             package_install "rxvt-unicode"
@@ -2118,20 +2120,21 @@ function install_video_apps(){
 while [ 1 ]
 do
     print_title "VIDEO APPS"
-    echo " 1) $(checkbox_package "gnome-mplayer") Gnome Mplayer"
-    echo " 2) $(checkbox_package "parole") Parole"
-    echo " 3) $(checkbox_package "minitube") Minitube"
-    echo " 4) $(checkbox_package "rosa-media-player-bin") Rosa Media Player"
-    echo " 5) $(checkbox_package "smplayer") SMplayer"
-    echo " 6) $(checkbox_package "vlc") VLC"
-    echo " 7) $(checkbox_package "xbmc") XBMC"
-    echo " 8) $(checkbox_package "arista-transcoder") Arista"
-    echo " 9) $(checkbox_package "transmageddon") Transmageddon"
-    echo "10) $(checkbox_package "kdenlive") Kdenlive"
-    echo "11) $(checkbox_package "openshot") Openshot"
-    echo "12) $(checkbox_package "pitivi") Pitivi"
-    echo "13) $(checkbox_package "kazam-bzr") Kazam"
-    echo "14) $(if [ "$ARCHI" = "i686" ]; then echo "$(checkbox_package "codecs")"; else echo "$(checkbox_package "codecs64")"; fi) Codecs"
+    echo " 1) $(checkbox_package "audience-bzr") Audience"
+    echo " 2) $(checkbox_package "gnome-mplayer") Gnome Mplayer"
+    echo " 3) $(checkbox_package "parole") Parole"
+    echo " 4) $(checkbox_package "minitube") Minitube"
+    echo " 5) $(checkbox_package "rosa-media-player-bin") Rosa Media Player"
+    echo " 6) $(checkbox_package "smplayer") SMplayer"
+    echo " 7) $(checkbox_package "vlc") VLC"
+    echo " 8) $(checkbox_package "xbmc") XBMC"
+    echo " 9) $(checkbox_package "arista-transcoder") Arista"
+    echo "10) $(checkbox_package "transmageddon") Transmageddon"
+    echo "11) $(checkbox_package "kdenlive") Kdenlive"
+    echo "12) $(checkbox_package "openshot") Openshot"
+    echo "13) $(checkbox_package "pitivi") Pitivi"
+    echo "14) $(checkbox_package "kazam-bzr") Kazam"
+    echo "15) $(if [ "$ARCHI" = "i686" ]; then echo "$(checkbox_package "codecs")"; else echo "$(checkbox_package "codecs64")"; fi) Codecs"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2139,49 +2142,52 @@ do
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
-                package_install "gnome-mplayer"
+                package_install "audience-bzr"
                 ;;
             2)
-                package_install "parole"
+                package_install "gnome-mplayer"
                 ;;
             3)
-                package_install "minitube"
+                package_install "parole"
                 ;;
             4)
-                package_install "rosa-media-player-bin"
+                package_install "minitube"
                 ;;
             5)
-                package_install "smplayer smplayer-themes"
+                package_install "rosa-media-player-bin"
                 ;;
             6)
+                package_install "smplayer smplayer-themes"
+                ;;
+            7)
                 package_install "vlc"
                 if [ "$KDE" -eq 1 ]; then
                     package_install "phonon-vlc"
                 fi
                 ;;
-            7)
+            8)
                 package_install "xbmc"
                 ;;
-            8)
+            9)
                 package_install "arista-transcoder"
                 ;;
-            9)
+            10)
                 package_install "transmageddon"
                 ;;
-            10)
+            11)
                 package_install "kdenlive"
                 ;;
-            11)
+            12)
                 package_install "openshot"
                 ;;
-            12)
+            13)
                 package_install "pitivi"
                 ;;
-            13)
+            14)
                 package_install "python-rsvg"
                 package_install "kazam-bzr"
                 ;;
-            14)
+            15)
                 package_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
                 if [ "$ARCHI" = "i686" ]; then
                     package_install "codecs"
