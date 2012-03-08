@@ -20,7 +20,7 @@
 # Active:
 # 0) No
 # 1) Yes
-USE_SCRIPT=1
+USE_SCRIPT=0
 
 #MAINMENU {{{
     # 1) Basic Setup
