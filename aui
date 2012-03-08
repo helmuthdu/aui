@@ -2266,10 +2266,10 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read_input_options "$GAMES_OPTIONS"
-    GAMES_OPTIONS="b"
+    read_input_options "$LOL"
+    LOL="b"
     for OPT in ${OPTIONS[@]}; do
-        case "$OPTION" in
+        case "$OPT" in
             1)
                 #ACTION/ADVENTURE {{{
                 while [ 1 ]
@@ -2283,8 +2283,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_input_options "$ACTION_GAMES"
-                    ACTION_GAMES="b"
+                    read_input_options "$ACTION"
+                    ACTION="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2310,7 +2310,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 #}}}
                 OPT=1
@@ -2331,8 +2331,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_input_options "$ARCADE_GAMES"
-                    ARCADE_GAMES="b"
+                    read_input_options "$ARCADE"
+                    ARCADE="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2367,7 +2367,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 #}}}
                 OPT=2
@@ -2383,8 +2383,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_input_options "$DUNGEON_GAMES"
-                    DUNGEON_GAMES="b"
+                    read_input_options "$DUNGEON"
+                    DUNGEON="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2404,7 +2404,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 #}}}
                 OPT=3
@@ -2419,8 +2419,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_input_options "$EMULATORS_GAMES"
-                    EMULATORS_GAMES="b"
+                    read_input_options "$EMULATORS"
+                    EMULATORS="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2437,7 +2437,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 #}}}
                 OPT=4
@@ -2454,8 +2454,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_input_options "$FPS_GAMES"
-                    FPS_GAMES="b"
+                    read_input_options "$FPS"
+                    FPS="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2479,7 +2479,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 #}}}
                 OPT=5
@@ -2495,8 +2495,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_input_options "$MMO_GAMES"
-                    MMO_GAMES="b"
+                    read_input_options "$MMO"
+                    MMO="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2516,7 +2516,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 #}}}
                 OPT=6
@@ -2530,8 +2530,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_input_options "$PUZZLE_GAMES"
-                    PUZZLE_GAMES="b"
+                    read_input_options "$PUZZLE"
+                    PUZZLE="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2545,7 +2545,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 #}}}
                 OPT=7
@@ -2560,8 +2560,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_input_options "$RPG_GAMES"
-                    RPG_GAMES="b"
+                    read_input_options "$RPG"
+                    RPG="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2578,7 +2578,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 #}}}
                 OPT=8
@@ -2596,8 +2596,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_input_options "$RACING_GAMES"
-                    RACING_GAMES="b"
+                    read_input_options "$RACING"
+                    RACING="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2623,7 +2623,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 #}}}
                 OPT=9
@@ -2639,8 +2639,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_input_options "$SIMULATION_GAMES"
-                    SIMULATION_GAMES="b"
+                    read_input_options "$SIMULATION"
+                    SIMULATION="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2660,7 +2660,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 #}}}
                 OPT=10
@@ -2679,8 +2679,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_input_options "$STRATEGY_GAMES"
-                    STRATEGY_GAMES="b"
+                    read_input_options "$STRATEGY"
+                    STRATEGY="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2709,7 +2709,7 @@ do
                                 ;;
                         esac
                     done
-                    elihw
+                elihw
                 done
                 #}}}
                 OPT=11
@@ -2751,7 +2751,7 @@ do
                 ;;
             2)
                 echo -e "\nWARNING: Install time can be > 20min"
-                read_input_text "Are you sure you want to continue?"
+                read_input_text "Are you sure you want to continue?" $GOOGLE_FONTS
                 if [ $OPTION = "n" ]; then continue; fi
                 pacman -Rdd --noconfirm ttf-droid
                 pacman -Rdd --noconfirm ttf-ubuntu-font-family
@@ -2876,8 +2876,8 @@ do
     echo " 8) $(checkbox $INTERNET) Internet Apps"
     echo " 9) $(checkbox $AUDIO) Audio Apps"
     echo "10) $(checkbox $VIDEO) Video Apps"
-    echo "11) $(checkbox $LAMP) LAMP"
-    echo "12) $(checkbox $GAMES) Games"
+    echo "11) $(checkbox $GAMES) Games"
+    echo "12) $(checkbox $LAMP) LAMP"
     echo "13) $(checkbox $FONTS) Fonts"
     echo "14) $(checkbox $FONTSCONFIG) Fonts Configuration"
     echo "15) $(checkbox $CLEANPACKAGES) Clean Orphan Packages"
@@ -2947,12 +2947,12 @@ do
                 VIDEO=1
                 ;;
             11)
-                install_lamp
-                LAMP=1
-                ;;
-            12)
                 install_games
                 GAMES=1
+                ;;
+            12)
+                install_lamp
+                LAMP=1
                 ;;
             13)
                 install_fonts

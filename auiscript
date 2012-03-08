@@ -33,8 +33,8 @@ USE_SCRIPT=0
     # 8) Internet Apps
     # 9) Audio Apps
     #10) Video Apps
-    #11) LAMP
-    #12) Games
+    #11) Games
+    #12) LAMP
     #13) Fonts
     #14) Fonts Configuration
     #15) Clean Orphan Packages
@@ -175,7 +175,7 @@ USE_SCRIPT=0
     #10) Shutter
     #11) Synapse
     #12) Terminator
-    ACCESSORIES_OPTIONS="1 2 6 8 10 12"
+    ACCESSORIES_OPTIONS="1 6 8 10 12"
 #}}}
 #DEVELOPEMENT {{{
     # 1) Aptana Studio
@@ -295,7 +295,7 @@ USE_SCRIPT=0
     #15) Codecs
     VIDEO_OPTIONS="7 8 15"
 #}}}
-#GAMES #{{{
+#GAMES {{{
     # 1) Action/Adventure
     # 2) Arcade/Platformer
     # 3) Dungeon
@@ -307,14 +307,14 @@ USE_SCRIPT=0
     # 9) Racing
     #10) Simulation
     #11) Strategy
-    GAMES_OPTIONS=""
+    LOL="11"
     #ACTION {{{
         # 1) Astromenace
         # 2) OpenTyrian
         # 3) M.A.R.S.
         # 4) Yo Frankie!
         # 5) Counter-Strike 2D
-        ACTION_GAMES=""
+        ACTION=""
     #}}}
     #ARCADE {{{
         # 1) Opensonic
@@ -325,40 +325,40 @@ USE_SCRIPT=0
         # 6) Neverball
         # 7) Super Mario Chronicles
         # 8) X-Moto
-        ARCADE_GAMES=""
+        ARCADE=""
     #}}}
     #DUNGEON {{{
         # 1) Tales of MajEyal
         # 2) Lost Labyrinth
         # 3) S.C.O.U.R.G.E.
-        DUNGEON_GAMES=""
+        DUNGEON=""
     #}}}
     #EMULATORS {{{
         # 1) VisualBoyAdvanced
         # 2) ZSNES
-        EMULATORS_GAMES=""
+        EMULATORS=""
     #}}}
     #FPS {{{
         # 1) AlienArena
         # 2) Wolfenstein: Enemy Territory
         # 3) World of Padman
         # 4) Warsow
-        FPS_GAMES=""
+        FPS=""
     #}}}
     #MMO {{{
         # 1) Heroes of Newerth
         # 2) Savage II
         # 3) Spiral Knights
-        MMO_GAMES=""
+        MMO=""
     #}}}
     #PUZZLE {{{
         # 1) Numptyphysics
-        PUZZLE_GAMES=""
+        PUZZLE=""
     #}}}
     #RPG {{{
         # 1) Ardentryst
         # 1) Freedroid RPG
-        RPG_GAMES=""
+        RPG=""
     #}}}
     #RACING {{{
         # 1) Maniadrive
@@ -366,13 +366,13 @@ USE_SCRIPT=0
         # 3) Stuntrally
         # 4) SupertuxKart
         # 5) Speed Dreams
-        RACING_GAMES=""
+        RACING=""
     #}}}
     #SIMULATION {{{
         # 1) Simultrans
         # 2) Theme Hospital
         # 3) OpenTTD
-        SIMULATION_GAMES=""
+        SIMULATION=""
     #}}}
     #STRATEGY {{{
         # 1) Wesnoth
@@ -381,7 +381,7 @@ USE_SCRIPT=0
         # 5) Warzone 2100
         # 6) MegaGlest
         # 7) Zod
-        STRATEGY_GAMES=""
+        STRATEGY="4"
     #}}}
 #}}}
 #FONTS {{{
@@ -394,6 +394,7 @@ USE_SCRIPT=0
     # 7) ttf-vista-fonts
     # 8) ttf-mac-fonts
     FONTS_OPTIONS="1-8"
+    GOOGLE_FONTS="n"
 #}}}
 #FONTS CONFIGURATION {{{
     # 1) Ubuntu patched packages
