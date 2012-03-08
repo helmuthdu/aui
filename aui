@@ -70,12 +70,12 @@ function read_input_options(){ #{{{
     local line
     local packages
     if [ $USE_SCRIPT -eq 1 ]; then
-        option=("$1")
+        array=("$1")
     else
         read -p "$prompt2" OPTION
-        option=("$OPTION")
+        array=("$OPTION")
     fi
-    for line in ${option[@]/,/ }; do
+    for line in ${array[@]/,/ }; do
         if [[ ${line/-/} != $line ]]; then
             for ((i=${line%-*}; i<=${line#*-}; i++)); do
                 packages+=($i);
