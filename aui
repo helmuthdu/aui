@@ -18,6 +18,8 @@
 #-------------------------------------------------------------------------------
 # Run this script after your first boot with archlinux (as root)
 
+source auiscript
+
 KDE=0
 LXDE=0
 XFCE=0
@@ -29,14 +31,14 @@ PACKER=0
 
 BASICSETUP=0
 DESKTOPENVIRONMENT=0
-ACCESSORIESAPPS=0
-DEVELOPMENTAPPS=0
-OFFICEAPPS=0
-SYSTEMAPPS=0
-GRAPHICSAPPS=0
-INTERNETAPPS=0
-AUDIOAPPS=0
-VIDEOAPPS=0
+ACCESSORIES=0
+DEVELOPMENT=0
+OFFICE=0
+SYSTEM=0
+GRAPHICS=0
+INTERNET=0
+AUDIO=0
+VIDEO=0
 LAMP=0
 GAMES=0
 FONTS=0
@@ -48,10 +50,41 @@ ARCHI=`uname -m`
 prompt1="Enter your option: "
 prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
 
-function question_for_answer(){ #{{{
-    read -p "$1 [y][N]: " OPTION
+function read_input(){ #{{{
+    if [ $USE_SCRIPT -eq 1 ]; then
+        OPTION=$1
+    else
+        read -p "$prompt1: " OPTION
+    fi
+} #}}}
+function read_input_text(){ #{{{
+    if [ $USE_SCRIPT -eq 1 ]; then
+        OPTION=$2
+    else
+        read -p "$1 [y][N]: " OPTION
+        echo ""
+    fi
     OPTION=`echo "$OPTION" | tr '[:upper:]' '[:lower:]'`
-    echo ""
+} #}}}
+function read_input_options(){ #{{{
+    local line
+    local packages
+    if [ $USE_SCRIPT -eq 1 ]; then
+        option=("$1")
+    else
+        read -p "$prompt2" OPTION
+        option=("$OPTION")
+    fi
+    for line in ${option[@]/,/ }; do
+        if [[ ${line/-/} != $line ]]; then
+            for ((i=${line%-*}; i<=${line#*-}; i++)); do
+                packages+=($i);
+            done
+        else
+            packages+=($line)
+        fi
+    done
+    OPTIONS=("${packages[@]}")
 } #}}}
 function print_line(){ #{{{
     printf "%$(tput cols)s\n"|tr ' ' '-'
@@ -113,7 +146,7 @@ function package_install(){ #{{{
             fi
             #FORCE CHECK #{{{
             if ! check_package "$PACKAGE" ; then
-                question_for_answer "Package $PACKAGE not installed, try install again?"
+                read_input_text "Package $PACKAGE not installed, try install again?"
                 if [ $OPTION = "y" ]; then
                     if [ "$YAOURT" -eq 1 ]; then
                         su -l $USERNAME --command="yaourt -S $PACKAGE"
@@ -131,21 +164,6 @@ function package_install(){ #{{{
 function contains_element(){ #{{{
     for e in "${@:2}"; do [[ "$e" = "$1" ]] && break; done;
 } #}}}
-function read_option(){ #{{{
-    local line packages
-    read -p "$prompt2" OPTION
-    option=($OPTION)
-    for line in ${option[@]/,/ }; do
-        if [[ ${line/-/} != $line ]]; then
-            for ((i=${line%-*}; i<=${line#*-}; i++)); do
-                packages+=($i);
-            done
-        else
-            packages+=($line)
-        fi
-    done
-    OPTIONS=("${packages[@]}")
-} #}}}
 function invalid_option(){ #{{{
     print_line
     echo "Invalid option. Try another one."
@@ -160,7 +178,9 @@ function install_status(){ #{{{
 } #}}}
 function pause_function(){ #{{{
     print_line
-    read -e -sn 1 -p "Press any key to continue..."
+    if [ $USE_SCRIPT -ne 1 ]; then
+        read -e -sn 1 -p "Press any key to continue..."
+    fi
 } #}}}
 function sumary(){ #{{{
     case $CURRENT_STATUS in
@@ -183,7 +203,7 @@ function sumary(){ #{{{
     esac
 } #}}}
 function reboot_now(){ #{{{
-    question_for_answer "Reboot now?"
+    read_input_text "Reboot now?"
     case "$OPTION" in
         "y")
             echo "Thanks for using the Archlinux Ultimate Install script by helmuthdu"
@@ -197,7 +217,7 @@ function reboot_now(){ #{{{
     esac
 } #}}}
 function elihw() { #{{{
-    if [ $OPT = "b" ] || [ $OPT = "d" ];then
+    if [ "$OPT" = "b" ] || [ "$OPT" = "d" ];then
         break;
     fi
 } #}}}
@@ -271,7 +291,7 @@ function language_selector(){
     #}}}
     #}}}
     print_title "LANGUAGE - https://wiki.archlinux.org/index.php/Locale"
-    question_for_answer "Default system language: \"$LOCATION\""
+    read_input_text "Default system language: \"$LOCATION\"" $LANGSELECT
     case "$OPTION" in
         "n")
             read -p "New system language [ex: en_US]: " LOCATION
@@ -319,7 +339,7 @@ function language_selector(){
 #CUSTOM REPOSITORIES {{{
 function custom_repositories(){
     print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
-    question_for_answer "Add custom repositories"
+    read_input_text "Add custom repositories" $CUSTOMREPO
     case "$OPTION" in
         "y")
             #CUSTOM REPOSITORIES {{{
@@ -334,7 +354,8 @@ function custom_repositories(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read_option
+                read_input_options "$CUSTOMREPO"
+                CUSTOMREPO="d"
                 for OPT in ${OPTIONS[@]}; do
                     case $OPT in
                         1)
@@ -388,7 +409,7 @@ function custom_repositories(){
 #RANKMIRROR {{{
 function rankmirror(){
     print_title "RANKMIRROR - https://wiki.archlinux.org/index.php/Improve_Pacman_Performance"
-    question_for_answer "Choosing the fastest mirror using rankmirror (this can take a while)"
+    read_input_text "Choosing the fastest mirror using rankmirror (this can take a while)"
     case "$OPTION" in
         "y")
             cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
@@ -558,7 +579,7 @@ function choose_aurhelper(){
 #PACKMAN PACKAGE SIGNING {{{
 function pacman_package_signing(){
     print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
-    question_for_answer "Automatically configure pacman package signing"
+    read_input_text "Automatically configure pacman package signing" $PACKAGESIGN
     case "$OPTION" in
         "y")
             pacman -S --noconfirm --needed base-devel
@@ -633,7 +654,7 @@ function install_basic_setup(){
     #}}}
     #SAMBA #{{{
     print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
-    question_for_answer "Install Samba"
+    read_input_text "Install Samba" $SAMBA
     case "$OPTION" in
         "y")
             pacman -S --noconfirm --needed samba
@@ -650,7 +671,7 @@ function install_basic_setup(){
     #}}}
     #NFS #{{{
     print_title "NFS - https://wiki.archlinux.org/index.php/Nfs"
-    question_for_answer "Install nfs"
+    read_input_text "Install nfs" $NFS
     case "$OPTION" in
         "y")
             pacman -S --noconfirm --needed nfs-utils
@@ -676,7 +697,7 @@ function install_basic_setup(){
 #TLP #{{{
 function install_tlp(){
     print_title "TLP - https://wiki.archlinux.org/index.php/TLP"
-    question_for_answer "Install TLP (Battery Improvement on Laptops)"
+    read_input_text "Install TLP (Battery Improvement on Laptops)" $TLP
     case "$OPTION" in
         "y")
             package_install "tlp"
@@ -745,7 +766,7 @@ function install_video_cards(){
     echo ""
     echo " s) SKIP"
     echo ""
-    read -p "$prompt1" OPTION
+    read_input $VIDEOCARD
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed libgl xf86-video-intel
@@ -797,7 +818,7 @@ function install_video_cards(){
 #CUPS {{{
 function install_cups(){
     print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
-    question_for_answer "Install CUPS (Common Unix Printing System)"
+    read_input_text "Install CUPS (Common Unix Printing System)" $CUPS
     case "$OPTION" in
         "y")
             pacman -S --noconfirm --needed cups ghostscript gsfonts
@@ -816,7 +837,7 @@ function install_cups(){
 #ADDITIONAL FIRMWARE {{{
 function install_additional_firmwares(){
     print_title "INSTALL ADDITIONAL FIRMWARES"
-    question_for_answer "Install additional firmwares [Wireless,Bluetooth]"
+    read_input_text "Install additional firmwares [Wireless,Bluetooth]" $FIRMWARE
     case "$OPTION" in
         "y")
             #ADDITIONAL FIRMWARE {{{
@@ -832,7 +853,8 @@ function install_additional_firmwares(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read_option
+                read_input_options "FIRMWARE_OPTIONS"
+                FIRMWARE_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -877,7 +899,7 @@ function install_additional_firmwares(){
 #GIT ACCESS THRU A FIREWALL {{{
 function install_git_tor(){
     print_title "GIT-TOR - https://wiki.archlinux.org/index.php/Tor"
-    question_for_answer "Ensuring access to GIT through a firewall (bypass college firewall)"
+    read_input_text "Ensuring access to GIT through a firewall (bypass college firewall)" $GITTOR
     case "$OPTION" in
         "y")
             package_install "gtk-doc openbsd-netcat vidalia privoxy git"
@@ -920,7 +942,8 @@ function install_desktop_environment(){
             echo ""
             echo " b) BACK"
             echo ""
-            read_option
+            read_input_options "$GNOME_ICONS"
+            GNOME_ICONS="b"
             for OPT in ${OPTIONS[@]}; do
                 case "$OPT" in
                     1)
@@ -958,7 +981,7 @@ function install_desktop_environment(){
     echo " 5) OpenBox"
     echo ""
     echo " b) BACK"
-    read -p "$prompt1" OPTION
+    read_input $DESKTOPENV
     case "$OPTION" in
         1)
             #GNOME {{{
@@ -985,7 +1008,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read_option
+                read_input_options "$GNOME_OPTIONS"
+                GNOME_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -1005,7 +1029,8 @@ function install_desktop_environment(){
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
-                                read_option
+                                read_input_options "$GNOME_THEMES"
+                                GNOME_THEMES="b"
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
@@ -1052,7 +1077,8 @@ function install_desktop_environment(){
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
-                                read_option
+                                read_input_options "$GNOME_EXTENSIONS"
+                                GNOME_EXTENSIONS="b"
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
@@ -1105,7 +1131,8 @@ function install_desktop_environment(){
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
-                                read_option
+                                read_input_options "$GNOME_SHELL_THEMES"
+                                GNOME_SHELL_THEMES="b"
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
@@ -1195,7 +1222,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read_option
+                read_input_options "$KDE_OPTIONS"
+                KDE_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -1256,7 +1284,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read_option
+                read_input_options "$XFCE_OPTIONS"
+                XFCE_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -1305,7 +1334,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read_option
+                read_input_options "$LXDE_OPTIONS"
+                LXDE_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -1367,7 +1397,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                read_option
+                read_input_options "$OPENBOX_OPTIONS"
+                OPENBOX_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -1437,7 +1468,7 @@ function install_nm_wicd(){
     echo ""
     echo " n) NONE"
     echo ""
-    read -p "$prompt1" OPTION
+    read_input $NETWORKMANAGER
     case "$OPTION" in
         1)
             print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
@@ -1505,7 +1536,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read_option
+    read_input_options "$ACCESSORIES_OPTIONS"
+    ACCESSORIES_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -1585,7 +1617,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read_option
+    read_input_options "$DEVELOPMENT_OPTIONS"
+    DEVELOPMENT_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -1611,7 +1644,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
-                    read_option
+                    read_input_options "$ECLIPSE"
+                    ECLIPSE_OPTIONSS="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -1723,7 +1757,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read_option
+    read_input_options "$OFFICE_OPTIONS"
+    OFFICE_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -1795,7 +1830,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read_option
+    read_input_options "$SYSTEMTOOLS_OPTIONS"
+    SYSTEMTOOLS_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -1845,7 +1881,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read_option
+    read_input_options "$GRAPHICS_OPTIONS"
+    GRAPHICS_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -1907,7 +1944,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read_option
+    read_input_options "$INTERNET_OPTIONS"
+    INTERNET_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -1987,7 +2025,7 @@ done
 #LAMP #{{{
 function install_lamp(){
 print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlinux.org/index.php/LAMP"
-question_for_answer "Install LAMP"
+read_input_text "Install LAMP" $LAMP
 case "$OPTION" in
     "y")
         pacman -S --noconfirm --needed apache mysql php php-apache php-mcrypt php-gd
@@ -2051,7 +2089,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read_option
+    read_input_options "$AUDIO_OPTIONS"
+    AUDIO_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -2138,7 +2177,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read_option
+    read_input_options "$VIDEO_OPTIONS"
+    VIDEO_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -2226,434 +2266,463 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt1" OPTION
-    case "$OPTION" in
-        1)
-            #ACTION/ADVENTURE {{{
-            while [ 1 ]
-            do
-                print_title "ACTION AND ADVENTURE"
-                echo " 1) $(checkbox_package "astromenace") Astromenace"
-                echo " 2) $(checkbox_package "opentyrian-hg") OpenTyrian"
-                echo " 3) $(checkbox_package "mars-shooter") M.A.R.S."
-                echo " 4) $(checkbox_package "yofrankie") Yo Frankie!"
-                echo " 5) $(checkbox_package "counter-strike-2d") Counter-Strike 2D"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read_option
-                for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                        1)
-                            package_install "astromenace"
-                            ;;
-                        2)
-                            package_install "opentyrian-hg"
-                            ;;
-                        3)
-                            package_install "mars-shooter"
-                            ;;
-                        4)
-                            package_install "yofrankie"
-                            ;;
-                        5)
-                            package_install "counter-strike-2d"
-                            ;;
-                        "b")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
+    read_input_options "$GAMES_OPTIONS"
+    GAMES_OPTIONS="b"
+    for OPT in ${OPTIONS[@]}; do
+        case "$OPTION" in
+            1)
+                #ACTION/ADVENTURE {{{
+                while [ 1 ]
+                do
+                    print_title "ACTION AND ADVENTURE"
+                    echo " 1) $(checkbox_package "astromenace") Astromenace"
+                    echo " 2) $(checkbox_package "opentyrian-hg") OpenTyrian"
+                    echo " 3) $(checkbox_package "mars-shooter") M.A.R.S."
+                    echo " 4) $(checkbox_package "yofrankie") Yo Frankie!"
+                    echo " 5) $(checkbox_package "counter-strike-2d") Counter-Strike 2D"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read_input_options "$ACTION_GAMES"
+                    ACTION_GAMES="b"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "astromenace"
+                                ;;
+                            2)
+                                package_install "opentyrian-hg"
+                                ;;
+                            3)
+                                package_install "mars-shooter"
+                                ;;
+                            4)
+                                package_install "yofrankie"
+                                ;;
+                            5)
+                                package_install "counter-strike-2d"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
                 done
-            elihw
-            done
-            ;;
-            #}}}
-        2)
-            #ARCADE/PLATFORMER {{{
-            while [ 1 ]
-            do
-                print_title "ARCADE AND PLATFORMER"
-                echo " 1) $(checkbox_package "opensonic") Opensonic"
-                echo " 2) $(checkbox_package "frogatto") Frogatto"
-                echo " 3) $(checkbox_package "bomberclone") Bomberclone"
-                echo " 4) $(checkbox_package "goonies") Goonies"
-                echo " 5) $(checkbox_package "mari0") Mari0"
-                echo " 6) $(checkbox_package "neverball") Neverball"
-                echo " 7) $(checkbox_package "smc") Super Mario Chronicles"
-                echo " 8) $(checkbox_package "xmoto") X-Moto"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read_option
-                for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                        1)
-                            package_install "opensonic"
-                            ;;
-                        2)
-                            package_install "frogatto"
-                            ;;
-                        3)
-                            package_install "bomberclone"
-                            ;;
-                        4)
-                            package_install "goonies"
-                            ;;
-                        5)
-                            package_install "mari0"
-                            ;;
-                        6)
-                            package_install "neverball"
-                            ;;
-                        7)
-                            package_install "smc"
-                            ;;
-                        8)
-                            package_install "xmoto"
-                            ;;
-                        "b")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
+                #}}}
+                OPT=1
+                ;;
+            2)
+                #ARCADE/PLATFORMER {{{
+                while [ 1 ]
+                do
+                    print_title "ARCADE AND PLATFORMER"
+                    echo " 1) $(checkbox_package "opensonic") Opensonic"
+                    echo " 2) $(checkbox_package "frogatto") Frogatto"
+                    echo " 3) $(checkbox_package "bomberclone") Bomberclone"
+                    echo " 4) $(checkbox_package "goonies") Goonies"
+                    echo " 5) $(checkbox_package "mari0") Mari0"
+                    echo " 6) $(checkbox_package "neverball") Neverball"
+                    echo " 7) $(checkbox_package "smc") Super Mario Chronicles"
+                    echo " 8) $(checkbox_package "xmoto") X-Moto"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read_input_options "$ARCADE_GAMES"
+                    ARCADE_GAMES="b"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "opensonic"
+                                ;;
+                            2)
+                                package_install "frogatto"
+                                ;;
+                            3)
+                                package_install "bomberclone"
+                                ;;
+                            4)
+                                package_install "goonies"
+                                ;;
+                            5)
+                                package_install "mari0"
+                                ;;
+                            6)
+                                package_install "neverball"
+                                ;;
+                            7)
+                                package_install "smc"
+                                ;;
+                            8)
+                                package_install "xmoto"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
                 done
-            elihw
-            done
-            ;;
-            #}}}
-        3)
-            #DUNGEON {{{
-            while [ 1 ]
-            do
-                print_title "DUNGEON"
-                echo " 1) $(checkbox_package "tome4") Tales of MajEyal"
-                echo " 2) $(checkbox_package "lostlabyrinth") Lost Labyrinth"
-                echo " 3) $(checkbox_package "scourge") S.C.O.U.R.G.E."
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read_option
-                for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                        1)
-                            package_install "tome4"
-                            ;;
-                        2)
-                            package_install "lostlabyrinth"
-                            ;;
-                        3)
-                            package_install "scourge"
-                            ;;
-                        "b")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
+                #}}}
+                OPT=2
+                ;;
+            3)
+                #DUNGEON {{{
+                while [ 1 ]
+                do
+                    print_title "DUNGEON"
+                    echo " 1) $(checkbox_package "tome4") Tales of MajEyal"
+                    echo " 2) $(checkbox_package "lostlabyrinth") Lost Labyrinth"
+                    echo " 3) $(checkbox_package "scourge") S.C.O.U.R.G.E."
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read_input_options "$DUNGEON_GAMES"
+                    DUNGEON_GAMES="b"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "tome4"
+                                ;;
+                            2)
+                                package_install "lostlabyrinth"
+                                ;;
+                            3)
+                                package_install "scourge"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
                 done
-            elihw
-            done
-            ;;
-            #}}}
-        4)
-            #EMULATORS {{{
-            while [ 1 ]
-            do
-                print_title "EMULATORS"
-                echo " 1) $(checkbox_package "vba-m-gtk-svn") VisualBoyAdvanced"
-                echo " 2) $(checkbox_package "zsnes") ZSNES"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read_option
-                for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                        1)
-                            package_install "vba-m-gtk-svn"
-                            ;;
-                        2)
-                            package_install "zsnes"
-                            ;;
-                        "b")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
+                #}}}
+                OPT=3
+                ;;
+            4)
+                #EMULATORS {{{
+                while [ 1 ]
+                do
+                    print_title "EMULATORS"
+                    echo " 1) $(checkbox_package "vba-m-gtk-svn") VisualBoyAdvanced"
+                    echo " 2) $(checkbox_package "zsnes") ZSNES"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read_input_options "$EMULATORS_GAMES"
+                    EMULATORS_GAMES="b"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "vba-m-gtk-svn"
+                                ;;
+                            2)
+                                package_install "zsnes"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
                 done
-            elihw
-            done
-            ;;
-            #}}}
-        5)
-            #FPS {{{
-            while [ 1 ]
-            do
-                print_title "FPS"
-                echo " 1) $(checkbox_package "alienarena") AlienArena"
-                echo " 2) $(checkbox_package "enemy-territory") Wolfenstein: Enemy Territory"
-                echo " 3) $(checkbox_package "worldofpadman") World of Padman"
-                echo " 4) $(checkbox_package "warsow") Warsow"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read_option
-                for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                        1)
-                            package_install "alienarena"
-                            ;;
-                        2)
-                            package_install "enemy-territory"
-                            ;;
-                        3)
-                            package_install "worldofpadman"
-                            ;;
-                        4)
-                            package_install "warsow"
-                            ;;
+                #}}}
+                OPT=4
+                ;;
+            5)
+                #FPS {{{
+                while [ 1 ]
+                do
+                    print_title "FPS"
+                    echo " 1) $(checkbox_package "alienarena") AlienArena"
+                    echo " 2) $(checkbox_package "enemy-territory") Wolfenstein: Enemy Territory"
+                    echo " 3) $(checkbox_package "worldofpadman") World of Padman"
+                    echo " 4) $(checkbox_package "warsow") Warsow"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read_input_options "$FPS_GAMES"
+                    FPS_GAMES="b"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "alienarena"
+                                ;;
+                            2)
+                                package_install "enemy-territory"
+                                ;;
+                            3)
+                                package_install "worldofpadman"
+                                ;;
+                            4)
+                                package_install "warsow"
+                                ;;
 
-                        "b")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
                 done
-            elihw
-            done
-            ;;
-            #}}}
-        6)
-            #MMO {{{
-            while [ 1 ]
-            do
-                print_title "MMO"
-                echo " 1) $(checkbox_package "hon") Heroes of Newerth"
-                echo " 2) $(checkbox_package "savage2") Savage II"
-                echo " 3) $(checkbox_package "spiral-knights") Spiral Knights"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read_option
-                for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                        1)
-                            package_install "hon"
-                            ;;
-                        2)
-                            package_install "savage2"
-                            ;;
-                        3)
-                            package_install "spiral-knights"
-                            ;;
-                        "b")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
+                #}}}
+                OPT=5
+                ;;
+            6)
+                #MMO {{{
+                while [ 1 ]
+                do
+                    print_title "MMO"
+                    echo " 1) $(checkbox_package "hon") Heroes of Newerth"
+                    echo " 2) $(checkbox_package "savage2") Savage II"
+                    echo " 3) $(checkbox_package "spiral-knights") Spiral Knights"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read_input_options "$MMO_GAMES"
+                    MMO_GAMES="b"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "hon"
+                                ;;
+                            2)
+                                package_install "savage2"
+                                ;;
+                            3)
+                                package_install "spiral-knights"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
                 done
-            elihw
-            done
-            ;;
-            #}}}
-        7)
-            #PUZZLE {{{
-            while [ 1 ]
-            do
-                print_title "PUZZLE"
-                echo " 1) $(checkbox_package "numptyphysics-svn") Numptyphysics"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read_option
-                for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                        1)
-                            package_install "numptyphysics-svn"
-                            ;;
-                        "b")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
+                #}}}
+                OPT=6
+                ;;
+            7)
+                #PUZZLE {{{
+                while [ 1 ]
+                do
+                    print_title "PUZZLE"
+                    echo " 1) $(checkbox_package "numptyphysics-svn") Numptyphysics"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read_input_options "$PUZZLE_GAMES"
+                    PUZZLE_GAMES="b"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "numptyphysics-svn"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
                 done
-            elihw
-            done
-            ;;
-            #}}}
-        8)
-            #RPG {{{
-            while [ 1 ]
-            do
-                print_title "RPG"
-                echo " 1) $(checkbox_package "ardentryst") Ardentryst"
-                echo " 1) $(checkbox_package "freedroidrpg") Freedroid RPG"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read_option
-                for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                        1)
-                            package_install "ardentryst"
-                            ;;
-                        2)
-                            package_install "freedroidrpg"
-                            ;;
-                        "b")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
+                #}}}
+                OPT=7
+                ;;
+            8)
+                #RPG {{{
+                while [ 1 ]
+                do
+                    print_title "RPG"
+                    echo " 1) $(checkbox_package "ardentryst") Ardentryst"
+                    echo " 1) $(checkbox_package "freedroidrpg") Freedroid RPG"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read_input_options "$RPG_GAMES"
+                    RPG_GAMES="b"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "ardentryst"
+                                ;;
+                            2)
+                                package_install "freedroidrpg"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
                 done
-            elihw
-            done
-            ;;
-            #}}}
-        9)
-            #RACING {{{
-            while [ 1 ]
-            do
-                print_title "RACING"
-                echo " 1) $(checkbox_package "maniadrive") Maniadrive"
-                echo " 2) $(checkbox_package "death-rally") Death Rally"
-                echo " 3) $(checkbox_package "stuntrally") Stuntrally"
-                echo " 4) $(checkbox_package "supertuxkart") SupertuxKart"
-                echo " 5) $(checkbox_package "speed-dreams") Speed Dreams"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read_option
-                for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                        1)
-                            package_install "maniadrive"
-                            ;;
-                        2)
-                            package_install "death-rally"
-                            ;;
-                        3)
-                            package_install "stuntrally"
-                            ;;
-                        4)
-                            package_install "supertuxkart"
-                            ;;
-                        5)
-                            package_install "speed-dreams"
-                            ;;
-                        "b")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
+                #}}}
+                OPT=8
+                ;;
+            9)
+                #RACING {{{
+                while [ 1 ]
+                do
+                    print_title "RACING"
+                    echo " 1) $(checkbox_package "maniadrive") Maniadrive"
+                    echo " 2) $(checkbox_package "death-rally") Death Rally"
+                    echo " 3) $(checkbox_package "stuntrally") Stuntrally"
+                    echo " 4) $(checkbox_package "supertuxkart") SupertuxKart"
+                    echo " 5) $(checkbox_package "speed-dreams") Speed Dreams"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read_input_options "$RACING_GAMES"
+                    RACING_GAMES="b"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "maniadrive"
+                                ;;
+                            2)
+                                package_install "death-rally"
+                                ;;
+                            3)
+                                package_install "stuntrally"
+                                ;;
+                            4)
+                                package_install "supertuxkart"
+                                ;;
+                            5)
+                                package_install "speed-dreams"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
                 done
-            elihw
-            done
-            ;;
-            #}}}
-        10)
-            #SIMULATION {{{
-            while [ 1 ]
-            do
-                print_title "SIMULATION"
-                echo " 1) $(checkbox_package "simutrans") Simultrans"
-                echo " 2) $(checkbox_package "corsix-th") Theme Hospital"
-                echo " 3) $(checkbox_package "openttd") OpenTTD"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read_option
-                for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                        1)
-                            package_install "simutrans"
-                            ;;
-                        2)
-                            package_install "corsix-th"
-                            ;;
-                        3)
-                            package_install "openttd"
-                            ;;
-                        "b")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
+                #}}}
+                OPT=9
+                ;;
+            10)
+                #SIMULATION {{{
+                while [ 1 ]
+                do
+                    print_title "SIMULATION"
+                    echo " 1) $(checkbox_package "simutrans") Simultrans"
+                    echo " 2) $(checkbox_package "corsix-th") Theme Hospital"
+                    echo " 3) $(checkbox_package "openttd") OpenTTD"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read_input_options "$SIMULATION_GAMES"
+                    SIMULATION_GAMES="b"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "simutrans"
+                                ;;
+                            2)
+                                package_install "corsix-th"
+                                ;;
+                            3)
+                                package_install "openttd"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
                 done
-            elihw
-            done
-            ;;
-            #}}}
-        11)
-            #STRATEGY {{{
-            while [ 1 ]
-            do
-                print_title "STRATEGY"
-                echo " 1) $(checkbox_package "wesnoth") Wesnoth"
-                echo " 3) $(checkbox_package "0ad") 0ad"
-                echo " 4) $(checkbox_package "hedgewars") Hedgewars"
-                echo " 5) $(checkbox_package "warzone2100") Warzone 2100"
-                echo " 6) $(checkbox_package "megaglest") MegaGlest"
-                echo " 7) $(checkbox_package "zod") Zod"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                read_option
-                for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                        1)
-                            package_install "wesnoth"
-                            ;;
-                        3)
-                            package_install "0ad"
-                            ;;
-                        4)
-                            package_install "hedgewars"
-                            ;;
-                        5)
-                            package_install "warzone2100"
-                            ;;
-                        6)
-                            package_install "megaglest"
-                            ;;
-                        7)
-                            package_install "commander-zod"
-                            ;;
-                        "b")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
+                #}}}
+                OPT=10
+                ;;
+            11)
+                #STRATEGY {{{
+                while [ 1 ]
+                do
+                    print_title "STRATEGY"
+                    echo " 1) $(checkbox_package "wesnoth") Wesnoth"
+                    echo " 3) $(checkbox_package "0ad") 0ad"
+                    echo " 4) $(checkbox_package "hedgewars") Hedgewars"
+                    echo " 5) $(checkbox_package "warzone2100") Warzone 2100"
+                    echo " 6) $(checkbox_package "megaglest") MegaGlest"
+                    echo " 7) $(checkbox_package "zod") Zod"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    read_input_options "$STRATEGY_GAMES"
+                    STRATEGY_GAMES="b"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "wesnoth"
+                                ;;
+                            3)
+                                package_install "0ad"
+                                ;;
+                            4)
+                                package_install "hedgewars"
+                                ;;
+                            5)
+                                package_install "warzone2100"
+                                ;;
+                            6)
+                                package_install "megaglest"
+                                ;;
+                            7)
+                                package_install "commander-zod"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
                 done
-            elihw
-            done
-            ;;
-            #}}}
-        *)
-            break
-            ;;
-    esac
+                #}}}
+                OPT=11
+                ;;
+            "b")
+                break
+                ;;
+            *)
+                invalid_option
+                ;;
+        esac
+    done
+elihw
 done
 }
 #}}}
@@ -2673,7 +2742,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read_option
+    read_input_options "$FONTS_OPTIONS"
+    FONTS_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -2681,7 +2751,7 @@ do
                 ;;
             2)
                 echo -e "\nWARNING: Install time can be > 20min"
-                question_for_answer "Are you sure you want to continue?"
+                read_input_text "Are you sure you want to continue?"
                 if [ $OPTION = "n" ]; then continue; fi
                 pacman -Rdd --noconfirm ttf-droid
                 pacman -Rdd --noconfirm ttf-ubuntu-font-family
@@ -2727,7 +2797,7 @@ function configure_fonts(){
     echo ""
     echo " b) BACK"
     echo ""
-    read -p "$prompt1" OPTION
+    read_input $FONTSCONFIG_OPTION
     case "$OPTION" in
         1)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
@@ -2798,14 +2868,14 @@ do
     print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
     echo " 1) $(checkbox $BASICSETUP) Basic Setup"
     echo " 2) $(checkbox $DESKTOPENVIRONMENT) Desktop Environment"
-    echo " 3) $(checkbox $ACCESSORIESAPPS) Accessories Apps"
-    echo " 4) $(checkbox $DEVELOPMENTAPPS) Development Apps"
-    echo " 5) $(checkbox $OFFICEAPPS) Office Apps"
-    echo " 6) $(checkbox $SYSTEMAPPS) System Apps"
-    echo " 7) $(checkbox $GRAPHICSAPPS) Graphics Apps"
-    echo " 8) $(checkbox $INTERNETAPPS) Internet Apps"
-    echo " 9) $(checkbox $AUDIOAPPS) Audio Apps"
-    echo "10) $(checkbox $VIDEOAPPS) Video Apps"
+    echo " 3) $(checkbox $ACCESSORIES) Accessories Apps"
+    echo " 4) $(checkbox $DEVELOPMENT) Development Apps"
+    echo " 5) $(checkbox $OFFICE) Office Apps"
+    echo " 6) $(checkbox $SYSTEM) System Apps"
+    echo " 7) $(checkbox $GRAPHICS) Graphics Apps"
+    echo " 8) $(checkbox $INTERNET) Internet Apps"
+    echo " 9) $(checkbox $AUDIO) Audio Apps"
+    echo "10) $(checkbox $VIDEO) Video Apps"
     echo "11) $(checkbox $LAMP) LAMP"
     echo "12) $(checkbox $GAMES) Games"
     echo "13) $(checkbox $FONTS) Fonts"
@@ -2814,7 +2884,8 @@ do
     echo ""
     echo " q) Quit"
     echo ""
-    read_option
+    read_input_options "$MAINMENU"
+    MAINMENU="q"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -2836,7 +2907,7 @@ do
             2)
                 if [ $BASICSETUP -eq 0 ]; then
                     echo -e "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
-                    question_for_answer "Are you sure you want to continue?"
+                    read_input_text "Are you sure you want to continue?"
                     if [ $OPTION = "n" ]; then continue; fi
                 fi
                 install_desktop_environment
@@ -2845,35 +2916,35 @@ do
                 ;;
             3)
                 install_accessories_apps
-                ACCESSORIESAPPS=1
+                ACCESSORIES=1
                 ;;
             4)
                 install_development_apps
-                DEVELOPMENTAPPS=1
+                DEVELOPMENT=1
                 ;;
             5)
                 install_office_apps
-                OFFICEAPPS=1
+                OFFICE=1
                 ;;
             6)
                 install_system_apps
-                SYSTEMAPPS=1
+                SYSTEM=1
                 ;;
             7)
                 install_graphics_apps
-                GRAPHICSAPPS=1
+                GRAPHICS=1
                 ;;
             8)
                 install_internet_apps
-                INTERNETAPPS=1
+                INTERNET=1
                 ;;
             9)
                 install_audio_apps
-                AUDIOAPPS=1
+                AUDIO=1
                 ;;
             10)
                 install_video_apps
-                VIDEOAPPS=1
+                VIDEO=1
                 ;;
             11)
                 install_lamp
