@@ -169,17 +169,17 @@ function invalid_option(){ #{{{
     echo "Invalid option. Try another one."
     pause_function
 } #}}}
+function pause_function(){ #{{{
+    print_line
+    if [ $USE_SCRIPT -ne 1 ]; then
+        read -e -sn 1 -p "Press any key to continue..."
+    fi
+} #}}}
 function install_status(){ #{{{
     if [ $? -ne 0 ] ; then
         CURRENT_STATUS=-1
     else
         CURRENT_STATUS=1
-    fi
-} #}}}
-function pause_function(){ #{{{
-    print_line
-    if [ $USE_SCRIPT -ne 1 ]; then
-        read -e -sn 1 -p "Press any key to continue..."
     fi
 } #}}}
 function sumary(){ #{{{
