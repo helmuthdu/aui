@@ -473,7 +473,7 @@ function select_user(){
                         # PENTADACTYL [FIREFOX]
                         git clone git://github.com/helmuthdu/pentadactyl
                         mv pentadactyl /home/$USERNAME/.pentadactyl
-                        ln -sf /home/$USERNAME/.vim/pentadactylrc /home/$USERNAME/.pentadactylrc
+                        ln -sf /home/$USERNAME/.pentadactyl/pentadactylrc /home/$USERNAME/.pentadactylrc
                         break
                         ;;
                     *)
