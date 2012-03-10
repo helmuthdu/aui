@@ -137,6 +137,7 @@ function checkbox_package(){ #{{{
     fi
 } #}}}
 function package_install(){ #{{{
+    FORCECHECK="n"
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
             if [ "$YAOURT" -eq 1 ]; then
@@ -146,8 +147,8 @@ function package_install(){ #{{{
             fi
             #FORCE CHECK #{{{
             if ! check_package "$PACKAGE" ; then
-                read_input_text "Package $PACKAGE not installed, try install again?"
-                if [ $OPTION = "y" ]; then
+                read_input_text "Package $PACKAGE not installed, try install again?" $FORCECHECK
+                if [ "$OPTION" = "y" ]; then
                     if [ "$YAOURT" -eq 1 ]; then
                         su -l $USERNAME --command="yaourt -S $PACKAGE"
                     else
@@ -354,8 +355,8 @@ function custom_repositories(){
                 echo ""
                 echo " d) DONE"
                 echo ""
+                CUSTOMREPO+=" d"
                 read_input_options "$CUSTOMREPO"
-                CUSTOMREPO="d"
                 for OPT in ${OPTIONS[@]}; do
                     case $OPT in
                         1)
@@ -462,11 +463,17 @@ function select_user(){
                         break
                         ;;
                     2)
-                        package_install "vim ctags ack discount"
+                        # VIM
+                        pacman -S --noconfirm --needed vim
+                        package_install "ctags ack discount"
                         git clone git://github.com/helmuthdu/vim
                         mv vim /home/$USERNAME/.vim
                         git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
                         ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
+                        # PENTADACTYL [FIREFOX]
+                        git clone git://github.com/helmuthdu/pentadactyl
+                        mv pentadactyl /home/$USERNAME/.pentadactyl
+                        ln -sf /home/$USERNAME/.vim/pentadactylrc /home/$USERNAME/.pentadactylrc
                         break
                         ;;
                     *)
@@ -742,7 +749,7 @@ function install_xorg(){
         else
             if [ $LOCATION = "pt_BR" ]; then
                 kblayout="\\\tOption \"XkbLayout\" \"br\""
-                kblayout="${kblayout}\n\\tOption \"XkbVariant\" \"abnt2\""
+                kblayout+="\n\\tOption \"XkbVariant\" \"abnt2\""
                 sed -i "${line}a $kblayout" $file
             elif [ $LOCATION = "fr_FR" ]; then
                 kblayout="\\\tOption \"XkbLayout\" \"fr\""
@@ -853,8 +860,8 @@ function install_additional_firmwares(){
                 echo ""
                 echo " d) DONE"
                 echo ""
+                FIRMWARE_OPTIONS+=" d"
                 read_input_options "FIRMWARE_OPTIONS"
-                FIRMWARE_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -942,8 +949,8 @@ function install_desktop_environment(){
             echo ""
             echo " b) BACK"
             echo ""
+            GNOME_ICONS+=" b"
             read_input_options "$GNOME_ICONS"
-            GNOME_ICONS="b"
             for OPT in ${OPTIONS[@]}; do
                 case "$OPT" in
                     1)
@@ -1008,8 +1015,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
+                GNOME_OPTIONS+=" d"
                 read_input_options "$GNOME_OPTIONS"
-                GNOME_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -1029,8 +1036,8 @@ function install_desktop_environment(){
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
+                                GNOME_THEMES+=" b"
                                 read_input_options "$GNOME_THEMES"
-                                GNOME_THEMES="b"
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
@@ -1077,8 +1084,8 @@ function install_desktop_environment(){
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
+                                GNOME_EXTENSIONS+=" b"
                                 read_input_options "$GNOME_EXTENSIONS"
-                                GNOME_EXTENSIONS="b"
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
@@ -1131,8 +1138,8 @@ function install_desktop_environment(){
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
+                                GNOME_SHELL_THEMES+=" b"
                                 read_input_options "$GNOME_SHELL_THEMES"
-                                GNOME_SHELL_THEMES="b"
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
@@ -1222,8 +1229,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
+                KDE_OPTIONS+=" d"
                 read_input_options "$KDE_OPTIONS"
-                KDE_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -1284,8 +1291,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
+                XFCE_OPTIONS+=" d"
                 read_input_options "$XFCE_OPTIONS"
-                XFCE_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -1334,8 +1341,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
+                LXDE_OPTIONS+=" d"
                 read_input_options "$LXDE_OPTIONS"
-                LXDE_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -1397,8 +1404,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
+                OPENBOX_OPTIONS+=" d"
                 read_input_options "$OPENBOX_OPTIONS"
-                OPENBOX_OPTIONS="d"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -1536,8 +1543,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
+    ACCESSORIES_OPTIONS+=" b"
     read_input_options "$ACCESSORIES_OPTIONS"
-    ACCESSORIES_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -1617,8 +1624,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
+    DEVELOPMENT_OPTIONS+=" b"
     read_input_options "$DEVELOPMENT_OPTIONS"
-    DEVELOPMENT_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -1644,8 +1651,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    ECLIPSE_OPTIONS+=" b"
                     read_input_options "$ECLIPSE"
-                    ECLIPSE_OPTIONSS="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -1757,8 +1764,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
+    OFFICE_OPTIONS+=" b"
     read_input_options "$OFFICE_OPTIONS"
-    OFFICE_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -1830,8 +1837,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
+    SYSTEMTOOLS_OPTIONS+=" b"
     read_input_options "$SYSTEMTOOLS_OPTIONS"
-    SYSTEMTOOLS_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -1881,8 +1888,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
+    GRAPHICS_OPTIONS+=" b"
     read_input_options "$GRAPHICS_OPTIONS"
-    GRAPHICS_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -1944,8 +1951,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
+    INTERNET_OPTIONS+=" b"
     read_input_options "$INTERNET_OPTIONS"
-    INTERNET_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -2089,8 +2096,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
+    AUDIO_OPTIONS+=" b"
     read_input_options "$AUDIO_OPTIONS"
-    AUDIO_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -2177,8 +2184,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
+    VIDEO_OPTIONS+=" b"
     read_input_options "$VIDEO_OPTIONS"
-    VIDEO_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -2266,8 +2273,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    read_input_options "$LOL"
-    LOL="b"
+    FUN+=" b"
+    read_input_options "$FUN"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -2283,8 +2290,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    ACTION+=" b"
                     read_input_options "$ACTION"
-                    ACTION="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2331,8 +2338,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    ARCADE+=" b"
                     read_input_options "$ARCADE"
-                    ARCADE="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2383,8 +2390,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    DUNGEON+=" b"
                     read_input_options "$DUNGEON"
-                    DUNGEON="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2419,8 +2426,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    EMULATORS+=" b"
                     read_input_options "$EMULATORS"
-                    EMULATORS="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2454,8 +2461,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    FPS+=" b"
                     read_input_options "$FPS"
-                    FPS="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2495,8 +2502,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    MMO+=" b"
                     read_input_options "$MMO"
-                    MMO="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2530,8 +2537,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    PUZZLE+=" b"
                     read_input_options "$PUZZLE"
-                    PUZZLE="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2560,8 +2567,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    RPG+=" b"
                     read_input_options "$RPG"
-                    RPG="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2596,8 +2603,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    RACING+=" b"
                     read_input_options "$RACING"
-                    RACING="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2639,8 +2646,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    SIMULATION+=" b"
                     read_input_options "$SIMULATION"
-                    SIMULATION="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2679,8 +2686,8 @@ do
                     echo ""
                     echo " b) BACK"
                     echo ""
+                    STRATEGY+=" b"
                     read_input_options "$STRATEGY"
-                    STRATEGY="b"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2742,8 +2749,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
+    FONTS_OPTIONS+=" b"
     read_input_options "$FONTS_OPTIONS"
-    FONTS_OPTIONS="b"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -2752,7 +2759,7 @@ do
             2)
                 echo -e "\nWARNING: Install time can be > 20min"
                 read_input_text "Are you sure you want to continue?" $GOOGLE_FONTS
-                if [ $OPTION = "n" ]; then continue; fi
+                if [ "$OPTION" = "n" ]; then continue; fi
                 pacman -Rdd --noconfirm ttf-droid
                 pacman -Rdd --noconfirm ttf-ubuntu-font-family
                 package_install "ttf-google-webfonts"
@@ -2884,8 +2891,8 @@ do
     echo ""
     echo " q) Quit"
     echo ""
+    MAINMENU+=" q"
     read_input_options "$MAINMENU"
-    MAINMENU="q"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -2908,7 +2915,7 @@ do
                 if [ $BASICSETUP -eq 0 ]; then
                     echo -e "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
                     read_input_text "Are you sure you want to continue?"
-                    if [ $OPTION = "n" ]; then continue; fi
+                    if [ "$OPTION" = "n" ]; then continue; fi
                 fi
                 install_desktop_environment
                 install_nm_wicd

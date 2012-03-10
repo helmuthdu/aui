@@ -49,7 +49,7 @@ USE_SCRIPT=0
     SAMBA="y"
     SSH="y"
     TLP="n"
-    CUSTOMREPO=""
+    CUSTOMREPO="n"
     #VIDEOCARD {{{
         # 1) Intel
         # 2) ATI
@@ -57,7 +57,7 @@ USE_SCRIPT=0
         # 4) Nouveau
         # 5) Virtualbox
         # 6) Vesa
-        VIDEOCARD=3
+        VIDEOCARD=5
     #}}}
     #ADDITIONAL FIRMWARE {{{
         # 1) ipw2100
@@ -76,7 +76,7 @@ USE_SCRIPT=0
     # 3) XFCE
     # 4) LXDE
     # 5) OpenBox
-    DESKTOPENV=1
+    DESKTOPENV=3
     #GNOME {{{
         # 1) Gnome Icons [Faience, Faenza, Elementary]
         # 2) Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]
@@ -117,7 +117,7 @@ USE_SCRIPT=0
             # 3) Faenza-Cupertino
             # 4) Faience
             # 5) Elementary
-            GNOME_ICONS="1-5"
+            GNOME_ICONS="2-5"
         #}}}
     #}}}
     #KDE {{{
@@ -135,7 +135,7 @@ USE_SCRIPT=0
         # 1) Icons [Faience, Faenza, Elementary]
         # 2) Themes [Zukitwo]
         # 3) LightDM
-        XFCE_OPTIONS=""
+        XFCE_OPTIONS="1 2 3"
     #}}}
     #LXDE {{{
         # 1) Icons [Faience, Faenza, Elementary]
@@ -157,10 +157,12 @@ USE_SCRIPT=0
         #11) Xfburn
         OPENBOX_OPTIONS=""
     #}}}
-    # 1) Networkmanager
-    # 2) Wicd
-    # 3) None
-    NETWORKMANAGER=1
+    #NETWORKMANAGER #{{{
+        # 1) Networkmanager
+        # 2) Wicd
+        # 3) None
+        NETWORKMANAGER=1
+    #}}}
 #}}}
 #ACCESSORIES {{{
     # 1) Cairo Dock
@@ -175,7 +177,7 @@ USE_SCRIPT=0
     #10) Shutter
     #11) Synapse
     #12) Terminator
-    ACCESSORIES_OPTIONS="1 6 8 10 12"
+    ACCESSORIES_OPTIONS="6 8 10 12"
 #}}}
 #DEVELOPEMENT {{{
     # 1) Aptana Studio
@@ -203,7 +205,7 @@ USE_SCRIPT=0
         # 7) Aptana Studio plugin for Eclipse
         # 8) Vim-like editing plugin for Eclipse
         # 9) Git support plugin for Eclipse
-        ECLIPSE_OPTIONSS="1"
+        ECLIPSE_OPTIONS="1"
     #}}}
 #}}}
 #OFFICE {{{
@@ -224,7 +226,7 @@ USE_SCRIPT=0
     # 3) Htop
     # 4) Virtualbox
     # 5) Wine
-    SYSTEMTOOLS_OPTIONS="2-5"
+    SYSTEMTOOLS_OPTIONS="2 3"
 #}}}
 #GRAPHICS {{{
     # 1) Blender
@@ -253,7 +255,7 @@ USE_SCRIPT=0
     #13) Teamviewer
     #14) Trasmission
     #15) X-Chat/Konversation
-    INTERNET_OPTIONS="1 3-5 7"
+    INTERNET_OPTIONS="1 2 5 7"
 #}}}
 #LAMP {{{
     LAMP="n"
@@ -307,7 +309,7 @@ USE_SCRIPT=0
     # 9) Racing
     #10) Simulation
     #11) Strategy
-    LOL="11"
+    FUN="1-11"
     #ACTION {{{
         # 1) Astromenace
         # 2) OpenTyrian
@@ -381,7 +383,7 @@ USE_SCRIPT=0
         # 5) Warzone 2100
         # 6) MegaGlest
         # 7) Zod
-        STRATEGY="4"
+        STRATEGY=""
     #}}}
 #}}}
 #FONTS {{{
