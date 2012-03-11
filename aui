@@ -2384,9 +2384,10 @@ do
                 while [ 1 ]
                 do
                     print_title "DUNGEON"
-                    echo " 1) $(checkbox_package "tome4") Tales of MajEyal"
-                    echo " 2) $(checkbox_package "lostlabyrinth") Lost Labyrinth"
-                    echo " 3) $(checkbox_package "scourge") S.C.O.U.R.G.E."
+                    echo " 1) $(checkbox_package "adom") Adom"
+                    echo " 2) $(checkbox_package "tome4") Tales of MajEyal"
+                    echo " 3) $(checkbox_package "lostlabyrinth") Lost Labyrinth"
+                    echo " 4) $(checkbox_package "scourge") S.C.O.U.R.G.E."
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2395,12 +2396,15 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "tome4"
+                                package_install "adom"
                                 ;;
                             2)
-                                package_install "lostlabyrinth"
+                                package_install "tome4"
                                 ;;
                             3)
+                                package_install "lostlabyrinth"
+                                ;;
+                            4)
                                 package_install "scourge"
                                 ;;
                             "b")
@@ -2421,8 +2425,14 @@ do
                 while [ 1 ]
                 do
                     print_title "EMULATORS"
-                    echo " 1) $(checkbox_package "vba-m-gtk-svn") VisualBoyAdvanced"
-                    echo " 2) $(checkbox_package "zsnes") ZSNES"
+                    echo " 1) $(checkbox_package "bsnes") BSNES"
+                    echo " 2) $(checkbox_package "desmume") Desmume"
+                    echo " 3) $(checkbox_package "dolphin-emu") Dolphin"
+                    echo " 4) $(checkbox_package "epsxe") ePSXe"
+                    echo " 5) $(checkbox_package "project64") Project64"
+                    echo " 6) $(checkbox_package "vba-m-gtk-svn") VisualBoyAdvanced"
+                    echo " 7) $(checkbox_package "wxmupen64plus-hg") wxMupen64Plus"
+                    echo " 8) $(checkbox_package "zsnes") ZSNES"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2431,9 +2441,31 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "vba-m-gtk-svn"
+                                package_install "bsnes"
                                 ;;
                             2)
+                                package_install "desmume-svn"
+                                ;;
+                            3)
+                                package_install "dolphin-emu"
+                                ;;
+                            4)
+                                package_install "epsxe"
+                                ;;
+                            5)
+                                package_install "project64"
+                                ;;
+                            6)
+                                package_install "vba-m-gtk-svn"
+                                ;;
+                            7)
+                                package_install "wxmupen64plus-hg"
+                                package_install "mupen64plus-video-rice-hg"
+                                package_install "mupen64plus-audio-sdl-hg"
+                                package_install "mupen64plus-input-sdl-hg"
+                                package_install "mupen64plus-rsp-hle-hg"
+                                ;;
+                            8)
                                 package_install "zsnes"
                                 ;;
                             "b")
@@ -2455,9 +2487,10 @@ do
                 do
                     print_title "FPS"
                     echo " 1) $(checkbox_package "alienarena") AlienArena"
-                    echo " 2) $(checkbox_package "enemy-territory") Wolfenstein: Enemy Territory"
-                    echo " 3) $(checkbox_package "worldofpadman") World of Padman"
-                    echo " 4) $(checkbox_package "warsow") Warsow"
+                    echo " 2) $(checkbox_package "warsow") Warsow"
+                    echo " 3) $(checkbox_package "enemy-territory") Wolfenstein: Enemy Territory"
+                    echo " 4) $(checkbox_package "worldofpadman") World of Padman"
+                    echo " 5) $(checkbox_package "xonotic") Xonotic"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2469,13 +2502,16 @@ do
                                 package_install "alienarena"
                                 ;;
                             2)
-                                package_install "enemy-territory"
+                                package_install "warsow"
                                 ;;
                             3)
-                                package_install "worldofpadman"
+                                package_install "enemy-territory"
                                 ;;
                             4)
-                                package_install "warsow"
+                                package_install "worldofpadman"
+                                ;;
+                            5)
+                                package_install "xonotic"
                                 ;;
 
                             "b")
@@ -2497,8 +2533,9 @@ do
                 do
                     print_title "MMO"
                     echo " 1) $(checkbox_package "hon") Heroes of Newerth"
-                    echo " 2) $(checkbox_package "savage2") Savage II"
-                    echo " 3) $(checkbox_package "spiral-knights") Spiral Knights"
+                    echo " 2) $(checkbox_package "manaplus") ManaPlus"
+                    echo " 3) $(checkbox_package "savage2") Savage II"
+                    echo " 4) $(checkbox_package "spiral-knights") Spiral Knights"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2510,9 +2547,12 @@ do
                                 package_install "hon"
                                 ;;
                             2)
-                                package_install "savage2"
+                                package_install "manaplus"
                                 ;;
                             3)
+                                package_install "savage2"
+                                ;;
+                            4)
                                 package_install "spiral-knights"
                                 ;;
                             "b")
@@ -2533,7 +2573,8 @@ do
                 while [ 1 ]
                 do
                     print_title "PUZZLE"
-                    echo " 1) $(checkbox_package "numptyphysics-svn") Numptyphysics"
+                    echo " 1) $(checkbox_package "frozen-bubble") Frozen Bubble"
+                    echo " 2) $(checkbox_package "numptyphysics-svn") Numptyphysics"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2542,6 +2583,9 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
+                                package_install "frozen-bubble"
+                                ;;
+                            2)
                                 package_install "numptyphysics-svn"
                                 ;;
                             "b")
@@ -2563,7 +2607,8 @@ do
                 do
                     print_title "RPG"
                     echo " 1) $(checkbox_package "ardentryst") Ardentryst"
-                    echo " 1) $(checkbox_package "freedroidrpg") Freedroid RPG"
+                    echo " 2) $(checkbox_package "flare-rpg") Flare"
+                    echo " 3) $(checkbox_package "freedroidrpg") Freedroid RPG"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2575,6 +2620,9 @@ do
                                 package_install "ardentryst"
                                 ;;
                             2)
+                                package_install "flare-rpg"
+                                ;;
+                            3)
                                 package_install "freedroidrpg"
                                 ;;
                             "b")
@@ -2677,12 +2725,12 @@ do
                 while [ 1 ]
                 do
                     print_title "STRATEGY"
-                    echo " 1) $(checkbox_package "wesnoth") Wesnoth"
-                    echo " 3) $(checkbox_package "0ad") 0ad"
-                    echo " 4) $(checkbox_package "hedgewars") Hedgewars"
-                    echo " 5) $(checkbox_package "warzone2100") Warzone 2100"
-                    echo " 6) $(checkbox_package "megaglest") MegaGlest"
-                    echo " 7) $(checkbox_package "zod") Zod"
+                    echo " 1) $(checkbox_package "0ad") 0ad"
+                    echo " 2) $(checkbox_package "hedgewars") Hedgewars"
+                    echo " 3) $(checkbox_package "megaglest") MegaGlest"
+                    echo " 4) $(checkbox_package "warzone2100") Warzone 2100"
+                    echo " 5) $(checkbox_package "wesnoth") Wesnoth"
+                    echo " 6) $(checkbox_package "zod") Zod"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2691,21 +2739,21 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "wesnoth"
-                                ;;
-                            3)
                                 package_install "0ad"
                                 ;;
-                            4)
+                            2)
                                 package_install "hedgewars"
                                 ;;
-                            5)
-                                package_install "warzone2100"
-                                ;;
-                            6)
+                            3)
                                 package_install "megaglest"
                                 ;;
-                            7)
+                            4)
+                                package_install "warzone2100"
+                                ;;
+                            5)
+                                package_install "wesnoth"
+                                ;;
+                            6)
                                 package_install "commander-zod"
                                 ;;
                             "b")

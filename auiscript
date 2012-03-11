@@ -330,36 +330,47 @@ USE_SCRIPT=0
         ARCADE=""
     #}}}
     #DUNGEON {{{
-        # 1) Tales of MajEyal
-        # 2) Lost Labyrinth
-        # 3) S.C.O.U.R.G.E.
+        # 1) Adom
+        # 2) Tales of MajEyal
+        # 3) Lost Labyrinth
+        # 4) S.C.O.U.R.G.E.
         DUNGEON=""
     #}}}
     #EMULATORS {{{
-        # 1) VisualBoyAdvanced
-        # 2) ZSNES
+        # 1) BSNES
+        # 2) Desmume
+        # 3) Dolphin
+        # 4) ePSXe
+        # 5) Project64
+        # 6) VisualBoyAdvanced
+        # 7) wxMupen64Plus
+        # 8) ZSNES
         EMULATORS=""
     #}}}
     #FPS {{{
         # 1) AlienArena
-        # 2) Wolfenstein: Enemy Territory
-        # 3) World of Padman
-        # 4) Warsow
+        # 2) Warsow
+        # 3) Wolfenstein: Enemy Territory
+        # 4) World of Padman
+        # 5) Xonotic
         FPS=""
     #}}}
     #MMO {{{
-        # 1) Heroes of Newerth
-        # 2) Savage II
-        # 3) Spiral Knights
+        # 1) ManaPlus
+        # 2) Heroes of Newerth
+        # 3) Savage II
+        # 4) Spiral Knights
         MMO=""
     #}}}
     #PUZZLE {{{
-        # 1) Numptyphysics
+        # 1) Frozen Bubble
+        # 2) Numptyphysics
         PUZZLE=""
     #}}}
     #RPG {{{
         # 1) Ardentryst
-        # 1) Freedroid RPG
+        # 2) Flare
+        # 3) Freedroid RPG
         RPG=""
     #}}}
     #RACING {{{
@@ -377,12 +388,12 @@ USE_SCRIPT=0
         SIMULATION=""
     #}}}
     #STRATEGY {{{
-        # 1) Wesnoth
-        # 3) 0ad
-        # 4) Hedgewars
-        # 5) Warzone 2100
-        # 6) MegaGlest
-        # 7) Zod
+        # 1) 0ad
+        # 2) Hedgewars
+        # 3) MegaGlest
+        # 4) Warzone 2100
+        # 5) Wesnoth
+        # 6) Zod
         STRATEGY=""
     #}}}
 #}}}
