@@ -1303,7 +1303,7 @@ function install_desktop_environment(){
                             package_install "zukitwo-themes"
                             ;;
                         3)
-                            package_install "lightdm"
+                            package_install "intltool lightdm"
                             add_daemon "lightdm"
                             sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
                             ;;
@@ -1422,7 +1422,7 @@ function install_desktop_environment(){
                             package_install "gmrun"
                             ;;
                         5)
-                            package_install "lightdm"
+                            package_install "intltool lightdm"
                             add_daemon "lightdm"
                             sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
                             ;;
