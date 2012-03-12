@@ -1530,16 +1530,17 @@ do
     print_title "ACCESSORIES APPS"
     echo " 1) $(checkbox_package "cairo-dock-bzr") Cairo Dock"
     echo " 2) $(checkbox_package "conky") Conky + CONKY-colors"
-    echo " 3) $(checkbox_package "dockbarx") Dockbarx"
-    echo " 4) $(checkbox_package "docky") Docky"
-    echo " 5) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "speedcrunch") Speedcrunch"; else echo "$(checkbox_package "galculator") Galculator"; fi)"
-    echo " 6) $(checkbox_package "gnome-pie") Gnome-Pie"
-    echo " 7) $(checkbox_package "guake") Guake"
-    echo " 8) $(checkbox_package "kupfer") Kupfer"
-    echo " 9) $(checkbox_package "pyrenamer") Pyrenamer"
-    echo "10) $(checkbox_package "shutter") Shutter"
-    echo "11) $(checkbox_package "synapse") Synapse"
-    echo "12) $(checkbox_package "terminator") Terminator"
+    echo " 3) $(checkbox_package "deepin-scrot-git") Deepin Scrot"
+    echo " 4) $(checkbox_package "dockbarx") Dockbarx"
+    echo " 5) $(checkbox_package "docky") Docky"
+    echo " 6) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "speedcrunch") Speedcrunch"; else echo "$(checkbox_package "galculator") Galculator"; fi)"
+    echo " 7) $(checkbox_package "gnome-pie") Gnome-Pie"
+    echo " 8) $(checkbox_package "guake") Guake"
+    echo " 9) $(checkbox_package "kupfer") Kupfer"
+    echo "10) $(checkbox_package "pyrenamer") Pyrenamer"
+    echo "11) $(checkbox_package "shutter") Shutter"
+    echo "12) $(checkbox_package "synapse") Synapse"
+    echo "13) $(checkbox_package "terminator") Terminator"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1556,38 +1557,41 @@ do
                 add_daemon "sensors"
                 ;;
             3)
-                package_install "dockbarx dockbarx-shinybar-theme"
+                package_install "deepin-scrot-git"
                 ;;
             4)
-                package_install "docky"
+                package_install "dockbarx dockbarx-shinybar-theme"
                 ;;
             5)
+                package_install "docky"
+                ;;
+            6)
                 if [ "$KDE" -eq 1 ]; then
                     package_install "speedcrunch"
                 else
                     package_install "galculator"
                 fi
                 ;;
-            6)
+            7)
                 package_install "gnome-pie"
                 ;;
-            7)
+            8)
                 package_install "guake"
                 ;;
-            8)
+            9)
                 package_install "kupfer"
                 ;;
-            9)
+            10)
                 package_install "pyrenamer"
                 ;;
-            10)
+            11)
                 package_install "shutter"
                 ;;
-            11)
+            12)
                 package_install "zeitgeist libzeitgeist zeitgeist-datahub"
                 package_install "synapse"
                 ;;
-            12)
+            13)
                 package_install "terminator python-keybinder"
                 ;;
             "b")

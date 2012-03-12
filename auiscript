@@ -126,7 +126,7 @@ USE_SCRIPT=0
         # 3) Choqok
         # 4) Digikam
         # 5) K3b
-        # 6) KDE Icons [KFaenza]
+        # 6) KDE Icons [Rosa, KFaenza]
         # 7) Plasma Themes [Caledonia, Produkt, Ronak]
         # 8) Yakuake
         KDE_OPTIONS=""
@@ -167,16 +167,17 @@ USE_SCRIPT=0
 #ACCESSORIES {{{
     # 1) Cairo Dock
     # 2) Conky + CONKY-colors
-    # 3) Dockbarx
-    # 4) Docky
-    # 5) Galculator/Speedcrunch
-    # 6) Gnome-Pie
-    # 7) Guake
-    # 8) Kupfer
-    # 9) Pyrenamer
-    #10) Shutter
-    #11) Synapse
-    #12) Terminator
+    # 3) Deepin Scrot
+    # 4) Dockbarx
+    # 5) Docky
+    # 6) Galculator/Speedcrunch
+    # 7) Gnome-Pie
+    # 8) Guake
+    # 9) Kupfer
+    #10) Pyrenamer
+    #11) Shutter
+    #12) Synapse
+    #13) Terminator
     ACCESSORIES_OPTIONS="6 8 10 12"
 #}}}
 #DEVELOPEMENT {{{
