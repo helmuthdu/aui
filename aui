@@ -1223,7 +1223,7 @@ function install_desktop_environment(){
                 echo " 3) $(checkbox_package "choqok") Choqok"
                 echo " 4) $(checkbox_package "digikam") Digikam"
                 echo " 5) $(checkbox_package "k3b") K3b"
-                echo " 6) $(checkbox_package "kfaenza-icon-theme") KDE Icons [KFaenza]"
+                echo " 6) $(checkbox_package "rosa-icons kfaenza-icon-theme") KDE Icons [Rosa, KFaenza]"
                 echo " 7) $(checkbox_package "plasma-theme-produkt") Plasma Themes [Caledonia, Produkt, Ronak]"
                 echo " 8) $(checkbox_package "yakuake") Yakuake"
                 echo ""
@@ -1249,7 +1249,7 @@ function install_desktop_environment(){
                             package_install "k3b dvd+rw-tools"
                             ;;
                         6)
-                            package_install "kfaenza-icon-theme"
+                            package_install "rosa-icons kfaenza-icon-theme"
                             ;;
                         7)
                             package_install "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
