@@ -1300,7 +1300,41 @@ function install_desktop_environment(){
                             OPT=1
                             ;;
                         2)
-                            package_install "zukitwo-themes"
+                            #THEMES {{{
+                            while [ 1 ]
+                            do
+                                print_title "XFCE THEMES"
+                                echo " 1) $(checkbox_package "xfce-theme-bluebird") Bluebird"
+                                echo " 2) $(checkbox_package "xfce-theme-greybird") Greybird)"
+                                echo " 3) $(checkbox_package "zukitwo-themes") Zukitwo"
+                                echo ""
+                                echo " b) BACK"
+                                echo ""
+                                XFCE_THEMES+=" b"
+                                read_input_options "$XFCE_THEMES"
+                                for OPT in ${OPTIONS[@]}; do
+                                    case "$OPT" in
+                                        1)
+                                            package_install "xfce-theme-bluebird"
+                                            ;;
+                                        2)
+                                            package_install "xfce-theme-greybird"
+                                            ;;
+                                        3)
+                                            package_install "zukitwo-themes"
+                                            ;;
+                                        "b")
+                                            break
+                                            ;;
+                                        *)
+                                            invalid_option
+                                            ;;
+                                    esac
+                                done
+                            elihw
+                            done
+                            #}}}
+                            OPT=2
                             ;;
                         3)
                             package_install "intltool lightdm"
