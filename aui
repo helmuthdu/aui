@@ -255,79 +255,85 @@ function check_root() {
 function language_selector(){
     #DETECTS THE SYSTEM LANGUAGE {{{
     #automatically detects the system language based on your rc.conf
-    LOCATION=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | sed 's/.*"\(.*\)".*/\1/g' | cut -c1-5`
+    LANGUAGE=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | sed 's/.*"\(.*\)".*/\1/g' | cut -c1-5`
     #KDE #{{{
-    if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "zh_CN" ]; then
-        LOCATION_KDE=`echo $LOCATION | tr '[:upper:]' '[:lower:]'`
-    elif [ $LOCATION = "en_US" ]; then
-        LOCATION_KDE="en_gb"
+    if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "zh_CN" ]; then
+        LANGUAGE_KDE=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]'`
+    elif [ $LANGUAGE = "en_US" ]; then
+        LANGUAGE_KDE="en_gb"
     else
-        LOCATION_KDE=`echo $LOCATION | cut -d\_ -f1`
+        LANGUAGE_KDE=`echo $LANGUAGE | cut -d\_ -f1`
     fi
     #}}}
     #FIREFOX #{{{
-    if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "pt_PT" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "es_AR" ] || [ $LOCATION = "es_ES" ] || [ $LOCATION = "zh_CN" ]; then
-        LOCATION_FF=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-    elif [ $LOCATION = "en_US" ]; then
-        LOCATION_FF="en-gb"
+    if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "pt_PT" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "es_AR" ] || [ $LANGUAGE = "es_ES" ] || [ $LANGUAGE = "zh_CN" ]; then
+        LANGUAGE_FF=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+    elif [ $LANGUAGE = "en_US" ]; then
+        LANGUAGE_FF="en-gb"
     else
-        LOCATION_FF=`echo $LOCATION | cut -d\_ -f1`
+        LANGUAGE_FF=`echo $LANGUAGE | cut -d\_ -f1`
     fi
     #}}}
     #HUNSPELL #{{{
-    if [ $LOCATION = "pt_BR" ]; then
-        LOCATION_HS=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-    elif [ $LOCATION = "pt_PT" ]; then
-        LOCATION_HS="pt_pt"
+    if [ $LANGUAGE = "pt_BR" ]; then
+        LANGUAGE_HS=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+    elif [ $LANGUAGE = "pt_PT" ]; then
+        LANGUAGE_HS="pt_pt"
     else
-        LOCATION_HS=`echo $LOCATION | cut -d\_ -f1`
+        LANGUAGE_HS=`echo $LANGUAGE | cut -d\_ -f1`
     fi
     #}}}
+    #ASPELL #{{{
+        LANGUAGE_AS=`echo $LANGUAGE | cut -d\_ -f1`
+    #}}}
     #LIBREOFFICE #{{{
-    if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "en_US" ] || [ $LOCATION = "zh_CN" ]; then
-        LOCATION_LO=`echo $LOCATION | sed 's/_/-/'`
+    if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "en_US" ] || [ $LANGUAGE = "zh_CN" ]; then
+        LANGUAGE_LO=`echo $LANGUAGE | sed 's/_/-/'`
     else
-        LOCATION_LO=`echo $LOCATION | cut -d\_ -f1`
+        LANGUAGE_LO=`echo $LANGUAGE | cut -d\_ -f1`
     fi
     #}}}
     #}}}
     print_title "LANGUAGE - https://wiki.archlinux.org/index.php/Locale"
-    read_input_text "Default system language: \"$LOCATION\"" $LANGSELECT
+    read_input_text "Default system language: \"$LANGUAGE\"" $LANGSELECT
     case "$OPTION" in
         "n")
-            read -p "New system language [ex: en_US]: " LOCATION
+            read -p "New system language [ex: en_US]: " LANGUAGE
             #KDE #{{{
-            if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "zh_CN" ]; then
-                LOCATION_KDE=`echo $LOCATION | tr '[:upper:]' '[:lower:]'`
-            elif [ $LOCATION = "en_US" ]; then
-                LOCATION_KDE="en_gb"
+            if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "zh_CN" ]; then
+                LANGUAGE_KDE=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]'`
+            elif [ $LANGUAGE = "en_US" ]; then
+                LANGUAGE_KDE="en_gb"
             else
-                LOCATION_KDE=`echo $LOCATION | cut -d\_ -f1`
+                LANGUAGE_KDE=`echo $LANGUAGE | cut -d\_ -f1`
             fi
             #}}}
             #FIREFOX #{{{
-            if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "pt_PT" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "es_AR" ] || [ $LOCATION = "es_ES" ] || [ $LOCATION = "zh_CN" ]; then
-                LOCATION_FF=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-            elif [ $LOCATION = "en_US" ]; then
-                LOCATION_FF="en-gb"
+            if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "pt_PT" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "es_AR" ] || [ $LANGUAGE = "es_ES" ] || [ $LANGUAGE = "zh_CN" ]; then
+                LANGUAGE_FF=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+            elif [ $LANGUAGE = "en_US" ]; then
+                LANGUAGE_FF="en-gb"
             else
-                LOCATION_FF=`echo $LOCATION | cut -d\_ -f1`
+                LANGUAGE_FF=`echo $LANGUAGE | cut -d\_ -f1`
             fi
             #}}}
             #HUNSPELL #{{{
-            if [ $LOCATION = "pt_BR" ]; then
-                LOCATION_HS=`echo $LOCATION | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-            elif [ $LOCATION = "pt_PT" ]; then
-                LOCATION_HS="pt_pt"
+            if [ $LANGUAGE = "pt_BR" ]; then
+                LANGUAGE_HS=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+            elif [ $LANGUAGE = "pt_PT" ]; then
+                LANGUAGE_HS="pt_pt"
             else
-                LOCATION_HS=`echo $LOCATION | cut -d\_ -f1`
+                LANGUAGE_HS=`echo $LANGUAGE | cut -d\_ -f1`
             fi
             #}}}
+            #ASPELL #{{{
+            LANGUAGE_AS=`echo $LANGUAGE | cut -d\_ -f1`
+            #}}}
             #LIBREOFFICE #{{{
-            if [ $LOCATION = "pt_BR" ] || [ $LOCATION = "en_GB" ] || [ $LOCATION = "en_US" ] || [ $LOCATION = "zh_CN" ]; then
-                LOCATION_LO=`echo $LOCATION | sed 's/_/-/'`
+            if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "en_US" ] || [ $LANGUAGE = "zh_CN" ]; then
+                LANGUAGE_LO=`echo $LANGUAGE | sed 's/_/-/'`
             else
-                LOCATION_LO=`echo $LOCATION | cut -d\_ -f1`
+                LANGUAGE_LO=`echo $LANGUAGE | cut -d\_ -f1`
             fi
             #}}}
             ;;
@@ -747,11 +753,11 @@ function install_xorg(){
             kblayout="\\\tOption \"XkbLayout\" \"us_intl\""
             sed -i "${line}a $kblayout" $file
         else
-            if [ $LOCATION = "pt_BR" ]; then
+            if [ $LANGUAGE = "pt_BR" ]; then
                 kblayout="\\\tOption \"XkbLayout\" \"br\""
                 kblayout+="\n\\tOption \"XkbVariant\" \"abnt2\""
                 sed -i "${line}a $kblayout" $file
-            elif [ $LOCATION = "fr_FR" ]; then
+            elif [ $LANGUAGE = "fr_FR" ]; then
                 kblayout="\\\tOption \"XkbLayout\" \"fr\""
                 sed -i "${line}a $kblayout" $file
             fi
@@ -1192,7 +1198,7 @@ function install_desktop_environment(){
         2)
             #KDE {{{
             print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
-            pacman -S --noconfirm --needed kde kde-l10n-$LOCATION_KDE kipi-plugins
+            pacman -S --noconfirm --needed kde kde-l10n-$LANGUAGE_KDE kipi-plugins
             pacman -Rcsn kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
             pacman -S --noconfirm --needed kdeadmin-system-config-printer-kde xdg-user-dirs
             package_install "kde-gtk-config-git"
@@ -1765,7 +1771,7 @@ do
                 package_install "sublime-text"
                 ;;
             12)
-                package_install "valgrind gdb splint tidyhtml pyflakes jsl"
+                package_install "valgrind gdb splint tidyhtml pyflakes-svn jsl"
                 ;;
             13)
                 package_install "mysql-workbench"
@@ -1799,6 +1805,7 @@ do
     echo " 7) $(checkbox_package "xmind") Xmind"
     echo " 8) $(checkbox_package "zathura") Zathura"
     echo " 9) $(checkbox_package "impressive") Impressive"
+    echo "10) $(checkbox_package "ocrfeeder") OCRFeeder"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1808,8 +1815,9 @@ do
         case "$OPT" in
             1)
                 print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
-                pacman -S --noconfirm --needed libreoffice-$LOCATION_LO libreoffice-common libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport libreoffice-extension-diagram
-                package_install "hunspell-$LOCATION_HS"
+                pacman -S --noconfirm --needed libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport
+                package_install "hunspell-$LANGUAGE_HS"
+                package_install "aspell-$LANGUAGE_AS"
                 if [ "$KDE" -eq 1 ]; then
                     package_install "libreoffice-kde4"
                 else
@@ -1818,13 +1826,15 @@ do
                 ;;
             2)
                 package_install "gnumeric abiword abiword-plugins"
+                package_install "hunspell-$LANGUAGE_HS"
+                package_install "aspell-$LANGUAGE_AS"
                 ;;
             3)
                 print_title "LATEX - https://wiki.archlinux.org/index.php/LaTeX"
                 pacman -S --noconfirm --needed texlive-most
                 package_install "texmaker"
                 package_install "latex-template-springer latex-template-ieee latex-beamer"
-                if [ $LOCATION = "pt_BR" ]; then
+                if [ $LANGUAGE = "pt_BR" ]; then
                     package_install "abntex"
                 fi
                 ;;
@@ -1849,6 +1859,10 @@ do
                 ;;
             9)
                 package_install "impressive"
+                ;;
+            10)
+                package_install "ocrfeeder tesseract gocr"
+                package_install "aspell-$LANGUAGE_AS"
                 ;;
             "b")
                 break
@@ -2021,10 +2035,10 @@ do
                 package_install "irssi"
                 ;;
             7)
-                package_install "firefox firefox-i18n-$LOCATION_FF flashplugin "
+                package_install "firefox firefox-i18n-$LANGUAGE_FF flashplugin "
                 ;;
             8)
-                package_install "thunderbird thunderbird-i18n-$LOCATION_FF"
+                package_install "thunderbird thunderbird-i18n-$LANGUAGE_FF"
                 ;;
             9)
                 package_install "pidgin"

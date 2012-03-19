@@ -249,6 +249,7 @@ USE_SCRIPT=0
     # 7) Xmind
     # 8) Zathura
     # 9) Impressive
+    #10) OCRFeeder
     OFFICE_OPTIONS="1 8 9"
 #}}}
 #SYSTEM TOOLS {{{
