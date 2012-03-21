@@ -1528,7 +1528,9 @@ function install_nm_wicd(){
             fi
             groupadd networkmanager
             gpasswd -a $USERNAME networkmanager
+            remove_daemon "networkmanager"
             remove_daemon "network"
+            remove_daemon "wicd"
             add_daemon "networkmanager"
             install_status
             sumary "Networkmanager installation"
@@ -1542,6 +1544,7 @@ function install_nm_wicd(){
             else
                 pacman -S --noconfirm --needed wicd
             fi
+            remove_daemon "networkmanager"
             remove_daemon "network"
             add_daemon "wicd"
             install_status
