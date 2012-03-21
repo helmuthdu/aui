@@ -2970,8 +2970,8 @@ welcome
 check_root
 language_selector
 system_upgrade
-select_user
 choose_aurhelper
+select_user
 
 while [ 1 ]
 do
