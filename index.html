@@ -2,92 +2,132 @@
 <html>
 <head>
   <meta charset='utf-8'>
-
-  <title>helmuthdu/aui @ GitHub</title>
+  <title>Arch Linux Ultimate Install</title>
 
   <style type="text/css">
     body {
-      margin-top: 1.0em;
-      background-color: #764087;
       font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #ffffff;
+      background-color: #333;
+      color: #333;
     }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #89bf78; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
+    h1 { font-size: 3.8em; color: #FFF; margin-bottom: 3px}
+    h1 .small { font-size: 0.4em}
     h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #89bf78; }
-    h3 { text-align: center; color: #89bf78; }
-    a { color: #89bf78; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
+    h2 { font-size: 1.5em; color: #000}
+    h3 { text-align: center; color: #000}
+    a { color: #000}
+    pre { background: #000; color: #fff; padding: 15px}
+    hr { border-bottom: 1px solid #3AD}
+    #container {
+      width: 1000px;
+      background-color: #F6F9FC;
+      border: 2px solid #08B;
+      border-radius: 12px;
+      -webkit-border-radius: 12px;
+      -moz-border-radius: 12px;
+      -o-border-radius: 12px;
+      -ms-border-radius: 12px;
+      margin: 50px auto;
+      padding: 40px 60px;
+    }
+    #header { 
+      text-align:center; 
+      padding: 30px 20px; 
+      background-color:#3AD; 
+      border-radius: 12px;
+      -webkit-border-radius: 12px;
+      -moz-border-radius: 12px;
+      -o-border-radius: 12px;
+      -ms-border-radius: 12px;
+    }
+    #description { 
+      font-size: 1.2em; 
+      margin: 30px 0; 
+      font-style: italic;
+    }
+    #footer { 
+      text-align:center; 
+      padding-top:30px; 
+      font-style: italic;
+    }
   </style>
 </head>
 
 <body>
-  <a href="https://github.com/helmuthdu/aui"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
-
+  <a href="https://github.com/helmuthdu/aui">
+      <img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork Arch Linux Ultimate Install on GitHub" />
+  </a>
   <div id="container">
-
-    <div class="download">
-      <a href="https://github.com/helmuthdu/aui/zipball/master">
-        <img border="0" width="90" src="https://github.com/images/modules/download/zip.png"></a>
-      <a href="https://github.com/helmuthdu/aui/tarball/master">
-        <img border="0" width="90" src="https://github.com/images/modules/download/tar.png"></a>
+    <div id="header">
+      <h1><a href="https://github.com/helmuthdu/aui">Archlinux Ultimate Install Script</a></h1>
     </div>
-
-    <h1><a href="https://github.com/helmuthdu/aui">aui</a>
-      <span class="small">by <a href="https://github.com/helmuthdu">helmuthdu</a></span></h1>
-
-    <div class="description">
-      Archlinux Ultimate Install
+    <div id="description">
+      <p>Install and configure archlinux has never been easier!</p>
+      <p><strong>You can try it first with a virtualbox</strong></p>
+      
+      <hr>
+      
+      <h2>Prerequisites</h2>
+      <ul>
+      <li>You need to have Archlinux (base + base_devel) already installed and rebooted</li>
+      <li>Git</li>
+      <li>A working internet connection</li>
+      <li>Logged in as <strong>'root'</strong></li>
+      </ul>
+      
+      <hr>
+      
+      <h2>How to use</h2>
+      <h3>With git</h3>
+      <p>Install git: <pre>pacman -Sy git</pre></p>
+      <p>get the script: <pre>git clone git://github.com/helmuthdu/aui</pre></p>
+      <p>run the script: <pre>cd aui && ./aui</pre></p>
+      <h3>Without git</h3>
+      <p>get the script: <pre>wget --no-check-certificate https://github.com/helmuthdu/aui/tarball/master -O - | tar xz</pre></p>
+      <p>run the script: <pre>./aui</pre></p>
+      
+      <hr>
+      
+      <h2>What does the script do?</h2>
+      <ul>
+      <li>Automatic configure rc.conf
+      <li>Install additional repositories</li>
+      <li>Configure rankmirror</li>
+      <li>System upgrade</li>
+      <li>Create and configure new user</li>
+      <li>Install and configure sudo</li>
+      <li>Configure pacman package signing</li>
+      <li>Install an AUR Helper [yaourt, packer]</li>
+      <li>Install base system</li>
+      <li>Install Xorg</li>
+      <li>Install GPU Drivers</li>
+      <li>Install CUPS</li>
+      <li>Install Additional wireless/bluetooth firmwares</li>
+      <li>Ensuring access to GIT through a firewall</li>
+      <li>Install a Desktop Environment [GNOME, KDE, XFCE, LXDE, OpenBox]</li>
+      <li>Install Developement tools [Vim, Emacs, Eclipse...]</li>
+      <li>Install Office apps [LibreOffice, GNOME-Office, Latex...]</li>
+      <li>Install System tools [Wine, Virtualbox, Grsync, Htop]</li>
+      <li>Install Graphics apps [Inkscape, Gimp, Blender, MComix]</li>
+      <li>Install Internet apps [Firefox, Google-Chrome, Jdownloader...]</li>
+      <li>Install Multimedia apps [Rhythmbox, Clementine, Codecs...]</li>
+      <li>Install Games [HoN, World of Padman, Wesnoth...]</li>
+      <li>Install Fonts [Liberation, MS-Fonts, Google-webfonts...]</li>
+      <li>Install and configure LAMP Server</li>
+      <li>Many More...</li>
+      </ul>
+      
+      <hr>
+      
+      <h2>Author</h2>
+      <p>Helmuth Saatkamp - <a href="https://twitter.com/#!/helmuthdu" target="_blank">@helmuthdu</a></p>
+    
+      <h2>Landing page creator</h2>
+      <p>Caio Ribeiro Pereira - <a href="https://twitter.com/#!/crp_underground" target="_blank">@crp_underground</a></p>
     </div>
-
-    
-
-    
-
-    
-      <h2>Install</h2>
-      <p>- Install git: `pacman -Sy git`
-- get the script: `git clone git://github.com/helmuthdu/aui`
-- run the script: `cd aui && ./aui`</p>
-    
-
-    
-
-    
-      <h2>Authors</h2>
-      <p>Helmuth Saatkamp (helmuthdu@gmail.com)<br/>      </p>
-    
-
-    
-      <h2>Contact</h2>
-      <p>Helmuth Saatkamp (helmuthdu@gmail.com)<br/>      </p>
-    
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="https://github.com/helmuthdu/aui/zipball/master">zip</a> or
-      <a href="https://github.com/helmuthdu/aui/tarball/master">tar formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/helmuthdu/aui</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="https://github.com/helmuthdu/aui">helmuthdu/aui</a>
+    <div id="footer">
+      Get the source code on GitHub: <a href="https://github.com/helmuthdu/aui">https://github.com/helmuthdu/aui</a>
     </div>
-
   </div>
-
 </body>
 </html>
