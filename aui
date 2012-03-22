@@ -478,8 +478,17 @@ function select_user(){
                         ;;
                     2)
                         # VIM
-                        pacman -S --noconfirm --needed vim
-                        package_install "ctags ack discount"
+                        pacman -S --noconfirm --needed vim ctags ack
+                        if ! check_package "discount" ; then
+                            su -l $USERNAME --command="
+                                wget http://aur.archlinux.org/packages/discount/discount.tar.gz;
+                                tar zxvf discount.tar.gz;
+                                cd discount;
+                                makepkg -si --noconfirm;
+                                cd ..;
+                                rm -fr discount*
+                            "
+                        fi
                         git clone git://github.com/helmuthdu/vim
                         mv vim /home/$USERNAME/.vim
                         git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
@@ -2980,8 +2989,8 @@ welcome
 check_root
 language_selector
 system_upgrade
-choose_aurhelper
 select_user
+choose_aurhelper
 
 while [ 1 ]
 do
