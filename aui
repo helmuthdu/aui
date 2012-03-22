@@ -114,6 +114,14 @@ function add_module(){ #{{{
     sed -i '/MODULES[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
     #sed -i '/MODULES[=]/s/^[^ ]*\>/& '"$1"'/' /etc/rc.conf
 } #}}}
+function check_multilib(){ #{{{
+    local repo=`cat /etc/pacman.conf | sed -n '/\[multilib\]/p'`
+    if [ "$ARCHI" = "x86_64" ] && [ -z "$repo" ]; then
+        echo -e "\nYou MUST enanble Multilib Repository"
+        pause_function
+        custom_repositories
+    fi
+} #}}}
 function check_package(){ #{{{
     for PACKAGE in $1; do
         if pacman -Q $PACKAGE &>/dev/null; then
@@ -172,7 +180,7 @@ function invalid_option(){ #{{{
 } #}}}
 function pause_function(){ #{{{
     print_line
-    if [ $USE_SCRIPT -ne 1 ]; then
+    if [ "$USE_SCRIPT" -ne 1 ]; then
         read -e -sn 1 -p "Press any key to continue..."
     fi
 } #}}}
@@ -737,7 +745,7 @@ function install_xorg(){
     #NUMLOCKX {{{
     pacman -S --noconfirm --needed numlockx
     local numlock=`cat /etc/rc.local | sed -n '/numlockx/p'`
-    if [[ "$numlock" != *"numlockx"* ]]; then
+    if [ -z "$numlock" ]; then
         echo -e "if [ -x /usr/bin/numlockx ]; then\n\t/usr/bin/numlockx on\nfi" >> /etc/rc.local
     fi
     #}}}
@@ -1709,6 +1717,7 @@ do
                                 package_install "eclipse-cdt"
                                 ;;
                             3)
+                                check_multilib
                                 package_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
                                 ;;
                             4)
@@ -1746,6 +1755,7 @@ do
                 package_install "emacs"
                 ;;
             5)
+                check_multilib
                 pacman -Rdd --noconfirm vim
                 package_install "gvim"
                 ;;
