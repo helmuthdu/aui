@@ -616,7 +616,7 @@ function pacman_package_signing(){
             package_install "rng-tools"
             sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
             rngd -f -r /dev/urandom &
-            pacman-key --init
+            pacman-key --init --keyserver pgp.mit.edu
             killall rngd
             pacman -Rns --noconfirm rng-tools
             #DEVELOPER AND TU KEYS {{{
