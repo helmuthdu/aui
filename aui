@@ -474,6 +474,8 @@ function select_user(){
                     1)
                         sed -i '/EDITOR/s/vim/nano/' /home/$USERNAME/.bashrc
                         sed -i '/VISUAL/s/vim/nano/' /home/$USERNAME/.bashrc
+                        sed -i '/EDITOR/s/vim/nano/' ~/.bashrc
+                        sed -i '/VISUAL/s/vim/nano/' ~/.bashrc
                         break
                         ;;
                     2)
@@ -489,9 +491,9 @@ function select_user(){
                                 rm -fr discount*
                             "
                         fi
+                        # VIMRC
                         git clone git://github.com/helmuthdu/vim
                         mv vim /home/$USERNAME/.vim
-                        git clone http://github.com/gmarik/vundle.git /home/$USERNAME/.vim/bundle/vundle
                         ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
                         # PENTADACTYL [FIREFOX]
                         git clone git://github.com/helmuthdu/pentadactyl
