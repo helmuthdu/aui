@@ -52,11 +52,12 @@ USE_SCRIPT=0
     CUSTOMREPO="n"
     #VIDEOCARD {{{
         # 1) Intel
-        # 2) ATI
-        # 3) nVidia
-        # 4) Nouveau
-        # 5) Virtualbox
-        # 6) Vesa
+        # 2) ATI [Catalyst]
+        # 3) ATI
+        # 4) nVidia
+        # 5) Nouveau
+        # 6) Virtualbox
+        # 7) Vesa
         VIDEOCARD=5
     #}}}
     #ADDITIONAL FIRMWARE {{{
@@ -113,10 +114,11 @@ USE_SCRIPT=0
         #}}}
         #GNOME THEMES {{{
             # 1) Aldabra
-            # 2) eGTK
-            # 3) Light (Aka Ambiance/Radiance)
-            # 4) Orion
-            # 5) Zukitwo
+            # 2) Boomerang
+            # 3) eGTK
+            # 4) Light (Aka Ambiance/Radiance)
+            # 5) Orion
+            # 6) Zukitwo
             GNOME_THEMES="1-5"
         #}}}
     #}}}

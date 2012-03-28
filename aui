@@ -114,14 +114,6 @@ function add_module(){ #{{{
     sed -i '/MODULES[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
     #sed -i '/MODULES[=]/s/^[^ ]*\>/& '"$1"'/' /etc/rc.conf
 } #}}}
-function check_multilib(){ #{{{
-    local repo=`cat /etc/pacman.conf | sed -n '/\[multilib\]/p'`
-    if [ "$ARCHI" = "x86_64" ] && [ -z "$repo" ]; then
-        echo -e "\nYou MUST enanble Multilib Repository"
-        pause_function
-        custom_repositories
-    fi
-} #}}}
 function check_package(){ #{{{
     for PACKAGE in $1; do
         if pacman -Q $PACKAGE &>/dev/null; then
@@ -353,6 +345,15 @@ function language_selector(){
 #}}}
 #CUSTOM REPOSITORIES {{{
 function custom_repositories(){
+    # ENABLE MULTILIB REPOSITORIE {{{
+    # this option will avoid any problems with packages install
+    if [ "$ARCHI" = "x86_64" ]; then
+        local multilib=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
+        sed -i "$multilib s/^#//g" /etc/pacman.conf
+        local multilib=$(( $multilib + 2 ))
+        sed -i "$multilib s/^#//g" /etc/pacman.conf
+    fi
+    #}}}
     print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
     read_input_text "Add custom repositories" $CUSTOMREPO
     case "$OPTION" in
@@ -363,7 +364,6 @@ function custom_repositories(){
                 print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
                 echo " 1) Ayatana"
                 echo " 2) Archlinuxfr"
-                if [ "$ARCHI" = "x86_64" ]; then echo " 3) Multilib"; fi
                 echo ""
                 echo " a) \"Add Custom\""
                 echo ""
@@ -382,15 +382,6 @@ function custom_repositories(){
                             echo -e '\n[archlinuxfr]\nServer = http://repo.archlinux.fr/$arch' >> /etc/pacman.conf
                             echo -e '\nArchlinuxfr repository added into pacman.conf file'
                             pause_function
-                            ;;
-                        3)
-                            if [ "$ARCHI" = "x86_64" ]; then
-                                echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
-                                echo -e '\nMultilib repository added into pacman.conf file'
-                                pause_function
-                            else
-                                invalid_option
-                            fi
                             ;;
                         "a")
                             read -p "Repository Name [ex: custom]: " REPONAME
@@ -790,11 +781,12 @@ function install_video_cards(){
     print_title "VIDEO CARD"
     echo "Select your GPU:"
     echo " 1) Intel"
-    echo " 2) ATI"
-    echo " 3) nVidia"
-    echo " 4) Nouveau"
-    echo " 5) Virtualbox"
-    echo " 6) Vesa"
+    echo " 2) ATI [Catalyst]"
+    echo " 3) ATI"
+    echo " 4) nVidia"
+    echo " 5) Nouveau"
+    echo " 6) Virtualbox"
+    echo " 7) Vesa"
     echo ""
     echo " s) SKIP"
     echo ""
@@ -806,24 +798,31 @@ function install_video_cards(){
             sumary "Intel GPU driver installation"
             ;;
         2)
+            pacman -Rdd --noconfirm libgl
             package_install "catalyst catalyst-utils"
+            install_status
+            sumary "ATI [Catalysm] GPU driver installation"
+            ;;
+        3)
+            pacman -S --noconfirm --needed libgl xf86-video-ati
+            add_module "radeon"
             install_status
             sumary "ATI GPU driver installation"
             ;;
-        3)
+        4)
             pacman -Rdd --noconfirm libgl
             pacman -S --noconfirm --needed nvidia nvidia-utils
             install_status
             sumary "nVidia GPU driver installation"
             ;;
-        4)
+        5)
             pacman -S --noconfirm --needed libgl xf86-video-nouveau nouveau-dri
             modprobe nouveau
             add_module "nouveau"
             install_status
             sumary "Nouveau GPU driver installation"
             ;;
-        5)
+        6)
             pacman -S --noconfirm --needed virtualbox-archlinux-additions
             modprobe -a vboxguest vboxsf vboxvideo
             add_module "vboxguest"
@@ -834,7 +833,7 @@ function install_video_cards(){
             install_status
             sumary "Virtualbox guest additions (incl. video drivers) installation"
             ;;
-        6)
+        7)
             pacman -S --noconfirm --needed xf86-video-vesa
             install_status
             sumary "Vesa GPU driver installation"
@@ -1024,7 +1023,7 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
             pacman -S --noconfirm --needed pulseaudio-gnome telepathy deja-dup
             pacman -S --noconfirm --needed system-config-printer-gnome
-            package_install "zeitgeist libzeitgeist zeitgeist-datahub"
+            package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
             package_install "automounter nautilus-open-terminal gnome-defaults-list"
             echo -e 'exec ck-launch-session gnome-session' >> /home/$USERNAME/.xinitrc
             #GNOME CUSTOMIZATION {{{
@@ -1032,7 +1031,7 @@ function install_desktop_environment(){
             do
                 print_title "GNOME CUSTOMIZATION"
                 echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "gtk-theme-aldabra egtk-bzr light-themes orion-gtk-theme zukitwo-themes") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
+                echo " 2) $(checkbox_package "gtk-theme-aldabra gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
                 echo " 3) $(checkbox_package "gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro gnome-shell-extension-user-theme gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git") GnomeShell Extensions"
                 echo " 4) $(checkbox_package "gnome-shell-theme-eos gnome-shell-theme-dark-shine gnome-shell-theme-faience gnome-shell-theme-nord") GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
                 echo " 5) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
@@ -1054,10 +1053,11 @@ function install_desktop_environment(){
                             do
                                 print_title "GNOME THEMES"
                                 echo " 1) $(checkbox_package "gtk-theme-aldabra") Aldabra"
-                                echo " 2) $(checkbox_package "egtk-bzr") eGTK"
-                                echo " 3) $(checkbox_package "light-themes") Light (aka Ambiance/Radiance)"
-                                echo " 4) $(checkbox_package "orion-gtk-theme") Orion"
-                                echo " 5) $(checkbox_package "zukitwo-themes") Zukitwo"
+                                echo " 2) $(checkbox_package "gtk-theme-boomerang") Boomerang"
+                                echo " 3) $(checkbox_package "egtk-bzr") eGTK"
+                                echo " 4) $(checkbox_package "light-themes") Light (aka Ambiance/Radiance)"
+                                echo " 5) $(checkbox_package "orion-gtk-theme") Orion"
+                                echo " 6) $(checkbox_package "zukitwo-themes") Zukitwo"
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
@@ -1069,15 +1069,18 @@ function install_desktop_environment(){
                                             package_install "gtk-theme-aldabra"
                                             ;;
                                         2)
-                                            package_install "egtk-bzr"
+                                            package_install "gtk-theme-boomerang"
                                             ;;
                                         3)
-                                            package_install "light-themes"
+                                            package_install "egtk-bzr"
                                             ;;
                                         4)
-                                            package_install "orion-gtk-theme"
+                                            package_install "light-themes"
                                             ;;
                                         5)
+                                            package_install "orion-gtk-theme"
+                                            ;;
+                                        6)
                                             package_install "zukitwo-themes"
                                             ;;
                                         "b")
@@ -1728,7 +1731,6 @@ do
                                 package_install "eclipse-cdt"
                                 ;;
                             3)
-                                check_multilib
                                 package_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
                                 ;;
                             4)
@@ -1766,7 +1768,6 @@ do
                 package_install "emacs"
                 ;;
             5)
-                check_multilib
                 pacman -Rdd --noconfirm vim
                 package_install "gvim"
                 ;;
