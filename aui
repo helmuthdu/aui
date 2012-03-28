@@ -346,7 +346,7 @@ function language_selector(){
 #CUSTOM REPOSITORIES {{{
 function custom_repositories(){
     # ENABLE MULTILIB REPOSITORIE {{{
-    # this option will avoid any problems with packages install
+    # this option will avoid any problem with packages install
     if [ "$ARCHI" = "x86_64" ]; then
         local multilib=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
         sed -i "$multilib s/^#//g" /etc/pacman.conf
