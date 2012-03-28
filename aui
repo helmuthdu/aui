@@ -2933,7 +2933,7 @@ function configure_fonts(){
     case "$OPTION" in
         1)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
-            package_install "cairo-ubuntu fontconfig-ubuntu freetype2-ubuntu"
+            package_install "fontconfig-ubuntu freetype2-ubuntu libxft-ubuntu cairo-ubuntu"
             install_status
             ;;
         2)
