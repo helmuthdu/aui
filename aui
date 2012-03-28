@@ -1017,7 +1017,7 @@ function install_desktop_environment(){
         1)
             #GNOME {{{
             print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
-            pacman -S --noconfirm --needed gnome gnome-extra
+            pacman -Sf --noconfirm --needed gnome gnome-extra
             gpasswd -a $USERNAME camera
             pacman -S --noconfirm --needed gedit-plugins gnome-tweak-tool
             pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
