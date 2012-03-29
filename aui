@@ -1021,7 +1021,7 @@ function install_desktop_environment(){
             gpasswd -a $USERNAME camera
             pacman -S --noconfirm --needed gedit-plugins gnome-tweak-tool
             pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
-            pacman -S --noconfirm --needed pulseaudio-gnome telepathy deja-dup
+            pacman -S --noconfirm --needed pulseaudio telepathy deja-dup
             pacman -S --noconfirm --needed system-config-printer-gnome
             package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
             package_install "automounter nautilus-open-terminal gnome-defaults-list"
