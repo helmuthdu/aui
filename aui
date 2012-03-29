@@ -1796,7 +1796,7 @@ do
                 package_install "sublime-text"
                 ;;
             12)
-                package_install "valgrind gdb splint tidyhtml pyflakes-svn jsl"
+                package_install "valgrind gdb splint tidyhtml python2-pyflakes jsl"
                 ;;
             13)
                 package_install "mysql-workbench"
@@ -2155,21 +2155,22 @@ while [ 1 ]
 do
     print_title "AUDIO APPS "
     echo " 1) $(checkbox_package "amarok") Amarok"
-    echo " 2) $(checkbox_package "banshee") Banshee"
-    echo " 3) $(checkbox_package "beatbox-bzr") Beatbox"
-    echo " 4) $(checkbox_package "clementine") Clementine"
-    echo " 5) $(checkbox_package "decibel-audio-player2") Decibel"
-    echo " 6) $(checkbox_package "exaile") Exaile"
-    echo " 7) $(checkbox_package "gmusicbrowser-development") Gmusicbrowser"
-    echo " 8) $(checkbox_package "musique") Musique"
-    echo " 9) $(checkbox_package "nuvola-bzr-stable") Nuvola"
-    echo "10) $(checkbox_package "rhythmbox") Rhythmbox"
-    echo "11) $(checkbox_package "spotify") Spotify"
-    echo "12) $(checkbox_package "soundconverter") Soundconverter"
-    echo "13) $(checkbox_package "puddletag") Puddletag"
-    echo "14) $(checkbox_package "audacity") Audacity"
-    echo "15) $(checkbox_package "timidity++") MIDI"
-    echo "16) $(checkbox_package "gstreamer0.10-ugly") Codecs"
+    echo " 2) $(checkbox_package "audacious") Audacious"
+    echo " 3) $(checkbox_package "banshee") Banshee"
+    echo " 4) $(checkbox_package "beatbox-bzr") Beatbox"
+    echo " 5) $(checkbox_package "clementine") Clementine"
+    echo " 6) $(checkbox_package "decibel-audio-player2") Decibel"
+    echo " 7) $(checkbox_package "exaile") Exaile"
+    echo " 8) $(checkbox_package "gmusicbrowser-development") Gmusicbrowser"
+    echo " 9) $(checkbox_package "musique") Musique"
+    echo "10) $(checkbox_package "nuvola-bzr-stable") Nuvola"
+    echo "11) $(checkbox_package "rhythmbox") Rhythmbox"
+    echo "12) $(checkbox_package "spotify") Spotify"
+    echo "13) $(checkbox_package "soundconverter") Soundconverter"
+    echo "14) $(checkbox_package "puddletag") Puddletag"
+    echo "15) $(checkbox_package "audacity") Audacity"
+    echo "16) $(checkbox_package "timidity++") MIDI"
+    echo "17) $(checkbox_package "gstreamer0.10-ugly") Codecs"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2181,49 +2182,52 @@ do
                 package_install "amarok"
                 ;;
             2)
-                package_install "banshee"
+                package_install "audacious audacious-plugins"
                 ;;
             3)
-                package_install "beatbox-bzr"
+                package_install "banshee"
                 ;;
             4)
-                package_install "clementine"
+                package_install "beatbox-bzr"
                 ;;
             5)
-                package_install "decibel-audio-player2"
+                package_install "clementine"
                 ;;
             6)
-                package_install "exaile"
+                package_install "decibel-audio-player2"
                 ;;
             7)
-                package_install "gmusicbrowser-development"
+                package_install "exaile"
                 ;;
             8)
-                package_install "musique"
+                package_install "gmusicbrowser-development"
                 ;;
             9)
-                package_install "nuvola-bzr-stable"
+                package_install "musique"
                 ;;
             10)
-                package_install "rhythmbox"
+                package_install "nuvola-bzr-stable"
                 ;;
             11)
-                package_install "spotify"
+                package_install "rhythmbox"
                 ;;
             12)
-                package_install "soundconverter"
+                package_install "spotify"
                 ;;
             13)
-                package_install "puddletag"
+                package_install "soundconverter"
                 ;;
             14)
-                package_install "audacity"
+                package_install "puddletag"
                 ;;
             15)
+                package_install "audacity"
+                ;;
+            16)
                 package_install "timidity++ fluidr3"
                 echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                 ;;
-            16)
+            17)
                 pacman -S --noconfirm --needed gstreamer0.10-plugins
                 ;;
             "b")
