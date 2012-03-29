@@ -1796,7 +1796,7 @@ do
                 package_install "sublime-text"
                 ;;
             12)
-                package_install "valgrind gdb splint tidyhtml python2-pyflakes jsl"
+                package_install "valgrind gdb splint tidyhtml python2-pyflakes jslint"
                 ;;
             13)
                 package_install "mysql-workbench"
