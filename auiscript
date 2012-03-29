@@ -296,21 +296,22 @@ USE_SCRIPT=0
 #}}}
 #AUDIO {{{
     # 1) Amarok
-    # 2) Banshee
-    # 3) Beatbox
-    # 4) Clementine
-    # 5) Decibel
-    # 6) Exaile
-    # 7) Gmusicbrowser
-    # 8) Musique
-    # 9) Nuvola
-    #10) Rhythmbox
-    #11) Spotify
-    #12) Soundconverter
-    #13) Puddletag
-    #14) Audacity
-    #15) MIDI
-    #16) Codecs
+    # 2) Audacious
+    # 3) Banshee
+    # 4) Beatbox
+    # 5) Clementine
+    # 6) Decibel
+    # 7) Exaile
+    # 8) Gmusicbrowser
+    # 9) Musique
+    #10) Nuvola
+    #11) Rhythmbox
+    #12) Spotify
+    #13) Soundconverter
+    #14) Puddletag
+    #15) Audacity
+    #16) MIDI
+    #17) Codecs
     AUDIO_OPTIONS="4 12 16"
 #}}}
 #VIDEO {{{
