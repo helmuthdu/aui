@@ -1018,10 +1018,11 @@ function install_desktop_environment(){
             #GNOME {{{
             print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
             pacman -Sf --noconfirm --needed gnome gnome-extra
+            package_install "telepathy empathy-theme-ubuntu-adium-bzr"
             gpasswd -a $USERNAME camera
             pacman -S --noconfirm --needed gedit-plugins gnome-tweak-tool
             pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
-            pacman -S --noconfirm --needed pulseaudio telepathy deja-dup
+            pacman -S --noconfirm --needed pulseaudio deja-dup
             pacman -S --noconfirm --needed system-config-printer-gnome
             package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
             package_install "automounter nautilus-open-terminal gnome-defaults-list"
@@ -1035,7 +1036,8 @@ function install_desktop_environment(){
                 echo " 3) $(checkbox_package "gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro gnome-shell-extension-user-theme gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git") GnomeShell Extensions"
                 echo " 4) $(checkbox_package "gnome-shell-theme-eos gnome-shell-theme-dark-shine gnome-shell-theme-faience gnome-shell-theme-nord") GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
                 echo " 5) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
-                echo " 6) $(checkbox_package "gnome-packagekit") Packagekit"
+                echo " 6) $(checkbox_package "gloobus-sushi-bzr") Gloobus Preview"
+                echo " 7) $(checkbox_package "gnome-packagekit") Packagekit"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1107,7 +1109,7 @@ function install_desktop_environment(){
                                 echo " 4) $(checkbox_package "gnome-shell-extension-noa11y-git") noa11y"
                                 echo " 5) $(checkbox_package "gnome-shell-extension-pomodoro") pomodoro"
                                 echo " 6) $(checkbox_package "gnome-shell-system-monitor-applet-git") system-monitor"
-                                echo " 7) $(checkbox_package "gnome-shell-extension-user-theme") user-theme"
+                                echo " 7) $(checkbox_package "gnome-shell-extension-user-theme-git") user-theme"
                                 echo " 8) $(checkbox_package "gnome-shell-extension-weather-git") weather"
                                 echo ""
                                 echo " b) BACK"
@@ -1199,6 +1201,9 @@ function install_desktop_environment(){
                             package_install "gnome-activity-journal"
                             ;;
                         6)
+                            package_install "gloobus-sushi-bzr"
+                            ;;
+                        7)
                             package_install "gnome-packagekit gnome-settings-daemon-updates"
                             ;;
                         "d")
@@ -1213,6 +1218,7 @@ function install_desktop_environment(){
             done
             #}}}
             add_daemon "gdm"
+            add_daemon "avahi-daemon"
             install_status
             GNOME=1
             ;;
@@ -1297,6 +1303,7 @@ function install_desktop_environment(){
             done
             #}}}
             add_daemon "kdm"
+            add_daemon "avahi-daemon"
             install_status
             KDE=1
             ;;
@@ -2067,6 +2074,7 @@ do
                 ;;
             9)
                 package_install "pidgin"
+                add_daemon "avahi-daemon"
                 ;;
             10)
                 package_install "remmina"
@@ -2121,7 +2129,7 @@ case "$OPTION" in
             echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
             echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
             sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
-            echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
+            echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
             sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
             sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
             sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
@@ -2133,7 +2141,7 @@ case "$OPTION" in
             #}}}
         fi
         su -l $USERNAME --command="mkdir -p ~/Sites"
-        su -l $USERNAME --command="chmod o+x ~/ && chmod -R g+xr-w ~/Sites"
+        su -l $USERNAME --command="chmod o+x ~/ && chmod -R o+x ~/Sites"
         rc.d restart httpd mysqld
         add_daemon "httpd @mysqld"
         install_status

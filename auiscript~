@@ -84,8 +84,7 @@ USE_SCRIPT=0
         # 3) GnomeShell Extensions
         # 4) GnomeShell Themes [eOS, Nord, Faience, Dark Shine]
         # 5) Gnome Activity Journal
-        # 6) Gloobus Preview
-        # 7) Packagekit
+        # 6) Packagekit
         GNOME_OPTIONS="1-6"
         #GNOME ICONS {{{
             # 1) Awoken
