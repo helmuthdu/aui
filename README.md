@@ -38,7 +38,7 @@ You can try it first with a `virtualbox`
 - Install CUPS
 - Install Additional wireless/bluetooth firmwares
 - Ensuring access to GIT through a firewall
-- Install a Desktop Environment [GNOME, KDE, XFCE, LXDE, OpenBox]
+- Install a Desktop Environment [GNOME, KDE, XFCE, LXDE, OpenBox, Cinnamon]
 - Install Developement tools [Vim, Emacs, Eclipse...]
 - Install Office apps [LibreOffice, GNOME-Office, Latex...]
 - Install System tools [Wine, Virtualbox, Grsync, Htop]
