@@ -190,7 +190,8 @@ USE_SCRIPT=0
             # 5) Elementary
             GNOME_ICONS="2-5"
         #}}}
-        #CINNAMON {{{
+    #}}}
+    #CINNAMON {{{
         # 1) Gnome Icons [Faience, Faenza, Elementary]
         # 2) Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]
         # 3) Gnome Activity Journal
@@ -272,13 +273,14 @@ USE_SCRIPT=0
     # 2) GnomeOffice [Abiword, Gnumeric]
     # 3) Latex + Texmaker
     # 4) CHM Viewer
-    # 5) GCStar
-    # 6) Wunderlist
-    # 7) Xmind
-    # 8) Zathura
-    # 9) Impressive
-    #10) OCRFeeder
-    OFFICE_OPTIONS="1 8 9"
+    # 5) CherryTree
+    # 6) GCStar
+    # 7) Impressive
+    # 8) OCRFeeder
+    # 9) Zathura
+    #10) Xmind
+    #11) Wunderlist
+    OFFICE_OPTIONS="1 5 9"
 #}}}
 #SYSTEM TOOLS {{{
     # 1) Gparted
@@ -477,3 +479,5 @@ USE_SCRIPT=0
     # 4) Reverting to unpatched packages
     FONTSCONFIG_OPTION=""
 #}}}
+
+

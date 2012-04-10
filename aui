@@ -1533,8 +1533,10 @@ function install_desktop_environment(){
             #CINNAMON {{{
             print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
             package_install "cinnamon cinnamon-themes cinnamon-applets"
-            pacman -S --noconfirm --needed gedit gedit-plugins
-            pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
+            pacman -S --noconfirm --needed gnome-extra gedit-plugins
+            package_install "telepathy empathy-theme-ubuntu-adium-bzr"
+            gpasswd -a $USERNAME camera
+            pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs-gtk
             pacman -S --noconfirm --needed pulseaudio deja-dup
             pacman -S --noconfirm --needed system-config-printer-gnome
             package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
@@ -1939,12 +1941,13 @@ do
     echo " 2) $(checkbox_package "goffice") GnomeOffice [Abiword, Gnumeric]"
     echo " 3) $(checkbox_package "texlive-core") Latex + Texmaker"
     echo " 4) $(if [ "$KDE" -eq 1 ]; then  echo "$(checkbox_package "kchmviewer") Kchmviewer"; else echo "$(checkbox_package "chmsee") Chmsee"; fi)"
-    echo " 5) $(checkbox_package "gcstar") GCStar"
-    echo " 6) $(checkbox_package "wunderlist") Wunderlist"
-    echo " 7) $(checkbox_package "xmind") Xmind"
-    echo " 8) $(checkbox_package "zathura") Zathura"
-    echo " 9) $(checkbox_package "impressive") Impressive"
-    echo "10) $(checkbox_package "ocrfeeder") OCRFeeder"
+    echo " 5) $(checkbox_package "cherrytree") CherryTree"
+    echo " 6) $(checkbox_package "gcstar") GCStar"
+    echo " 7) $(checkbox_package "impressive") Impressive"
+    echo " 8) $(checkbox_package "ocrfeeder") OCRFeeder"
+    echo " 9) $(checkbox_package "zathura") Zathura"
+    echo "10) $(checkbox_package "xmind") Xmind"
+    echo "11) $(checkbox_package "wunderlist") Wunderlist"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1985,23 +1988,26 @@ do
                 fi
                 ;;
             5)
-                package_install "gcstar"
+                package_install "cherrytree"
                 ;;
             6)
-                package_install "wunderlist"
+                package_install "gcstar"
                 ;;
             7)
-                package_install "xmind"
-                ;;
-            8)
-                package_install "zathura"
-                ;;
-            9)
                 package_install "impressive"
                 ;;
-            10)
+            8)
                 package_install "ocrfeeder tesseract gocr"
                 package_install "aspell-$LANGUAGE_AS"
+                ;;
+            9)
+                package_install "zathura"
+                ;;
+            10)
+                package_install "xmind"
+                ;;
+            11)
+                package_install "wunderlist"
                 ;;
             "b")
                 break
