@@ -1010,6 +1010,7 @@ function install_desktop_environment(){
     echo " 3) XFCE"
     echo " 4) LXDE"
     echo " 5) OpenBox"
+    echo " 6) Cinnamon"
     echo ""
     echo " b) BACK"
     read_input $DESKTOPENV
@@ -1526,6 +1527,112 @@ function install_desktop_environment(){
             #}}}
             install_status
             XFCE=1
+            ;;
+            #}}}
+        6)
+            #CINNAMON {{{
+            print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
+            package_install "cinnamon cinnamon-themes cinnamon-applets"
+            pacman -S --noconfirm --needed gedit gedit-plugins
+            pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
+            pacman -S --noconfirm --needed pulseaudio deja-dup
+            pacman -S --noconfirm --needed system-config-printer-gnome
+            package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
+            package_install "automounter nautilus-open-terminal gnome-defaults-list"
+            echo -e 'exec ck-launch-session gnome-session-cinnamon' >> /home/$USERNAME/.xinitrc
+            #CINNAMON CUSTOMIZATION {{{
+            while [ 1 ]
+            do
+                print_title "CINNAMON CUSTOMIZATION"
+                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons [Faience, Faenza, Elementary]"
+                echo " 2) $(checkbox_package "gtk-theme-aldabra gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
+                echo " 3) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
+                echo " 4) $(checkbox_package "gloobus-sushi-bzr") Gloobus Preview"
+                echo " 5) $(checkbox_package "gnome-packagekit") Packagekit"
+                echo ""
+                echo " d) DONE"
+                echo ""
+                GNOME_OPTIONS+=" d"
+                read_input_options "$GNOME_OPTIONS"
+                for OPT in ${OPTIONS[@]}; do
+                    case "$OPT" in
+                        1)
+                            install_icons
+                            OPT=1
+                            ;;
+                        2)
+                            #THEMES {{{
+                            while [ 1 ]
+                            do
+                                print_title "GNOME THEMES"
+                                echo " 1) $(checkbox_package "gtk-theme-aldabra") Aldabra"
+                                echo " 2) $(checkbox_package "gtk-theme-boomerang") Boomerang"
+                                echo " 3) $(checkbox_package "egtk-bzr") eGTK"
+                                echo " 4) $(checkbox_package "light-themes") Light (aka Ambiance/Radiance)"
+                                echo " 5) $(checkbox_package "orion-gtk-theme") Orion"
+                                echo " 6) $(checkbox_package "zukitwo-themes") Zukitwo"
+                                echo ""
+                                echo " b) BACK"
+                                echo ""
+                                GNOME_THEMES+=" b"
+                                read_input_options "$GNOME_THEMES"
+                                for OPT in ${OPTIONS[@]}; do
+                                    case "$OPT" in
+                                        1)
+                                            package_install "gtk-theme-aldabra"
+                                            ;;
+                                        2)
+                                            package_install "gtk-theme-boomerang"
+                                            ;;
+                                        3)
+                                            package_install "egtk-bzr"
+                                            ;;
+                                        4)
+                                            package_install "light-themes"
+                                            ;;
+                                        5)
+                                            package_install "orion-gtk-theme"
+                                            ;;
+                                        6)
+                                            package_install "zukitwo-themes"
+                                            ;;
+                                        "b")
+                                            break
+                                            ;;
+                                        *)
+                                            invalid_option
+                                            ;;
+                                    esac
+                                done
+                            elihw
+                            done
+                            #}}}
+                            OPT=2
+                            ;;
+                        3)
+                            package_install "gnome-activity-journal"
+                            ;;
+                        4)
+                            package_install "gloobus-sushi-bzr"
+                            ;;
+                        5)
+                            package_install "gnome-packagekit gnome-settings-daemon-updates"
+                            ;;
+                        "d")
+                            break
+                            ;;
+                        *)
+                            invalid_option
+                            ;;
+                    esac
+                done
+            elihw
+            done
+            #}}}
+            add_daemon "gdm"
+            add_daemon "avahi-daemon"
+            install_status
+            GNOME=1
             ;;
             #}}}
         *)

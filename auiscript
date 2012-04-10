@@ -77,6 +77,7 @@ USE_SCRIPT=0
     # 3) XFCE
     # 4) LXDE
     # 5) OpenBox
+    # 6) Cinnamon
     DESKTOPENV=3
     #GNOME {{{
         # 1) Gnome Icons [Faience, Faenza, Elementary]
@@ -188,6 +189,30 @@ USE_SCRIPT=0
             # 4) Faience
             # 5) Elementary
             GNOME_ICONS="2-5"
+        #}}}
+        #CINNAMON {{{
+        # 1) Gnome Icons [Faience, Faenza, Elementary]
+        # 2) Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]
+        # 3) Gnome Activity Journal
+        # 4) Gloobus Preview
+        # 5) Packagekit
+        GNOME_OPTIONS="1-5"
+        #GNOME ICONS {{{
+            # 1) Awoken
+            # 2) Faenza
+            # 3) Faenza-Cupertino
+            # 4) Faience
+            # 5) Elementary
+            GNOME_ICONS="2-5"
+        #}}}
+        #GNOME THEMES {{{
+            # 1) Aldabra
+            # 2) Boomerang
+            # 3) eGTK
+            # 4) Light (Aka Ambiance/Radiance)
+            # 5) Orion
+            # 6) Zukitwo
+            GNOME_THEMES="1-5"
         #}}}
     #}}}
     #NETWORKMANAGER #{{{
