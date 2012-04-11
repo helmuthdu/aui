@@ -1034,7 +1034,7 @@ function install_desktop_environment(){
                 print_title "GNOME CUSTOMIZATION"
                 echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons [Faience, Faenza, Elementary]"
                 echo " 2) $(checkbox_package "gtk-theme-aldabra gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
-                echo " 3) $(checkbox_package "gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro gnome-shell-extension-user-theme gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git") GnomeShell Extensions"
+                echo " 3) $(checkbox_package "gpaste-git gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro gnome-shell-extension-user-theme gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git") GnomeShell Extensions"
                 echo " 4) $(checkbox_package "gnome-shell-theme-eos gnome-shell-theme-dark-shine gnome-shell-theme-faience gnome-shell-theme-nord") GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
                 echo " 5) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
                 echo " 6) $(checkbox_package "gloobus-sushi-bzr") Gloobus Preview"
@@ -1104,7 +1104,7 @@ function install_desktop_environment(){
                             while [ 1 ]
                             do
                                 print_title "GNOMESHELL EXTENSIONS"
-                                echo " 1) $(checkbox_package "gpaste") gpaste"
+                                echo " 1) $(checkbox_package "gpaste-git") gpaste"
                                 echo " 2) $(checkbox_package "gnome-shell-extension-gtile-git") gtile"
                                 echo " 3) $(checkbox_package "gnome-shell-extension-mediaplayer-git") media-player"
                                 echo " 4) $(checkbox_package "gnome-shell-extension-noa11y-git") noa11y"
@@ -1120,7 +1120,7 @@ function install_desktop_environment(){
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
-                                            package_install "gpaste"
+                                            package_install "gpaste-git"
                                             ;;
                                         2)
                                             package_install "gnome-shell-extension-gtile-git"
