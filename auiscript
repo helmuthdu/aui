@@ -466,9 +466,8 @@ USE_SCRIPT=0
     # 3) ttf-kochi-substitute
     # 4) ttf-liberation
     # 5) ttf-ms-fonts
-    # 6) ttf-roboto
-    # 7) ttf-vista-fonts
-    # 8) ttf-mac-fonts
+    # 6) ttf-vista-fonts
+    # 7) ttf-mac-fonts
     FONTS_OPTIONS="1-8"
     GOOGLE_FONTS="n"
 #}}}
