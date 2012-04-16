@@ -1944,10 +1944,11 @@ do
     echo " 5) $(checkbox_package "cherrytree") CherryTree"
     echo " 6) $(checkbox_package "gcstar") GCStar"
     echo " 7) $(checkbox_package "impressive") Impressive"
-    echo " 8) $(checkbox_package "ocrfeeder") OCRFeeder"
-    echo " 9) $(checkbox_package "zathura") Zathura"
-    echo "10) $(checkbox_package "xmind") Xmind"
-    echo "11) $(checkbox_package "wunderlist") Wunderlist"
+    echo " 8) $(checkbox_package "nitrotasks") Nitrotasks"
+    echo " 9) $(checkbox_package "ocrfeeder") OCRFeeder"
+    echo "10) $(checkbox_package "zathura") Zathura"
+    echo "11) $(checkbox_package "xmind") Xmind"
+    echo "12) $(checkbox_package "wunderlist") Wunderlist"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1997,16 +1998,19 @@ do
                 package_install "impressive"
                 ;;
             8)
+                package_install "nitrotasks"
+                ;;
+            9)
                 package_install "ocrfeeder tesseract gocr"
                 package_install "aspell-$LANGUAGE_AS"
                 ;;
-            9)
+            10)
                 package_install "zathura"
                 ;;
-            10)
+            11)
                 package_install "xmind"
                 ;;
-            11)
+            12)
                 package_install "wunderlist"
                 ;;
             "b")
