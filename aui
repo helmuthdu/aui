@@ -931,10 +931,10 @@ function install_additional_firmwares(){
 #GIT ACCESS THRU A FIREWALL {{{
 function install_git_tor(){
     print_title "GIT-TOR - https://wiki.archlinux.org/index.php/Tor"
-    read_input_text "Ensuring access to GIT through a firewall (bypass college firewall)" $GITTOR
+    read_input_text "Ensuring access to GIT through a firewall (bypass college/work firewall)" $GITTOR
     case "$OPTION" in
         "y")
-            package_install "gtk-doc openbsd-netcat vidalia privoxy git"
+            package_install "openbsd-netcat vidalia privoxy git"
             if [ ! -f /usr/bin/proxy-wrapper ]; then
                 echo 'forward-socks5   /               127.0.0.1:9050 .' >> /etc/privoxy/config
                 echo -e '#!/bin/bash\nnc.openbsd -xlocalhost:9050 -X5 $*' > /usr/bin/proxy-wrapper
