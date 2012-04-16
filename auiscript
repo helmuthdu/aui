@@ -276,10 +276,11 @@ USE_SCRIPT=0
     # 5) CherryTree
     # 6) GCStar
     # 7) Impressive
-    # 8) OCRFeeder
-    # 9) Zathura
-    #10) Xmind
-    #11) Wunderlist
+    # 8) Nitrotask
+    # 9) OCRFeeder
+    #10) Zathura
+    #11) Xmind
+    #12) Wunderlist
     OFFICE_OPTIONS="1 5 9"
 #}}}
 #SYSTEM TOOLS {{{
