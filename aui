@@ -645,7 +645,7 @@ function install_basic_setup(){
     add_daemon "acpid"
     print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/Windows"
     pacman -S --noconfirm --needed ntfs-3g ntfsprogs dosfstools exfat-utils fuse fuse-exfat
-    add_module "@fuse"
+    add_daemon"@fuse"
     print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
     pacman -S --noconfirm --needed rssh openssh
     add_daemon "@sshd"
