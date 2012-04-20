@@ -1035,7 +1035,7 @@ function install_desktop_environment(){
                 print_title "GNOME CUSTOMIZATION"
                 echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons [Faience, Faenza, Elementary]"
                 echo " 2) $(checkbox_package "gtk-theme-aldabra gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
-                echo " 3) $(checkbox_package "gpaste-git gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro gnome-shell-extension-user-theme gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git") GnomeShell Extensions"
+                echo " 3) $(checkbox_package "gpaste-git gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git") GnomeShell Extensions"
                 echo " 4) $(checkbox_package "gnome-shell-theme-eos gnome-shell-theme-dark-shine gnome-shell-theme-faience gnome-shell-theme-nord") GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
                 echo " 5) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
                 echo " 6) $(checkbox_package "gloobus-sushi-bzr") Gloobus Preview"
@@ -1106,13 +1106,13 @@ function install_desktop_environment(){
                             do
                                 print_title "GNOMESHELL EXTENSIONS"
                                 echo " 1) $(checkbox_package "gpaste-git") gpaste"
-                                echo " 2) $(checkbox_package "gnome-shell-extension-gtile-git") gtile"
-                                echo " 3) $(checkbox_package "gnome-shell-extension-mediaplayer-git") media-player"
-                                echo " 4) $(checkbox_package "gnome-shell-extension-noa11y-git") noa11y"
-                                echo " 5) $(checkbox_package "gnome-shell-extension-pomodoro") pomodoro"
-                                echo " 6) $(checkbox_package "gnome-shell-system-monitor-applet-git") system-monitor"
-                                echo " 7) $(checkbox_package "gnome-shell-extension-user-theme-git") user-theme"
-                                echo " 8) $(checkbox_package "gnome-shell-extension-weather-git") weather"
+                                echo " 2) $(checkbox_package "gnome-shell-extension-mediaplayer-git") media-player"
+                                echo " 3) $(checkbox_package "gnome-shell-extension-noa11y-git") noa11y"
+                                echo " 4) $(checkbox_package "gnome-shell-extension-pomodoro-git") pomodoro"
+                                echo " 5) $(checkbox_package "gnome-shell-system-monitor-applet-git") system-monitor"
+                                echo " 6) $(checkbox_package "gnome-shell-extension-user-theme-git") user-theme"
+                                echo " 7) $(checkbox_package "gnome-shell-extension-weather-git") weather"
+                                echo " 8) $(checkbox_package "gnome-shell-extension-gtile-git") gtile"
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
@@ -1124,26 +1124,26 @@ function install_desktop_environment(){
                                             package_install "gpaste-git"
                                             ;;
                                         2)
-                                            package_install "gnome-shell-extension-gtile-git"
-                                            ;;
-                                        3)
                                             package_install "gnome-shell-extension-mediaplayer-git"
                                             ;;
-                                        4)
+                                        3)
                                             package_install "gnome-shell-extension-noa11y-git"
                                             ;;
-                                        5)
+                                        4)
                                             package_install "libkeybinder3"
-                                            package_install "gnome-shell-extension-pomodoro"
+                                            package_install "gnome-shell-extension-pomodoro-git"
                                             ;;
-                                        6)
+                                        5)
                                             package_install "gnome-shell-system-monitor-applet-git"
                                             ;;
-                                        7)
+                                        6)
                                             package_install "gnome-shell-extension-user-theme-git"
                                             ;;
-                                        8)
+                                        7)
                                             package_install "gnome-shell-extension-weather-git"
+                                            ;;
+                                        8)
+                                            package_install "gnome-shell-extension-gtile-git"
                                             ;;
                                         "b")
                                             break
