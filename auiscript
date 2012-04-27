@@ -58,7 +58,7 @@ USE_SCRIPT=0
         # 5) Nouveau
         # 6) Virtualbox
         # 7) Vesa
-        VIDEOCARD=5
+        VIDEOCARD=4
     #}}}
     #ADDITIONAL FIRMWARE {{{
         # 1) ipw2100
@@ -78,7 +78,7 @@ USE_SCRIPT=0
     # 4) LXDE
     # 5) OpenBox
     # 6) Cinnamon
-    DESKTOPENV=3
+    DESKTOPENV=1
     #GNOME {{{
         # 1) Gnome Icons [Faience, Faenza, Elementary]
         # 2) Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]
@@ -87,7 +87,7 @@ USE_SCRIPT=0
         # 5) Gnome Activity Journal
         # 6) Gloobus Preview
         # 7) Packagekit
-        GNOME_OPTIONS="1-6"
+        GNOME_OPTIONS="1-5 7"
         #GNOME ICONS {{{
             # 1) Awoken
             # 2) Faenza
@@ -105,7 +105,7 @@ USE_SCRIPT=0
             # 6) system-monitor
             # 7) user-theme
             # 8) weather
-            GNOME_EXTENSIONS="1-8"
+            GNOME_EXTENSIONS="1 3-8"
         #}}}
         #GNOME SHELL THEMES {{{
             # 1) eOS
@@ -121,7 +121,7 @@ USE_SCRIPT=0
             # 4) Light (Aka Ambiance/Radiance)
             # 5) Orion
             # 6) Zukitwo
-            GNOME_THEMES="1-5"
+            GNOME_THEMES="3-5"
         #}}}
     #}}}
     #KDE {{{
@@ -237,7 +237,7 @@ USE_SCRIPT=0
     #11) Shutter
     #12) Synapse
     #13) Terminator
-    ACCESSORIES_OPTIONS="3 7 9 13"
+    ACCESSORIES_OPTIONS="11 13"
 #}}}
 #DEVELOPEMENT {{{
     # 1) Aptana Studio
@@ -278,10 +278,10 @@ USE_SCRIPT=0
     # 7) Impressive
     # 8) Nitrotask
     # 9) OCRFeeder
-    #10) Zathura
-    #11) Xmind
-    #12) Wunderlist
-    OFFICE_OPTIONS="1 5 9"
+    #10) ReText
+    #11) Zathura
+    #12) Xmind
+    OFFICE_OPTIONS="1 3 7 8 11 12"
 #}}}
 #SYSTEM TOOLS {{{
     # 1) Gparted
@@ -289,7 +289,7 @@ USE_SCRIPT=0
     # 3) Htop
     # 4) Virtualbox
     # 5) Wine
-    SYSTEMTOOLS_OPTIONS="2 3"
+    SYSTEMTOOLS_OPTIONS="2 3 5"
 #}}}
 #GRAPHICS {{{
     # 1) Blender
@@ -300,7 +300,7 @@ USE_SCRIPT=0
     # 6) MComix
     # 7) Mypaint
     # 8) Shotwell
-    GRAPHICS_OPTIONS="2 3 5-8"
+    GRAPHICS_OPTIONS="2-8"
 #}}}
 #INTERNET {{{
     # 1) Dropbox
@@ -318,7 +318,7 @@ USE_SCRIPT=0
     #13) Teamviewer
     #14) Trasmission
     #15) X-Chat/Konversation
-    INTERNET_OPTIONS="1 2 5 7"
+    INTERNET_OPTIONS="1 4 5 7"
 #}}}
 #LAMP {{{
     LAMP="n"
@@ -341,7 +341,7 @@ USE_SCRIPT=0
     #15) Audacity
     #16) MIDI
     #17) Codecs
-    AUDIO_OPTIONS="4 12 16"
+    AUDIO_OPTIONS="5 13 17"
 #}}}
 #VIDEO {{{
     # 1) Audience
@@ -477,7 +477,7 @@ USE_SCRIPT=0
     # 2) Cleartype patched packages
     # 3) Infinality patched packages
     # 4) Reverting to unpatched packages
-    FONTSCONFIG_OPTION=""
+    FONTSCONFIG_OPTION="1"
 #}}}
 
 
