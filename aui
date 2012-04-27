@@ -613,7 +613,7 @@ function pacman_package_signing(){
             pacman-key --init --keyserver pgp.mit.edu
             killall rngd
             pacman -Rns --noconfirm rng-tools
-            pacman -S archlinux-keyring
+            pacman -S --noconfirm --needed archlinux-keyring
             #DEVELOPER AND TU KEYS {{{
             KEYS="y"
             read_input_text "Install Developer and TU Keys" $KEYS
