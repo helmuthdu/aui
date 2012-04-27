@@ -117,6 +117,7 @@ function add_module(){ #{{{
 function check_package(){ #{{{
     for PACKAGE in $1; do
         if pacman -Q $PACKAGE &>/dev/null; then
+            echo -e "Warning: $PACKAGE is up to date --skipping"
             return 0
         fi
     done
@@ -612,10 +613,15 @@ function pacman_package_signing(){
             pacman-key --init --keyserver pgp.mit.edu
             killall rngd
             pacman -Rns --noconfirm rng-tools
+            pacman -S archlinux-keyring
             #DEVELOPER AND TU KEYS {{{
-            curl https://www.archlinux.org/{developers,trustedusers}/ |
-            awk -F\" '(/pgp.mit.edu/) {sub(/.*search=0x/,"");print $1}' |
-            xargs pacman-key --recv-keys
+            KEYS="y"
+            read_input_text "Install Developer and TU Keys" $KEYS
+            if [ "$OPTION" = "n" ]; then
+                curl https://www.archlinux.org/{developers,trustedusers}/ |
+                awk -F\" '(/pgp.mit.edu/) {sub(/.*search=0x/,"");print $1}' |
+                xargs pacman-key --recv-keys
+            fi
             #}}}
             sed -i '/SigLevel\ [=]\ Optional\ TrustAll/s/^#//' /etc/pacman.conf
             sed -i '/SigLevel\ [=]\ Never/s/^/#/' /etc/pacman.conf
