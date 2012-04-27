@@ -137,7 +137,6 @@ function checkbox_package(){ #{{{
     fi
 } #}}}
 function package_install(){ #{{{
-    FORCECHECK="n"
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
             if [ "$YAOURT" -eq 1 ]; then
@@ -147,12 +146,16 @@ function package_install(){ #{{{
             fi
             #FORCE CHECK #{{{
             if ! check_package "$PACKAGE" ; then
-                read_input_text "Package $PACKAGE not installed, try install again?" $FORCECHECK
-                if [ "$OPTION" = "y" ]; then
-                    if [ "$YAOURT" -eq 1 ]; then
-                        su -l $USERNAME --command="yaourt -S $PACKAGE"
-                    else
-                        su -l $USERNAME --command="packer -S --skipinteg $PACKAGE"
+                if [ "$USE_SCRIPT" -eq 1 ]; then
+                    echo "$PACKAGE" >> packages_not_installed.txt
+                else
+                    read_input_text "Package $PACKAGE not installed, try install again?"
+                    if [ "$OPTION" = "y" ]; then
+                        if [ "$YAOURT" -eq 1 ]; then
+                            su -l $USERNAME --command="yaourt -S $PACKAGE"
+                        else
+                            su -l $USERNAME --command="packer -S --skipinteg $PACKAGE"
+                        fi
                     fi
                 fi
             fi
@@ -434,9 +437,6 @@ function rankmirror(){
 #SYSTEM UPDATE {{{
 function system_upgrade(){
     print_title "UPDATING YOUR SYSTEM"
-    if [ -f /etc/profile.d/locale.sh ]; then
-        pacman -S  --noconfirm --force initscripts
-    fi
     pacman -S  --noconfirm --needed --force filesystem #http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required/
     pacman -Syuf
     reboot_now
@@ -645,7 +645,7 @@ function install_basic_setup(){
     add_daemon "acpid"
     print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/Windows"
     pacman -S --noconfirm --needed ntfs-3g ntfsprogs dosfstools exfat-utils fuse fuse-exfat
-    add_daemon"@fuse"
+    add_daemon "@fuse"
     print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
     pacman -S --noconfirm --needed rssh openssh
     add_daemon "@sshd"
