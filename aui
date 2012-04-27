@@ -856,7 +856,7 @@ function install_video_cards(){
 #CUPS {{{
 function install_cups(){
     print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
-    read_input_text "Install CUPS (Common Unix Printing System)" $CUPS
+    read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
     case "$OPTION" in
         "y")
             pacman -S --noconfirm --needed cups ghostscript gsfonts
@@ -1810,7 +1810,7 @@ do
     echo " 9) $(checkbox_package "jdk") Oracle Java"
     echo "10) $(checkbox_package "qtcreator") QT Creator"
     echo "11) $(checkbox_package "sublime-text") Sublime Text 2"
-    echo "12) $(checkbox_package "gdb") Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]"
+    echo "12) $(checkbox_package "gdb") Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jslint]"
     echo "13) $(checkbox_package "mysql-workbench") MySQL Workbench"
     echo "14) $(checkbox_package "meld") Meld"
     echo ""
