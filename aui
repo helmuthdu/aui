@@ -1953,9 +1953,9 @@ do
     echo " 7) $(checkbox_package "impressive") Impressive"
     echo " 8) $(checkbox_package "nitrotasks") Nitrotasks"
     echo " 9) $(checkbox_package "ocrfeeder") OCRFeeder"
-    echo "10) $(checkbox_package "zathura") Zathura"
-    echo "11) $(checkbox_package "xmind") Xmind"
-    echo "12) $(checkbox_package "wunderlist") Wunderlist"
+    echo "10) $(checkbox_package "wunderlist") ReText"
+    echo "11) $(checkbox_package "zathura") Zathura"
+    echo "12) $(checkbox_package "xmind") Xmind"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2012,13 +2012,13 @@ do
                 package_install "aspell-$LANGUAGE_AS"
                 ;;
             10)
-                package_install "zathura"
+                package_install "retext"
                 ;;
             11)
-                package_install "xmind"
+                package_install "zathura"
                 ;;
             12)
-                package_install "wunderlist"
+                package_install "xmind"
                 ;;
             "b")
                 break
