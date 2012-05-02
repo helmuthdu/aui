@@ -117,7 +117,6 @@ function add_module(){ #{{{
 function check_package(){ #{{{
     for PACKAGE in $1; do
         if pacman -Q $PACKAGE &>/dev/null; then
-            echo -e "Warning: $PACKAGE is up to date --skipping"
             return 0
         fi
     done
@@ -1266,8 +1265,9 @@ function install_desktop_environment(){
                 echo " 4) $(checkbox_package "digikam") Digikam"
                 echo " 5) $(checkbox_package "k3b") K3b"
                 echo " 6) $(checkbox_package "rosa-icons kfaenza-icon-theme") KDE Icons [Rosa, KFaenza]"
-                echo " 7) $(checkbox_package "plasma-theme-produkt") Plasma Themes [Caledonia, Produkt, Ronak]"
-                echo " 8) $(checkbox_package "yakuake") Yakuake"
+                echo " 7) $(checkbox_package "kdebase-dolphin-klook") KLook"
+                echo " 8) $(checkbox_package "caledonia-bundle plasma-theme-produkt") Plasma Themes [Caledonia, Produkt, Ronak]"
+                echo " 9) $(checkbox_package "yakuake") Yakuake"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1294,9 +1294,12 @@ function install_desktop_environment(){
                             package_install "rosa-icons kfaenza-icon-theme"
                             ;;
                         7)
-                            package_install "caledonia-bundle plasma-theme-produkt ronak-plasmatheme"
+                            package_install "kdebase-dolphin-klook"
                             ;;
                         8)
+                            package_install "caledonia-bundle plasma-theme-rosa plasma-theme-produkt ronak-plasmatheme"
+                            ;;
+                        9)
                             package_install "yakuake yakuake-skin-plasma-oxygen-panel"
                             ;;
                         "d")
@@ -2383,17 +2386,18 @@ do
     echo " 2) $(checkbox_package "gnome-mplayer") Gnome Mplayer"
     echo " 3) $(checkbox_package "parole") Parole"
     echo " 4) $(checkbox_package "minitube") Minitube"
-    echo " 5) $(checkbox_package "rosa-media-player-bin") Rosa Media Player"
-    echo " 6) $(checkbox_package "smplayer") SMplayer"
-    echo " 7) $(checkbox_package "vlc") VLC"
-    echo " 8) $(checkbox_package "xbmc") XBMC"
-    echo " 9) $(checkbox_package "arista-transcoder") Arista"
-    echo "10) $(checkbox_package "transmageddon") Transmageddon"
-    echo "11) $(checkbox_package "kdenlive") Kdenlive"
-    echo "12) $(checkbox_package "openshot") Openshot"
-    echo "13) $(checkbox_package "pitivi") Pitivi"
-    echo "14) $(checkbox_package "kazam-bzr") Kazam"
-    echo "15) $(if [ "$ARCHI" = "i686" ]; then echo "$(checkbox_package "codecs")"; else echo "$(checkbox_package "codecs64")"; fi) Codecs"
+    echo " 5) $(checkbox_package "miro") Miro"
+    echo " 6) $(checkbox_package "rosa-media-player-bin") Rosa Media Player"
+    echo " 7) $(checkbox_package "smplayer") SMplayer"
+    echo " 8) $(checkbox_package "vlc") VLC"
+    echo " 9) $(checkbox_package "xbmc") XBMC"
+    echo "10) $(checkbox_package "arista-transcoder") Arista"
+    echo "11) $(checkbox_package "transmageddon") Transmageddon"
+    echo "12) $(checkbox_package "kdenlive") Kdenlive"
+    echo "13) $(checkbox_package "openshot") Openshot"
+    echo "14) $(checkbox_package "pitivi") Pitivi"
+    echo "15) $(checkbox_package "kazam-bzr") Kazam"
+    echo "16) $(if [ "$ARCHI" = "i686" ]; then echo "$(checkbox_package "codecs")"; else echo "$(checkbox_package "codecs64")"; fi) Codecs"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2414,40 +2418,43 @@ do
                 package_install "minitube"
                 ;;
             5)
-                package_install "rosa-media-player-bin"
+                package_install "miro"
                 ;;
             6)
-                package_install "smplayer smplayer-themes"
+                package_install "rosa-media-player-bin"
                 ;;
             7)
+                package_install "smplayer smplayer-themes"
+                ;;
+            8)
                 package_install "vlc"
                 if [ "$KDE" -eq 1 ]; then
                     package_install "phonon-vlc"
                 fi
                 ;;
-            8)
+            9)
                 package_install "xbmc"
                 ;;
-            9)
+            10)
                 package_install "arista-transcoder"
                 ;;
-            10)
+            11)
                 package_install "transmageddon"
                 ;;
-            11)
+            12)
                 package_install "kdenlive"
                 ;;
-            12)
+            13)
                 package_install "openshot"
                 ;;
-            13)
+            14)
                 package_install "pitivi"
                 ;;
-            14)
+            15)
                 package_install "python-rsvg"
                 package_install "kazam-bzr"
                 ;;
-            15)
+            16)
                 package_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
                 if [ "$ARCHI" = "i686" ]; then
                     package_install "codecs"

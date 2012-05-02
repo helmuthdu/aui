@@ -131,8 +131,9 @@ USE_SCRIPT=0
         # 4) Digikam
         # 5) K3b
         # 6) KDE Icons [Rosa, KFaenza]
-        # 7) Plasma Themes [Caledonia, Produkt, Ronak]
-        # 8) Yakuake
+        # 7) KLook
+        # 8) Plasma Themes [Caledonia, Produkt, Ronak]
+        # 9) Yakuake
         KDE_OPTIONS=""
     #}}}
     #XFCE {{{
@@ -348,18 +349,19 @@ USE_SCRIPT=0
     # 2) Gnome Mplayer
     # 3) Parole
     # 4) Minitube
-    # 5) Rosa Media Player
-    # 6) SMplayer
-    # 7) VLC
-    # 8) XBMC
-    # 9) Arista
-    #10) Transmageddon
-    #11) Kdenlive
-    #12) Openshot
-    #13) Pitivi
-    #14) Kazam
-    #15) Codecs
-    VIDEO_OPTIONS="7 8 15"
+    # 5) Miro
+    # 6) Rosa Media Player
+    # 7) SMplayer
+    # 8) VLC
+    # 9) XBMC
+    #10) Arista
+    #11) Transmageddon
+    #12) Kdenlive
+    #13) Openshot
+    #14) Pitivi
+    #15) Kazam
+    #16) Codecs
+    VIDEO_OPTIONS="8 9 16"
 #}}}
 #GAMES {{{
     # 1) Action/Adventure
@@ -479,5 +481,3 @@ USE_SCRIPT=0
     # 4) Reverting to unpatched packages
     FONTSCONFIG_OPTION="1"
 #}}}
-
-
