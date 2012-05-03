@@ -1039,9 +1039,9 @@ function install_desktop_environment(){
             do
                 print_title "GNOME CUSTOMIZATION"
                 echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "gtk-theme-aldabra gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
+                echo " 2) $(checkbox_package "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme") Gnome Themes [Orion, eGTK, Light, Zukitwo, Zukini]"
                 echo " 3) $(checkbox_package "gpaste-git gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git") GnomeShell Extensions"
-                echo " 4) $(checkbox_package "gnome-shell-theme-eos gnome-shell-theme-dark-shine gnome-shell-theme-faience gnome-shell-theme-nord") GnomeShell Themes [eOS, Nord, Faience, Dark Shine]"
+                echo " 4) $(checkbox_package "gnome-shell-theme-frieze gnome-shell-theme-elegance") GnomeShell Themes [Elegance, Frieze]"
                 echo " 5) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
                 echo " 6) $(checkbox_package "gloobus-sushi-bzr") Gloobus Preview"
                 echo " 7) $(checkbox_package "gnome-packagekit") Packagekit"
@@ -1061,11 +1061,11 @@ function install_desktop_environment(){
                             while [ 1 ]
                             do
                                 print_title "GNOME THEMES"
-                                echo " 1) $(checkbox_package "gtk-theme-aldabra") Aldabra"
-                                echo " 2) $(checkbox_package "gtk-theme-boomerang") Boomerang"
-                                echo " 3) $(checkbox_package "egtk-bzr") eGTK"
-                                echo " 4) $(checkbox_package "light-themes") Light (aka Ambiance/Radiance)"
-                                echo " 5) $(checkbox_package "orion-gtk-theme") Orion"
+                                echo " 1) $(checkbox_package "gtk-theme-boomerang") Boomerang"
+                                echo " 2) $(checkbox_package "egtk-bzr") eGTK"
+                                echo " 3) $(checkbox_package "light-themes") Light (aka Ambiance/Radiance)"
+                                echo " 4) $(checkbox_package "orion-gtk-theme") Orion"
+                                echo " 5) $(checkbox_package "zukini-theme") Zukini"
                                 echo " 6) $(checkbox_package "zukitwo-themes") Zukitwo"
                                 echo ""
                                 echo " b) BACK"
@@ -1075,19 +1075,19 @@ function install_desktop_environment(){
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
-                                            package_install "gtk-theme-aldabra"
-                                            ;;
-                                        2)
                                             package_install "gtk-theme-boomerang"
                                             ;;
-                                        3)
+                                        2)
                                             package_install "egtk-bzr"
                                             ;;
-                                        4)
+                                        3)
                                             package_install "light-themes"
                                             ;;
-                                        5)
+                                        4)
                                             package_install "orion-gtk-theme"
+                                            ;;
+                                        5)
+                                            package_install "gtk-theme-aldabra"
                                             ;;
                                         6)
                                             package_install "zukitwo-themes"
@@ -1168,10 +1168,8 @@ function install_desktop_environment(){
                             while [ 1 ]
                             do
                                 print_title "GNOMESHELL THEMES"
-                                echo " 1) $(checkbox_package "gnome-shell-theme-eos") eOS"
-                                echo " 2) $(checkbox_package "gnome-shell-theme-dark-shine") Dark Shine"
-                                echo " 3) $(checkbox_package "gnome-shell-theme-faience") Faience"
-                                echo " 4) $(checkbox_package "gnome-shell-theme-nord") Nord"
+                                echo " 1) $(checkbox_package "gnome-shell-theme-elegance") Elegance"
+                                echo " 2) $(checkbox_package "gnome-shell-theme-frieze") Frieze"
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
@@ -1180,16 +1178,10 @@ function install_desktop_environment(){
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
-                                            package_install "gnome-shell-theme-eos"
+                                            package_install "gnome-shell-theme-elegance"
                                             ;;
                                         2)
-                                            package_install "gnome-shell-theme-dark-shine"
-                                            ;;
-                                        3)
-                                            package_install "gnome-shell-theme-faience"
-                                            ;;
-                                        4)
-                                            package_install "gnome-shell-theme-nord"
+                                            package_install "gnome-shell-theme-frieze"
                                             ;;
                                         "b")
                                             break
@@ -1557,7 +1549,7 @@ function install_desktop_environment(){
             do
                 print_title "CINNAMON CUSTOMIZATION"
                 echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "gtk-theme-aldabra gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes") Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]"
+                echo " 2) $(checkbox_package "zukini-theme gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes") Gnome Themes [Orion, eGTK, Light, Zukitwo, Zukini]"
                 echo " 3) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
                 echo " 4) $(checkbox_package "gloobus-sushi-bzr") Gloobus Preview"
                 echo " 5) $(checkbox_package "gnome-packagekit") Packagekit"
@@ -1577,11 +1569,11 @@ function install_desktop_environment(){
                             while [ 1 ]
                             do
                                 print_title "GNOME THEMES"
-                                echo " 1) $(checkbox_package "gtk-theme-aldabra") Aldabra"
-                                echo " 2) $(checkbox_package "gtk-theme-boomerang") Boomerang"
-                                echo " 3) $(checkbox_package "egtk-bzr") eGTK"
-                                echo " 4) $(checkbox_package "light-themes") Light (aka Ambiance/Radiance)"
-                                echo " 5) $(checkbox_package "orion-gtk-theme") Orion"
+                                echo " 1) $(checkbox_package "gtk-theme-boomerang") Boomerang"
+                                echo " 2) $(checkbox_package "egtk-bzr") eGTK"
+                                echo " 3) $(checkbox_package "light-themes") Light (aka Ambiance/Radiance)"
+                                echo " 4) $(checkbox_package "orion-gtk-theme") Orion"
+                                echo " 5) $(checkbox_package "zukini-theme") Zukini"
                                 echo " 6) $(checkbox_package "zukitwo-themes") Zukitwo"
                                 echo ""
                                 echo " b) BACK"
@@ -1591,19 +1583,19 @@ function install_desktop_environment(){
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
-                                            package_install "gtk-theme-aldabra"
-                                            ;;
-                                        2)
                                             package_install "gtk-theme-boomerang"
                                             ;;
-                                        3)
+                                        2)
                                             package_install "egtk-bzr"
                                             ;;
-                                        4)
+                                        3)
                                             package_install "light-themes"
                                             ;;
-                                        5)
+                                        4)
                                             package_install "orion-gtk-theme"
+                                            ;;
+                                        5)
+                                            package_install "gtk-theme-aldabra"
                                             ;;
                                         6)
                                             package_install "zukitwo-themes"
@@ -1732,6 +1724,7 @@ do
     echo "11) $(checkbox_package "shutter") Shutter"
     echo "12) $(checkbox_package "synapse") Synapse"
     echo "13) $(checkbox_package "terminator") Terminator"
+    echo "14) $(checkbox_package "zim") Zim"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1785,6 +1778,9 @@ do
             13)
                 package_install "terminator python-keybinder"
                 ;;
+            14)
+                package_install "zim"
+                ;;
             "b")
                 break
                 ;;
@@ -1816,6 +1812,7 @@ do
     echo "12) $(checkbox_package "gdb") Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jslint]"
     echo "13) $(checkbox_package "mysql-workbench") MySQL Workbench"
     echo "14) $(checkbox_package "meld") Meld"
+    echo "15) $(checkbox_package "rabbitvcs") RabbitVCS"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1930,6 +1927,16 @@ do
             14)
                 package_install "meld"
                 ;;
+            15)
+                package_install "rabbitvcs"
+                if [ "$GNOME" -eq 1 ]; then
+                    package_install "rabbitvcs-nautilus"
+                elif [ "$XFCE" -eq 1 ]; then
+                    package_install "rabbitvcs-thunar"
+                else
+                    package_install "rabbitvcs-cli"
+                fi
+                ;;
             "b")
                 break
                 ;;
@@ -1951,14 +1958,12 @@ do
     echo " 2) $(checkbox_package "goffice") GnomeOffice [Abiword, Gnumeric]"
     echo " 3) $(checkbox_package "texlive-core") Latex + Texmaker"
     echo " 4) $(if [ "$KDE" -eq 1 ]; then  echo "$(checkbox_package "kchmviewer") Kchmviewer"; else echo "$(checkbox_package "chmsee") Chmsee"; fi)"
-    echo " 5) $(checkbox_package "cherrytree") CherryTree"
-    echo " 6) $(checkbox_package "gcstar") GCStar"
-    echo " 7) $(checkbox_package "impressive") Impressive"
-    echo " 8) $(checkbox_package "nitrotasks") Nitrotasks"
-    echo " 9) $(checkbox_package "ocrfeeder") OCRFeeder"
-    echo "10) $(checkbox_package "wunderlist") ReText"
-    echo "11) $(checkbox_package "zathura") Zathura"
-    echo "12) $(checkbox_package "xmind") Xmind"
+    echo " 5) $(checkbox_package "gcstar") GCStar"
+    echo " 6) $(checkbox_package "impressive") Impressive"
+    echo " 7) $(checkbox_package "nitrotasks") Nitrotasks"
+    echo " 8) $(checkbox_package "ocrfeeder") OCRFeeder"
+    echo " 9) $(checkbox_package "xmind") Xmind"
+    echo "10) $(checkbox_package "zathura") Zathura"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1999,29 +2004,23 @@ do
                 fi
                 ;;
             5)
-                package_install "cherrytree"
-                ;;
-            6)
                 package_install "gcstar"
                 ;;
-            7)
+            6)
                 package_install "impressive"
                 ;;
-            8)
+            7)
                 package_install "nitrotasks"
                 ;;
-            9)
+            8)
                 package_install "ocrfeeder tesseract gocr"
                 package_install "aspell-$LANGUAGE_AS"
                 ;;
-            10)
-                package_install "retext"
-                ;;
-            11)
-                package_install "zathura"
-                ;;
-            12)
+            9)
                 package_install "xmind"
+                ;;
+            10)
+                package_install "zathura"
                 ;;
             "b")
                 break
