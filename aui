@@ -1324,7 +1324,7 @@ function install_desktop_environment(){
             do
                 print_title "XFCE CUSTOMIZATION"
                 echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "zukitwo-themes") Themes [Zukitwo]"
+                echo " 2) $(checkbox_package "xfce-theme-greybird xfce-theme-bluebird zukitwo-themes") XFCE Themes"
                 echo " 3) $(checkbox_package "lightdm") LightDM"
                 echo ""
                 echo " d) DONE"
@@ -1375,7 +1375,7 @@ function install_desktop_environment(){
                             OPT=2
                             ;;
                         3)
-                            package_install "intltool lightdm"
+                            package_install "intltool lightdm lightdm-gtk-greeter"
                             add_daemon "lightdm"
                             sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
                             ;;
@@ -1494,7 +1494,7 @@ function install_desktop_environment(){
                             package_install "gmrun"
                             ;;
                         5)
-                            package_install "intltool lightdm"
+                            package_install "intltool lightdm lightdm-gtk-greeter"
                             add_daemon "lightdm"
                             sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
                             ;;
