@@ -645,6 +645,9 @@ function install_basic_setup(){
     pacman -S --noconfirm --needed dbus
     add_daemon "dbus"
     rc.d start dbus
+    print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
+    pacman -S avahi nss-mdns
+    add_daemon "avahi-daemon"
     print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
     pacman -S --noconfirm --needed acpi acpid
     add_daemon "acpid"
@@ -1217,7 +1220,6 @@ function install_desktop_environment(){
             done
             #}}}
             add_daemon "gdm"
-            add_daemon "avahi-daemon"
             install_status
             GNOME=1
             ;;
@@ -1306,7 +1308,6 @@ function install_desktop_environment(){
             done
             #}}}
             add_daemon "kdm"
-            add_daemon "avahi-daemon"
             install_status
             KDE=1
             ;;
@@ -1634,7 +1635,6 @@ function install_desktop_environment(){
             done
             #}}}
             add_daemon "gdm"
-            add_daemon "avahi-daemon"
             install_status
             GNOME=1
             ;;
@@ -2200,7 +2200,6 @@ do
                 ;;
             9)
                 package_install "pidgin"
-                add_daemon "avahi-daemon"
                 ;;
             10)
                 package_install "remmina"
