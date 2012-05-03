@@ -1090,7 +1090,7 @@ function install_desktop_environment(){
                                             package_install "orion-gtk-theme"
                                             ;;
                                         5)
-                                            package_install "gtk-theme-aldabra"
+                                            package_install "zukini-theme"
                                             ;;
                                         6)
                                             package_install "zukitwo-themes"
@@ -1596,7 +1596,7 @@ function install_desktop_environment(){
                                             package_install "orion-gtk-theme"
                                             ;;
                                         5)
-                                            package_install "gtk-theme-aldabra"
+                                            package_install "zukini-theme"
                                             ;;
                                         6)
                                             package_install "zukitwo-themes"
