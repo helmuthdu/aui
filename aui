@@ -355,6 +355,7 @@ function custom_repositories(){
         sed -i "$multilib s/^#//g" /etc/pacman.conf
         local multilib=$(( $multilib + 2 ))
         sed -i "$multilib s/^#//g" /etc/pacman.conf
+        pacman -Sy
     fi
     #}}}
     print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
@@ -571,7 +572,7 @@ function choose_aurhelper(){
                 ;;
             2)
                 if ! check_package "packer" ; then
-                    pacman -S --noconfirm --needed git jshon curl
+                    pacman -S --noconfirm --needed base-devel git jshon curl
                     su -l $USERNAME --command="
                         wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
                         tar zxvf packer.tar.gz;
