@@ -366,10 +366,7 @@ function custom_repositories(){
             while [ 1 ]
             do
                 print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
-                echo " 1) Ayatana"
-                echo " 2) Archlinuxfr"
-                echo ""
-                echo " a) \"Add Custom\""
+                echo " 1) \"Add new repository\""
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -378,16 +375,6 @@ function custom_repositories(){
                 for OPT in ${OPTIONS[@]}; do
                     case $OPT in
                         1)
-                            echo -e '\n[ayatana]\nServer = http://repo.ayatana.info/' >> /etc/pacman.conf
-                            echo -e '\nAyatana repository added into pacman.conf file'
-                            pause_function
-                            ;;
-                        2)
-                            echo -e '\n[archlinuxfr]\nServer = http://repo.archlinux.fr/$arch' >> /etc/pacman.conf
-                            echo -e '\nArchlinuxfr repository added into pacman.conf file'
-                            pause_function
-                            ;;
-                        "a")
                             read -p "Repository Name [ex: custom]: " REPONAME
                             read -p "Repository Address [ex: file:///media/backup/Archlinux]: " REPOADDRESS
                             echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"/'$arch' >> /etc/pacman.conf
@@ -438,8 +425,7 @@ function rankmirror(){
 #SYSTEM UPDATE {{{
 function system_upgrade(){
     print_title "UPDATING YOUR SYSTEM"
-    pacman -S  --noconfirm --needed --force filesystem #http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required/
-    pacman -Syuf
+    pacman -Syu
     reboot_now
 }
 #}}}
