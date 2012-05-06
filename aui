@@ -1246,9 +1246,8 @@ function install_desktop_environment(){
                 echo " 4) $(checkbox_package "digikam") Digikam"
                 echo " 5) $(checkbox_package "k3b") K3b"
                 echo " 6) $(checkbox_package "rosa-icons kfaenza-icon-theme") KDE Icons [Rosa, KFaenza]"
-                echo " 7) $(checkbox_package "kdebase-dolphin-klook") KLook"
-                echo " 8) $(checkbox_package "caledonia-bundle plasma-theme-produkt") Plasma Themes [Caledonia, Produkt, Ronak]"
-                echo " 9) $(checkbox_package "yakuake") Yakuake"
+                echo " 7) $(checkbox_package "caledonia-bundle plasma-theme-produkt") Plasma Themes [Caledonia, Produkt, Ronak]"
+                echo " 8) $(checkbox_package "yakuake") Yakuake"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1275,12 +1274,9 @@ function install_desktop_environment(){
                             package_install "rosa-icons kfaenza-icon-theme"
                             ;;
                         7)
-                            package_install "kdebase-dolphin-klook"
-                            ;;
-                        8)
                             package_install "caledonia-bundle plasma-theme-rosa plasma-theme-produkt ronak-plasmatheme"
                             ;;
-                        9)
+                        8)
                             package_install "yakuake yakuake-skin-plasma-oxygen-panel"
                             ;;
                         "d")
