@@ -3073,7 +3073,6 @@ function finish(){
     more aur_pkglist.txt
     print_title "INSTALL COMPLETED"
     echo "Thanks for using the Archlinux Ultimate Install script by helmuthdu"
-    print_line
     pause_function
     if [[ $LXDE -eq 1 ]]; then
         DM="lxdm"
