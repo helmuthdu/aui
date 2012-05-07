@@ -413,10 +413,6 @@ function rankmirror(){
 function system_upgrade(){
     print_title "UPDATING YOUR SYSTEM"
     pacman -Syu
-<<<<<<< HEAD
-=======
-    reboot_now
->>>>>>> 614bd891dbe25ae78414f8c5f2f1b0bfa07d615a
 }
 #}}}
 #SELECT/CREATE USER {{{
