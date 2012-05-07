@@ -14,7 +14,8 @@ You can try it first with a `virtualbox`
 ## How to use
 
 ### With git
-- Install git: `pacman -Sy git`
+- Upgrade your system: `pacman -Syu`
+- Install git: `pacman -S git`
 - get the script: `git clone git://github.com/helmuthdu/aui`
 - run the script: `cd aui && ./aui`
 

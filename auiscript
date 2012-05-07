@@ -129,9 +129,8 @@ USE_SCRIPT=0
         # 4) Digikam
         # 5) K3b
         # 6) KDE Icons [Rosa, KFaenza]
-        # 7) KLook
-        # 8) Plasma Themes [Caledonia, Produkt, Ronak]
-        # 9) Yakuake
+        # 7) Plasma Themes [Caledonia, Produkt, Ronak]
+        # 8) Yakuake
         KDE_OPTIONS=""
     #}}}
     #XFCE {{{

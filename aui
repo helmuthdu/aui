@@ -50,15 +50,22 @@ ARCHI=`uname -m`
 prompt1="Enter your option: "
 prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
 
+function create_backup(){ #{{{
+    [[ ! -f /etc/rc.conf.aui ]] && cp -v /etc/rc.conf /etc/rc.conf.aui;
+    [[ ! -f /etc/pacman.conf.aui ]] && cp -v /etc/pacman.conf /etc/pacman.conf.aui;
+    [[ ! -f /etc/inittab.aui ]] && cp -v /etc/inittab /etc/inittab.aui;
+    [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
+    [[ ! -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && cp -v /etc/X11/xorg.conf.d/10-evdev.conf /etc/X11/xorg.conf.d/10-evdev.conf.aui;
+} #}}}
 function read_input(){ #{{{
-    if [ $USE_SCRIPT -eq 1 ]; then
+    if [[ $USE_SCRIPT -eq 1 ]]; then
         OPTION=$1
     else
         read -p "$prompt1: " OPTION
     fi
 } #}}}
 function read_input_text(){ #{{{
-    if [ $USE_SCRIPT -eq 1 ]; then
+    if [[ $USE_SCRIPT -eq 1 ]]; then
         OPTION=$2
     else
         read -p "$1 [y][N]: " OPTION
@@ -69,7 +76,7 @@ function read_input_text(){ #{{{
 function read_input_options(){ #{{{
     local line
     local packages
-    if [ $USE_SCRIPT -eq 1 ]; then
+    if [[ $USE_SCRIPT -eq 1 ]]; then
         array=("$1")
     else
         read -p "$prompt2" OPTION
@@ -105,6 +112,13 @@ function replace_daemon(){ #{{{
 function add_daemon(){ #{{{
     remove_daemon "$1"
     sed -i '/DAEMONS[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
+    start_daemon "$1"
+} #}}}
+function start_daemon(){ #{{{
+    DAEMON_LIST=`echo "$1" | sed 's/@//g'`
+    for DAEMON in $DAEMON_LIST; do
+        ! ls -1 /var/run/daemons/$DAEMON &> /dev/null && rc.d start $DAEMON;
+    done
 } #}}}
 function remove_module(){ #{{{
     sed -i '/MODULES[=]/s/ '"$1"'//' /etc/rc.conf
@@ -113,6 +127,14 @@ function add_module(){ #{{{
     remove_module "$1"
     sed -i '/MODULES[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
     #sed -i '/MODULES[=]/s/^[^ ]*\>/& '"$1"'/' /etc/rc.conf
+} #}}}
+function config_dm(){ #{{{
+    sed -i '/'"$1"'/s/^#//' /etc/inittab
+    sed -i '/xdm/s/^#//' /etc/inittab
+    sed -i '/xdm/s/^/#/' /etc/inittab
+    sed -i '/id:3:initdefault/s/^#//' /etc/inittab
+    sed -i '/id:3:initdefault/s/^/#/' /etc/inittab
+    sed -i '/id:5:initdefault/s/^#//' /etc/inittab
 } #}}}
 function check_package(){ #{{{
     for PACKAGE in $1; do
@@ -123,11 +145,7 @@ function check_package(){ #{{{
     return 1
 } #}}}
 function checkbox(){ #{{{
-    if [ $1 -eq 1 ]; then
-        echo "[X]"
-    else
-        echo "[ ]"
-    fi
+    [[ $1 -eq 1 ]] && echo "[X]" || echo "[ ]";
 } #}}}
 function checkbox_package(){ #{{{
     if check_package "$1"; then
@@ -139,22 +157,22 @@ function checkbox_package(){ #{{{
 function package_install(){ #{{{
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
-            if [ "$YAOURT" -eq 1 ]; then
+            if [[ $YAOURT -eq 1 ]]; then
                 su -l $USERNAME --command="yaourt -S --noconfirm $PACKAGE"
             else
                 su -l $USERNAME --command="packer -S --noconfirm $PACKAGE"
             fi
-            #FORCE CHECK #{{{
+            #RECHECK #{{{
             if ! check_package "$PACKAGE" ; then
-                if [ "$USE_SCRIPT" -eq 1 ]; then
+                if [[ $USE_SCRIPT -eq 1 ]]; then
                     echo "$PACKAGE" >> packages_not_installed.txt
                 else
                     read_input_text "Package $PACKAGE not installed, try install again?"
-                    if [ "$OPTION" = "y" ]; then
-                        if [ "$YAOURT" -eq 1 ]; then
+                    if [[ $OPTION == y ]]; then
+                        if [[ $YAOURT -eq 1 ]]; then
                             su -l $USERNAME --command="yaourt -S $PACKAGE"
                         else
-                            su -l $USERNAME --command="packer -S --skipinteg $PACKAGE"
+                            su -l $USERNAME --command="packer -S $PACKAGE"
                         fi
                     fi
                 fi
@@ -166,7 +184,7 @@ function package_install(){ #{{{
     done
 } #}}}
 function contains_element(){ #{{{
-    for e in "${@:2}"; do [[ "$e" = "$1" ]] && break; done;
+    for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
 } #}}}
 function invalid_option(){ #{{{
     print_line
@@ -175,55 +193,24 @@ function invalid_option(){ #{{{
 } #}}}
 function pause_function(){ #{{{
     print_line
-    if [ "$USE_SCRIPT" -ne 1 ]; then
+    if [[ $USE_SCRIPT -ne 1 ]]; then
         read -e -sn 1 -p "Press any key to continue..."
-    fi
-} #}}}
-function install_status(){ #{{{
-    if [ $? -ne 0 ] ; then
-        CURRENT_STATUS=-1
-    else
-        CURRENT_STATUS=1
     fi
 } #}}}
 function sumary(){ #{{{
     case $CURRENT_STATUS in
-        0)
-            print_line
-            echo "$1 not successful (Canceled)"
-            ;;
-        -1)
-            print_line
-            echo "$1 not successful (Error)"
-            ;;
         1)
             print_line
             echo "$1 successful"
             ;;
         *)
             print_line
-            echo "WRONG ARG GIVEN"
-            ;;
-    esac
-} #}}}
-function reboot_now(){ #{{{
-    read_input_text "Reboot now?"
-    case "$OPTION" in
-        "y")
-            echo "Thanks for using the Archlinux Ultimate Install script by helmuthdu"
-            echo "Your Computer will now restart"
-            pause_function
-            reboot
-            exit 0
-            ;;
-        *)
+            echo "$1 not successful (Canceled)"
             ;;
     esac
 } #}}}
 function elihw() { #{{{
-    if [ "$OPT" = "b" ] || [ "$OPT" = "d" ];then
-        break;
-    fi
+    [[ $OPT == b || $OPT == d ]] && break;
 } #}}}
 
 #WELCOME {{{
@@ -247,7 +234,7 @@ function welcome(){
 #CHECK ROOT {{{
 function check_root() {
     CURRENTUSER="$(whoami)"
-    if [ $CURRENTUSER != "root" ]; then
+    if [[ $CURRENTUSER != root ]]; then
         echo "Current user is NOT 'root'. EXIT now"
         pause_function
         exit 1
@@ -260,27 +247,27 @@ function language_selector(){
     #automatically detects the system language based on your rc.conf
     LANGUAGE=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | sed 's/.*"\(.*\)".*/\1/g' | cut -c1-5`
     #KDE #{{{
-    if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "zh_CN" ]; then
+    if [[ $LANGUAGE == pt_BR || $LANGUAGE == en_GB || $LANGUAGE == zh_CN ]]; then
         LANGUAGE_KDE=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]'`
-    elif [ $LANGUAGE = "en_US" ]; then
+    elif [[ $LANGUAGE == en_US ]]; then
         LANGUAGE_KDE="en_gb"
     else
         LANGUAGE_KDE=`echo $LANGUAGE | cut -d\_ -f1`
     fi
     #}}}
     #FIREFOX #{{{
-    if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "pt_PT" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "es_AR" ] || [ $LANGUAGE = "es_ES" ] || [ $LANGUAGE = "zh_CN" ]; then
+    if [[ $LANGUAGE == pt_BR || $LANGUAGE == pt_PT || $LANGUAGE == en_GB || $LANGUAGE == es_AR || $LANGUAGE == es_ES || $LANGUAGE == zh_CN ]]; then
         LANGUAGE_FF=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-    elif [ $LANGUAGE = "en_US" ]; then
+    elif [[ $LANGUAGE == en_US ]]; then
         LANGUAGE_FF="en-gb"
     else
         LANGUAGE_FF=`echo $LANGUAGE | cut -d\_ -f1`
     fi
     #}}}
     #HUNSPELL #{{{
-    if [ $LANGUAGE = "pt_BR" ]; then
+    if [[ $LANGUAGE == pt_BR ]]; then
         LANGUAGE_HS=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-    elif [ $LANGUAGE = "pt_PT" ]; then
+    elif [[ $LANGUAGE == pt_PT ]]; then
         LANGUAGE_HS="pt_pt"
     else
         LANGUAGE_HS=`echo $LANGUAGE | cut -d\_ -f1`
@@ -290,7 +277,7 @@ function language_selector(){
         LANGUAGE_AS=`echo $LANGUAGE | cut -d\_ -f1`
     #}}}
     #LIBREOFFICE #{{{
-    if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "en_US" ] || [ $LANGUAGE = "zh_CN" ]; then
+    if [[ $LANGUAGE == pt_BR || $LANGUAGE == en_GB || $LANGUAGE == en_US || $LANGUAGE == zh_CN ]]; then
         LANGUAGE_LO=`echo $LANGUAGE | sed 's/_/-/'`
     else
         LANGUAGE_LO=`echo $LANGUAGE | cut -d\_ -f1`
@@ -303,27 +290,27 @@ function language_selector(){
         "n")
             read -p "New system language [ex: en_US]: " LANGUAGE
             #KDE #{{{
-            if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "zh_CN" ]; then
+            if [[ $LANGUAGE == pt_BR || $LANGUAGE == en_GB || $LANGUAGE == zh_CN ]]; then
                 LANGUAGE_KDE=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]'`
-            elif [ $LANGUAGE = "en_US" ]; then
+            elif [[ $LANGUAGE == en_US ]]; then
                 LANGUAGE_KDE="en_gb"
             else
                 LANGUAGE_KDE=`echo $LANGUAGE | cut -d\_ -f1`
             fi
             #}}}
             #FIREFOX #{{{
-            if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "pt_PT" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "es_AR" ] || [ $LANGUAGE = "es_ES" ] || [ $LANGUAGE = "zh_CN" ]; then
+            if [[ $LANGUAGE == pt_BR || $LANGUAGE == pt_PT || $LANGUAGE == en_GB || $LANGUAGE == es_AR || $LANGUAGE == es_ES || $LANGUAGE == zh_CN ]]; then
                 LANGUAGE_FF=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-            elif [ $LANGUAGE = "en_US" ]; then
+            elif [[ $LANGUAGE == en_US ]]; then
                 LANGUAGE_FF="en-gb"
             else
                 LANGUAGE_FF=`echo $LANGUAGE | cut -d\_ -f1`
             fi
             #}}}
             #HUNSPELL #{{{
-            if [ $LANGUAGE = "pt_BR" ]; then
+            if [[ $LANGUAGE == pt_BR ]]; then
                 LANGUAGE_HS=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-            elif [ $LANGUAGE = "pt_PT" ]; then
+            elif [[ $LANGUAGE == pt_PT ]]; then
                 LANGUAGE_HS="pt_pt"
             else
                 LANGUAGE_HS=`echo $LANGUAGE | cut -d\_ -f1`
@@ -333,7 +320,7 @@ function language_selector(){
             LANGUAGE_AS=`echo $LANGUAGE | cut -d\_ -f1`
             #}}}
             #LIBREOFFICE #{{{
-            if [ $LANGUAGE = "pt_BR" ] || [ $LANGUAGE = "en_GB" ] || [ $LANGUAGE = "en_US" ] || [ $LANGUAGE = "zh_CN" ]; then
+            if [[ $LANGUAGE == pt_BR || $LANGUAGE == en_GB || $LANGUAGE == en_US || $LANGUAGE == zh_CN ]]; then
                 LANGUAGE_LO=`echo $LANGUAGE | sed 's/_/-/'`
             else
                 LANGUAGE_LO=`echo $LANGUAGE | cut -d\_ -f1`
@@ -350,7 +337,7 @@ function language_selector(){
 function custom_repositories(){
     # ENABLE MULTILIB REPOSITORY {{{
     # this option will avoid any problem with packages install
-    if [ "$ARCHI" = "x86_64" ]; then
+    if [[ $ARCHI == x86_64 ]]; then
         local multilib=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
         sed -i "$multilib s/^#//g" /etc/pacman.conf
         local multilib=$(( $multilib + 2 ))
@@ -363,13 +350,10 @@ function custom_repositories(){
     case "$OPTION" in
         "y")
             #CUSTOM REPOSITORIES {{{
-            while [ 1 ]
+            while [[ 1 ]]
             do
                 print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
-                echo " 1) Ayatana"
-                echo " 2) Archlinuxfr"
-                echo ""
-                echo " a) \"Add Custom\""
+                echo " 1) \"Add new repository\""
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -378,16 +362,6 @@ function custom_repositories(){
                 for OPT in ${OPTIONS[@]}; do
                     case $OPT in
                         1)
-                            echo -e '\n[ayatana]\nServer = http://repo.ayatana.info/' >> /etc/pacman.conf
-                            echo -e '\nAyatana repository added into pacman.conf file'
-                            pause_function
-                            ;;
-                        2)
-                            echo -e '\n[archlinuxfr]\nServer = http://repo.archlinux.fr/$arch' >> /etc/pacman.conf
-                            echo -e '\nArchlinuxfr repository added into pacman.conf file'
-                            pause_function
-                            ;;
-                        "a")
                             read -p "Repository Name [ex: custom]: " REPONAME
                             read -p "Repository Address [ex: file:///media/backup/Archlinux]: " REPOADDRESS
                             echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"/'$arch' >> /etc/pacman.conf
@@ -405,7 +379,7 @@ function custom_repositories(){
             elihw
             done
             pacman -Sy
-            install_status
+            CURRENT_STATUS=1
             ;;
             #}}}
         *)
@@ -425,7 +399,7 @@ function rankmirror(){
             cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
             sed -i '/^#\S/ s|#||' /etc/pacman.d/mirrorlist.backup
             rankmirrors -n 5 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
-            install_status
+            CURRENT_STATUS=1
             ;;
         *)
             CURRENT_STATUS=0
@@ -438,12 +412,10 @@ function rankmirror(){
 #SYSTEM UPDATE {{{
 function system_upgrade(){
     print_title "UPDATING YOUR SYSTEM"
-    pacman -S  --noconfirm --needed --force filesystem #http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required/
-    pacman -Syuf
-    reboot_now
+    pacman -Syu
 }
 #}}}
-#SELECT USER {{{
+#SELECT/CREATE USER {{{
 function select_user(){
     create_new_user(){ #{{{
         read -p "Username: " USERNAME
@@ -505,7 +477,7 @@ function select_user(){
     users=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
     PS3="$prompt1"
     echo "Avaliable Users:"
-    if [ $(( ${#users[@]} )) -gt 0 ]; then
+    if [[ $(( ${#users[@]} )) -gt 0 ]]; then
         echo -e "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES\n"
     else
         echo ""
@@ -566,7 +538,7 @@ function choose_aurhelper(){
                         exit 0
                     fi
                 fi
-                install_status
+                CURRENT_STATUS=1
                 YAOURT=1
                 break
                 ;;
@@ -587,7 +559,7 @@ function choose_aurhelper(){
                         exit 0
                     fi
                 fi
-                install_status
+                CURRENT_STATUS=1
                 PACKER=1
                 break
                 ;;
@@ -617,7 +589,7 @@ function pacman_package_signing(){
             #DEVELOPER AND TU KEYS {{{
             KEYS="y"
             read_input_text "Install Developer and TU Keys" $KEYS
-            if [ "$OPTION" = "n" ]; then
+            if [[ $OPTION == n ]]; then
                 curl https://www.archlinux.org/{developers,trustedusers}/ |
                 awk -F\" '(/pgp.mit.edu/) {sub(/.*search=0x/,"");print $1}' |
                 xargs pacman-key --recv-keys
@@ -625,7 +597,7 @@ function pacman_package_signing(){
             #}}}
             sed -i '/SigLevel\ [=]\ Optional\ TrustAll/s/^#//' /etc/pacman.conf
             sed -i '/SigLevel\ [=]\ Never/s/^/#/' /etc/pacman.conf
-            install_status
+            CURRENT_STATUS=1
             ;;
         *)
             CURRENT_STATUS=0
@@ -645,9 +617,8 @@ function install_basic_setup(){
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
     pacman -S --noconfirm --needed dbus
     add_daemon "dbus"
-    rc.d start dbus
     print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
-    pacman -S avahi nss-mdns
+    pacman -S --noconfirm --needed avahi nss-mdns
     add_daemon "avahi-daemon"
     print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
     pacman -S --noconfirm --needed acpi acpid
@@ -658,10 +629,7 @@ function install_basic_setup(){
     print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
     pacman -S --noconfirm --needed rssh openssh
     add_daemon "@sshd"
-    #CONFIGURE SSH #{{{
-    echo -e "sshd: ALL\n# End of file" > /etc/hosts.allow
-    echo -e "ALL: ALL: DENY\n# End of file" > /etc/hosts.deny
-    #SSHD_CONF #{{{
+    #CONFIGURE SSHD_CONF #{{{
         sed -i '/ListenAddress/s/^#//' /etc/ssh/sshd_config
         sed -i '/SyslogFacility/s/^#//' /etc/ssh/sshd_config
         sed -i '/LogLevel/s/^#//' /etc/ssh/sshd_config
@@ -684,7 +652,6 @@ function install_basic_setup(){
         sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
         sed -i '/ListenAddress\ ::/s/^/#/' /etc/ssh/sshd_config
     #}}}
-    #}}}
     #SAMBA #{{{
     print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
     read_input_text "Install Samba" $SAMBA
@@ -693,7 +660,7 @@ function install_basic_setup(){
             pacman -S --noconfirm --needed samba
             cp /etc/samba/smb.conf.default /etc/samba/smb.conf
             add_daemon "@samba"
-            install_status
+            CURRENT_STATUS=1
             ;;
         *)
             CURRENT_STATUS=0
@@ -711,7 +678,7 @@ function install_basic_setup(){
             add_daemon "rpcbind"
             add_daemon "nfs-common"
             add_daemon "nfs-server"
-            install_status
+            CURRENT_STATUS=1
             ;;
         *)
             CURRENT_STATUS=0
@@ -736,7 +703,7 @@ function install_tlp(){
             package_install "tlp"
             pacman -S --noconfirm --needed upower
             add_daemon "@tlp"
-            install_status
+            CURRENT_STATUS=1
             ;;
         *)
             CURRENT_STATUS=0
@@ -754,13 +721,6 @@ function install_xorg(){
     pacman -S --noconfirm --needed xf86-input-synaptics xf86-input-mouse xf86-input-keyboard
     pacman -S --noconfirm --needed mesa
     pacman -S --noconfirm --needed gamin
-    #NUMLOCKX {{{
-    pacman -S --noconfirm --needed numlockx
-    local numlock=`cat /etc/rc.local | sed -n '/numlockx/p'`
-    if [ -z "$numlock" ]; then
-        echo -e "if [ -x /usr/bin/numlockx ]; then\n\t/usr/bin/numlockx on\nfi" >> /etc/rc.local
-    fi
-    #}}}
     #CONFIGURE QWERTY KEYBOARD IN XORG {{{
     local file="/etc/X11/xorg.conf.d/10-evdev.conf"
     local line=`grep -n "keyboard" $file | cut -f1 -d:`
@@ -768,16 +728,16 @@ function install_xorg(){
     local patch=`cat $file | sed ''$(( $line + 1 ))'!d'`
     local keymap=`cat /etc/rc.conf | sed -n '/KEYMAP[=]/p' | sed 's/.*"\(.*\)".*/\1/g'`
 
-    if [[ "$patch" != *"XkbLayout"* ]]; then
-        if [ $keymap = "us-acentos" ]; then
+    if [[ $patch != *"XkbLayout"* ]]; then
+        if [[ $keymap == us-acentos ]]; then
             kblayout="\\\tOption \"XkbLayout\" \"us_intl\""
             sed -i "${line}a $kblayout" $file
         else
-            if [ $LANGUAGE = "pt_BR" ]; then
+            if [[ $LANGUAGE == pt_BR ]]; then
                 kblayout="\\\tOption \"XkbLayout\" \"br\""
                 kblayout+="\n\\tOption \"XkbVariant\" \"abnt2\""
                 sed -i "${line}a $kblayout" $file
-            elif [ $LANGUAGE = "fr_FR" ]; then
+            elif [[ $LANGUAGE == fr_FR ]]; then
                 kblayout="\\\tOption \"XkbLayout\" \"fr\""
                 sed -i "${line}a $kblayout" $file
             fi
@@ -791,12 +751,11 @@ function install_video_cards(){
     print_title "VIDEO CARD"
     echo "Select your GPU:"
     echo " 1) Intel"
-    echo " 2) ATI [Catalyst]"
-    echo " 3) ATI"
-    echo " 4) nVidia"
-    echo " 5) Nouveau"
-    echo " 6) Virtualbox"
-    echo " 7) Vesa"
+    echo " 2) ATI"
+    echo " 3) nVidia"
+    echo " 4) Nouveau"
+    echo " 5) Virtualbox"
+    echo " 6) Vesa"
     echo ""
     echo " s) SKIP"
     echo ""
@@ -804,48 +763,40 @@ function install_video_cards(){
     case "$OPTION" in
         1)
             pacman -S --noconfirm --needed libgl xf86-video-intel
-            install_status
+            CURRENT_STATUS=1
             sumary "Intel GPU driver installation"
             ;;
         2)
-            pacman -Rdd --noconfirm libgl
-            package_install "catalyst catalyst-utils"
-            install_status
-            sumary "ATI [Catalysm] GPU driver installation"
-            ;;
-        3)
             pacman -S --noconfirm --needed libgl xf86-video-ati
             add_module "radeon"
-            install_status
+            CURRENT_STATUS=1
             sumary "ATI GPU driver installation"
             ;;
-        4)
+        3)
             pacman -Rdd --noconfirm libgl
             pacman -S --noconfirm --needed nvidia nvidia-utils
-            install_status
+            CURRENT_STATUS=1
             sumary "nVidia GPU driver installation"
             ;;
-        5)
+        4)
             pacman -S --noconfirm --needed libgl xf86-video-nouveau nouveau-dri
             modprobe nouveau
             add_module "nouveau"
-            install_status
+            CURRENT_STATUS=1
             sumary "Nouveau GPU driver installation"
             ;;
-        6)
+        5)
             pacman -S --noconfirm --needed virtualbox-archlinux-additions
             modprobe -a vboxguest vboxsf vboxvideo
-            add_module "vboxguest"
-            add_module "vboxsf"
-            add_module "vboxvideo"
+            add_module "vboxguest vboxsf vboxvideo"
             groupadd vboxsf
             gpasswd -a $USERNAME vboxsf
-            install_status
+            CURRENT_STATUS=1
             sumary "Virtualbox guest additions (incl. video drivers) installation"
             ;;
-        7)
+        6)
             pacman -S --noconfirm --needed xf86-video-vesa
-            install_status
+            CURRENT_STATUS=1
             sumary "Vesa GPU driver installation"
             ;;
         *)
@@ -865,7 +816,7 @@ function install_cups(){
             pacman -S --noconfirm --needed cups ghostscript gsfonts
             pacman -S --noconfirm --needed gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf
             add_daemon "@cupsd"
-            install_status
+            CURRENT_STATUS=1
             ;;
         *)
             CURRENT_STATUS=0
@@ -882,7 +833,7 @@ function install_additional_firmwares(){
     case "$OPTION" in
         "y")
             #ADDITIONAL FIRMWARE {{{
-            while [ 1 ]
+            while [[ 1 ]]
             do
                 print_title "INSTALL ADDITIONAL FIRMWARES"
                 echo " 1) $(checkbox_package "ipw2100-fw") ipw2100"
@@ -926,7 +877,7 @@ function install_additional_firmwares(){
                 done
             elihw
             done
-            install_status
+            CURRENT_STATUS=1
             ;;
             #}}}
         *)
@@ -944,7 +895,7 @@ function install_git_tor(){
     case "$OPTION" in
         "y")
             package_install "openbsd-netcat vidalia privoxy git"
-            if [ ! -f /usr/bin/proxy-wrapper ]; then
+            if [[ ! -f /usr/bin/proxy-wrapper ]]; then
                 echo 'forward-socks5   /               127.0.0.1:9050 .' >> /etc/privoxy/config
                 echo -e '#!/bin/bash\nnc.openbsd -xlocalhost:9050 -X5 $*' > /usr/bin/proxy-wrapper
                 chmod +x /usr/bin/proxy-wrapper
@@ -955,11 +906,8 @@ function install_git_tor(){
             groupadd -g 42 privoxy
             useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
             pacman -S --noconfirm tor privoxy
-            rc.d start tor privoxy
-            su -l $USERNAME --command="sudo /etc/rc.d/tor restart"
-            su -l $USERNAME --command="sudo /etc/rc.d/privoxy restart"
             add_daemon "@tor @privoxy"
-            install_status
+            CURRENT_STATUS=1
             ;;
         *)
             CURRENT_STATUS=0
@@ -972,7 +920,7 @@ function install_git_tor(){
 #DESKTOP ENVIRONMENT {{{
 function install_desktop_environment(){
     function install_icons() { #{{{
-        while [ 1 ]
+        while [[ 1 ]]
         do
             print_title "GNOME ICONS"
             echo " 1) $(checkbox_package "awoken-icons") Awoken"
@@ -1028,7 +976,7 @@ function install_desktop_environment(){
         1)
             #GNOME {{{
             print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
-            pacman -Sf --noconfirm --needed gnome gnome-extra telepathy
+            pacman -S --noconfirm --needed gnome gnome-extra telepathy
             package_install "empathy-theme-ubuntu-adium-bzr"
             gpasswd -a $USERNAME camera
             pacman -S --noconfirm --needed gedit-plugins gnome-tweak-tool
@@ -1039,7 +987,7 @@ function install_desktop_environment(){
             package_install "automounter nautilus-open-terminal gnome-defaults-list"
             echo -e 'exec ck-launch-session gnome-session' >> /home/$USERNAME/.xinitrc
             #GNOME CUSTOMIZATION {{{
-            while [ 1 ]
+            while [[ 1 ]]
             do
                 print_title "GNOME CUSTOMIZATION"
                 echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons [Faience, Faenza, Elementary]"
@@ -1062,7 +1010,7 @@ function install_desktop_environment(){
                             ;;
                         2)
                             #THEMES {{{
-                            while [ 1 ]
+                            while [[ 1 ]]
                             do
                                 print_title "GNOME THEMES"
                                 echo " 1) $(checkbox_package "gtk-theme-boomerang") Boomerang"
@@ -1111,7 +1059,7 @@ function install_desktop_environment(){
                             ;;
                         3)
                             #GNOMESHELL EXTENSIONS {{{
-                            while [ 1 ]
+                            while [[ 1 ]]
                             do
                                 print_title "GNOMESHELL EXTENSIONS"
                                 echo " 1) $(checkbox_package "gpaste-git") gpaste"
@@ -1169,7 +1117,7 @@ function install_desktop_environment(){
                             ;;
                         4)
                             #GNOMESHELL THEMES {{{
-                            while [ 1 ]
+                            while [[ 1 ]]
                             do
                                 print_title "GNOMESHELL THEMES"
                                 echo " 1) $(checkbox_package "gnome-shell-theme-elegance") Elegance"
@@ -1220,8 +1168,8 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
-            add_daemon "gdm"
-            install_status
+            config_dm "gdm"
+            CURRENT_STATUS=1
             GNOME=1
             ;;
             #}}}
@@ -1251,7 +1199,7 @@ function install_desktop_environment(){
             rm -fr Kawai Sweet
             #}}}
             #KDE CUSTOMIZATION {{{
-            while [ 1 ]
+            while [[ 1 ]]
             do
                 print_title "KDE CUSTOMIZATION"
                 echo " 1) $(checkbox_package "apper") Apper"
@@ -1260,9 +1208,8 @@ function install_desktop_environment(){
                 echo " 4) $(checkbox_package "digikam") Digikam"
                 echo " 5) $(checkbox_package "k3b") K3b"
                 echo " 6) $(checkbox_package "rosa-icons kfaenza-icon-theme") KDE Icons [Rosa, KFaenza]"
-                echo " 7) $(checkbox_package "kdebase-dolphin-klook") KLook"
-                echo " 8) $(checkbox_package "caledonia-bundle plasma-theme-produkt") Plasma Themes [Caledonia, Produkt, Ronak]"
-                echo " 9) $(checkbox_package "yakuake") Yakuake"
+                echo " 7) $(checkbox_package "caledonia-bundle plasma-theme-produkt") Plasma Themes [Caledonia, Produkt, Ronak]"
+                echo " 8) $(checkbox_package "yakuake") Yakuake"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1289,12 +1236,9 @@ function install_desktop_environment(){
                             package_install "rosa-icons kfaenza-icon-theme"
                             ;;
                         7)
-                            package_install "kdebase-dolphin-klook"
-                            ;;
-                        8)
                             package_install "caledonia-bundle plasma-theme-rosa plasma-theme-produkt ronak-plasmatheme"
                             ;;
-                        9)
+                        8)
                             package_install "yakuake yakuake-skin-plasma-oxygen-panel"
                             ;;
                         "d")
@@ -1308,8 +1252,8 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
-            add_daemon "kdm"
-            install_status
+            config_dm "kdm"
+            CURRENT_STATUS=1
             KDE=1
             ;;
             #}}}
@@ -1322,12 +1266,12 @@ function install_desktop_environment(){
             package_install "gnome-defaults-list"
             echo -e 'exec ck-launch-session startxfce4' >> /home/$USERNAME/.xinitrc
             #XFCE CUSTOMIZATION{{{
-            while [ 1 ]
+            while [[ 1 ]]
             do
                 print_title "XFCE CUSTOMIZATION"
                 echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons [Faience, Faenza, Elementary]"
                 echo " 2) $(checkbox_package "xfce-theme-greybird xfce-theme-bluebird zukitwo-themes") XFCE Themes"
-                echo " 3) $(checkbox_package "lightdm") LightDM"
+                echo " 3) $(checkbox_package "slim") Slim"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1341,7 +1285,7 @@ function install_desktop_environment(){
                             ;;
                         2)
                             #THEMES {{{
-                            while [ 1 ]
+                            while [[ 1 ]]
                             do
                                 print_title "XFCE THEMES"
                                 echo " 1) $(checkbox_package "xfce-theme-bluebird") Bluebird"
@@ -1377,9 +1321,8 @@ function install_desktop_environment(){
                             OPT=2
                             ;;
                         3)
-                            package_install "intltool lightdm lightdm-gtk-greeter"
-                            add_daemon "lightdm"
-                            sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
+                            package_install "slim"
+                            config_dm "slim"
                             ;;
                         "d")
                             break
@@ -1392,7 +1335,7 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
-            install_status
+            CURRENT_STATUS=1
             XFCE=1
             ;;
             #}}}
@@ -1406,7 +1349,7 @@ function install_desktop_environment(){
             package_install "gnome-defaults-list"
             echo -e 'exec ck-launch-session startlxde' >> /home/$USERNAME/.xinitrc
             #LXDE CUSTOMIZATION{{{
-            while [ 1 ]
+            while [[ 1 ]]
             do
                 print_title "LXDE CUSTOMIZATION"
                 echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons [Faience, Faenza, Elementary]"
@@ -1425,7 +1368,11 @@ function install_desktop_environment(){
                             ;;
                         2)
                             package_install "lxdm"
-                            add_daemon "lxdm"
+                            local lxdm=`cat /etc/inittab | sed -n '/lxdm/p'`
+                            if [[ -z "$lxdm" ]]; then
+                                echo -e "x:5:respawn:/usr/sbin/lxdm >& /dev/null" >> /etc/inittab
+                            fi
+                            config_dm "lxdm"
                             ;;
                         3)
                             package_install "xfburn"
@@ -1441,8 +1388,7 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
-            add_daemon "lxdm"
-            install_status
+            CURRENT_STATUS=1
             LXDE=1
             ;;
             #}}}
@@ -1461,16 +1407,16 @@ function install_desktop_environment(){
             chown -R $USERNAME:users /home/$USERNAME/.config
             echo -e 'exec ck-launch-session openbox-session' >> /home/$USERNAME/.xinitrc
             #OPENBOX CUSTOMIZATION {{{
-            while [ 1 ]
+            while [[ 1 ]]
             do
                 print_title "OPENBOX CUSTOMIZATION"
                 echo " 1) $(checkbox_package "compton") Compton [xcompmgr fork]"
                 echo " 2) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons [Faience, Faenza, Elementary]"
                 echo " 3) $(checkbox_package "geeqie") Geeqie"
                 echo " 4) $(checkbox_package "gmrun") Gmrun"
-                echo " 5) $(checkbox_package "lightdm") LightDM"
-                echo " 6) $(checkbox_package "rxvt-unicode") rxvt-unicode"
-                echo " 7) $(checkbox_package "scrot") Scrot"
+                echo " 5) $(checkbox_package "rxvt-unicode") rxvt-unicode"
+                echo " 6) $(checkbox_package "scrot") Scrot"
+                echo " 7) $(checkbox_package "slim") Slim"
                 echo " 8) $(checkbox_package "thunar") Thunar"
                 echo " 9) $(checkbox_package "tint2") Tint2"
                 echo "10) $(checkbox_package "volwheel") Volwheel"
@@ -1496,15 +1442,14 @@ function install_desktop_environment(){
                             package_install "gmrun"
                             ;;
                         5)
-                            package_install "intltool lightdm lightdm-gtk-greeter"
-                            add_daemon "lightdm"
-                            sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
-                            ;;
-                        6)
                             package_install "rxvt-unicode"
                             ;;
-                        7)
+                        6)
                             package_install "scrot"
+                            ;;
+                        7)
+                            package_install "slim"
+                            config_dm "slim"
                             ;;
                         8)
                             package_install "polkit-gnome gvfs-smb thunar"
@@ -1529,8 +1474,8 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
-            install_status
-            XFCE=1
+            CURRENT_STATUS=1
+            OPENBOX=1
             ;;
             #}}}
         6)
@@ -1547,7 +1492,7 @@ function install_desktop_environment(){
             package_install "automounter nautilus-open-terminal gnome-defaults-list"
             echo -e 'exec ck-launch-session gnome-session-cinnamon' >> /home/$USERNAME/.xinitrc
             #CINNAMON CUSTOMIZATION {{{
-            while [ 1 ]
+            while [[ 1 ]]
             do
                 print_title "CINNAMON CUSTOMIZATION"
                 echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons [Faience, Faenza, Elementary]"
@@ -1568,7 +1513,7 @@ function install_desktop_environment(){
                             ;;
                         2)
                             #THEMES {{{
-                            while [ 1 ]
+                            while [[ 1 ]]
                             do
                                 print_title "GNOME THEMES"
                                 echo " 1) $(checkbox_package "gtk-theme-boomerang") Boomerang"
@@ -1635,8 +1580,8 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
-            add_daemon "gdm"
-            install_status
+            config_dm "gdm"
+            CURRENT_STATUS=1
             GNOME=1
             ;;
             #}}}
@@ -1660,9 +1605,9 @@ function install_nm_wicd(){
     case "$OPTION" in
         1)
             print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
-            if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
+            if [[ $GNOME -eq 1 || $XFCE -eq 1 || $LXDE -eq 1 ]]; then
                 pacman -S --noconfirm --needed networkmanager network-manager-applet
-            elif [ "$KDE" -eq 1 ]; then
+            elif [[ $KDE -eq 1 ]]; then
                 pacman -S --noconfirm --needed networkmanager kdeplasma-applets-networkmanagement
             else
                 pacman -S --noconfirm --needed networkmanager
@@ -1673,14 +1618,14 @@ function install_nm_wicd(){
             remove_daemon "network"
             remove_daemon "wicd"
             add_daemon "networkmanager"
-            install_status
+            CURRENT_STATUS=1
             sumary "Networkmanager installation"
             ;;
         2)
             print_title "WICD - https://wiki.archlinux.org/index.php/Wicd"
-            if [ "$GNOME" -eq 1 ] || [ "$XFCE" -eq 1 ] || [ "$LXDE" -eq 1 ]; then
+            if [[ $GNOME -eq 1 || $XFCE -eq 1 || $LXDE -eq 1 ]]; then
                 pacman -S --noconfirm --needed wicd wicd-gtk
-            elif [ "$KDE" -eq 1 ]; then
+            elif [[ $KDE -eq 1 ]]; then
                 package_install "wicd wicd-kde"
             else
                 pacman -S --noconfirm --needed wicd
@@ -1688,7 +1633,7 @@ function install_nm_wicd(){
             remove_daemon "networkmanager"
             remove_daemon "network"
             add_daemon "wicd"
-            install_status
+            CURRENT_STATUS=1
             sumary "Wicd installation"
             ;;
         *)
@@ -1709,7 +1654,7 @@ function install_nm_wicd(){
 #}}}
 #ACCESSORIES {{{
 function install_accessories_apps(){
-while [ 1 ]
+while [[ 1 ]]
 do
     print_title "ACCESSORIES APPS"
     echo " 1) $(checkbox_package "cairo-dock-bzr") Cairo Dock"
@@ -1717,7 +1662,7 @@ do
     echo " 3) $(checkbox_package "deepin-scrot-git") Deepin Scrot"
     echo " 4) $(checkbox_package "dockbarx") Dockbarx"
     echo " 5) $(checkbox_package "docky") Docky"
-    echo " 6) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "speedcrunch") Speedcrunch"; else echo "$(checkbox_package "galculator") Galculator"; fi)"
+    echo " 6) $(if [[ $KDE -eq 1 ]]; then echo "$(checkbox_package "speedcrunch") Speedcrunch"; else echo "$(checkbox_package "galculator") Galculator"; fi)"
     echo " 7) $(checkbox_package "gnome-pie") Gnome-Pie"
     echo " 8) $(checkbox_package "guake") Guake"
     echo " 9) $(checkbox_package "kupfer") Kupfer"
@@ -1737,7 +1682,7 @@ do
                 package_install "cairo-dock-bzr cairo-dock-plugins-bzr"
                 ;;
             2)
-                package_install "conky conky-colors"
+                package_install "conky-lua conky-colors"
                 sensors-detect
                 add_daemon "sensors"
                 ;;
@@ -1751,7 +1696,7 @@ do
                 package_install "docky"
                 ;;
             6)
-                if [ "$KDE" -eq 1 ]; then
+                if [[ $KDE -eq 1 ]]; then
                     package_install "speedcrunch"
                 else
                     package_install "galculator"
@@ -1796,7 +1741,7 @@ done
 #}}}
 #DEVELOPEMENT {{{
 function install_development_apps(){
-while [ 1 ]
+while [[ 1 ]]
 do
     print_title "DEVELOPMENT APPS"
     echo " 1) $(checkbox_package "aptana-studio") Aptana Studio"
@@ -1829,7 +1774,7 @@ do
                 ;;
             3)
                 #ECLIPSE {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "ECLIPSE - https://wiki.archlinux.org/index.php/Eclipse"
                     echo " 1) $(checkbox_package "eclipse") Eclipse Classic"
@@ -1892,7 +1837,7 @@ do
                 package_install "emacs"
                 ;;
             5)
-                pacman -Rdd --noconfirm vim
+                pacman -Rsn --noconfirm vim
                 package_install "gvim"
                 ;;
             6)
@@ -1930,9 +1875,9 @@ do
                 ;;
             15)
                 package_install "rabbitvcs"
-                if [ "$GNOME" -eq 1 ]; then
+                if [[ $GNOME -eq 1 ]]; then
                     package_install "rabbitvcs-nautilus"
-                elif [ "$XFCE" -eq 1 ]; then
+                elif [[ $XFCE -eq 1 ]]; then
                     package_install "rabbitvcs-thunar"
                 else
                     package_install "rabbitvcs-cli"
@@ -1952,13 +1897,13 @@ done
 #}}}
 #OFFICE {{{
 function install_office_apps(){
-while [ 1 ]
+while [[ 1 ]]
 do
     print_title "OFFICE APPS"
     echo " 1) $(checkbox_package "libreoffice-common") LibreOffice"
     echo " 2) $(checkbox_package "goffice") GnomeOffice [Abiword, Gnumeric]"
     echo " 3) $(checkbox_package "texlive-core") Latex + Texmaker"
-    echo " 4) $(if [ "$KDE" -eq 1 ]; then  echo "$(checkbox_package "kchmviewer") Kchmviewer"; else echo "$(checkbox_package "chmsee") Chmsee"; fi)"
+    echo " 4) $(if [[ $KDE -eq 1 ]]; then  echo "$(checkbox_package "kchmviewer") Kchmviewer"; else echo "$(checkbox_package "chmsee") Chmsee"; fi)"
     echo " 5) $(checkbox_package "gcstar") GCStar"
     echo " 6) $(checkbox_package "impressive") Impressive"
     echo " 7) $(checkbox_package "nitrotasks") Nitrotasks"
@@ -1977,7 +1922,7 @@ do
                 pacman -S --noconfirm --needed libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport
                 package_install "hunspell-$LANGUAGE_HS"
                 package_install "aspell-$LANGUAGE_AS"
-                if [ "$KDE" -eq 1 ]; then
+                if [[ $KDE -eq 1 ]]; then
                     package_install "libreoffice-kde4"
                 else
                     package_install "libreoffice-gnome"
@@ -1993,12 +1938,12 @@ do
                 pacman -S --noconfirm --needed texlive-most
                 package_install "texmaker"
                 package_install "latex-template-springer latex-template-ieee latex-beamer"
-                if [ $LANGUAGE = "pt_BR" ]; then
+                if [[ $LANGUAGE == pt_BR ]]; then
                     package_install "abntex"
                 fi
                 ;;
             4)
-                if [ "$KDE" -eq 1 ]; then
+                if [[ $KDE -eq 1 ]]; then
                     package_install "kchmviewer"
                 else
                     package_install "chmsee"
@@ -2037,7 +1982,7 @@ done
 #}}}
 #SYSTEM TOOLS {{{
 function install_system_apps(){
-while [ 1 ]
+while [[ 1 ]]
 do
     print_title "SYSTEM TOOLS APPS"
     echo " 1) $(checkbox_package "gparted") Gparted"
@@ -2085,7 +2030,7 @@ done
 #}}}
 #GRAPHICS {{{
 function install_graphics_apps(){
-while [ 1 ]
+while [[ 1 ]]
 do
     print_title "GRAPHICS APPS"
     echo " 1) $(checkbox_package "blender") Blender"
@@ -2141,7 +2086,7 @@ done
 #}}}
 #INTERNET {{{
 function install_internet_apps(){
-while [ 1 ]
+while [[ 1 ]]
 do
     print_title "INTERNET APPS"
     echo " 1) $(checkbox_package "dropbox") Dropbox"
@@ -2157,8 +2102,8 @@ do
     echo "11) $(checkbox_package "skype") Skype"
     echo "12) $(checkbox_package "teamspeak3") Teamspeak"
     echo "13) $(checkbox_package "teamviewer") Teamviewer"
-    echo "14) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "transmission-qt")"; else echo "$(checkbox_package "transmission-gtk")"; fi) Trasmission"
-    echo "15) $(if [ "$KDE" -eq 1 ]; then echo "$(checkbox_package "konversation") Konversation"; else echo "$(checkbox_package "xchat") X-Chat"; fi)"
+    echo "14) $(if [[ $KDE -eq 1 ]]; then echo "$(checkbox_package "transmission-qt")"; else echo "$(checkbox_package "transmission-gtk")"; fi) Trasmission"
+    echo "15) $(if [[ $KDE -eq 1 ]]; then echo "$(checkbox_package "konversation") Konversation"; else echo "$(checkbox_package "xchat") X-Chat"; fi)"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2168,11 +2113,11 @@ do
         case "$OPT" in
             1)
                 package_install "dropbox"
-                if [ "$GNOME" -eq 1 ]; then
+                if [[ $GNOME -eq 1 ]]; then
                     package_install "nautilus-dropbox"
-                elif [ "$XFCE" -eq 1 ]; then
+                elif [[ $XFCE -eq 1 ]]; then
                     package_install "thunar-dropbox"
-                elif [ "$KDE" -eq 1 ]; then
+                elif [[ $KDE -eq 1 ]]; then
                     package_install "kfilebox"
                 else
                     package_install "dropbox-cli"
@@ -2215,14 +2160,14 @@ do
                 package_install "teamviewer"
                 ;;
             14)
-                if [ "$KDE" -eq 1 ]; then
+                if [[ $KDE -eq 1 ]]; then
                     package_install "transmission-qt"
                 else
                     package_install "transmission-gtk"
                 fi
                 ;;
             15)
-                if [ "$KDE" -eq 1 ]; then
+                if [[ $KDE -eq 1 ]]; then
                     package_install "konversation"
                 else
                     package_install "xchat"
@@ -2247,9 +2192,12 @@ read_input_text "Install LAMP" $LAMP
 case "$OPTION" in
     "y")
         pacman -S --noconfirm --needed apache mysql php php-apache php-mcrypt php-gd
-        if ! check_package "adminer" ; then
-            package_install "adminer"
-            rc.d start httpd mysqld
+        package_install "adminer"
+        if [[ ! -f /etc/php/php.ini.aui ]]; then
+            cp -v /etc/php/php.ini /etc/php/php.ini.aui
+            cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
+            cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
+            add_daemon "httpd @mysqld"
             #CONFIGURE LAMP SERVER {{{
             /usr/bin/mysql_secure_installation
             echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
@@ -2269,8 +2217,7 @@ case "$OPTION" in
         su -l $USERNAME --command="mkdir -p ~/Sites"
         su -l $USERNAME --command="chmod o+x ~/ && chmod -R o+x ~/Sites"
         rc.d restart httpd mysqld
-        add_daemon "httpd @mysqld"
-        install_status
+        CURRENT_STATUS=1
         print_line
         echo "The folder \"Sites\" has been created in your home"
         echo "You can access your projects at \"http://localhost/~username\""
@@ -2285,7 +2232,7 @@ pause_function
 #}}}
 #AUDIO {{{
 function install_audio_apps(){
-while [ 1 ]
+while [[ 1 ]]
 do
     print_title "AUDIO APPS "
     echo " 1) $(checkbox_package "amarok") Amarok"
@@ -2378,7 +2325,7 @@ done
 #}}}
 #VIDEO {{{
 function install_video_apps(){
-while [ 1 ]
+while [[ 1 ]]
 do
     print_title "VIDEO APPS"
     echo " 1) $(checkbox_package "audience-bzr") Audience"
@@ -2396,7 +2343,7 @@ do
     echo "13) $(checkbox_package "openshot") Openshot"
     echo "14) $(checkbox_package "pitivi") Pitivi"
     echo "15) $(checkbox_package "kazam-bzr") Kazam"
-    echo "16) $(if [ "$ARCHI" = "i686" ]; then echo "$(checkbox_package "codecs")"; else echo "$(checkbox_package "codecs64")"; fi) Codecs"
+    echo "16) $(if [[ $ARCHI == i686 ]]; then echo "$(checkbox_package "codecs")"; else echo "$(checkbox_package "codecs64")"; fi) Codecs"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2427,7 +2374,7 @@ do
                 ;;
             8)
                 package_install "vlc"
-                if [ "$KDE" -eq 1 ]; then
+                if [[ $KDE -eq 1 ]]; then
                     package_install "phonon-vlc"
                 fi
                 ;;
@@ -2455,7 +2402,7 @@ do
                 ;;
             16)
                 package_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
-                if [ "$ARCHI" = "i686" ]; then
+                if [[ $ARCHI == i686 ]]; then
                     package_install "codecs"
                 else
                     package_install "codecs64"
@@ -2475,7 +2422,7 @@ done
 #}}}
 #GAMES {{{
 function install_games(){
-while [ 1 ]
+while [[ 1 ]]
 do
     print_title "GAMES - https://wiki.archlinux.org/index.php/Games"
     echo " 1) Action/Adventure"
@@ -2498,7 +2445,7 @@ do
         case "$OPT" in
             1)
                 #ACTION/ADVENTURE {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "ACTION AND ADVENTURE"
                     echo " 1) $(checkbox_package "astromenace") Astromenace"
@@ -2543,7 +2490,7 @@ do
                 ;;
             2)
                 #ARCADE/PLATFORMER {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "ARCADE AND PLATFORMER"
                     echo " 1) $(checkbox_package "opensonic") Opensonic"
@@ -2600,7 +2547,7 @@ do
                 ;;
             3)
                 #DUNGEON {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "DUNGEON"
                     echo " 1) $(checkbox_package "adom") Adom"
@@ -2641,7 +2588,7 @@ do
                 ;;
             4)
                 #EMULATORS {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "EMULATORS"
                     echo " 1) $(checkbox_package "bsnes") BSNES"
@@ -2702,7 +2649,7 @@ do
                 ;;
             5)
                 #FPS {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "FPS"
                     echo " 1) $(checkbox_package "alienarena") AlienArena"
@@ -2748,7 +2695,7 @@ do
                 ;;
             6)
                 #MMO {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "MMO"
                     echo " 1) $(checkbox_package "hon") Heroes of Newerth"
@@ -2789,7 +2736,7 @@ do
                 ;;
             7)
                 #PUZZLE {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "PUZZLE"
                     echo " 1) $(checkbox_package "frozen-bubble") Frozen Bubble"
@@ -2822,7 +2769,7 @@ do
                 ;;
             8)
                 #RPG {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "RPG"
                     echo " 1) $(checkbox_package "ardentryst") Ardentryst"
@@ -2859,7 +2806,7 @@ do
                 ;;
             9)
                 #RACING {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "RACING"
                     echo " 1) $(checkbox_package "maniadrive") Maniadrive"
@@ -2904,7 +2851,7 @@ do
                 ;;
             10)
                 #SIMULATION {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "SIMULATION"
                     echo " 1) $(checkbox_package "simutrans") Simultrans"
@@ -2941,7 +2888,7 @@ do
                 ;;
             11)
                 #STRATEGY {{{
-                while [ 1 ]
+                while [[ 1 ]]
                 do
                     print_title "STRATEGY"
                     echo " 1) $(checkbox_package "0ad") 0ad"
@@ -3002,7 +2949,7 @@ done
 #}}}
 #FONTS {{{
 function install_fonts(){
-while [ 1 ]
+while [[ 1 ]]
 do
     print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
     echo " 1) $(checkbox_package "ttf-dejavu") ttf-dejavu"
@@ -3025,7 +2972,7 @@ do
             2)
                 echo -e "\nWARNING: Install time can be > 20min"
                 read_input_text "Are you sure you want to continue?" $GOOGLE_FONTS
-                if [ "$OPTION" = "n" ]; then continue; fi
+                if [[ $OPTION == n ]]; then continue; fi
                 pacman -Rdd --noconfirm ttf-droid
                 pacman -Rdd --noconfirm ttf-roboto
                 pacman -Rdd --noconfirm ttf-ubuntu-font-family
@@ -3073,12 +3020,12 @@ function configure_fonts(){
         1)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
             package_install "fontconfig-ubuntu freetype2-ubuntu libxft-ubuntu cairo-ubuntu"
-            install_status
+            CURRENT_STATUS=1
             ;;
         2)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
             package_install "freetype2-cleartype libxft-cleartype cairo-cleartype"
-            install_status
+            CURRENT_STATUS=1
             ;;
         3)
             pacman -Rdd --noconfirm fontconfig freetype2
@@ -3095,11 +3042,11 @@ function configure_fonts(){
                     invalid_option
                 fi
             done
-            install_status
+            CURRENT_STATUS=1
             ;;
         4)
-            pacman -Sf --asdeps cairo fontconfig freetype2 libxft
-            install_status
+            pacman -S --asdeps cairo fontconfig freetype2 libxft
+            CURRENT_STATUS=1
             ;;
         *)
             CURRENT_STATUS=0
@@ -3119,9 +3066,25 @@ function configure_fonts(){
 #}}}
 #FINISH {{{
 function finish(){
+    print_title "WARNING: PACKAGES INSTALLED FROM AUR"
+    echo "List of packages not officially supported that may kill your cat:"
+    pause_function
+    pacman -Qm | awk '{print $1}' > aur_pkglist.txt
+    more aur_package_list.txt
     print_title "INSTALL COMPLETED"
-    reboot_now
     echo "Thanks for using the Archlinux Ultimate Install script by helmuthdu"
+    print_line
+    pause_function
+    if [[ $LXDE -eq 1 ]]; then
+        DM="lxdm"
+    elif [[ $XFCE -eq 1 || $OPENBOX -eq 1 ]]; then
+        DM="slim"
+    elif [[ $KDE -eq 1 ]]; then
+        DM="kdm"
+    else
+        DM="gdm"
+    fi
+    [[ ! -n $DISPLAY ]] && start_daemon "$DM"
     exit 0
 }
 #}}}
@@ -3129,12 +3092,13 @@ function finish(){
 #MAIN {{{
 welcome
 check_root
+create_backup
 language_selector
 system_upgrade
 select_user
 choose_aurhelper
 
-while [ 1 ]
+while [[ 1 ]]
 do
     print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
     echo " 1) $(checkbox $BASICSETUP) Basic Setup"
@@ -3170,16 +3134,16 @@ do
                 install_cups
                 install_additional_firmwares
                 install_git_tor
-                install_status
+                CURRENT_STATUS=1
                 sumary "Basic setup installation"
                 pause_function
                 BASICSETUP=1
                 ;;
             2)
-                if [ $BASICSETUP -eq 0 ]; then
+                if [[ $BASICSETUP -eq 0 ]]; then
                     echo -e "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
                     read_input_text "Are you sure you want to continue?"
-                    if [ "$OPTION" = "n" ]; then continue; fi
+                    if [[ $OPTION == n ]]; then continue; fi
                 fi
                 install_desktop_environment
                 install_nm_wicd
