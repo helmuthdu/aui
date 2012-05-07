@@ -52,12 +52,11 @@ USE_SCRIPT=0
     CUSTOMREPO="n"
     #VIDEOCARD {{{
         # 1) Intel
-        # 2) ATI [Catalyst]
-        # 3) ATI
-        # 4) nVidia
-        # 5) Nouveau
-        # 6) Virtualbox
-        # 7) Vesa
+        # 2) ATI
+        # 3) nVidia
+        # 4) Nouveau
+        # 5) Virtualbox
+        # 6) Vesa
         VIDEOCARD=4
     #}}}
     #ADDITIONAL FIRMWARE {{{
