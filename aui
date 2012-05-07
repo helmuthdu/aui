@@ -3070,7 +3070,7 @@ function finish(){
     echo "List of packages not officially supported that may kill your cat:"
     pause_function
     pacman -Qm | awk '{print $1}' > aur_pkglist.txt
-    more aur_package_list.txt
+    more aur_pkglist.txt
     print_title "INSTALL COMPLETED"
     echo "Thanks for using the Archlinux Ultimate Install script by helmuthdu"
     print_line
