@@ -109,24 +109,30 @@ function remove_daemon(){ #{{{
 function replace_daemon(){ #{{{
     sed -i '/DAEMONS[=]/s/'"$1"'/'"$2"'/' /etc/rc.conf
 } #}}}
-function add_daemon(){ #{{{
-    remove_daemon "$1"
-    sed -i '/DAEMONS[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
-    start_daemon "$1"
-} #}}}
 function start_daemon(){ #{{{
     DAEMON_LIST=`echo "$1" | sed 's/@//g'`
     for DAEMON in $DAEMON_LIST; do
         ! ls -1 /var/run/daemons/$DAEMON &> /dev/null && rc.d start $DAEMON;
     done
 } #}}}
+function add_daemon(){ #{{{
+    remove_daemon "$1"
+    sed -i '/DAEMONS[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
+    start_daemon "$1"
+} #}}}
 function remove_module(){ #{{{
     sed -i '/MODULES[=]/s/ '"$1"'//' /etc/rc.conf
+} #}}}
+function start_module(){ #{{{
+    for MODULE in $1; do
+        modprobe $MODULE;
+    done
 } #}}}
 function add_module(){ #{{{
     remove_module "$1"
     sed -i '/MODULES[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
     #sed -i '/MODULES[=]/s/^[^ ]*\>/& '"$1"'/' /etc/rc.conf
+    start_module "$1"
 } #}}}
 function config_dm(){ #{{{
     sed -i '/'"$1"'/s/^#//' /etc/inittab
