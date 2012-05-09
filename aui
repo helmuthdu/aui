@@ -773,6 +773,7 @@ function install_video_cards(){
             sumary "ATI GPU driver installation"
             ;;
         3)
+            pacman -Rsc $(pacman -Qe | grep xf86-video | awk '{print $1}')
             pacman -Rdd --noconfirm libgl
             pacman -S --noconfirm --needed nvidia nvidia-utils
             CURRENT_STATUS=1
