@@ -1665,7 +1665,7 @@ while [[ 1 ]]
 do
     print_title "ACCESSORIES APPS"
     echo " 1) $(checkbox_package "cairo-dock-bzr") Cairo Dock"
-    echo " 2) $(checkbox_package "conky") Conky + CONKY-colors"
+    echo " 2) $(checkbox_package "conky-lua") Conky + CONKY-colors"
     echo " 3) $(checkbox_package "deepin-scrot-git") Deepin Scrot"
     echo " 4) $(checkbox_package "dockbarx") Dockbarx"
     echo " 5) $(checkbox_package "docky") Docky"
