@@ -153,7 +153,7 @@ function checkbox_package(){ #{{{
         checkbox 0
     fi
 } #}}}
-function package_install(){ #{{{
+function aur_package_install(){ #{{{
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
             if [[ $YAOURT -eq 1 ]]; then
@@ -181,6 +181,13 @@ function package_install(){ #{{{
             echo -e "Warning: $PACKAGE is up to date --skipping"
         fi
     done
+} #}}}
+function package_install(){ #{{{
+    if [[ $USE_SCRIPT -eq 1 ]]; then
+        pacman -S --noconfirm --needed $1
+    else
+        pacman -S --needed $1
+    fi
 } #}}}
 function contains_element(){ #{{{
     for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
@@ -431,7 +438,7 @@ function select_user(){
         cp /etc/skel/.* /home/$USERNAME/
         #BASHRC {{{
             print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
-            pacman -S --noconfirm --needed git
+            package_install "git"
             git clone git://github.com/helmuthdu/dotfiles
             cp dotfiles/.* ~
             cp dotfiles/.* /home/$USERNAME/
@@ -451,7 +458,7 @@ function select_user(){
                         ;;
                     2)
                         # VIM
-                        pacman -S --noconfirm --needed vim ctags ack
+                        package_install "vim ctags ack"
                         if ! check_package "discount" ; then
                             su -l $USERNAME --command="
                                 wget http://aur.archlinux.org/packages/discount/discount.tar.gz;
@@ -503,7 +510,7 @@ function select_user(){
     #ENABLE SUDO {{{
     if ! check_package "sudo" ; then
         print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
-        pacman -S --noconfirm --needed sudo
+        package_install "sudo"
     fi
     ## Uncomment to allow members of group wheel to execute any command
     sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
@@ -522,7 +529,7 @@ function choose_aurhelper(){
         case "$REPLY" in
             1)
                 if ! check_package "yaourt" ; then
-                    pacman -S --noconfirm --needed base-devel yajl
+                    package_install "base-devel yajl"
                     su -l $USERNAME --command="
                         wget http://aur.archlinux.org/packages/package-query/package-query.tar.gz;
                         tar zxvf package-query.tar.gz;
@@ -551,7 +558,7 @@ function choose_aurhelper(){
                 ;;
             2)
                 if ! check_package "packer" ; then
-                    pacman -S --noconfirm --needed base-devel git jshon curl
+                    package_install "base-devel git jshon curl"
                     su -l $USERNAME --command="
                         wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
                         tar zxvf packer.tar.gz;
@@ -585,14 +592,14 @@ function pacman_package_signing(){
     read_input_text "Automatically configure pacman package signing" $PACKAGESIGN
     case "$OPTION" in
         "y")
-            pacman -S --noconfirm --needed base-devel
-            package_install "rng-tools"
+            package_install "base-devel"
+            aur_package_install "rng-tools"
             sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
             rngd -f -r /dev/urandom &
             pacman-key --init --keyserver pgp.mit.edu
             killall rngd
-            pacman -Rns --noconfirm rng-tools
-            pacman -S --noconfirm --needed archlinux-keyring
+            pacman -Rsn --noconfirm rng-tools
+            package_install "archlinux-keyring"
             #DEVELOPER AND TU KEYS {{{
             KEYS="y"
             read_input_text "Install Developer and TU Keys" $KEYS
@@ -617,24 +624,23 @@ function pacman_package_signing(){
 #BASIC SETUP{{{
 function install_basic_setup(){
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-    pacman -S --noconfirm --needed curl bc rsync mlocate bash-completion net-tools
+    package_install "bc rsync mlocate bash-completion net-tools"
     print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
-    pacman -S --noconfirm --needed zip unzip unrar p7zip
-    package_install "rar"
+    package_install "zip unzip unrar p7zip"
+    aur_package_install "rar"
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
-    pacman -S --noconfirm --needed dbus
+    package_install "dbus"
     add_daemon "dbus"
     print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
-    pacman -S --noconfirm --needed avahi nss-mdns
+    package_install "avahi nss-mdns"
     add_daemon "avahi-daemon"
     print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
-    pacman -S --noconfirm --needed acpi acpid
+    package_install "acpi acpid"
     add_daemon "acpid"
     print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/Windows"
-    pacman -S --noconfirm --needed ntfs-3g ntfsprogs dosfstools exfat-utils fuse fuse-exfat
-    add_daemon "@fuse"
+    package_install "ntfs-3g ntfsprogs dosfstools exfat-utils fuse fuse-exfat"
     print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
-    pacman -S --noconfirm --needed rssh openssh
+    package_install "rssh openssh"
     add_daemon "@sshd"
     #CONFIGURE SSHD_CONF #{{{
         sed -i '/ListenAddress/s/^#//' /etc/ssh/sshd_config
@@ -664,7 +670,7 @@ function install_basic_setup(){
     read_input_text "Install Samba" $SAMBA
     case "$OPTION" in
         "y")
-            pacman -S --noconfirm --needed samba
+            package_install "samba"
             cp /etc/samba/smb.conf.default /etc/samba/smb.conf
             add_daemon "@samba"
             CURRENT_STATUS=1
@@ -681,10 +687,8 @@ function install_basic_setup(){
     read_input_text "Install nfs" $NFS
     case "$OPTION" in
         "y")
-            pacman -S --noconfirm --needed nfs-utils
-            add_daemon "rpcbind"
-            add_daemon "nfs-common"
-            add_daemon "nfs-server"
+            package_install "nfs-utils"
+            add_daemon "rpcbind nfs-common nfs-server"
             CURRENT_STATUS=1
             ;;
         *)
@@ -695,7 +699,7 @@ function install_basic_setup(){
     pause_function
     #}}}
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
-    pacman -S --noconfirm --needed alsa-utils alsa-plugins
+    package_install "alsa-utils alsa-plugins"
     sed -i '/MODULES[=]/s/snd-usb-audio//' /etc/rc.conf
     sed -i '/MODULES[=]/s/MODULES[=](/&snd-usb-audio/' /etc/rc.conf
     add_daemon "@alsa"
@@ -707,8 +711,8 @@ function install_tlp(){
     read_input_text "Install TLP (Battery Improvement on Laptops)" $TLP
     case "$OPTION" in
         "y")
-            package_install "tlp"
-            pacman -S --noconfirm --needed upower
+            package_install "upower"
+            aur_package_install "tlp"
             add_daemon "@tlp"
             CURRENT_STATUS=1
             ;;
@@ -724,10 +728,10 @@ function install_tlp(){
 function install_xorg(){
     print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
     echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
-    pacman -S --noconfirm --needed xorg-server xorg-xinit xorg-xkill
-    pacman -S --noconfirm --needed xf86-input-synaptics xf86-input-mouse xf86-input-keyboard
-    pacman -S --noconfirm --needed mesa
-    pacman -S --noconfirm --needed gamin
+    package_install "xorg-server xorg-xinit xorg-xkill"
+    package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard"
+    package_install "mesa"
+    package_install "gamin"
     #CONFIGURE QWERTY KEYBOARD IN XORG {{{
     local file="/etc/X11/xorg.conf.d/10-evdev.conf"
     local line=`grep -n "keyboard" $file | cut -f1 -d:`
@@ -769,12 +773,12 @@ function install_video_cards(){
     read_input $VIDEOCARD
     case "$OPTION" in
         1)
-            pacman -S --noconfirm --needed libgl xf86-video-intel
+            package_install "libgl xf86-video-intel"
             CURRENT_STATUS=1
             sumary "Intel GPU driver installation"
             ;;
         2)
-            pacman -S --noconfirm --needed libgl xf86-video-ati
+            package_install "libgl xf86-video-ati"
             add_module "radeon"
             CURRENT_STATUS=1
             sumary "ATI GPU driver installation"
@@ -786,15 +790,13 @@ function install_video_cards(){
             sumary "nVidia GPU driver installation"
             ;;
         4)
-            pacman -S --noconfirm --needed libgl xf86-video-nouveau nouveau-dri
-            modprobe nouveau
+            package_install "libgl xf86-video-nouveau nouveau-dri"
             add_module "nouveau"
             CURRENT_STATUS=1
             sumary "Nouveau GPU driver installation"
             ;;
         5)
-            pacman -S --noconfirm --needed virtualbox-archlinux-additions
-            modprobe -a vboxguest vboxsf vboxvideo
+            package_install "virtualbox-archlinux-additions"
             add_module "vboxguest vboxsf vboxvideo"
             groupadd vboxsf
             gpasswd -a $USERNAME vboxsf
@@ -802,7 +804,7 @@ function install_video_cards(){
             sumary "Virtualbox guest additions (incl. video drivers) installation"
             ;;
         6)
-            pacman -S --noconfirm --needed xf86-video-vesa
+            package_install "xf86-video-vesa"
             CURRENT_STATUS=1
             sumary "Vesa GPU driver installation"
             ;;
@@ -820,8 +822,8 @@ function install_cups(){
     read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
     case "$OPTION" in
         "y")
-            pacman -S --noconfirm --needed cups ghostscript gsfonts
-            pacman -S --noconfirm --needed gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf
+            package_install "cups ghostscript gsfonts"
+            package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
             add_daemon "@cupsd"
             CURRENT_STATUS=1
             ;;
@@ -863,13 +865,13 @@ function install_additional_firmwares(){
                             package_install "ipw2200-fw"
                             ;;
                         3)
-                            package_install "b43-firmware"
+                            aur_package_install "b43-firmware"
                             ;;
                         4)
-                            package_install "b43-firmware-legacy"
+                            aur_package_install "b43-firmware-legacy"
                             ;;
                         5)
-                            package_install "broadcom-wl"
+                            aur_package_install "broadcom-wl"
                             ;;
                         6)
                             package_install "bluez-firmware"
@@ -943,19 +945,19 @@ function install_desktop_environment(){
             for OPT in ${OPTIONS[@]}; do
                 case "$OPT" in
                     1)
-                        package_install "awoken-icons"
+                        aur_package_install "awoken-icons"
                         ;;
                     2)
-                        package_install "faenza-icon-theme"
+                        aur_package_install "faenza-icon-theme"
                         ;;
                     3)
-                        package_install "faenza-cupertino-icon-theme"
+                        aur_package_install "faenza-cupertino-icon-theme"
                         ;;
                     4)
-                        package_install "faience-icon-theme"
+                        aur_package_install "faience-icon-theme"
                         ;;
                     5)
-                        package_install "elementary-icons"
+                        aur_package_install "elementary-icons"
                         ;;
                     "b")
                         break
@@ -983,25 +985,26 @@ function install_desktop_environment(){
         1)
             #GNOME {{{
             print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
-            pacman -S --noconfirm --needed gnome gnome-extra telepathy
-            package_install "empathy-theme-ubuntu-adium-bzr"
+            package_install "gnome gnome-extra zeitgeist telepathy"
             gpasswd -a $USERNAME camera
-            pacman -S --noconfirm --needed gedit-plugins gnome-tweak-tool
-            pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
-            pacman -S --noconfirm --needed pulseaudio deja-dup
-            pacman -S --noconfirm --needed system-config-printer-gnome
-            package_install "automounter nautilus-open-terminal gnome-defaults-list"
+            package_install "gksu nautilus-open-terminal deja-dup gedit-plugins gnome-tweak-tool"
+            package_install "gvfs-smb"
+            package_install "pulseaudio"
+            package_install "system-config-printer-gnome"
+            aur_package_install "empathy-theme-ubuntu-adium-bzr"
+            aur_package_install "automounter"
+            aur_package_install "gnome-defaults-list"
             echo -e 'exec ck-launch-session gnome-session' >> /home/$USERNAME/.xinitrc
             #GNOME CUSTOMIZATION {{{
             while [[ 1 ]]
             do
                 print_title "GNOME CUSTOMIZATION"
-                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme") Gnome Themes [Orion, eGTK, Light, Zukitwo, Zukini]"
-                echo " 3) $(checkbox_package "gpaste-git gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git") GnomeShell Extensions"
-                echo " 4) $(checkbox_package "gnome-shell-theme-frieze gnome-shell-theme-elegance") GnomeShell Themes [Elegance, Frieze]"
-                echo " 5) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
-                echo " 6) $(checkbox_package "gloobus-sushi-bzr") Gloobus Preview"
+                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons")* Gnome Icons [Faience, Faenza, Elementary]"
+                echo " 2) $(checkbox_package "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme")* Gnome Themes [Orion, eGTK, Light, Zukitwo, Zukini]"
+                echo " 3) $(checkbox_package "gpaste-git gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git")* GnomeShell Extensions"
+                echo " 4) $(checkbox_package "gnome-shell-theme-frieze gnome-shell-theme-elegance")* GnomeShell Themes [Elegance, Frieze]"
+                echo " 5) $(checkbox_package "gnome-activity-journal")* Gnome Activity Journal "
+                echo " 6) $(checkbox_package "gloobus-sushi-bzr")* Gloobus Preview"
                 echo " 7) $(checkbox_package "gnome-packagekit") Packagekit"
                 echo ""
                 echo " d) DONE"
@@ -1033,22 +1036,22 @@ function install_desktop_environment(){
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
-                                            package_install "gtk-theme-boomerang"
+                                            aur_package_install "gtk-theme-boomerang"
                                             ;;
                                         2)
-                                            package_install "egtk-bzr"
+                                            aur_package_install "egtk-bzr"
                                             ;;
                                         3)
-                                            package_install "light-themes"
+                                            aur_package_install "light-themes"
                                             ;;
                                         4)
-                                            package_install "orion-gtk-theme"
+                                            aur_package_install "orion-gtk-theme"
                                             ;;
                                         5)
-                                            package_install "zukini-theme"
+                                            aur_package_install "zukini-theme"
                                             ;;
                                         6)
-                                            package_install "zukitwo-themes"
+                                            aur_package_install "zukitwo-themes"
                                             ;;
                                         "b")
                                             break
@@ -1084,29 +1087,29 @@ function install_desktop_environment(){
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
-                                            package_install "gpaste-git"
+                                            aur_package_install "gpaste-git"
                                             ;;
                                         2)
-                                            package_install "gnome-shell-extension-mediaplayer-git"
+                                            aur_package_install "gnome-shell-extension-mediaplayer-git"
                                             ;;
                                         3)
-                                            package_install "gnome-shell-extension-noa11y-git"
+                                            aur_package_install "gnome-shell-extension-noa11y-git"
                                             ;;
                                         4)
-                                            package_install "libkeybinder3"
-                                            package_install "gnome-shell-extension-pomodoro-git"
+                                            aur_package_install "libkeybinder3"
+                                            aur_package_install "gnome-shell-extension-pomodoro-git"
                                             ;;
                                         5)
-                                            package_install "gnome-shell-system-monitor-applet-git"
+                                            aur_package_install "gnome-shell-system-monitor-applet-git"
                                             ;;
                                         6)
-                                            package_install "gnome-shell-extension-user-theme-git"
+                                            aur_package_install "gnome-shell-extension-user-theme-git"
                                             ;;
                                         7)
-                                            package_install "gnome-shell-extension-weather-git"
+                                            aur_package_install "gnome-shell-extension-weather-git"
                                             ;;
                                         8)
-                                            package_install "gnome-shell-extension-gtile-git"
+                                            aur_package_install "gnome-shell-extension-gtile-git"
                                             ;;
                                         "b")
                                             break
@@ -1136,10 +1139,10 @@ function install_desktop_environment(){
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
-                                            package_install "gnome-shell-theme-elegance"
+                                            aur_package_install "gnome-shell-theme-elegance"
                                             ;;
                                         2)
-                                            package_install "gnome-shell-theme-frieze"
+                                            aur_package_install "gnome-shell-theme-frieze"
                                             ;;
                                         "b")
                                             break
@@ -1155,11 +1158,11 @@ function install_desktop_environment(){
                             OPT=4
                             ;;
                         5)
-                            package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
-                            package_install "gnome-activity-journal"
+                            aur_package_install "libzeitgeist python2-rdflib zeitgeist-datahub"
+                            aur_package_install "gnome-activity-journal"
                             ;;
                         6)
-                            package_install "gloobus-sushi-bzr"
+                            aur_package_install "gloobus-sushi-bzr"
                             ;;
                         7)
                             package_install "gnome-packagekit gnome-settings-daemon-updates"
@@ -1183,11 +1186,11 @@ function install_desktop_environment(){
         2)
             #KDE {{{
             print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
-            pacman -S --noconfirm --needed kde kde-l10n-$LANGUAGE_KDE kipi-plugins
+            package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
             pacman -Rcsn kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
-            pacman -S --noconfirm --needed kdeadmin-system-config-printer-kde xdg-user-dirs
-            package_install "kde-gtk-config-git"
-            package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
+            package_install "kdeadmin-system-config-printer-kde xdg-user-dirs"
+            aur_package_install "kde-gtk-config-git"
+            aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
             echo -e 'exec ck-launch-session startkde' >> /home/$USERNAME/.xinitrc
             #QTCURVE THEMES #{{{
             wget http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
@@ -1210,12 +1213,12 @@ function install_desktop_environment(){
             do
                 print_title "KDE CUSTOMIZATION"
                 echo " 1) $(checkbox_package "apper") Apper"
-                echo " 2) $(checkbox_package "bangarang") Bangarang"
+                echo " 2) $(checkbox_package "bangarang")* Bangarang"
                 echo " 3) $(checkbox_package "choqok") Choqok"
                 echo " 4) $(checkbox_package "digikam") Digikam"
                 echo " 5) $(checkbox_package "k3b") K3b"
-                echo " 6) $(checkbox_package "rosa-icons kfaenza-icon-theme") KDE Icons [Rosa, KFaenza]"
-                echo " 7) $(checkbox_package "caledonia-bundle plasma-theme-produkt") Plasma Themes [Caledonia, Produkt, Ronak]"
+                echo " 6) $(checkbox_package "rosa-icons kfaenza-icon-theme")* KDE Icons [Rosa, KFaenza]"
+                echo " 7) $(checkbox_package "caledonia-bundle plasma-theme-produkt")* Plasma Themes [Caledonia, Produkt, Ronak]"
                 echo " 8) $(checkbox_package "yakuake") Yakuake"
                 echo ""
                 echo " d) DONE"
@@ -1228,7 +1231,7 @@ function install_desktop_environment(){
                             package_install "apper"
                             ;;
                         2)
-                            package_install "bangarang"
+                            aur_package_install "bangarang"
                             ;;
                         3)
                             package_install "choqok"
@@ -1240,13 +1243,14 @@ function install_desktop_environment(){
                             package_install "k3b dvd+rw-tools"
                             ;;
                         6)
-                            package_install "rosa-icons kfaenza-icon-theme"
+                            aur_package_install "rosa-icons kfaenza-icon-theme"
                             ;;
                         7)
-                            package_install "caledonia-bundle plasma-theme-rosa plasma-theme-produkt ronak-plasmatheme"
+                            aur_package_install "caledonia-bundle plasma-theme-rosa plasma-theme-produkt ronak-plasmatheme"
                             ;;
                         8)
-                            package_install "yakuake yakuake-skin-plasma-oxygen-panel"
+                            package_install "yakuake"
+                            aur_package_install "yakuake-skin-plasma-oxygen-panel"
                             ;;
                         "d")
                             break
@@ -1267,17 +1271,17 @@ function install_desktop_environment(){
         3)
             #XFCE {{{
             print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
-            pacman -S --noconfirm --needed xfce4 xfce4-goodies
-            pacman -S --noconfirm --needed polkit-gnome gvfs-smb xdg-user-dirs
-            package_install "automounter"
-            package_install "gnome-defaults-list"
+            package_install "xfce4 xfce4-goodies"
+            package_install "polkit-gnome gvfs-smb xdg-user-dirs"
+            aur_package_install "automounter"
+            aur_package_install "gnome-defaults-list"
             echo -e 'exec ck-launch-session startxfce4' >> /home/$USERNAME/.xinitrc
             #XFCE CUSTOMIZATION{{{
             while [[ 1 ]]
             do
                 print_title "XFCE CUSTOMIZATION"
-                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "xfce-theme-greybird xfce-theme-bluebird zukitwo-themes") XFCE Themes"
+                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons")* Icons [Faience, Faenza, Elementary]"
+                echo " 2) $(checkbox_package "xfce-theme-greybird xfce-theme-bluebird zukitwo-themes")* XFCE Themes"
                 echo " 3) $(checkbox_package "slim") Slim"
                 echo ""
                 echo " d) DONE"
@@ -1306,13 +1310,13 @@ function install_desktop_environment(){
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
-                                            package_install "xfce-theme-bluebird"
+                                            aur_package_install "xfce-theme-bluebird"
                                             ;;
                                         2)
-                                            package_install "xfce-theme-greybird"
+                                            aur_package_install "xfce-theme-greybird"
                                             ;;
                                         3)
-                                            package_install "zukitwo-themes"
+                                            aur_package_install "zukitwo-themes"
                                             ;;
                                         "b")
                                             break
@@ -1349,18 +1353,18 @@ function install_desktop_environment(){
         4)
             #LXDE {{{
             print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
-            pacman -S --noconfirm --needed lxde obconf
-            pacman -S --noconfirm --needed leafpad xarchiver epdfview
-            pacman -S --noconfirm --needed pm-utils upower
-            pacman -S --noconfirm --needed polkit-gnome gvfs gvfs-smb xdg-user-dirs
-            package_install "gnome-defaults-list"
+            package_install "lxde obconf"
+            package_install "leafpad xarchiver epdfview"
+            package_install "pm-utils upower"
+            package_install "polkit-gnome gvfs gvfs-smb xdg-user-dirs"
+            aur_package_install "gnome-defaults-list"
             echo -e 'exec ck-launch-session startlxde' >> /home/$USERNAME/.xinitrc
             #LXDE CUSTOMIZATION{{{
             while [[ 1 ]]
             do
                 print_title "LXDE CUSTOMIZATION"
-                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "lxdm") LXDM"
+                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons")* Icons [Faience, Faenza, Elementary]"
+                echo " 2) $(checkbox_package "lxdm")* LXDM"
                 echo " 3) $(checkbox_package "xfburn") Xfburn"
                 echo ""
                 echo " d) DONE"
@@ -1374,7 +1378,7 @@ function install_desktop_environment(){
                             OPT=1
                             ;;
                         2)
-                            package_install "lxdm"
+                            aur_package_install "lxdm"
                             local lxdm=`cat /etc/inittab | sed -n '/lxdm/p'`
                             if [[ -z "$lxdm" ]]; then
                                 echo -e "x:5:respawn:/usr/sbin/lxdm >& /dev/null" >> /etc/inittab
@@ -1402,11 +1406,11 @@ function install_desktop_environment(){
         5)
             #OPENBOX {{{
             print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
-            pacman -S --noconfirm --needed openbox obconf obmenu menumaker
-            pacman -S --noconfirm --needed lxappearance consolekit
-            pacman -S --noconfirm --needed xdg-user-dirs
-            pacman -S --noconfirm --needed leafpad xarchiver epdfview nitrogen
-            package_install "gnome-defaults-list"
+            package_install "openbox obconf obmenu menumaker"
+            package_install "lxappearance consolekit"
+            package_install "xdg-user-dirs"
+            package_install "leafpad xarchiver epdfview nitrogen"
+            aur_package_install "gnome-defaults-list"
             mkdir -p /home/$USERNAME/.config/openbox/
             cp /etc/xdg/openbox/rc.xml /home/$USERNAME/.config/openbox/
             cp /etc/xdg/openbox/menu.xml /home/$USERNAME/.config/openbox/
@@ -1417,8 +1421,8 @@ function install_desktop_environment(){
             while [[ 1 ]]
             do
                 print_title "OPENBOX CUSTOMIZATION"
-                echo " 1) $(checkbox_package "compton") Compton [xcompmgr fork]"
-                echo " 2) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons [Faience, Faenza, Elementary]"
+                echo " 1) $(checkbox_package "compton-git")* Compton [xcompmgr fork]"
+                echo " 2) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons")* Icons [Faience, Faenza, Elementary]"
                 echo " 3) $(checkbox_package "geeqie") Geeqie"
                 echo " 4) $(checkbox_package "gmrun") Gmrun"
                 echo " 5) $(checkbox_package "rxvt-unicode") rxvt-unicode"
@@ -1436,7 +1440,7 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
-                            package_install "compton-git"
+                            aur_package_install "compton-git"
                             ;;
                         2)
                             install_icons
@@ -1488,23 +1492,26 @@ function install_desktop_environment(){
         6)
             #CINNAMON {{{
             print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
-            package_install "cinnamon cinnamon-themes cinnamon-applets"
-            pacman -S --noconfirm --needed gnome-extra gedit-plugins
-            package_install "telepathy empathy-theme-ubuntu-adium-bzr"
+            aur_package_install "cinnamon cinnamon-themes cinnamon-applets"
+            package_install "gnome-extra gedit-plugins"
+            package_install "telepathy"
+            package_install "gksu nautilus-open-terminal xdg-user-dirs-gtk"
+            package_install "gvfs-smb"
+            package_install "pulseaudio"
+            package_install "deja-dup"
+            package_install "system-config-printer-gnome"
+            aur_package_install "empathy-theme-ubuntu-adium-bzr"
+            aur_package_install "automounter gnome-defaults-list"
             gpasswd -a $USERNAME camera
-            pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs-gtk
-            pacman -S --noconfirm --needed pulseaudio deja-dup
-            pacman -S --noconfirm --needed system-config-printer-gnome
-            package_install "automounter nautilus-open-terminal gnome-defaults-list"
             echo -e 'exec ck-launch-session gnome-session-cinnamon' >> /home/$USERNAME/.xinitrc
             #CINNAMON CUSTOMIZATION {{{
             while [[ 1 ]]
             do
                 print_title "CINNAMON CUSTOMIZATION"
-                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "zukini-theme gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes") Gnome Themes [Orion, eGTK, Light, Zukitwo, Zukini]"
-                echo " 3) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal "
-                echo " 4) $(checkbox_package "gloobus-sushi-bzr") Gloobus Preview"
+                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons")* Gnome Icons [Faience, Faenza, Elementary]"
+                echo " 2) $(checkbox_package "zukini-theme gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes")* Gnome Themes [Orion, eGTK, Light, Zukitwo, Zukini]"
+                echo " 3) $(checkbox_package "gnome-activity-journal")* Gnome Activity Journal "
+                echo " 4) $(checkbox_package "gloobus-sushi-bzr")* Gloobus Preview"
                 echo " 5) $(checkbox_package "gnome-packagekit") Packagekit"
                 echo ""
                 echo " d) DONE"
@@ -1536,22 +1543,22 @@ function install_desktop_environment(){
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
-                                            package_install "gtk-theme-boomerang"
+                                            aur_package_install "gtk-theme-boomerang"
                                             ;;
                                         2)
-                                            package_install "egtk-bzr"
+                                            aur_package_install "egtk-bzr"
                                             ;;
                                         3)
-                                            package_install "light-themes"
+                                            aur_package_install "light-themes"
                                             ;;
                                         4)
-                                            package_install "orion-gtk-theme"
+                                            aur_package_install "orion-gtk-theme"
                                             ;;
                                         5)
-                                            package_install "zukini-theme"
+                                            aur_package_install "zukini-theme"
                                             ;;
                                         6)
-                                            package_install "zukitwo-themes"
+                                            aur_package_install "zukitwo-themes"
                                             ;;
                                         "b")
                                             break
@@ -1567,11 +1574,11 @@ function install_desktop_environment(){
                             OPT=2
                             ;;
                         3)
-                            package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
-                            package_install "gnome-activity-journal"
+                            aur_package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
+                            aur_package_install "gnome-activity-journal"
                             ;;
                         4)
-                            package_install "gloobus-sushi-bzr"
+                            aur_package_install "gloobus-sushi-bzr"
                             ;;
                         5)
                             package_install "gnome-packagekit gnome-settings-daemon-updates"
@@ -1613,11 +1620,11 @@ function install_nm_wicd(){
         1)
             print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
             if [[ $GNOME -eq 1 || $XFCE -eq 1 || $LXDE -eq 1 ]]; then
-                pacman -S --noconfirm --needed networkmanager network-manager-applet
+                package_install "networkmanager network-manager-applet"
             elif [[ $KDE -eq 1 ]]; then
-                pacman -S --noconfirm --needed networkmanager kdeplasma-applets-networkmanagement
+                package_install "networkmanager kdeplasma-applets-networkmanagement"
             else
-                pacman -S --noconfirm --needed networkmanager
+                package_install "networkmanager"
             fi
             groupadd networkmanager
             gpasswd -a $USERNAME networkmanager
@@ -1631,11 +1638,11 @@ function install_nm_wicd(){
         2)
             print_title "WICD - https://wiki.archlinux.org/index.php/Wicd"
             if [[ $GNOME -eq 1 || $XFCE -eq 1 || $LXDE -eq 1 ]]; then
-                pacman -S --noconfirm --needed wicd wicd-gtk
+                package_install "wicd wicd-gtk"
             elif [[ $KDE -eq 1 ]]; then
-                package_install "wicd wicd-kde"
+                aur_package_install "wicd wicd-kde"
             else
-                pacman -S --noconfirm --needed wicd
+                package_install "wicd"
             fi
             remove_daemon "networkmanager"
             remove_daemon "network"
@@ -1664,18 +1671,18 @@ function install_accessories_apps(){
 while [[ 1 ]]
 do
     print_title "ACCESSORIES APPS"
-    echo " 1) $(checkbox_package "cairo-dock-bzr") Cairo Dock"
-    echo " 2) $(checkbox_package "conky-lua") Conky + CONKY-colors"
-    echo " 3) $(checkbox_package "deepin-scrot-git") Deepin Scrot"
-    echo " 4) $(checkbox_package "dockbarx") Dockbarx"
-    echo " 5) $(checkbox_package "docky") Docky"
-    echo " 6) $(if [[ $KDE -eq 1 ]]; then echo "$(checkbox_package "speedcrunch") Speedcrunch"; else echo "$(checkbox_package "galculator") Galculator"; fi)"
-    echo " 7) $(checkbox_package "gnome-pie") Gnome-Pie"
+    echo " 1) $(checkbox_package "cairo-dock-bzr") Cairo Dock (aur)"
+    echo " 2) $(checkbox_package "conky-lua") Conky + CONKY-colors (aur)"
+    echo " 3) $(checkbox_package "deepin-scrot-git") Deepin Scrot (aur)"
+    echo " 4) $(checkbox_package "dockbarx") Dockbarx (aur)"
+    echo " 5) $(checkbox_package "docky") Docky (aur)"
+    echo " 6) $(checkbox_package "speedcrunch galculator") $(if [[ $KDE -eq 1 ]]; then echo "Speedcrunch"; else echo "Galculator"; fi) (aur)"
+    echo " 7) $(checkbox_package "gnome-pie") Gnome-Pie (aur)"
     echo " 8) $(checkbox_package "guake") Guake"
-    echo " 9) $(checkbox_package "kupfer") Kupfer"
-    echo "10) $(checkbox_package "pyrenamer") Pyrenamer"
-    echo "11) $(checkbox_package "shutter") Shutter"
-    echo "12) $(checkbox_package "synapse") Synapse"
+    echo " 9) $(checkbox_package "kupfer") Kupfer (aur)"
+    echo "10) $(checkbox_package "pyrenamer") Pyrenamer (aur)"
+    echo "11) $(checkbox_package "shutter") Shutter (aur)"
+    echo "12) $(checkbox_package "synapse") Synapse (aur)"
     echo "13) $(checkbox_package "terminator") Terminator"
     echo "14) $(checkbox_package "zim") Zim"
     echo ""
@@ -1686,50 +1693,52 @@ do
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
-                package_install "cairo-dock-bzr cairo-dock-plugins-bzr"
+                aur_package_install "cairo-dock-bzr cairo-dock-plugins-bzr"
                 ;;
             2)
-                package_install "conky-lua conky-colors"
+                aur_package_install "conky-lua conky-colors"
                 sensors-detect
                 add_daemon "sensors"
                 ;;
             3)
-                package_install "deepin-scrot-git"
+                aur_package_install "deepin-scrot-git"
                 ;;
             4)
-                package_install "dockbarx dockbarx-shinybar-theme"
+                aur_package_install "dockbarx dockbarx-shinybar-theme"
                 ;;
             5)
-                package_install "docky"
+                aur_package_install "docky"
                 ;;
             6)
                 if [[ $KDE -eq 1 ]]; then
-                    package_install "speedcrunch"
+                    aur_package_install "speedcrunch"
                 else
-                    package_install "galculator"
+                    aur_package_install "galculator"
                 fi
                 ;;
             7)
-                package_install "gnome-pie"
+                aur_package_install "gnome-pie"
                 ;;
             8)
                 package_install "guake"
                 ;;
             9)
-                package_install "kupfer"
+                aur_package_install "kupfer"
                 ;;
             10)
-                package_install "pyrenamer"
+                aur_package_install "pyrenamer"
                 ;;
             11)
-                package_install "shutter"
+                aur_package_install "shutter"
                 ;;
             12)
-                package_install "zeitgeist libzeitgeist zeitgeist-datahub"
-                package_install "synapse"
+                package_install "zeitgeist"
+                aur_package_install "libzeitgeist zeitgeist-datahub"
+                aur_package_install "synapse"
                 ;;
             13)
-                package_install "terminator python-keybinder"
+                package_install "terminator"
+                aur_package_install "python-keybinder"
                 ;;
             14)
                 package_install "zim"
@@ -1751,7 +1760,7 @@ function install_development_apps(){
 while [[ 1 ]]
 do
     print_title "DEVELOPMENT APPS"
-    echo " 1) $(checkbox_package "aptana-studio") Aptana Studio"
+    echo " 1) $(checkbox_package "aptana-studio") Aptana Studio (aur)"
     echo " 2) $(checkbox_package "bluefish") Bluefish"
     echo " 3) $(checkbox_package "eclipse") Eclipse"
     echo " 4) $(checkbox_package "emacs") Emacs"
@@ -1759,13 +1768,13 @@ do
     echo " 6) $(checkbox_package "geany") Geany"
     echo " 7) $(checkbox_package "intellij-idea-community-edition") IntelliJ IDEA"
     echo " 8) $(checkbox_package "netbeans") Netbeans"
-    echo " 9) $(checkbox_package "jdk") Oracle Java"
+    echo " 9) $(checkbox_package "jdk") Oracle Java (aur)"
     echo "10) $(checkbox_package "qtcreator") QT Creator"
-    echo "11) $(checkbox_package "sublime-text") Sublime Text 2"
+    echo "11) $(checkbox_package "sublime-text") Sublime Text 2 (aur)"
     echo "12) $(checkbox_package "gdb") Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jslint]"
-    echo "13) $(checkbox_package "mysql-workbench") MySQL Workbench"
+    echo "13) $(checkbox_package "mysql-workbench") MySQL Workbench (aur)"
     echo "14) $(checkbox_package "meld") Meld"
-    echo "15) $(checkbox_package "rabbitvcs") RabbitVCS"
+    echo "15) $(checkbox_package "rabbitvcs") RabbitVCS (aur)"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1774,7 +1783,7 @@ do
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
-                package_install "aptana-studio"
+                aur_package_install "aptana-studio"
                 ;;
             2)
                 package_install "bluefish"
@@ -1801,31 +1810,31 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "eclipse"
+                                aur_package_install "eclipse"
                                 ;;
                             2)
-                                package_install "eclipse-cdt"
+                                aur_package_install "eclipse-cdt"
                                 ;;
                             3)
-                                package_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
+                                aur_package_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
                                 ;;
                             4)
-                                package_install "eclipse-wtp-wst"
+                                aur_package_install "eclipse-wtp-wst"
                                 ;;
                             5)
-                                package_install "eclipse-pdt"
+                                aur_package_install "eclipse-pdt"
                                 ;;
                             6)
-                                package_install "eclipse-pydev"
+                                aur_package_install "eclipse-pydev"
                                 ;;
                             7)
-                                package_install "eclipse-aptana"
+                                aur_package_install "eclipse-aptana"
                                 ;;
                             8)
-                                package_install "eclipse-vrapper"
+                                aur_package_install "eclipse-vrapper"
                                 ;;
                             9)
-                                package_install "eclipse-egit"
+                                aur_package_install "eclipse-egit"
                                 ;;
                             "b")
                                 break
@@ -1859,7 +1868,7 @@ do
             9)
                 pacman -Rdd --noconfirm jre7-openjdk
                 pacman -Rdd --noconfirm jdk7-openjdk
-                package_install "jdk"
+                aur_package_install "jdk"
                 ;;
             10)
                 package_install "qtcreator qt-doc"
@@ -1869,25 +1878,25 @@ do
                 chown -R $USERNAME:users /home/$USERNAME/.config
                 ;;
             11)
-                package_install "sublime-text"
+                aur_package_install "sublime-text"
                 ;;
             12)
-                package_install "valgrind gdb splint tidyhtml python2-pyflakes jslint"
+                aur_package_install "valgrind gdb splint tidyhtml python2-pyflakes jslint"
                 ;;
             13)
-                package_install "mysql-workbench"
+                aur_package_install "mysql-workbench"
                 ;;
             14)
                 package_install "meld"
                 ;;
             15)
-                package_install "rabbitvcs"
+                aur_package_install "rabbitvcs"
                 if [[ $GNOME -eq 1 ]]; then
-                    package_install "rabbitvcs-nautilus"
+                    aur_package_install "rabbitvcs-nautilus"
                 elif [[ $XFCE -eq 1 ]]; then
-                    package_install "rabbitvcs-thunar"
+                    aur_package_install "rabbitvcs-thunar"
                 else
-                    package_install "rabbitvcs-cli"
+                    aur_package_install "rabbitvcs-cli"
                 fi
                 ;;
             "b")
@@ -1913,9 +1922,9 @@ do
     echo " 4) $(if [[ $KDE -eq 1 ]]; then  echo "$(checkbox_package "kchmviewer") Kchmviewer"; else echo "$(checkbox_package "chmsee") Chmsee"; fi)"
     echo " 5) $(checkbox_package "gcstar") GCStar"
     echo " 6) $(checkbox_package "impressive") Impressive"
-    echo " 7) $(checkbox_package "nitrotasks") Nitrotasks"
+    echo " 7) $(checkbox_package "nitrotasks") Nitrotasks (aur)"
     echo " 8) $(checkbox_package "ocrfeeder") OCRFeeder"
-    echo " 9) $(checkbox_package "xmind") Xmind"
+    echo " 9) $(checkbox_package "xmind") Xmind (aur)"
     echo "10) $(checkbox_package "zathura") Zathura"
     echo ""
     echo " b) BACK"
@@ -1926,9 +1935,9 @@ do
         case "$OPT" in
             1)
                 print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
-                pacman -S --noconfirm --needed libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport
-                package_install "hunspell-$LANGUAGE_HS"
-                package_install "aspell-$LANGUAGE_AS"
+                package_install "libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport"
+                aur_package_install "hunspell-$LANGUAGE_HS"
+                aur_package_install "aspell-$LANGUAGE_AS"
                 if [[ $KDE -eq 1 ]]; then
                     package_install "libreoffice-kde4"
                 else
@@ -1937,16 +1946,15 @@ do
                 ;;
             2)
                 package_install "gnumeric abiword abiword-plugins"
-                package_install "hunspell-$LANGUAGE_HS"
-                package_install "aspell-$LANGUAGE_AS"
+                aur_package_install "hunspell-$LANGUAGE_HS"
+                aur_package_install "aspell-$LANGUAGE_AS"
                 ;;
             3)
                 print_title "LATEX - https://wiki.archlinux.org/index.php/LaTeX"
-                pacman -S --noconfirm --needed texlive-most
-                package_install "texmaker"
-                package_install "latex-template-springer latex-template-ieee latex-beamer"
+                package_install "texlive-most"
+                aur_package_install "texmaker"
                 if [[ $LANGUAGE == pt_BR ]]; then
-                    package_install "abntex"
+                    aur_package_install "abntex"
                 fi
                 ;;
             4)
@@ -1963,14 +1971,14 @@ do
                 package_install "impressive"
                 ;;
             7)
-                package_install "nitrotasks"
+                aur_package_install "nitrotasks"
                 ;;
             8)
                 package_install "ocrfeeder tesseract gocr"
-                package_install "aspell-$LANGUAGE_AS"
+                aur_package_install "aspell-$LANGUAGE_AS"
                 ;;
             9)
-                package_install "xmind"
+                aur_package_install "xmind"
                 ;;
             10)
                 package_install "zathura"
@@ -2014,11 +2022,11 @@ do
                 package_install "htop"
                 ;;
             4)
-                package_install "virtualbox virtualbox-additions virtualbox-ext-oracle"
-                modprobe vboxdrv
+                package_install "virtualbox virtualbox-additions"
+                aur_package_install "virtualbox-ext-oracle"
+                add_module "vboxdrv"
                 groupadd vboxusers
                 gpasswd -a $USERNAME vboxusers
-                add_module "vboxdrv"
                 ;;
             5)
                 package_install "wine wine_gecko winetricks"
@@ -2042,7 +2050,7 @@ do
     print_title "GRAPHICS APPS"
     echo " 1) $(checkbox_package "blender") Blender"
     echo " 2) $(checkbox_package "gimp") Gimp"
-    echo " 3) $(checkbox_package "gimp-paint-studio") Gimp-plugins"
+    echo " 3) $(checkbox_package "gimp-paint-studio") Gimp-plugins (aur)"
     echo " 4) $(checkbox_package "gthumb") Gthumb"
     echo " 5) $(checkbox_package "inkscape") Inkscape"
     echo " 6) $(checkbox_package "mcomix") MComix"
@@ -2062,22 +2070,23 @@ do
                 package_install "gimp"
                 ;;
             3)
-                package_install "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
+                aur_package_install "gimp-paint-studio gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
                 ;;
             4)
                 package_install "gthumb"
                 ;;
             5)
-                package_install "inkscape uniconvertor python2-numpy python-lxml sozi"
+                package_install "inkscape uniconvertor python2-numpy python-lxml"
+                aur_package_install "sozi"
                 ;;
             6)
-                package_install "mcomix"
+                aur_package_install "mcomix"
                 ;;
             7)
-                package_install "mypaint"
+                aur_package_install "mypaint"
                 ;;
             8)
-                package_install "shotwell"
+                aur_package_install "shotwell"
                 ;;
             "b")
                 break
@@ -2096,19 +2105,19 @@ function install_internet_apps(){
 while [[ 1 ]]
 do
     print_title "INTERNET APPS"
-    echo " 1) $(checkbox_package "dropbox") Dropbox"
+    echo " 1) $(checkbox_package "dropbox") Dropbox (aur)"
     echo " 2) $(checkbox_package "chromium") Chromium"
-    echo " 3) $(checkbox_package "google-earth") Google Earth"
-    echo " 4) $(checkbox_package "google-chrome") Google Chrome"
-    echo " 5) $(checkbox_package "jdownloader") Jdownloader"
+    echo " 3) $(checkbox_package "google-earth") Google Earth (aur)"
+    echo " 4) $(checkbox_package "google-chrome") Google Chrome (aur)"
+    echo " 5) $(checkbox_package "jdownloader") Jdownloader (aur)"
     echo " 6) $(checkbox_package "irssi") Irssi"
     echo " 7) $(checkbox_package "firefox") Mozilla Firefox"
     echo " 8) $(checkbox_package "thunderbird") Mozilla Thunderbird"
     echo " 9) $(checkbox_package "pidgin") Pidgin"
     echo "10) $(checkbox_package "remmina") Remmina"
     echo "11) $(checkbox_package "skype") Skype"
-    echo "12) $(checkbox_package "teamspeak3") Teamspeak"
-    echo "13) $(checkbox_package "teamviewer") Teamviewer"
+    echo "12) $(checkbox_package "teamspeak3") Teamspeak (aur)"
+    echo "13) $(checkbox_package "teamviewer") Teamviewer (aur)"
     echo "14) $(if [[ $KDE -eq 1 ]]; then echo "$(checkbox_package "transmission-qt")"; else echo "$(checkbox_package "transmission-gtk")"; fi) Trasmission"
     echo "15) $(if [[ $KDE -eq 1 ]]; then echo "$(checkbox_package "konversation") Konversation"; else echo "$(checkbox_package "xchat") X-Chat"; fi)"
     echo ""
@@ -2119,28 +2128,28 @@ do
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
-                package_install "dropbox"
+                aur_package_install "dropbox"
                 if [[ $GNOME -eq 1 ]]; then
-                    package_install "nautilus-dropbox"
+                    aur_package_install "nautilus-dropbox"
                 elif [[ $XFCE -eq 1 ]]; then
-                    package_install "thunar-dropbox"
+                    aur_package_install "thunar-dropbox"
                 elif [[ $KDE -eq 1 ]]; then
-                    package_install "kfilebox"
+                    aur_package_install "kfilebox"
                 else
-                    package_install "dropbox-cli"
+                    aur_package_install "dropbox-cli"
                 fi
                 ;;
             2)
                 package_install "chromium flashplugin"
                 ;;
             3)
-                package_install "google-earth"
+                aur_package_install "google-earth"
                 ;;
             4)
-                package_install "google-chrome flashplugin"
+                aur_package_install "google-chrome flashplugin"
                 ;;
             5)
-                package_install "jdownloader"
+                aur_package_install "jdownloader"
                 ;;
             6)
                 package_install "irssi"
@@ -2161,10 +2170,10 @@ do
                 package_install "skype"
                 ;;
             12)
-                package_install "teamspeak3"
+                aur_package_install "teamspeak3"
                 ;;
             13)
-                package_install "teamviewer"
+                aur_package_install "teamviewer"
                 ;;
             14)
                 if [[ $KDE -eq 1 ]]; then
@@ -2198,8 +2207,8 @@ print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlin
 read_input_text "Install LAMP" $LAMP
 case "$OPTION" in
     "y")
-        pacman -S --noconfirm --needed apache mysql php php-apache php-mcrypt php-gd
-        package_install "adminer"
+        package_install "apache mysql php php-apache php-mcrypt php-gd"
+        aur_package_install "adminer"
         if [[ ! -f /etc/php/php.ini.aui ]]; then
             cp -v /etc/php/php.ini /etc/php/php.ini.aui
             cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
@@ -2245,17 +2254,17 @@ do
     echo " 1) $(checkbox_package "amarok") Amarok"
     echo " 2) $(checkbox_package "audacious") Audacious"
     echo " 3) $(checkbox_package "banshee") Banshee"
-    echo " 4) $(checkbox_package "beatbox-bzr") Beatbox"
+    echo " 4) $(checkbox_package "beatbox-bzr") Beatbox (aur)"
     echo " 5) $(checkbox_package "clementine") Clementine"
-    echo " 6) $(checkbox_package "decibel-audio-player2") Decibel"
-    echo " 7) $(checkbox_package "exaile") Exaile"
-    echo " 8) $(checkbox_package "gmusicbrowser-development") Gmusicbrowser"
-    echo " 9) $(checkbox_package "musique") Musique"
-    echo "10) $(checkbox_package "nuvola-bzr-stable") Nuvola"
+    echo " 6) $(checkbox_package "decibel-audio-player2") Decibel (aur)"
+    echo " 7) $(checkbox_package "exaile") Exaile (aur)"
+    echo " 8) $(checkbox_package "gmusicbrowser-development") Gmusicbrowser (aur)"
+    echo " 9) $(checkbox_package "musique") Musique (aur)"
+    echo "10) $(checkbox_package "nuvola-bzr-stable") Nuvola (aur)"
     echo "11) $(checkbox_package "rhythmbox") Rhythmbox"
-    echo "12) $(checkbox_package "spotify") Spotify"
+    echo "12) $(checkbox_package "spotify") Spotify (aur)"
     echo "13) $(checkbox_package "soundconverter") Soundconverter"
-    echo "14) $(checkbox_package "puddletag") Puddletag"
+    echo "14) $(checkbox_package "puddletag") Puddletag (aur)"
     echo "15) $(checkbox_package "audacity") Audacity"
     echo "16) $(checkbox_package "timidity++") MIDI"
     echo "17) $(checkbox_package "gstreamer0.10-ugly") Codecs"
@@ -2276,47 +2285,47 @@ do
                 package_install "banshee"
                 ;;
             4)
-                package_install "beatbox-bzr"
+                aur_package_install "beatbox-bzr"
                 ;;
             5)
                 package_install "clementine"
                 ;;
             6)
-                package_install "decibel-audio-player2"
+                aur_package_install "decibel-audio-player2"
                 ;;
             7)
-                package_install "exaile"
+                aur_package_install "exaile"
                 ;;
             8)
-                package_install "gmusicbrowser-development"
+                aur_package_install "gmusicbrowser-development"
                 ;;
             9)
-                package_install "musique"
+                aur_package_install "musique"
                 ;;
             10)
-                package_install "nuvola-bzr-stable"
+                aur_package_install "nuvola-bzr-stable"
                 ;;
             11)
                 package_install "rhythmbox"
                 ;;
             12)
-                package_install "spotify"
+                aur_package_install "spotify"
                 ;;
             13)
                 package_install "soundconverter"
                 ;;
             14)
-                package_install "puddletag"
+                aur_package_install "puddletag"
                 ;;
             15)
                 package_install "audacity"
                 ;;
             16)
-                package_install "timidity++ fluidr3"
+                aur_package_install "timidity++ fluidr3"
                 echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                 ;;
             17)
-                pacman -S --noconfirm --needed gstreamer0.10-plugins
+                package_install "gstreamer0.10-plugins"
                 ;;
             "b")
                 break
@@ -2335,12 +2344,12 @@ function install_video_apps(){
 while [[ 1 ]]
 do
     print_title "VIDEO APPS"
-    echo " 1) $(checkbox_package "audience-bzr") Audience"
+    echo " 1) $(checkbox_package "audience-bzr") Audience (aur)"
     echo " 2) $(checkbox_package "gnome-mplayer") Gnome Mplayer"
     echo " 3) $(checkbox_package "parole") Parole"
-    echo " 4) $(checkbox_package "minitube") Minitube"
+    echo " 4) $(checkbox_package "minitube") Minitube (aur)"
     echo " 5) $(checkbox_package "miro") Miro"
-    echo " 6) $(checkbox_package "rosa-media-player-bin") Rosa Media Player"
+    echo " 6) $(checkbox_package "rosa-media-player-bin") Rosa Media Player (aur)"
     echo " 7) $(checkbox_package "smplayer") SMplayer"
     echo " 8) $(checkbox_package "vlc") VLC"
     echo " 9) $(checkbox_package "xbmc") XBMC"
@@ -2349,8 +2358,8 @@ do
     echo "12) $(checkbox_package "kdenlive") Kdenlive"
     echo "13) $(checkbox_package "openshot") Openshot"
     echo "14) $(checkbox_package "pitivi") Pitivi"
-    echo "15) $(checkbox_package "kazam-bzr") Kazam"
-    echo "16) $(if [[ $ARCHI == i686 ]]; then echo "$(checkbox_package "codecs")"; else echo "$(checkbox_package "codecs64")"; fi) Codecs"
+    echo "15) $(checkbox_package "kazam-bzr") Kazam (aur)"
+    echo "16) $(checkbox_package "codecs codecs64") Codecs (aur)"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2359,7 +2368,7 @@ do
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
-                package_install "audience-bzr"
+                aur_package_install "audience-bzr"
                 ;;
             2)
                 package_install "gnome-mplayer"
@@ -2368,13 +2377,13 @@ do
                 package_install "parole"
                 ;;
             4)
-                package_install "minitube"
+                aur_package_install "minitube"
                 ;;
             5)
                 package_install "miro"
                 ;;
             6)
-                package_install "rosa-media-player-bin"
+                aur_package_install "rosa-media-player-bin"
                 ;;
             7)
                 package_install "smplayer smplayer-themes"
@@ -2404,15 +2413,15 @@ do
                 package_install "pitivi"
                 ;;
             15)
-                package_install "python-rsvg"
-                package_install "kazam-bzr"
+                aur_package_install "python-rsvg"
+                aur_package_install "kazam-bzr"
                 ;;
             16)
                 package_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
                 if [[ $ARCHI == i686 ]]; then
-                    package_install "codecs"
+                    aur_package_install "codecs"
                 else
-                    package_install "codecs64"
+                    aur_package_install "codecs64"
                 fi
                 ;;
             "b")
@@ -2468,19 +2477,19 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "astromenace"
+                                aur_package_install "astromenace"
                                 ;;
                             2)
-                                package_install "opentyrian-hg"
+                                aur_package_install "opentyrian-hg"
                                 ;;
                             3)
-                                package_install "mars-shooter"
+                                aur_package_install "mars-shooter"
                                 ;;
                             4)
-                                package_install "yofrankie"
+                                aur_package_install "yofrankie"
                                 ;;
                             5)
-                                package_install "counter-strike-2d"
+                                aur_package_install "counter-strike-2d"
                                 ;;
                             "b")
                                 break
@@ -2516,28 +2525,28 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "opensonic"
+                                aur_package_install "opensonic"
                                 ;;
                             2)
-                                package_install "frogatto"
+                                aur_package_install "frogatto"
                                 ;;
                             3)
-                                package_install "bomberclone"
+                                aur_package_install "bomberclone"
                                 ;;
                             4)
-                                package_install "goonies"
+                                aur_package_install "goonies"
                                 ;;
                             5)
-                                package_install "mari0"
+                                aur_package_install "mari0"
                                 ;;
                             6)
-                                package_install "neverball"
+                                aur_package_install "neverball"
                                 ;;
                             7)
-                                package_install "smc"
+                                aur_package_install "smc"
                                 ;;
                             8)
-                                package_install "xmoto"
+                                aur_package_install "xmoto"
                                 ;;
                             "b")
                                 break
@@ -2569,16 +2578,16 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "adom"
+                                aur_package_install "adom"
                                 ;;
                             2)
-                                package_install "tome4"
+                                aur_package_install "tome4"
                                 ;;
                             3)
-                                package_install "lostlabyrinth"
+                                aur_package_install "lostlabyrinth"
                                 ;;
                             4)
-                                package_install "scourge"
+                                aur_package_install "scourge"
                                 ;;
                             "b")
                                 break
@@ -2614,32 +2623,32 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "bsnes"
+                                aur_package_install "bsnes"
                                 ;;
                             2)
-                                package_install "desmume-svn"
+                                aur_package_install "desmume-svn"
                                 ;;
                             3)
-                                package_install "dolphin-emu"
+                                aur_package_install "dolphin-emu"
                                 ;;
                             4)
-                                package_install "epsxe"
+                                aur_package_install "epsxe"
                                 ;;
                             5)
-                                package_install "project64"
+                                aur_package_install "project64"
                                 ;;
                             6)
-                                package_install "vba-m-gtk-svn"
+                                aur_package_install "vba-m-gtk-svn"
                                 ;;
                             7)
-                                package_install "wxmupen64plus-hg"
-                                package_install "mupen64plus-video-rice-hg"
-                                package_install "mupen64plus-audio-sdl-hg"
-                                package_install "mupen64plus-input-sdl-hg"
-                                package_install "mupen64plus-rsp-hle-hg"
+                                aur_package_install "wxmupen64plus-hg"
+                                aur_package_install "mupen64plus-video-rice-hg"
+                                aur_package_install "mupen64plus-audio-sdl-hg"
+                                aur_package_install "mupen64plus-input-sdl-hg"
+                                aur_package_install "mupen64plus-rsp-hle-hg"
                                 ;;
                             8)
-                                package_install "zsnes"
+                                aur_package_install "zsnes"
                                 ;;
                             "b")
                                 break
@@ -2672,19 +2681,19 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "alienarena"
+                                aur_package_install "alienarena"
                                 ;;
                             2)
-                                package_install "warsow"
+                                aur_package_install "warsow"
                                 ;;
                             3)
-                                package_install "enemy-territory"
+                                aur_package_install "enemy-territory"
                                 ;;
                             4)
-                                package_install "worldofpadman"
+                                aur_package_install "worldofpadman"
                                 ;;
                             5)
-                                package_install "xonotic"
+                                aur_package_install "xonotic"
                                 ;;
 
                             "b")
@@ -2717,16 +2726,16 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "hon"
+                                aur_package_install "hon"
                                 ;;
                             2)
-                                package_install "manaplus"
+                                aur_package_install "manaplus"
                                 ;;
                             3)
-                                package_install "savage2"
+                                aur_package_install "savage2"
                                 ;;
                             4)
-                                package_install "spiral-knights"
+                                aur_package_install "spiral-knights"
                                 ;;
                             "b")
                                 break
@@ -2756,10 +2765,10 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "frozen-bubble"
+                                aur_package_install "frozen-bubble"
                                 ;;
                             2)
-                                package_install "numptyphysics-svn"
+                                aur_package_install "numptyphysics-svn"
                                 ;;
                             "b")
                                 break
@@ -2790,13 +2799,13 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "ardentryst"
+                                aur_package_install "ardentryst"
                                 ;;
                             2)
-                                package_install "flare-rpg"
+                                aur_package_install "flare-rpg"
                                 ;;
                             3)
-                                package_install "freedroidrpg"
+                                aur_package_install "freedroidrpg"
                                 ;;
                             "b")
                                 break
@@ -2829,19 +2838,19 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "maniadrive"
+                                aur_package_install "maniadrive"
                                 ;;
                             2)
-                                package_install "death-rally"
+                                aur_package_install "death-rally"
                                 ;;
                             3)
-                                package_install "stuntrally"
+                                aur_package_install "stuntrally"
                                 ;;
                             4)
-                                package_install "supertuxkart"
+                                aur_package_install "supertuxkart"
                                 ;;
                             5)
-                                package_install "speed-dreams"
+                                aur_package_install "speed-dreams"
                                 ;;
                             "b")
                                 break
@@ -2872,13 +2881,13 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "simutrans"
+                                aur_package_install "simutrans"
                                 ;;
                             2)
-                                package_install "corsix-th"
+                                aur_package_install "corsix-th"
                                 ;;
                             3)
-                                package_install "openttd"
+                                aur_package_install "openttd"
                                 ;;
                             "b")
                                 break
@@ -2912,22 +2921,22 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                package_install "0ad"
+                                aur_package_install "0ad"
                                 ;;
                             2)
-                                package_install "hedgewars"
+                                aur_package_install "hedgewars"
                                 ;;
                             3)
-                                package_install "megaglest"
+                                aur_package_install "megaglest"
                                 ;;
                             4)
-                                package_install "warzone2100"
+                                aur_package_install "warzone2100"
                                 ;;
                             5)
-                                package_install "wesnoth"
+                                aur_package_install "wesnoth"
                                 ;;
                             6)
-                                package_install "commander-zod"
+                                aur_package_install "commander-zod"
                                 ;;
                             "b")
                                 break
@@ -2960,12 +2969,12 @@ while [[ 1 ]]
 do
     print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
     echo " 1) $(checkbox_package "ttf-dejavu") ttf-dejavu"
-    echo " 2) $(checkbox_package "ttf-google-webfonts") ttf-google-webfonts"
-    echo " 3) $(checkbox_package "ttf-kochi-substitute") ttf-kochi-substitute (Japanese Support)"
+    echo " 2) $(checkbox_package "ttf-google-webfonts") ttf-google-webfonts (aur)"
+    echo " 3) $(checkbox_package "ttf-kochi-substitute") ttf-kochi-substitute (Japanese Support) (aur)"
     echo " 4) $(checkbox_package "ttf-liberation") ttf-liberation"
-    echo " 5) $(checkbox_package "ttf-ms-fonts") ttf-ms-fonts"
-    echo " 6) $(checkbox_package "ttf-vista-fonts") ttf-vista-fonts"
-    echo " 7) $(checkbox_package "ttf-mac-fonts") ttf-mac-fonts"
+    echo " 5) $(checkbox_package "ttf-ms-fonts") ttf-ms-fonts (aur)"
+    echo " 6) $(checkbox_package "ttf-vista-fonts") ttf-vista-fonts (aur)"
+    echo " 7) $(checkbox_package "ttf-mac-fonts") ttf-mac-fonts (aur)"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2983,22 +2992,22 @@ do
                 pacman -Rdd --noconfirm ttf-droid
                 pacman -Rdd --noconfirm ttf-roboto
                 pacman -Rdd --noconfirm ttf-ubuntu-font-family
-                package_install "ttf-google-webfonts"
+                aur_package_install "ttf-google-webfonts"
                 ;;
             3)
-                package_install "ttf-kochi-substitute"
+                aur_package_install "ttf-kochi-substitute"
                 ;;
             4)
                 package_install "ttf-liberation"
                 ;;
             5)
-                package_install "ttf-ms-fonts"
+                aur_package_install "ttf-ms-fonts"
                 ;;
             6)
-                package_install "ttf-vista-fonts"
+                aur_package_install "ttf-vista-fonts"
                 ;;
             7)
-                package_install "ttf-mac-fonts"
+                aur_package_install "ttf-mac-fonts"
                 ;;
             "b")
                 break
@@ -3026,17 +3035,17 @@ function configure_fonts(){
     case "$OPTION" in
         1)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
-            package_install "fontconfig-ubuntu freetype2-ubuntu libxft-ubuntu cairo-ubuntu"
+            aur_package_install "fontconfig-ubuntu freetype2-ubuntu libxft-ubuntu cairo-ubuntu"
             CURRENT_STATUS=1
             ;;
         2)
             pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
-            package_install "freetype2-cleartype libxft-cleartype cairo-cleartype"
+            aur_package_install "freetype2-cleartype libxft-cleartype cairo-cleartype"
             CURRENT_STATUS=1
             ;;
         3)
             pacman -Rdd --noconfirm fontconfig freetype2
-            package_install "freetype2-infinality fontconfig-infinality"
+            aur_package_install "freetype2-infinality fontconfig-infinality"
             /etc/profile.d/infinality-settings.sh
             infctl=("infinality" "linux" "osx" "osx2" "win7" "winxp")
             PS3="$prompt1"
