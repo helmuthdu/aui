@@ -50,13 +50,6 @@ ARCHI=`uname -m`
 prompt1="Enter your option: "
 prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
 
-function create_backup(){ #{{{
-    [[ ! -f /etc/rc.conf.aui ]] && cp -v /etc/rc.conf /etc/rc.conf.aui;
-    [[ ! -f /etc/pacman.conf.aui ]] && cp -v /etc/pacman.conf /etc/pacman.conf.aui;
-    [[ ! -f /etc/inittab.aui ]] && cp -v /etc/inittab /etc/inittab.aui;
-    [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
-    [[ ! -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && cp -v /etc/X11/xorg.conf.d/10-evdev.conf /etc/X11/xorg.conf.d/10-evdev.conf.aui;
-} #}}}
 function read_input(){ #{{{
     if [[ $USE_SCRIPT -eq 1 ]]; then
         OPTION=$1
@@ -234,6 +227,14 @@ function welcome(){
     echo "it's highly recommended that you read this script before using it"
     echo "This version is still in BETA. Send bugreports to: "
     echo "http://www.github.com/helmuthdu/aui"
+    print_line
+    echo -e "\nSystem config backup:"
+    print_line
+    [[ ! -f /etc/rc.conf.aui ]] && cp -v /etc/rc.conf /etc/rc.conf.aui || echo "/etc/rc.conf.aui";
+    [[ ! -f /etc/pacman.conf.aui ]] && cp -v /etc/pacman.conf /etc/pacman.conf.aui || echo "/etc/pacman.conf.aui";
+    [[ ! -f /etc/inittab.aui ]] && cp -v /etc/inittab /etc/inittab.aui || echo "/etc/inittab.aui";
+    [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui || echo "/etc/ssh/sshd_conf.aui";
+    [[ ! -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && cp -v /etc/X11/xorg.conf.d/10-evdev.conf /etc/X11/xorg.conf.d/10-evdev.conf.aui || echo "/etc/X11/xorg.conf.d/10-evdev.conf.aui";
     pause_function
 }
 #}}}
@@ -780,8 +781,7 @@ function install_video_cards(){
             ;;
         3)
             pacman -Rsc $(pacman -Qe | grep xf86-video | awk '{print $1}')
-            pacman -Rdd --noconfirm libgl
-            pacman -S --noconfirm --needed nvidia nvidia-utils
+            pacman -S --needed nvidia nvidia-utils
             CURRENT_STATUS=1
             sumary "nVidia GPU driver installation"
             ;;
