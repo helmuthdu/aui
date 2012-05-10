@@ -990,7 +990,6 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs
             pacman -S --noconfirm --needed pulseaudio deja-dup
             pacman -S --noconfirm --needed system-config-printer-gnome
-            package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
             package_install "automounter nautilus-open-terminal gnome-defaults-list"
             echo -e 'exec ck-launch-session gnome-session' >> /home/$USERNAME/.xinitrc
             #GNOME CUSTOMIZATION {{{
@@ -1156,6 +1155,7 @@ function install_desktop_environment(){
                             OPT=4
                             ;;
                         5)
+                            package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
                             package_install "gnome-activity-journal"
                             ;;
                         6)
@@ -1495,7 +1495,6 @@ function install_desktop_environment(){
             pacman -S --noconfirm --needed gksu gvfs-smb xdg-user-dirs-gtk
             pacman -S --noconfirm --needed pulseaudio deja-dup
             pacman -S --noconfirm --needed system-config-printer-gnome
-            package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
             package_install "automounter nautilus-open-terminal gnome-defaults-list"
             echo -e 'exec ck-launch-session gnome-session-cinnamon' >> /home/$USERNAME/.xinitrc
             #CINNAMON CUSTOMIZATION {{{
@@ -1568,6 +1567,7 @@ function install_desktop_environment(){
                             OPT=2
                             ;;
                         3)
+                            package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
                             package_install "gnome-activity-journal"
                             ;;
                         4)
