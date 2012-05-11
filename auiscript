@@ -71,13 +71,35 @@ AUTOMATIC_MODE=0
     #}}}
 #}}}
 #DESKTOP ENVIRONMENT {{{
-    # 1) GNOME
-    # 2) KDE
-    # 3) XFCE
-    # 4) LXDE
-    # 5) OpenBox
-    # 6) Cinnamon
-    DESKTOPENV=1
+    # 1) Cinnamon
+    # 2) E17
+    # 3) GNOME
+    # 4) KDE
+    # 5) LXDE
+    # 6) OpenBox
+    # 7) XFCE
+    DESKTOPENV=3
+    #CINNAMON {{{
+        # 1) Gnome Icons
+        # 2) Gnome Themes
+        # 3) Gnome Activity Journal
+        # 4) Gloobus Preview
+        # 5) Packagekit
+        CINNAMON_OPTIONS="1-5"
+    #}}}
+    #E17 {{{
+        # 1) Elsa
+        # 2) Icons
+        # 3) Geeqie
+        # 4) Gmrun
+        # 5) PCManFM
+        # 6) rxvt-unicode
+        # 7) Scrot
+        # 8) Themes
+        # 9) Thunar
+        #10) Xfburn
+        E17_OPTIONS=""
+    #}}}
     #GNOME {{{
         # 1) Gnome Icons [Faience, Faenza, Elementary]
         # 2) Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]
@@ -103,15 +125,6 @@ AUTOMATIC_MODE=0
             # 2) Frieze
             GNOME_SHELL_THEMES="1 2"
         #}}}
-        #GNOME THEMES {{{
-            # 1) Boomerang
-            # 2) eGTK
-            # 3) Light (Aka Ambiance/Radiance)
-            # 4) Orion
-            # 5) Zukini
-            # 6) Zukitwo
-            GNOME_THEMES="2-6"
-        #}}}
     #}}}
     #KDE {{{
         # 1) Apper
@@ -124,63 +137,50 @@ AUTOMATIC_MODE=0
         # 8) Yakuake
         KDE_OPTIONS=""
     #}}}
-    #XFCE {{{
-        # 1) Icons [Faience, Faenza, Elementary]
-        # 2) Themes [Zukitwo]
-        # 3) Slim
-        XFCE_OPTIONS="1 2 3"
-        #XFCE THEMES {{{
-            # 1) Bluebird
-            # 2) Greybird
-            # 3) Zukitwo
-            XFCE_THEMES="1-3"
-        #}}}
-    #}}}
     #LXDE {{{
-        # 1) Icons [Faience, Faenza, Elementary]
+        # 1) Icons
         # 2) LXDM
         # 3) Xfburn
         LXDE_OPTIONS=""
     #}}}
     #OPENBOX {{{
         # 1) Compton [xcompmgr fork]
-        # 2) Icons [Faience, Faenza, Elementary]
+        # 2) Icons
         # 3) Geeqie
         # 4) Gmrun
         # 5) PCManFM
         # 6) rxvt-unicode
         # 7) Scrot
         # 8) Slim
-        # 9) Thunar
-        #10) Tint2
-        #11) Volwheel
-        #12) Xfburn
+        # 9) Themes
+        #10) Thunar
+        #11) Tint2
+        #12) Volwheel
+        #13) Xfburn
         OPENBOX_OPTIONS=""
     #}}}
-    #CINNAMON {{{
-        # 1) Gnome Icons [Faience, Faenza, Elementary]
-        # 2) Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]
-        # 3) Gnome Activity Journal
-        # 4) Gloobus Preview
-        # 5) Packagekit
-        CINNAMON_OPTIONS="1-5"
-        #GNOME THEMES {{{
-            # 1) Boomerang
-            # 2) eGTK
-            # 3) Light (Aka Ambiance/Radiance)
-            # 4) Orion
-            # 5) Zukini
-            # 6) Zukitwo
-            CINNAMON_THEMES="2-6"
-        #}}}
+    #XFCE {{{
+        # 1) Icons
+        # 2) Themes
+        # 3) Slim
+        XFCE_OPTIONS="1 2 3"
     #}}}
-    #GNOME/XFCE/OPENBOX/LXDE ICONS {{{
+    #E17/GNOME/LXDE/OPENBOX/XFCE ICONS {{{
         # 1) Awoken
         # 2) Faenza
         # 3) Faenza-Cupertino
         # 4) Faience
         # 5) Elementary
         GNOME_ICONS="2-5"
+    #}}}
+    #GTK2/GTK3 THEMES {{{
+        # 1) Boomerang
+        # 2) eGTK
+        # 3) Light (Aka Ambiance/Radiance)
+        # 4) Orion
+        # 5) Zukini
+        # 6) Zukitwo
+        GTK_THEMES="2-6"
     #}}}
     #NETWORKMANAGER #{{{
         # 1) Networkmanager
