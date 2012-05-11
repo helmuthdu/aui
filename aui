@@ -137,9 +137,7 @@ function config_dm(){ #{{{
 } #}}}
 function check_package(){ #{{{
     for PACKAGE in $1; do
-        if pacman -Q $PACKAGE &>/dev/null; then
-            return 0
-        fi
+        pacman -Q $PACKAGE &> /dev/null && return 0;
     done
     return 1
 } #}}}
@@ -147,11 +145,7 @@ function checkbox(){ #{{{
     [[ $1 -eq 1 ]] && echo "[X]" || echo "[ ]";
 } #}}}
 function checkbox_package(){ #{{{
-    if check_package "$1"; then
-        checkbox 1
-    else
-        checkbox 0
-    fi
+    check_package "$1" && checkbox 1 || checkbox 0
 } #}}}
 function aur_package_install(){ #{{{
     for PACKAGE in $1; do
@@ -992,15 +986,15 @@ function install_desktop_environment(){
         1)
             #GNOME {{{
             print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
-            package_install "gnome gnome-extra zeitgeist telepathy"
+            package_install "gnome gnome-extra telepathy"
             gpasswd -a $USERNAME camera
             package_install "gksu nautilus-open-terminal deja-dup gedit-plugins gnome-tweak-tool"
             package_install "gvfs-smb"
+            package_install "zeitgeist"
             package_install "pulseaudio"
             package_install "system-config-printer-gnome"
             aur_package_install "empathy-theme-ubuntu-adium-bzr"
-            aur_package_install "automounter"
-            aur_package_install "gnome-defaults-list"
+            aur_package_install "automounter gnome-defaults-list"
             echo -e 'exec ck-launch-session gnome-session' >> /home/$USERNAME/.xinitrc
             #GNOME CUSTOMIZATION {{{
             while [[ 1 ]]
@@ -1432,13 +1426,14 @@ function install_desktop_environment(){
                 echo " 2) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons (aur)"
                 echo " 3) $(checkbox_package "geeqie") Geeqie"
                 echo " 4) $(checkbox_package "gmrun") Gmrun"
-                echo " 5) $(checkbox_package "rxvt-unicode") rxvt-unicode"
-                echo " 6) $(checkbox_package "scrot") Scrot"
-                echo " 7) $(checkbox_package "slim") Slim"
-                echo " 8) $(checkbox_package "thunar") Thunar"
-                echo " 9) $(checkbox_package "tint2") Tint2"
-                echo "10) $(checkbox_package "volwheel") Volwheel"
-                echo "11) $(checkbox_package "xfburn") Xfburn"
+                echo " 5) $(checkbox_package "pcmanfm") PCManFM"
+                echo " 6) $(checkbox_package "rxvt-unicode") rxvt-unicode"
+                echo " 7) $(checkbox_package "scrot") Scrot"
+                echo " 8) $(checkbox_package "slim") Slim"
+                echo " 9) $(checkbox_package "thunar") Thunar"
+                echo "10) $(checkbox_package "tint2") Tint2"
+                echo "11) $(checkbox_package "volwheel") Volwheel"
+                echo "12) $(checkbox_package "xfburn") Xfburn"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1460,25 +1455,28 @@ function install_desktop_environment(){
                             package_install "gmrun"
                             ;;
                         5)
-                            package_install "rxvt-unicode"
+                            package_install "pcmanfm"
                             ;;
                         6)
-                            package_install "scrot"
+                            package_install "rxvt-unicode"
                             ;;
                         7)
+                            package_install "scrot"
+                            ;;
+                        8)
                             package_install "slim"
                             config_dm "slim"
                             ;;
-                        8)
+                        9)
                             package_install "polkit-gnome gvfs-smb thunar"
                             ;;
-                        9)
+                        10)
                             package_install "tint2"
                             ;;
-                        10)
+                        11)
                             package_install "volwheel"
                             ;;
-                        11)
+                        12)
                             package_install "xfburn"
                             ;;
                         "d")
@@ -1523,8 +1521,8 @@ function install_desktop_environment(){
                 echo ""
                 echo " d) DONE"
                 echo ""
-                GNOME_OPTIONS+=" d"
-                read_input_options "$GNOME_OPTIONS"
+                CINNAMON_OPTIONS+=" d"
+                read_input_options "$CINNAMON_OPTIONS"
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
@@ -1545,8 +1543,8 @@ function install_desktop_environment(){
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
-                                GNOME_THEMES+=" b"
-                                read_input_options "$GNOME_THEMES"
+                                CINNAMON_THEMES+=" b"
+                                read_input_options "$CINNAMON_THEMES"
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
@@ -1666,9 +1664,7 @@ function install_nm_wicd(){
             ;;
     esac
     if check_package "nfs-utils" ; then
-        add_daemon "rpcbind"
-        add_daemon "nfs-common"
-        add_daemon "nfs-server"
+        add_daemon "rpcbind nfs-common nfs-server"
     fi
     pause_function
 }
@@ -1802,13 +1798,13 @@ do
                     print_title "ECLIPSE - https://wiki.archlinux.org/index.php/Eclipse"
                     echo " 1) $(checkbox_package "eclipse") Eclipse Classic"
                     echo " 2) $(checkbox_package "eclipse-cdt") Eclipse IDE for C/C++ Developers "
-                    echo " 3) $(checkbox_package "eclipse-android") Android Development Tools for Eclipse"
-                    echo " 4) $(checkbox_package "eclipse-wtp-wst") Web Development Tools for Eclipse"
-                    echo " 5) $(checkbox_package "eclipse-pdt") PHP Development Tools for Eclipse"
-                    echo " 6) $(checkbox_package "eclipse-pydev") Python Development Tools for Eclipse"
-                    echo " 7) $(checkbox_package "eclipse-aptana") Aptana Studio plugin for Eclipse"
-                    echo " 8) $(checkbox_package "eclipse-vrapper") Vim-like editing plugin for Eclipse"
-                    echo " 9) $(checkbox_package "eclipse-egit") Git support plugin for Eclipse"
+                    echo " 3) $(checkbox_package "eclipse-android") Android Development Tools for Eclipse (aur)"
+                    echo " 4) $(checkbox_package "eclipse-wtp-wst") Web Development Tools for Eclipse (aur)"
+                    echo " 5) $(checkbox_package "eclipse-pdt") PHP Development Tools for Eclipse (aur)"
+                    echo " 6) $(checkbox_package "eclipse-pydev") Python Development Tools for Eclipse (aur)"
+                    echo " 7) $(checkbox_package "eclipse-aptana") Aptana Studio plugin for Eclipse (aur)"
+                    echo " 8) $(checkbox_package "eclipse-vrapper") Vim-like editing plugin for Eclipse (aur)"
+                    echo " 9) $(checkbox_package "eclipse-egit") Git support plugin for Eclipse (aur)"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2263,18 +2259,19 @@ do
     echo " 3) $(checkbox_package "banshee") Banshee"
     echo " 4) $(checkbox_package "beatbox-bzr") Beatbox (aur)"
     echo " 5) $(checkbox_package "clementine") Clementine"
-    echo " 6) $(checkbox_package "decibel-audio-player2") Decibel (aur)"
-    echo " 7) $(checkbox_package "exaile") Exaile (aur)"
-    echo " 8) $(checkbox_package "gmusicbrowser-development") Gmusicbrowser (aur)"
-    echo " 9) $(checkbox_package "musique") Musique (aur)"
-    echo "10) $(checkbox_package "nuvola-bzr-stable") Nuvola (aur)"
-    echo "11) $(checkbox_package "rhythmbox") Rhythmbox"
-    echo "12) $(checkbox_package "spotify") Spotify (aur)"
-    echo "13) $(checkbox_package "soundconverter") Soundconverter"
-    echo "14) $(checkbox_package "puddletag") Puddletag (aur)"
-    echo "15) $(checkbox_package "audacity") Audacity"
-    echo "16) $(checkbox_package "timidity++") MIDI"
-    echo "17) $(checkbox_package "gstreamer0.10-ugly") Codecs"
+    echo " 6) $(checkbox_package "deadbeef") Deadbeef"
+    echo " 7) $(checkbox_package "decibel-audio-player2") Decibel (aur)"
+    echo " 8) $(checkbox_package "exaile") Exaile (aur)"
+    echo " 9) $(checkbox_package "gmusicbrowser-development") Gmusicbrowser (aur)"
+    echo "10) $(checkbox_package "musique") Musique (aur)"
+    echo "11) $(checkbox_package "nuvola-bzr-stable") Nuvola (aur)"
+    echo "12) $(checkbox_package "rhythmbox") Rhythmbox"
+    echo "13) $(checkbox_package "spotify") Spotify (aur)"
+    echo "14) $(checkbox_package "soundconverter") Soundconverter"
+    echo "15) $(checkbox_package "puddletag") Puddletag (aur)"
+    echo "16) $(checkbox_package "audacity") Audacity"
+    echo "17) $(checkbox_package "timidity++") MIDI"
+    echo "18) $(checkbox_package "gstreamer0.10-ugly") Codecs"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2298,40 +2295,43 @@ do
                 package_install "clementine"
                 ;;
             6)
-                aur_package_install "decibel-audio-player2"
+                package_install "deadbeef"
                 ;;
             7)
-                aur_package_install "exaile"
+                aur_package_install "decibel-audio-player2"
                 ;;
             8)
-                aur_package_install "gmusicbrowser-development"
+                aur_package_install "exaile"
                 ;;
             9)
-                aur_package_install "musique"
+                aur_package_install "gmusicbrowser-development"
                 ;;
             10)
-                aur_package_install "nuvola-bzr-stable"
+                aur_package_install "musique"
                 ;;
             11)
-                package_install "rhythmbox"
+                aur_package_install "nuvola-bzr-stable"
                 ;;
             12)
-                aur_package_install "spotify"
+                package_install "rhythmbox"
                 ;;
             13)
-                package_install "soundconverter"
+                aur_package_install "spotify"
                 ;;
             14)
-                aur_package_install "puddletag"
+                package_install "soundconverter"
                 ;;
             15)
-                package_install "audacity"
+                aur_package_install "puddletag"
                 ;;
             16)
+                package_install "audacity"
+                ;;
+            17)
                 aur_package_install "timidity++ fluidr3"
                 echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                 ;;
-            17)
+            18)
                 package_install "gstreamer0.10-plugins"
                 ;;
             "b")

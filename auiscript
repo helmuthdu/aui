@@ -87,14 +87,6 @@ AUTOMATIC_MODE=0
         # 6) Gloobus Preview
         # 7) Packagekit
         GNOME_OPTIONS="1-5 7"
-        #GNOME ICONS {{{
-            # 1) Awoken
-            # 2) Faenza
-            # 3) Faenza-Cupertino
-            # 4) Faience
-            # 5) Elementary
-            GNOME_ICONS="2-5"
-        #}}}
         #GNOME EXTENSIONS {{{
             # 1) gpaste
             # 2) gtile
@@ -135,16 +127,8 @@ AUTOMATIC_MODE=0
     #XFCE {{{
         # 1) Icons [Faience, Faenza, Elementary]
         # 2) Themes [Zukitwo]
-        # 3) LightDM
+        # 3) Slim
         XFCE_OPTIONS="1 2 3"
-        #XFCE ICONS #{{{
-            # 1) Awoken
-            # 2) Faenza
-            # 3) Faenza-Cupertino
-            # 4) Faience
-            # 5) Elementary
-            GNOME_ICONS="2-5"
-        #}}}
         #XFCE THEMES {{{
             # 1) Bluebird
             # 2) Greybird
@@ -157,36 +141,21 @@ AUTOMATIC_MODE=0
         # 2) LXDM
         # 3) Xfburn
         LXDE_OPTIONS=""
-        #ICONS {{{
-            # 1) Awoken
-            # 2) Faenza
-            # 3) Faenza-Cupertino
-            # 4) Faience
-            # 5) Elementary
-            GNOME_ICONS="2-5"
-        #}}}
     #}}}
     #OPENBOX {{{
         # 1) Compton [xcompmgr fork]
         # 2) Icons [Faience, Faenza, Elementary]
         # 3) Geeqie
         # 4) Gmrun
-        # 5) LightDM
+        # 5) PCManFM
         # 6) rxvt-unicode
         # 7) Scrot
-        # 8) Thunar
-        # 9) Tint2
-        #10) Volwheel
-        #11) Xfburn
+        # 8) Slim
+        # 9) Thunar
+        #10) Tint2
+        #11) Volwheel
+        #12) Xfburn
         OPENBOX_OPTIONS=""
-        #ICONS {{{
-            # 1) Awoken
-            # 2) Faenza
-            # 3) Faenza-Cupertino
-            # 4) Faience
-            # 5) Elementary
-            GNOME_ICONS="2-5"
-        #}}}
     #}}}
     #CINNAMON {{{
         # 1) Gnome Icons [Faience, Faenza, Elementary]
@@ -194,15 +163,7 @@ AUTOMATIC_MODE=0
         # 3) Gnome Activity Journal
         # 4) Gloobus Preview
         # 5) Packagekit
-        GNOME_OPTIONS="1-5"
-        #GNOME ICONS {{{
-            # 1) Awoken
-            # 2) Faenza
-            # 3) Faenza-Cupertino
-            # 4) Faience
-            # 5) Elementary
-            GNOME_ICONS="2-5"
-        #}}}
+        CINNAMON_OPTIONS="1-5"
         #GNOME THEMES {{{
             # 1) Boomerang
             # 2) eGTK
@@ -210,8 +171,16 @@ AUTOMATIC_MODE=0
             # 4) Orion
             # 5) Zukini
             # 6) Zukitwo
-            GNOME_THEMES="2-6"
+            CINNAMON_THEMES="2-6"
         #}}}
+    #}}}
+    #GNOME/XFCE/OPENBOX/LXDE ICONS {{{
+        # 1) Awoken
+        # 2) Faenza
+        # 3) Faenza-Cupertino
+        # 4) Faience
+        # 5) Elementary
+        GNOME_ICONS="2-5"
     #}}}
     #NETWORKMANAGER #{{{
         # 1) Networkmanager
@@ -326,18 +295,19 @@ AUTOMATIC_MODE=0
     # 3) Banshee
     # 4) Beatbox
     # 5) Clementine
-    # 6) Decibel
-    # 7) Exaile
-    # 8) Gmusicbrowser
-    # 9) Musique
-    #10) Nuvola
-    #11) Rhythmbox
-    #12) Spotify
-    #13) Soundconverter
-    #14) Puddletag
-    #15) Audacity
-    #16) MIDI
-    #17) Codecs
+    # 6) Deadbeef
+    # 7) Decibel
+    # 8) Exaile
+    # 9) Gmusicbrowser
+    #10) Musique
+    #11) Nuvola
+    #12) Rhythmbox
+    #13) Spotify
+    #14) Soundconverter
+    #15) Puddletag
+    #16) Audacity
+    #17) MIDI
+    #18) Codecs
     AUDIO_OPTIONS="5 13 17"
 #}}}
 #VIDEO {{{
