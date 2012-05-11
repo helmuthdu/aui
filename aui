@@ -1134,16 +1134,18 @@ function install_desktop_environment(){
             while [[ 1 ]]
             do
                 print_title "E17 CUSTOMIZATION"
-                echo " 1) $(checkbox_package "elsa-svn-arch") Elsa"
-                echo " 2) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons (aur)"
-                echo " 3) $(checkbox_package "geeqie") Geeqie"
-                echo " 4) $(checkbox_package "gmrun") Gmrun"
-                echo " 5) $(checkbox_package "pcmanfm") PCManFM"
-                echo " 6) $(checkbox_package "rxvt-unicode") rxvt-unicode"
-                echo " 7) $(checkbox_package "scrot") Scrot"
-                echo " 8) $(checkbox_package "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme") GTK Themes (aur)"
-                echo " 9) $(checkbox_package "thunar") Thunar"
-                echo "10) $(checkbox_package "xfburn") Xfburn"
+                echo " 1) $(checkbox_package "e17-icons") E17 Icons (aur)"
+                echo " 2) $(checkbox_package "e17-themes") E17 Themes (aur)"
+                echo " 3) $(checkbox_package "elsa-svn-arch") Elsa"
+                echo " 4) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons (aur)"
+                echo " 5) $(checkbox_package "geeqie") Geeqie"
+                echo " 6) $(checkbox_package "gmrun") Gmrun"
+                echo " 7) $(checkbox_package "pcmanfm") PCManFM"
+                echo " 8) $(checkbox_package "rxvt-unicode") rxvt-unicode"
+                echo " 9) $(checkbox_package "scrot") Scrot"
+                echo "10) $(checkbox_package "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme") GTK Themes (aur)"
+                echo "11) $(checkbox_package "thunar") Thunar"
+                echo "12) $(checkbox_package "xfburn") Xfburn"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1152,6 +1154,12 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
+                            aur_package_install "e17-icons"
+                            ;;
+                        2)
+                            aur_package_install "e17-themes"
+                            ;;
+                        3)
                             aur_package_install "elsa-svn-arch"
                             local elsa=`cat /etc/inittab | sed -n '/elsa/p'`
                             if [[ -z "$elsa" ]]; then
@@ -1159,34 +1167,34 @@ function install_desktop_environment(){
                             fi
                             config_dm "elsa"
                             ;;
-                        2)
+                        4)
                             install_icons
                             OPT=2
                             ;;
-                        3)
+                        5)
                             package_install "geeqie"
                             ;;
-                        4)
+                        6)
                             package_install "gmrun"
                             ;;
-                        5)
+                        7)
                             package_install "gksu gvfs pcmanfm"
                             ;;
-                        6)
+                        8)
                             package_install "rxvt-unicode"
                             ;;
-                        7)
+                        9)
                             package_install "scrot"
                             ;;
-                        8)
+                        10)
                             install_themes
                             OPT=8
                             ;;
-                        9)
+                        11)
                             package_install "polkit-gnome thunar tumbler"
                             package_install "gvfs-smb"
                             ;;
-                        10)
+                        12)
                             package_install "xfburn"
                             ;;
                         "d")

@@ -88,16 +88,18 @@ AUTOMATIC_MODE=0
         CINNAMON_OPTIONS="1-5"
     #}}}
     #E17 {{{
-        # 1) Elsa
-        # 2) Icons
-        # 3) Geeqie
-        # 4) Gmrun
-        # 5) PCManFM
-        # 6) rxvt-unicode
-        # 7) Scrot
-        # 8) Themes
-        # 9) Thunar
-        #10) Xfburn
+        # 1) E17 Icons
+        # 2) E17 Themes
+        # 3) Elsa
+        # 4) Icons
+        # 5) Geeqie
+        # 6) Gmrun
+        # 7) PCManFM
+        # 8) rxvt-unicode
+        # 9) Scrot
+        #10) Themes
+        #11) Thunar
+        #12) Xfburn
         E17_OPTIONS=""
     #}}}
     #GNOME {{{
