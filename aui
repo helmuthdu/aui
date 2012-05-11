@@ -452,7 +452,7 @@ function select_user(){
         #BASHRC {{{
             print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
             package_install "git"
-            git clone git://github.com/helmuthdu/dotfiles
+            git clone https://github.com/helmuthdu/dotfiles
             cp dotfiles/.* ~
             cp dotfiles/.* /home/$USERNAME/
             rm -fr dotfiles
@@ -483,11 +483,11 @@ function select_user(){
                             "
                         fi
                         # VIMRC
-                        git clone git://github.com/helmuthdu/vim
+                        git clone https://github.com/helmuthdu/vim
                         mv vim /home/$USERNAME/.vim
                         ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
                         # PENTADACTYL [FIREFOX]
-                        git clone git://github.com/helmuthdu/pentadactyl
+                        git clone https://github.com/helmuthdu/pentadactyl
                         mv pentadactyl /home/$USERNAME/.pentadactyl
                         ln -sf /home/$USERNAME/.pentadactyl/pentadactylrc /home/$USERNAME/.pentadactylrc
                         break
@@ -1993,7 +1993,12 @@ do
         case "$OPT" in
             1)
                 print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
-                package_install "libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport"
+
+                if [[ $AUTOMATIC_MODE -eq 1 ]]; then
+                    pacman -S --noconfirm --needed libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport
+                else
+                    pacman -S --needed libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport
+                fi
                 aur_package_install "hunspell-$LANGUAGE_HS"
                 aur_package_install "aspell-$LANGUAGE_AS"
                 if [[ $KDE -eq 1 ]]; then
