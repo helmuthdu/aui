@@ -20,11 +20,13 @@ You can try it first with a `virtualbox`
 - run the script: `cd aui && ./aui`
 
 ### Without git
+- Upgrade your system: `pacman -Syu`
 - get the script: ` wget --no-check-certificate https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
 - run the script: `./aui`
 
 ## What does the script do?
 
+- Backup all config files
 - Automatic configure rc.conf
 - Install additional repositories
 - Configure rankmirror
@@ -39,7 +41,7 @@ You can try it first with a `virtualbox`
 - Install CUPS
 - Install Additional wireless/bluetooth firmwares
 - Ensuring access to GIT through a firewall
-- Install a Desktop Environment [GNOME, KDE, XFCE, LXDE, OpenBox, Cinnamon]
+- Install a Desktop Environment [Cinnamon, E17, GNOME, KDE, LXDE, OpenBox, XFCE]
 - Install Developement tools [Vim, Emacs, Eclipse...]
 - Install Office apps [LibreOffice, GNOME-Office, Latex...]
 - Install System tools [Wine, Virtualbox, Grsync, Htop]
