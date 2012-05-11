@@ -926,7 +926,7 @@ function install_git_tor(){
                 chmod +x /usr/bin/proxy-wrapper
                 echo -e '\nexport GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"' >> /etc/bash.bashrc
                 export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
-                su -l $USERNAME --command="export GIT_PROXY_COMMAND=\"/usr/bin/proxy-wrapper\""
+                su -l $USERNAME --command='export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"'
             fi
             groupadd -g 42 privoxy
             useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
