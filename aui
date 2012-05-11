@@ -189,6 +189,13 @@ function package_install(){ #{{{
         pacman -S --needed $1
     fi
 } #}}}
+function package_remove(){ #{{{
+    if [[ $USE_SCRIPT -eq 1 ]]; then
+        pacman -Rsn --noconfirm --needed $1
+    else
+        pacman -Rsn --needed $1
+    fi
+} #}}}
 function contains_element(){ #{{{
     for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
 } #}}}
@@ -598,7 +605,7 @@ function pacman_package_signing(){
             rngd -f -r /dev/urandom &
             pacman-key --init --keyserver pgp.mit.edu
             killall rngd
-            pacman -Rsn --noconfirm rng-tools
+            package_remove "rng-tools"
             package_install "archlinux-keyring"
             #DEVELOPER AND TU KEYS {{{
             KEYS="y"
@@ -784,7 +791,7 @@ function install_video_cards(){
             sumary "ATI GPU driver installation"
             ;;
         3)
-            pacman -Rsc $(pacman -Qe | grep xf86-video | awk '{print $1}')
+            pacman -Rsn $(pacman -Qe | grep xf86-video | awk '{print $1}')
             pacman -S --needed nvidia nvidia-utils
             CURRENT_STATUS=1
             sumary "nVidia GPU driver installation"
@@ -999,12 +1006,12 @@ function install_desktop_environment(){
             while [[ 1 ]]
             do
                 print_title "GNOME CUSTOMIZATION"
-                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons")* Gnome Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme")* Gnome Themes [Orion, eGTK, Light, Zukitwo, Zukini]"
-                echo " 3) $(checkbox_package "gpaste-git gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git")* GnomeShell Extensions"
-                echo " 4) $(checkbox_package "gnome-shell-theme-frieze gnome-shell-theme-elegance")* GnomeShell Themes [Elegance, Frieze]"
-                echo " 5) $(checkbox_package "gnome-activity-journal")* Gnome Activity Journal "
-                echo " 6) $(checkbox_package "gloobus-sushi-bzr")* Gloobus Preview"
+                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons (aur)"
+                echo " 2) $(checkbox_package "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme") Gnome Themes (aur)"
+                echo " 3) $(checkbox_package "gpaste-git gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git") GnomeShell Extensions (aur)"
+                echo " 4) $(checkbox_package "gnome-shell-theme-frieze gnome-shell-theme-elegance") GnomeShell Themes (aur)"
+                echo " 5) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal (aur) "
+                echo " 6) $(checkbox_package "gloobus-sushi-bzr") Gloobus Preview (aur)"
                 echo " 7) $(checkbox_package "gnome-packagekit") Packagekit"
                 echo ""
                 echo " d) DONE"
@@ -1187,8 +1194,8 @@ function install_desktop_environment(){
             #KDE {{{
             print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
             package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
-            pacman -Rcsn kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer
             package_install "kdeadmin-system-config-printer-kde xdg-user-dirs"
+            package_remove "kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer"
             aur_package_install "kde-gtk-config-git"
             aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
             echo -e 'exec ck-launch-session startkde' >> /home/$USERNAME/.xinitrc
@@ -1213,12 +1220,12 @@ function install_desktop_environment(){
             do
                 print_title "KDE CUSTOMIZATION"
                 echo " 1) $(checkbox_package "apper") Apper"
-                echo " 2) $(checkbox_package "bangarang")* Bangarang"
+                echo " 2) $(checkbox_package "bangarang") Bangarang (aur)"
                 echo " 3) $(checkbox_package "choqok") Choqok"
                 echo " 4) $(checkbox_package "digikam") Digikam"
                 echo " 5) $(checkbox_package "k3b") K3b"
-                echo " 6) $(checkbox_package "rosa-icons kfaenza-icon-theme")* KDE Icons [Rosa, KFaenza]"
-                echo " 7) $(checkbox_package "caledonia-bundle plasma-theme-produkt")* Plasma Themes [Caledonia, Produkt, Ronak]"
+                echo " 6) $(checkbox_package "rosa-icons kfaenza-icon-theme") KDE Icons (aur)"
+                echo " 7) $(checkbox_package "caledonia-bundle plasma-theme-produkt") Plasma Themes (aur)"
                 echo " 8) $(checkbox_package "yakuake") Yakuake"
                 echo ""
                 echo " d) DONE"
@@ -1280,8 +1287,8 @@ function install_desktop_environment(){
             while [[ 1 ]]
             do
                 print_title "XFCE CUSTOMIZATION"
-                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons")* Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "xfce-theme-greybird xfce-theme-bluebird zukitwo-themes")* XFCE Themes"
+                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons (aur)"
+                echo " 2) $(checkbox_package "xfce-theme-greybird xfce-theme-bluebird zukitwo-themes") XFCE Themes (aur)"
                 echo " 3) $(checkbox_package "slim") Slim"
                 echo ""
                 echo " d) DONE"
@@ -1363,8 +1370,8 @@ function install_desktop_environment(){
             while [[ 1 ]]
             do
                 print_title "LXDE CUSTOMIZATION"
-                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons")* Icons [Faience, Faenza, Elementary]"
-                echo " 2) $(checkbox_package "lxdm")* LXDM"
+                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons (aur)"
+                echo " 2) $(checkbox_package "lxdm") LXDM (aur)"
                 echo " 3) $(checkbox_package "xfburn") Xfburn"
                 echo ""
                 echo " d) DONE"
@@ -1421,8 +1428,8 @@ function install_desktop_environment(){
             while [[ 1 ]]
             do
                 print_title "OPENBOX CUSTOMIZATION"
-                echo " 1) $(checkbox_package "compton-git")* Compton [xcompmgr fork]"
-                echo " 2) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons")* Icons [Faience, Faenza, Elementary]"
+                echo " 1) $(checkbox_package "compton-git") Compton (aur) [xcompmgr fork]"
+                echo " 2) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons (aur)"
                 echo " 3) $(checkbox_package "geeqie") Geeqie"
                 echo " 4) $(checkbox_package "gmrun") Gmrun"
                 echo " 5) $(checkbox_package "rxvt-unicode") rxvt-unicode"
@@ -1853,7 +1860,7 @@ do
                 package_install "emacs"
                 ;;
             5)
-                pacman -Rsn --noconfirm vim
+                package_remove "vim"
                 package_install "gvim"
                 ;;
             6)
