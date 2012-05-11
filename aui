@@ -185,9 +185,9 @@ function package_install(){ #{{{
 } #}}}
 function package_remove(){ #{{{
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
-        pacman -Rsn --noconfirm $1
+        pacman -Rcsn --noconfirm $1
     else
-        pacman -Rsn $1
+        pacman -Rcsn $1
     fi
 } #}}}
 function contains_element(){ #{{{
@@ -1869,8 +1869,8 @@ do
                 package_install "netbeans"
                 ;;
             9)
-                pacman -Rdd --noconfirm jre7-openjdk
-                pacman -Rdd --noconfirm jdk7-openjdk
+                package_remove "jre7-openjdk"
+                package_remove "jdk7-openjdk"
                 aur_package_install "jdk"
                 ;;
             10)
