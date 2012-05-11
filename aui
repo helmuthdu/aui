@@ -191,7 +191,7 @@ function package_install(){ #{{{
 } #}}}
 function package_remove(){ #{{{
     if [[ $USE_SCRIPT -eq 1 ]]; then
-        pacman -Rsn --noconfirm $1
+        pacman -Rsn --noconfirm "$1"
     else
         pacman -Rsn $1
     fi
@@ -791,7 +791,7 @@ function install_video_cards(){
             sumary "ATI GPU driver installation"
             ;;
         3)
-            pacman -Rsn $(pacman -Qe | grep xf86-video | awk '{print $1}')
+            package_remove "$(pacman -Qe | grep xf86-video | awk '{print $1}')"
             pacman -S --needed nvidia nvidia-utils
             CURRENT_STATUS=1
             sumary "nVidia GPU driver installation"
