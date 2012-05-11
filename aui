@@ -848,9 +848,9 @@ function install_additional_firmwares(){
                 print_title "INSTALL ADDITIONAL FIRMWARES"
                 echo " 1) $(checkbox_package "ipw2100-fw") ipw2100"
                 echo " 2) $(checkbox_package "ipw2200-fw") ipw2200"
-                echo " 3) $(checkbox_package "b43-firmware") b43"
-                echo " 4) $(checkbox_package "b43-firmware-legacy") b43legacy"
-                echo " 5) $(checkbox_package "broadcom-wl") broadcom-wl"
+                echo " 3) $(checkbox_package "b43-firmware") b43 (aur)"
+                echo " 4) $(checkbox_package "b43-firmware-legacy") b43legacy (aur)"
+                echo " 5) $(checkbox_package "broadcom-wl") broadcom-wl (aur)"
                 echo " 6) $(checkbox_package "bluez-firmware") bluez-firmware"
                 echo ""
                 echo " d) DONE"
@@ -1813,10 +1813,10 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                aur_package_install "eclipse"
+                                package_install "eclipse"
                                 ;;
                             2)
-                                aur_package_install "eclipse-cdt"
+                                package_install "eclipse-cdt"
                                 ;;
                             3)
                                 aur_package_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
