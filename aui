@@ -191,9 +191,9 @@ function package_install(){ #{{{
 } #}}}
 function package_remove(){ #{{{
     if [[ $USE_SCRIPT -eq 1 ]]; then
-        pacman -Rsn --noconfirm --needed $1
+        pacman -Rsn --noconfirm $1
     else
-        pacman -Rsn --needed $1
+        pacman -Rsn $1
     fi
 } #}}}
 function contains_element(){ #{{{
