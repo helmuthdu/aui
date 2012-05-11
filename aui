@@ -2472,10 +2472,10 @@ do
                 do
                     print_title "ACTION AND ADVENTURE"
                     echo " 1) $(checkbox_package "astromenace") Astromenace"
-                    echo " 2) $(checkbox_package "opentyrian-hg") OpenTyrian"
-                    echo " 3) $(checkbox_package "mars-shooter") M.A.R.S."
-                    echo " 4) $(checkbox_package "yofrankie") Yo Frankie!"
-                    echo " 5) $(checkbox_package "counter-strike-2d") Counter-Strike 2D"
+                    echo " 2) $(checkbox_package "opentyrian-hg") OpenTyrian (aur)"
+                    echo " 3) $(checkbox_package "mars-shooter") M.A.R.S. (aur)"
+                    echo " 4) $(checkbox_package "yofrankie") Yo Frankie! (aur)"
+                    echo " 5) $(checkbox_package "counter-strike-2d") Counter-Strike 2D (aur)"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2484,7 +2484,7 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                aur_package_install "astromenace"
+                                package_install "astromenace"
                                 ;;
                             2)
                                 aur_package_install "opentyrian-hg"
@@ -2516,11 +2516,11 @@ do
                 while [[ 1 ]]
                 do
                     print_title "ARCADE AND PLATFORMER"
-                    echo " 1) $(checkbox_package "opensonic") Opensonic"
+                    echo " 1) $(checkbox_package "opensonic") Opensonic (aur)"
                     echo " 2) $(checkbox_package "frogatto") Frogatto"
                     echo " 3) $(checkbox_package "bomberclone") Bomberclone"
-                    echo " 4) $(checkbox_package "goonies") Goonies"
-                    echo " 5) $(checkbox_package "mari0") Mari0"
+                    echo " 4) $(checkbox_package "goonies") Goonies (aur)"
+                    echo " 5) $(checkbox_package "mari0") Mari0 (aur)"
                     echo " 6) $(checkbox_package "neverball") Neverball"
                     echo " 7) $(checkbox_package "smc") Super Mario Chronicles"
                     echo " 8) $(checkbox_package "xmoto") X-Moto"
@@ -2535,10 +2535,10 @@ do
                                 aur_package_install "opensonic"
                                 ;;
                             2)
-                                aur_package_install "frogatto"
+                                package_install "frogatto"
                                 ;;
                             3)
-                                aur_package_install "bomberclone"
+                                package_install "bomberclone"
                                 ;;
                             4)
                                 aur_package_install "goonies"
@@ -2547,13 +2547,13 @@ do
                                 aur_package_install "mari0"
                                 ;;
                             6)
-                                aur_package_install "neverball"
+                                package_install "neverball"
                                 ;;
                             7)
-                                aur_package_install "smc"
+                                package_install "smc"
                                 ;;
                             8)
-                                aur_package_install "xmoto"
+                                package_install "xmoto"
                                 ;;
                             "b")
                                 break
@@ -2573,10 +2573,10 @@ do
                 while [[ 1 ]]
                 do
                     print_title "DUNGEON"
-                    echo " 1) $(checkbox_package "adom") Adom"
-                    echo " 2) $(checkbox_package "tome4") Tales of MajEyal"
-                    echo " 3) $(checkbox_package "lostlabyrinth") Lost Labyrinth"
-                    echo " 4) $(checkbox_package "scourge") S.C.O.U.R.G.E."
+                    echo " 1) $(checkbox_package "adom") Adom (aur)"
+                    echo " 2) $(checkbox_package "tome4") Tales of MajEyal (aur)"
+                    echo " 3) $(checkbox_package "lostlabyrinth") Lost Labyrinth (aur)"
+                    echo " 4) $(checkbox_package "scourge") S.C.O.U.R.G.E. (aur)"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2614,13 +2614,13 @@ do
                 while [[ 1 ]]
                 do
                     print_title "EMULATORS"
-                    echo " 1) $(checkbox_package "bsnes") BSNES"
-                    echo " 2) $(checkbox_package "desmume") Desmume"
-                    echo " 3) $(checkbox_package "dolphin-emu") Dolphin"
-                    echo " 4) $(checkbox_package "epsxe") ePSXe"
-                    echo " 5) $(checkbox_package "project64") Project64"
-                    echo " 6) $(checkbox_package "vba-m-gtk-svn") VisualBoyAdvanced"
-                    echo " 7) $(checkbox_package "wxmupen64plus-hg") wxMupen64Plus"
+                    echo " 1) $(checkbox_package "bsnes") BSNES (aur)"
+                    echo " 2) $(checkbox_package "desmume-svn") Desmume (aur)"
+                    echo " 3) $(checkbox_package "dolphin-emu") Dolphin (aur)"
+                    echo " 4) $(checkbox_package "epsxe") ePSXe (aur)"
+                    echo " 5) $(checkbox_package "project64") Project64 (aur)"
+                    echo " 6) $(checkbox_package "vba-m-gtk-svn") VisualBoyAdvanced (aur)"
+                    echo " 7) $(checkbox_package "wxmupen64plus-hg") wxMupen64Plus (aur)"
                     echo " 8) $(checkbox_package "zsnes") ZSNES"
                     echo ""
                     echo " b) BACK"
@@ -2655,7 +2655,7 @@ do
                                 aur_package_install "mupen64plus-rsp-hle-hg"
                                 ;;
                             8)
-                                aur_package_install "zsnes"
+                                package_install "zsnes"
                                 ;;
                             "b")
                                 break
@@ -2677,8 +2677,8 @@ do
                     print_title "FPS"
                     echo " 1) $(checkbox_package "alienarena") AlienArena"
                     echo " 2) $(checkbox_package "warsow") Warsow"
-                    echo " 3) $(checkbox_package "enemy-territory") Wolfenstein: Enemy Territory"
-                    echo " 4) $(checkbox_package "worldofpadman") World of Padman"
+                    echo " 3) $(checkbox_package "enemy-territory") Wolfenstein: Enemy Territory (aur)"
+                    echo " 4) $(checkbox_package "worldofpadman") World of Padman (aur)"
                     echo " 5) $(checkbox_package "xonotic") Xonotic"
                     echo ""
                     echo " b) BACK"
@@ -2688,10 +2688,10 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                aur_package_install "alienarena"
+                                package_install "alienarena"
                                 ;;
                             2)
-                                aur_package_install "warsow"
+                                package_install "warsow"
                                 ;;
                             3)
                                 aur_package_install "enemy-territory"
@@ -2700,7 +2700,7 @@ do
                                 aur_package_install "worldofpadman"
                                 ;;
                             5)
-                                aur_package_install "xonotic"
+                                package_install "xonotic"
                                 ;;
 
                             "b")
@@ -2721,10 +2721,10 @@ do
                 while [[ 1 ]]
                 do
                     print_title "MMO"
-                    echo " 1) $(checkbox_package "hon") Heroes of Newerth"
-                    echo " 2) $(checkbox_package "manaplus") ManaPlus"
-                    echo " 3) $(checkbox_package "savage2") Savage II"
-                    echo " 4) $(checkbox_package "spiral-knights") Spiral Knights"
+                    echo " 1) $(checkbox_package "hon") Heroes of Newerth (aur)"
+                    echo " 2) $(checkbox_package "manaplus") ManaPlus (aur)"
+                    echo " 3) $(checkbox_package "savage2") Savage II (aur)"
+                    echo " 4) $(checkbox_package "spiral-knights") Spiral Knights (aur)"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2763,7 +2763,7 @@ do
                 do
                     print_title "PUZZLE"
                     echo " 1) $(checkbox_package "frozen-bubble") Frozen Bubble"
-                    echo " 2) $(checkbox_package "numptyphysics-svn") Numptyphysics"
+                    echo " 2) $(checkbox_package "numptyphysics-svn") Numptyphysics (aur)"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2772,7 +2772,7 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                aur_package_install "frozen-bubble"
+                                package_install "frozen-bubble"
                                 ;;
                             2)
                                 aur_package_install "numptyphysics-svn"
@@ -2795,8 +2795,8 @@ do
                 while [[ 1 ]]
                 do
                     print_title "RPG"
-                    echo " 1) $(checkbox_package "ardentryst") Ardentryst"
-                    echo " 2) $(checkbox_package "flare-rpg") Flare"
+                    echo " 1) $(checkbox_package "ardentryst") Ardentryst (aur)"
+                    echo " 2) $(checkbox_package "flare-rpg") Flare (aur)"
                     echo " 3) $(checkbox_package "freedroidrpg") Freedroid RPG"
                     echo ""
                     echo " b) BACK"
@@ -2812,7 +2812,7 @@ do
                                 aur_package_install "flare-rpg"
                                 ;;
                             3)
-                                aur_package_install "freedroidrpg"
+                                package_install "freedroidrpg"
                                 ;;
                             "b")
                                 break
@@ -2832,9 +2832,9 @@ do
                 while [[ 1 ]]
                 do
                     print_title "RACING"
-                    echo " 1) $(checkbox_package "maniadrive") Maniadrive"
-                    echo " 2) $(checkbox_package "death-rally") Death Rally"
-                    echo " 3) $(checkbox_package "stuntrally") Stuntrally"
+                    echo " 1) $(checkbox_package "maniadrive") Maniadrive (aur)"
+                    echo " 2) $(checkbox_package "death-rally") Death Rally (aur)"
+                    echo " 3) $(checkbox_package "stuntrally") Stuntrally (aur)"
                     echo " 4) $(checkbox_package "supertuxkart") SupertuxKart"
                     echo " 5) $(checkbox_package "speed-dreams") Speed Dreams"
                     echo ""
@@ -2854,10 +2854,10 @@ do
                                 aur_package_install "stuntrally"
                                 ;;
                             4)
-                                aur_package_install "supertuxkart"
+                                package_install "supertuxkart"
                                 ;;
                             5)
-                                aur_package_install "speed-dreams"
+                                package_install "speed-dreams"
                                 ;;
                             "b")
                                 break
@@ -2878,7 +2878,7 @@ do
                 do
                     print_title "SIMULATION"
                     echo " 1) $(checkbox_package "simutrans") Simultrans"
-                    echo " 2) $(checkbox_package "corsix-th") Theme Hospital"
+                    echo " 2) $(checkbox_package "corsix-th") Theme Hospital (aur)"
                     echo " 3) $(checkbox_package "openttd") OpenTTD"
                     echo ""
                     echo " b) BACK"
@@ -2888,13 +2888,13 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                aur_package_install "simutrans"
+                                package_install "simutrans"
                                 ;;
                             2)
                                 aur_package_install "corsix-th"
                                 ;;
                             3)
-                                aur_package_install "openttd"
+                                package_install "openttd"
                                 ;;
                             "b")
                                 break
@@ -2919,7 +2919,7 @@ do
                     echo " 3) $(checkbox_package "megaglest") MegaGlest"
                     echo " 4) $(checkbox_package "warzone2100") Warzone 2100"
                     echo " 5) $(checkbox_package "wesnoth") Wesnoth"
-                    echo " 6) $(checkbox_package "zod") Zod"
+                    echo " 6) $(checkbox_package "zod") Zod (aur)"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2928,19 +2928,19 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                aur_package_install "0ad"
+                                package_install "0ad"
                                 ;;
                             2)
-                                aur_package_install "hedgewars"
+                                package_install "hedgewars"
                                 ;;
                             3)
-                                aur_package_install "megaglest"
+                                package_install "megaglest"
                                 ;;
                             4)
-                                aur_package_install "warzone2100"
+                                package_install "warzone2100"
                                 ;;
                             5)
-                                aur_package_install "wesnoth"
+                                package_install "wesnoth"
                                 ;;
                             6)
                                 aur_package_install "commander-zod"
