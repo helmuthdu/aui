@@ -459,7 +459,7 @@ function select_user(){
             cp dotfiles/.* /home/$USERNAME/
             rm -fr dotfiles
             print_title "DEFAULT EDITOR"
-            EDITOR=("Emacs" "Nano" "Vim");
+            EDITOR=("Emacs" "Joe" "Nano" "Vim");
             PS3="$prompt1"
             echo -e "Choose default editor\n"
             select OPT in "${EDITOR[@]}"; do
@@ -473,13 +473,30 @@ function select_user(){
                         break
                         ;;
                     2)
+                        if ! check_package "joe" ; then
+                            su -l $USERNAME --command="
+                                wget http://aur.archlinux.org/packages/jo/joe/joe.tar.gz;
+                                tar zxvf joe.tar.gz;
+                                cd joe;
+                                makepkg -si --noconfirm;
+                                cd ..;
+                                rm -fr joe*
+                            "
+                        fi
+                        sed -i '/EDITOR/s/vim/joe/' /home/$USERNAME/.bashrc
+                        sed -i '/VISUAL/s/vim/joe/' /home/$USERNAME/.bashrc
+                        sed -i '/EDITOR/s/vim/joe/' ~/.bashrc
+                        sed -i '/VISUAL/s/vim/joe/' ~/.bashrc
+                        break
+                        ;;
+                    3)
                         sed -i '/EDITOR/s/vim/nano/' /home/$USERNAME/.bashrc
                         sed -i '/VISUAL/s/vim/nano/' /home/$USERNAME/.bashrc
                         sed -i '/EDITOR/s/vim/nano/' ~/.bashrc
                         sed -i '/VISUAL/s/vim/nano/' ~/.bashrc
                         break
                         ;;
-                    3)
+                    4)
                         # VIM
                         package_install "vim ctags ack"
                         if ! check_package "discount" ; then
