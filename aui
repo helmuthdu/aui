@@ -466,10 +466,10 @@ function select_user(){
                 case "$REPLY" in
                     1)
                         package_install "emacs"
-                        sed -i '/EDITOR/s/vim/emacs -nw/' /home/$USERNAME/.bashrc
-                        sed -i '/VISUAL/s/vim/emacs -nw/' /home/$USERNAME/.bashrc
-                        sed -i '/EDITOR/s/vim/emacs -nw/' ~/.bashrc
-                        sed -i '/VISUAL/s/vim/emacs -nw/' ~/.bashrc
+                        sed -i '/EDITOR/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
+                        sed -i '/VISUAL/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
+                        sed -i '/EDITOR/s/vim/emacs\ -nw/' ~/.bashrc
+                        sed -i '/VISUAL/s/vim/emacs\ -nw/' ~/.bashrc
                         break
                         ;;
                     2)
