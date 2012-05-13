@@ -176,13 +176,15 @@ AUTOMATIC_MODE=0
         GNOME_ICONS="2-5"
     #}}}
     #GTK2/GTK3 THEMES {{{
-        # 1) Boomerang
-        # 2) eGTK
-        # 3) Light (Aka Ambiance/Radiance)
-        # 4) Orion
-        # 5) Zukini
-        # 6) Zukitwo
-        GTK_THEMES="2-6"
+        # 1) Bluebird
+        # 2) Boomerang
+        # 3) eGTK
+        # 4) Greybird
+        # 5) Light (Aka Ambiance/Radiance)
+        # 6) Orion
+        # 7) Zukini
+        # 8) Zukitwo
+        GTK_THEMES="1-8"
     #}}}
     #NETWORKMANAGER #{{{
         # 1) Networkmanager
