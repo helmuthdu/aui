@@ -362,7 +362,7 @@ function language_selector(){
 }
 #}}}
 #CUSTOM REPOSITORIES {{{
-function custom_repositories(){
+function add_custom_repositories(){
     # ENABLE MULTILIB REPOSITORY {{{
     # this option will avoid any problem with packages install
     if [[ $ARCHI == x86_64 ]]; then
@@ -627,7 +627,7 @@ function choose_aurhelper(){
 }
 #}}}
 #PACKMAN PACKAGE SIGNING {{{
-function pacman_package_signing(){
+function configure_pacman_package_signing(){
     print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
     read_input_text "Automatically configure pacman package signing" $PACKAGESIGN
     case "$OPTION" in
@@ -3241,9 +3241,9 @@ do
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
-                custom_repositories
+                add_custom_repositories
+                configure_pacman_package_signing
                 install_reflector
-                pacman_package_signing
                 install_basic_setup
                 install_tlp
                 install_xorg
