@@ -1567,7 +1567,7 @@ function install_desktop_environment(){
             while [[ 1 ]]
             do
                 print_title "OPENBOX CUSTOMIZATION"
-                echo " 1) $(checkbox_package "compton-git") Compton (aur) [xcompmgr fork]"
+                echo " 1) $(checkbox_package "xcompmgr") Xcompmgr"
                 echo " 2) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons (aur)"
                 echo " 3) $(checkbox_package "geeqie") Geeqie"
                 echo " 4) $(checkbox_package "gmrun") Gmrun"
@@ -1588,7 +1588,7 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
-                            aur_package_install "compton-git"
+                            package_install "xcompmgr transset-df"
                             ;;
                         2)
                             install_icons
