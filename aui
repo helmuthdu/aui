@@ -248,13 +248,14 @@ function welcome(){
     echo "This version is still in BETA. Send bugreports to: "
     echo "http://www.github.com/helmuthdu/aui"
     print_line
-    echo -e "\nSystem config backup:"
+    echo -e "\nSystem config backups:"
     print_line
     [[ ! -f /etc/rc.conf.aui ]] && cp -v /etc/rc.conf /etc/rc.conf.aui || echo "/etc/rc.conf.aui";
     [[ ! -f /etc/pacman.conf.aui ]] && cp -v /etc/pacman.conf /etc/pacman.conf.aui || echo "/etc/pacman.conf.aui";
     [[ ! -f /etc/inittab.aui ]] && cp -v /etc/inittab /etc/inittab.aui || echo "/etc/inittab.aui";
     [[ -f /etc/ssh/sshd_config.aui ]] && echo "/etc/ssh/sshd_conf.aui";
     [[ -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && echo "/etc/X11/xorg.conf.d/10-evdev.conf.aui";
+    [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui";
     pause_function
 }
 #}}}
@@ -417,15 +418,16 @@ function custom_repositories(){
     pause_function
 }
 #}}}
-#RANKMIRROR {{{
-function rankmirror(){
-    print_title "RANKMIRROR - https://wiki.archlinux.org/index.php/Improve_Pacman_Performance"
-    read_input_text "Choosing the fastest mirror using rankmirror (this can take a while)"
+#REFLECTOR {{{
+function install_reflector(){
+    print_title "REFLECTOR - https://wiki.archlinux.org/index.php/Reflector"
+    echo -e "\nReflector is a script which can retrieve the latest mirror list from the MirrorStatus page, filter the most up-to-date mirrors, sort them by speed and overwrite the file /etc/pacman.d/mirrorlist\n"
+    read_input_text "Install and configure reflector" $REFLECTOR
     case "$OPTION" in
         "y")
+            package_install "reflector"
             cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
-            sed -i '/^#\S/ s|#||' /etc/pacman.d/mirrorlist.backup
-            rankmirrors -n 5 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
+            reflector -l 5 --sort rate --save /etc/pacman.d/mirrorlist
             CURRENT_STATUS=1
             ;;
         *)
@@ -3223,7 +3225,7 @@ do
         case "$OPT" in
             1)
                 custom_repositories
-                rankmirror
+                install_reflector
                 pacman_package_signing
                 install_basic_setup
                 install_tlp

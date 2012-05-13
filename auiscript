@@ -42,6 +42,7 @@ AUTOMATIC_MODE=0
 #}}}
 #BASIC SETUP{{{
     LANGSELECT="y"
+    REFLECTOR="n"
     PACKAGESIGN="n"
     CUPS="y"
     GITTOR="y"
