@@ -453,23 +453,31 @@ function select_user(){
             print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
             package_install "git"
             git clone https://github.com/helmuthdu/dotfiles
-            cp dotfiles/.* ~
+            cp dotfiles/.* ~/
             cp dotfiles/.* /home/$USERNAME/
             rm -fr dotfiles
             print_title "DEFAULT EDITOR"
-            EDITOR=("Nano" "Vim");
+            EDITOR=("Emacs" "Nano" "Vim");
             PS3="$prompt1"
             echo -e "Choose default editor\n"
             select OPT in "${EDITOR[@]}"; do
                 case "$REPLY" in
                     1)
+                        package_install "emacs"
+                        sed -i '/EDITOR/s/vim/emacs -nw/' /home/$USERNAME/.bashrc
+                        sed -i '/VISUAL/s/vim/emacs -nw/' /home/$USERNAME/.bashrc
+                        sed -i '/EDITOR/s/vim/emacs -nw/' ~/.bashrc
+                        sed -i '/VISUAL/s/vim/emacs -nw/' ~/.bashrc
+                        break
+                        ;;
+                    2)
                         sed -i '/EDITOR/s/vim/nano/' /home/$USERNAME/.bashrc
                         sed -i '/VISUAL/s/vim/nano/' /home/$USERNAME/.bashrc
                         sed -i '/EDITOR/s/vim/nano/' ~/.bashrc
                         sed -i '/VISUAL/s/vim/nano/' ~/.bashrc
                         break
                         ;;
-                    2)
+                    3)
                         # VIM
                         package_install "vim ctags ack"
                         if ! check_package "discount" ; then
@@ -1056,7 +1064,7 @@ function install_desktop_environment(){
         1)
             #CINNAMON {{{
             print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
-            aur_package_install "cinnamon cinnamon-themes cinnamon-applets"
+            aur_package_install "cinnamon"
             package_install "gnome-extra gedit-plugins"
             package_install "telepathy"
             package_install "gksu nautilus-open-terminal xdg-user-dirs-gtk"
@@ -1072,11 +1080,13 @@ function install_desktop_environment(){
             while [[ 1 ]]
             do
                 print_title "CINNAMON CUSTOMIZATION"
-                echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons (aur)"
-                echo " 2) $(checkbox_package "zukini-theme gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes") GTK2/GTK3 Themes (aur)"
-                echo " 3) $(checkbox_package "gnome-activity-journal")* Gnome Activity Journal "
-                echo " 4) $(checkbox_package "gloobus-sushi-bzr")* Gloobus Preview"
-                echo " 5) $(checkbox_package "gnome-packagekit") Packagekit"
+                echo " 1) $(checkbox_package "cinnamon-applets") Cinnamon Applets (aur)"
+                echo " 2) $(checkbox_package "cinnamon-themes") Cinnamon Themes (aur)"
+                echo " 3) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Gnome Icons (aur)"
+                echo " 4) $(checkbox_package "zukini-theme gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes") GTK2/GTK3 Themes (aur)"
+                echo " 5) $(checkbox_package "gnome-activity-journal") Gnome Activity Journal (aur)"
+                echo " 6) $(checkbox_package "gloobus-sushi-bzr") Gloobus Preview (aur)"
+                echo " 7) $(checkbox_package "gnome-packagekit") Packagekit"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1085,21 +1095,27 @@ function install_desktop_environment(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
+                            aur_package_install "cinnamon-applets"
+                            ;;
+                        2)
+                            aur_package_install "cinnamon-themes"
+                            ;;
+                        3)
                             install_icons
                             OPT=1
                             ;;
-                        2)
+                        4)
                             install_themes
                             OPT=2
                             ;;
-                        3)
+                        5)
                             aur_package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
                             aur_package_install "gnome-activity-journal"
                             ;;
-                        4)
+                        6)
                             aur_package_install "gloobus-sushi-bzr"
                             ;;
-                        5)
+                        7)
                             package_install "gnome-packagekit gnome-settings-daemon-updates"
                             ;;
                         "d")

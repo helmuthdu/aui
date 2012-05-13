@@ -80,11 +80,13 @@ AUTOMATIC_MODE=0
     # 7) XFCE
     DESKTOPENV=3
     #CINNAMON {{{
-        # 1) Gnome Icons
-        # 2) Gnome Themes
-        # 3) Gnome Activity Journal
-        # 4) Gloobus Preview
-        # 5) Packagekit
+        # 1) Cinnamon Applets
+        # 2) Cinnamon Themes
+        # 3) Gnome Icons
+        # 4) Gnome Themes
+        # 5) Gnome Activity Journal
+        # 6) Gloobus Preview
+        # 7) Packagekit
         CINNAMON_OPTIONS="1-5"
     #}}}
     #E17 {{{
