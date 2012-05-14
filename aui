@@ -112,7 +112,7 @@ function print_title (){ #{{{
 } #}}}
 function print_info (){ #{{{
     T_COLS=`tput cols`
-    echo -e "${BWhite}$1${White}" | fold -sw $(( $T_COLS - 18 )) | sed 's/^/\t/'
+    echo -e "${BWhite}$1${White}\n" | fold -sw $(( $T_COLS - 18 )) | sed 's/^/\t/'
 } #}}}
 function print_warning (){ #{{{
     echo -e "${BRed}$1${White}\n"
@@ -255,7 +255,7 @@ function elihw() { #{{{
 #WELCOME {{{
 function welcome(){
     clear
-    echo "Welcome to the Archlinux Ultimate install script by helmuthdu"
+    echo -e "${BWhite}Welcome to the Archlinux Ultimate install script by helmuthdu${White}"
     print_line
     echo "Requirements:"
     echo "-> Archlinux installation"
