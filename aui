@@ -163,7 +163,7 @@ function check_package(){ #{{{
     return 1
 } #}}}
 function checkbox(){ #{{{
-    [[ $1 -eq 1 ]] && echo -e "${Blue}[${BWhite}X${Blue}]${White}" || echo -e "${BBlue}[${White} ${BBlue}]${White}";
+    [[ $1 -eq 1 ]] && echo -e "${Blue}[${BWhite}X${Blue}]${White}" || echo -e "${Blue}[${White} ${Blue}]${White}";
 } #}}}
 function checkbox_package(){ #{{{
     check_package "$1" && checkbox 1 || checkbox 0
