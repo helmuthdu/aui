@@ -61,12 +61,15 @@ AUTOMATIC_MODE=0
         VIDEOCARD=4
     #}}}
     #ADDITIONAL FIRMWARE {{{
-        # 1) ipw2100
-        # 2) ipw2200
-        # 3) b43
-        # 4) b43legacy
-        # 5) broadcom-wl
-        # 6) bluez-firmware
+        # 1) alsa-firmware
+        # 2) ipw2100
+        # 3) ipw2200
+        # 4) b43
+        # 5) b43legacy
+        # 6) broadcom-wl
+        # 7) bluez-firmware
+        # 8) libffado [Fireware Audio Devices]
+        # 9) sane-gt68xx-firmware
         FIRMWARE_OPTIONS=""
         FIRMWARE="n"
     #}}}
@@ -149,7 +152,7 @@ AUTOMATIC_MODE=0
         LXDE_OPTIONS=""
     #}}}
     #OPENBOX {{{
-        # 1) Compton [xcompmgr fork]
+        # 1) Xcompmgr
         # 2) Icons
         # 3) Geeqie
         # 4) Gmrun
@@ -157,7 +160,7 @@ AUTOMATIC_MODE=0
         # 6) rxvt-unicode
         # 7) Scrot
         # 8) Slim
-        # 9) Themes
+        # 9) GTK Themes
         #10) Thunar
         #11) Tint2
         #12) Volwheel
@@ -282,15 +285,16 @@ AUTOMATIC_MODE=0
     # 4) Google Chrome
     # 5) Jdownloader
     # 6) Irssi
-    # 7) Mozilla Firefox
-    # 8) Mozilla Thunderbird
-    # 9) Pidgin
-    #10) Remmina
-    #11) Skype
-    #12) Teamspeak
-    #13) Teamviewer
-    #14) Trasmission
-    #15) X-Chat/Konversation
+    # 7) Midori
+    # 8) Mozilla Firefox
+    # 9) Mozilla Thunderbird
+    #10) Pidgin
+    #11) Remmina
+    #12) Skype
+    #13) Teamspeak
+    #14) Teamviewer
+    #15) Trasmission
+    #16) X-Chat/Konversation
     INTERNET_OPTIONS="1 4 5 7"
 #}}}
 #LAMP {{{
