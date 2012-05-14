@@ -69,6 +69,7 @@ AUTOMATIC_MODE=0
         # 6) broadcom-wl
         # 7) bluez-firmware
         # 8) libffado [Fireware Audio Devices]
+        # 8) libraw1394 [IEE1394 Driver]
         # 9) sane-gt68xx-firmware
         FIRMWARE_OPTIONS=""
         FIRMWARE="n"

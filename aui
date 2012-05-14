@@ -930,7 +930,8 @@ function install_additional_firmwares(){
                 echo " 6) $(checkbox_package "broadcom-wl") broadcom-wl (aur)"
                 echo " 7) $(checkbox_package "bluez-firmware") bluez-firmware"
                 echo " 8) $(checkbox_package "libffado") libffado [Fireware Audio Devices]"
-                echo " 9) $(checkbox_package "sane-gt68xx-firmware") sane-gt68xx-firmware"
+                echo " 9) $(checkbox_package "libraw1394") libraw1394 [IEEE1394 Driver]"
+                echo " 10) $(checkbox_package "sane-gt68xx-firmware") sane-gt68xx-firmware"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -939,22 +940,34 @@ function install_additional_firmwares(){
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
-                            package_install "ipw2100-fw"
+                            package_install "alsa-firmware"
                             ;;
                         2)
-                            package_install "ipw2200-fw"
+                            package_install "ipw2100-fw"
                             ;;
                         3)
-                            aur_package_install "b43-firmware"
+                            package_install "ipw2200-fw"
                             ;;
                         4)
-                            aur_package_install "b43-firmware-legacy"
+                            aur_package_install "b43-firmware"
                             ;;
                         5)
-                            aur_package_install "broadcom-wl"
+                            aur_package_install "b43-firmware-legacy"
                             ;;
                         6)
+                            aur_package_install "broadcom-wl"
+                            ;;
+                        7)
                             package_install "bluez-firmware"
+                            ;;
+                        8)
+                            package_install "libffado"
+                            ;;
+                        9)
+                            package_install "libraw1394"
+                            ;;
+                        10)
+                            package_install "sane-gt68xx-firmware"
                             ;;
                         "d")
                             break
