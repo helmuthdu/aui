@@ -1381,8 +1381,9 @@ function install_desktop_environment(){
                             while [[ 1 ]]
                             do
                                 print_title "GNOMESHELL THEMES"
-                                echo " 1) $(checkbox_package "gnome-shell-theme-elegance") Elegance"
-                                echo " 2) $(checkbox_package "gnome-shell-theme-frieze") Frieze"
+                                echo " 1) $(checkbox_package "gnome-shell-theme-dark-shine") Dark Shine"
+                                echo " 2) $(checkbox_package "gnome-shell-theme-elegance") Elegance"
+                                echo " 3) $(checkbox_package "gnome-shell-theme-frieze") Frieze"
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
@@ -1391,9 +1392,12 @@ function install_desktop_environment(){
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
-                                            aur_package_install "gnome-shell-theme-elegance"
+                                            aur_package_install "gnome-shell-theme-dark-shine"
                                             ;;
                                         2)
+                                            aur_package_install "gnome-shell-theme-elegance"
+                                            ;;
+                                        3)
                                             aur_package_install "gnome-shell-theme-frieze"
                                             ;;
                                         "b")
