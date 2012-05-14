@@ -931,7 +931,7 @@ function install_additional_firmwares(){
                 echo " 7) $(checkbox_package "bluez-firmware") bluez-firmware"
                 echo " 8) $(checkbox_package "libffado") libffado [Fireware Audio Devices]"
                 echo " 9) $(checkbox_package "libraw1394") libraw1394 [IEEE1394 Driver]"
-                echo " 10) $(checkbox_package "sane-gt68xx-firmware") sane-gt68xx-firmware"
+                echo "10) $(checkbox_package "sane-gt68xx-firmware") sane-gt68xx-firmware"
                 echo ""
                 echo " d) DONE"
                 echo ""
