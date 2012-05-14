@@ -1637,7 +1637,7 @@ function install_desktop_environment(){
                 echo " 6) $(checkbox_package "rxvt-unicode") rxvt-unicode"
                 echo " 7) $(checkbox_package "scrot") Scrot"
                 echo " 8) $(checkbox_package "slim") Slim"
-                echo " 9) $(checkbox_package "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme") Gnome Themes (aur)"
+                echo " 9) $(checkbox_package "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme") GTK Themes (aur)"
                 echo "10) $(checkbox_package "thunar") Thunar"
                 echo "11) $(checkbox_package "tint2") Tint2"
                 echo "12) $(checkbox_package "volwheel") Volwheel"
@@ -1722,7 +1722,7 @@ function install_desktop_environment(){
             do
                 print_title "XFCE CUSTOMIZATION"
                 echo " 1) $(checkbox_package "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons") Icons (aur)"
-                echo " 2) $(checkbox_package "xfce-theme-greybird xfce-theme-bluebird zukitwo-themes") XFCE Themes (aur)"
+                echo " 2) $(checkbox_package "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme") GTK Themes (aur)"
                 echo " 3) $(checkbox_package "slim") Slim"
                 echo ""
                 echo " d) DONE"
