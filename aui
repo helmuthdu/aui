@@ -1551,7 +1551,7 @@ function install_desktop_environment(){
                             package_install "k3b dvd+rw-tools"
                             ;;
                         6)
-                            aur_package_install "rosa-icons kfaenza-icon-theme"
+                            aur_package_install "rosa-icons"
                             ;;
                         7)
                             aur_package_install "caledonia-bundle plasma-theme-rosa plasma-theme-produkt ronak-plasmatheme"
