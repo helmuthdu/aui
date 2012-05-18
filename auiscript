@@ -306,21 +306,18 @@ AUTOMATIC_MODE=0
     # 1) Amarok
     # 2) Audacious
     # 3) Banshee
-    # 4) Beatbox
-    # 5) Clementine
-    # 6) Deadbeef
-    # 7) Decibel
-    # 8) Exaile
-    # 9) Gmusicbrowser
-    #10) Musique
-    #11) Nuvola
-    #12) Rhythmbox
-    #13) Spotify
-    #14) Soundconverter
-    #15) Puddletag
-    #16) Audacity
-    #17) MIDI
-    #18) Codecs
+    # 4) Clementine
+    # 5) Deadbeef
+    # 6) Exaile
+    # 7) Musique
+    # 8) Nuvola
+    # 9) Rhythmbox
+    #10) Spotify
+    #11) Soundconverter
+    #12) Puddletag
+    #13) Audacity
+    #14) MIDI
+    #15) Codecs
     AUDIO_OPTIONS="5 13 17"
 #}}}
 #VIDEO {{{
