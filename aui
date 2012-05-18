@@ -725,7 +725,7 @@ function install_basic_setup(){
     print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
     print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD service discovery. It allows programs to publish and discover services and hosts running on a local network with no specific configuration."
     package_install "avahi nss-mdns"
-    add_daemon "avahi-daemon"
+    add_daemon "avahi-daemon avahi-dnsconfd"
     print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
     print_info "acpid is a flexible and extensible daemon for delivering ACPI events."
     package_install "acpi acpid"
@@ -1496,7 +1496,8 @@ function install_desktop_environment(){
             print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
             package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
             package_install "kdeadmin-system-config-printer-kde xdg-user-dirs"
-            package_remove "kdemultimedia-kscd kdemultimedia-juk kdemultimedia-dragonplayer"
+            package_install "kde-telepathy"
+            package_remove "kdenetwork-kopete kdemultimedia-kscd kdemultimedia-juk"
             aur_package_install "kde-gtk-config-git"
             aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
             create_xinitrc "startkde"
@@ -1850,7 +1851,7 @@ function install_nm_wicd(){
         add_daemon "rpcbind nfs-common @netfs nfs-server"
     fi
     if check_package "avahi" ; then
-        add_daemon "avahi-daemon"
+        add_daemon "avahi-daemon avahi-dnsconfd"
     fi
     pause_function
 }
