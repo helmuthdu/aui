@@ -3234,7 +3234,7 @@ function configure_fonts(){
             CURRENT_STATUS=1
             ;;
         3)
-            pacman -Rdd --noconfirm fontconfig freetype2
+            pacman -Rdd --noconfirm freetype2
             aur_package_install "freetype2-infinality fontconfig-infinality"
             /etc/profile.d/infinality-settings.sh
             infctl=("infinality" "linux" "osx" "osx2" "win7" "winxp")
