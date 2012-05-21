@@ -571,7 +571,7 @@ function select_user(){
                         ;;
                 esac
             done
-            chown -R $USERNAME:users /home/$USERNAME/.*
+            chown -R $USERNAME:users /home/$USERNAME
         #}}}
     } #}}}
     print_title "SELECT USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
