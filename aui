@@ -1095,7 +1095,7 @@ function install_desktop_environment(){
         while [[ 1 ]]
         do
             print_title "GTK2/GTK3 THEMES"
-            echo " 1) $(menu_item "xfce-theme-bluebird" "Bluebird")"
+            echo " 1) $(menu_item "gtk-theme-adwaita-cupertino" "Adwaita Cupertino")"
             echo " 2) $(menu_item "gtk-theme-boomerang" "Boomerang")"
             echo " 3) $(menu_item "egtk-bzr" "eGTK")"
             echo " 4) $(menu_item "xfce-theme-greybird" "Greybird")"

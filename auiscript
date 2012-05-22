@@ -184,7 +184,7 @@ AUTOMATIC_MODE=0
         GNOME_ICONS="2-5"
     #}}}
     #GTK2/GTK3 THEMES {{{
-        # 1) Bluebird
+        # 1) Adwaita Cupertino
         # 2) Boomerang
         # 3) eGTK
         # 4) Greybird
