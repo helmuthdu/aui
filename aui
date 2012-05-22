@@ -493,6 +493,16 @@ function system_upgrade(){
 #}}}
 #SELECT/CREATE USER {{{
 function select_user(){
+    #ENABLE SUDO {{{
+    if ! check_package "sudo" ; then
+        print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
+        package_install "sudo"
+    fi
+    ## Uncomment to allow members of group wheel to execute any command
+    sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
+    ## Same thing without a password (not secure)
+    #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
+    #}}}
     create_new_user(){ #{{{
         read -p "Username: " USERNAME
         useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
@@ -594,16 +604,6 @@ function select_user(){
             invalid_option
         fi
     done
-    #ENABLE SUDO {{{
-    if ! check_package "sudo" ; then
-        print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
-        package_install "sudo"
-    fi
-    ## Uncomment to allow members of group wheel to execute any command
-    sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
-    ## Same thing without a password (not secure)
-    #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
-    #}}}
 }
 #}}}
 #AUR HELPER {{{
