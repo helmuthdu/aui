@@ -1096,7 +1096,7 @@ function install_desktop_environment(){
         do
             print_title "GTK2/GTK3 THEMES"
             echo " 1) $(menu_item "gtk-theme-adwaita-cupertino" "Adwaita Cupertino")"
-            echo " 2) $(menu_item "gtk-theme-boomerang" "Boomerang")"
+            echo " 2) $(menu_item "xfce-theme-bluebird" "Bluebird")"
             echo " 3) $(menu_item "egtk-bzr" "eGTK")"
             echo " 4) $(menu_item "xfce-theme-greybird" "Greybird")"
             echo " 5) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
@@ -1111,10 +1111,10 @@ function install_desktop_environment(){
             for OPT in ${OPTIONS[@]}; do
                 case "$OPT" in
                     1)
-                        aur_package_install "xfce-theme-bluebird"
+                        aur_package_install "gtk-theme-adwaita-cupertino"
                         ;;
                     2)
-                        aur_package_install "gtk-theme-boomerang"
+                        aur_package_install "xfce-theme-bluebird"
                         ;;
                     3)
                         aur_package_install "egtk-bzr"
@@ -1349,7 +1349,7 @@ function install_desktop_environment(){
                 print_title "GNOME CUSTOMIZATION"
                 echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
                 echo " 2) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
-                echo " 3) $(menu_item "gpaste-git gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git" "GnomeShell Extensions") $AUR"
+                echo " 3) $(menu_item "gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git" "GnomeShell Extensions") $AUR"
                 echo " 4) $(menu_item "gnome-shell-theme-frieze gnome-shell-theme-elegance" "GnomeShell Themes") $AUR"
                 echo " 5) $(menu_item "gnome-activity-journal") $AUR"
                 echo " 6) $(menu_item "gloobus-sushi-bzr") $AUR"
@@ -1374,7 +1374,7 @@ function install_desktop_environment(){
                             while [[ 1 ]]
                             do
                                 print_title "GNOMESHELL EXTENSIONS"
-                                echo " 1) $(menu_item "gpaste-git")"
+                                echo " 1) $(menu_item "gpaste")"
                                 echo " 2) $(menu_item "gnome-shell-extension-mediaplayer-git")"
                                 echo " 3) $(menu_item "gnome-shell-extension-noa11y-git")"
                                 echo " 4) $(menu_item "gnome-shell-extension-pomodoro-git")"
@@ -1390,7 +1390,7 @@ function install_desktop_environment(){
                                 for OPT in ${OPTIONS[@]}; do
                                     case "$OPT" in
                                         1)
-                                            aur_package_install "gpaste-git"
+                                            aur_package_install "gpaste"
                                             ;;
                                         2)
                                             aur_package_install "gnome-shell-extension-mediaplayer-git"

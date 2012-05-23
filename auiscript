@@ -185,7 +185,7 @@ AUTOMATIC_MODE=0
     #}}}
     #GTK2/GTK3 THEMES {{{
         # 1) Adwaita Cupertino
-        # 2) Boomerang
+        # 2) Bluebird
         # 3) eGTK
         # 4) Greybird
         # 5) Light (Aka Ambiance/Radiance)
