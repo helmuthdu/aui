@@ -2081,9 +2081,9 @@ do
                 ;;
             15)
                 aur_package_install "rabbitvcs"
-                if [[ $GNOME -eq 1 ]]; then
+                if check_package "nautilus" ; then
                     aur_package_install "rabbitvcs-nautilus"
-                elif [[ $XFCE -eq 1 ]]; then
+                elif check_package "thunar" ; then
                     aur_package_install "rabbitvcs-thunar"
                 else
                     aur_package_install "rabbitvcs-cli"
