@@ -413,10 +413,10 @@ function add_custom_repositories(){
     # ENABLE MULTILIB REPOSITORY {{{
     # this option will avoid any problem with packages install
     if [[ $ARCHI == x86_64 ]]; then
-        local multilib=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
-        sed -i "${multilib}s/^#//" /etc/pacman.conf
+        local multilib=`grep -n "\[multilib\]'" /etc/pacman.conf | cut -f1 -d:`
+        sed -i ''${multilib}'s/^#//' /etc/pacman.conf
         local multilib=$(( $multilib + 2 ))
-        sed -i "${multilib}s/^#//" /etc/pacman.conf
+        sed -i ''${multilib}'s/^#//' /etc/pacman.conf
         pacman -Sy
     fi
     #}}}
@@ -699,8 +699,8 @@ function configure_pacman_package_signing(){
                 xargs pacman-key --recv-keys
             fi
             #}}}
-            sed -i '/SigLevel\ [=]\ Optional\ TrustAll/s/^#//' /etc/pacman.conf
-            sed -i '/SigLevel\ [=]\ Never/s/^/#/' /etc/pacman.conf
+            sed -i '/SigLevel = Optional TrustAll/s/^#//' /etc/pacman.conf
+            sed -i '/SigLevel = Never/s/^/#/' /etc/pacman.conf
             CURRENT_STATUS=1
             ;;
         *)
