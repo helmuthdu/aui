@@ -2125,11 +2125,7 @@ do
         case "$OPT" in
             1)
                 print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
-                if [[ $AUTOMATIC_MODE -eq 1 ]]; then
-                    pacman -S --noconfirm --needed libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport
-                else
-                    pacman -S --needed libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-{base,calc,draw,impress,math,writer} libreoffice-extension-presenter-screen libreoffice-extension-pdfimport
-                fi
+                package_install "libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer libreoffice-extension-presenter-screen libreoffice-extension-pdfimport"
                 aur_package_install "hunspell-$LANGUAGE_HS"
                 aur_package_install "aspell-$LANGUAGE_AS"
                 if [[ $KDE -eq 1 ]]; then
@@ -2324,11 +2320,11 @@ do
         case "$OPT" in
             1)
                 aur_package_install "dropbox"
-                if [[ $GNOME -eq 1 ]]; then
+                if check_package "nautilus" ; then
                     aur_package_install "nautilus-dropbox"
-                elif [[ $XFCE -eq 1 ]]; then
+                elif check_package "thunar" ; then
                     aur_package_install "thunar-dropbox"
-                elif [[ $KDE -eq 1 ]]; then
+                elif check_package "kdebase-dolphin" ; then
                     aur_package_install "kfilebox"
                 else
                     aur_package_install "dropbox-cli"
@@ -2424,7 +2420,7 @@ case "$OPTION" in
             sed -i '/mysql.so/s/^;//' /etc/php/php.ini
             sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
             sed -i '/gd.so/s/^;//' /etc/php/php.ini
-            sed -i '/display_errors[=]/s/off/on/' /etc/php/php.ini
+            sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
             sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
             #}}}
         fi
