@@ -693,7 +693,7 @@ function configure_pacman_package_signing(){
             #DEVELOPER AND TU KEYS {{{
             KEYS="y"
             read_input_text "Install Developer and TU Keys" $KEYS
-            if [[ $OPTION == n ]]; then
+            if [[ $OPTION == y ]]; then
                 curl https://www.archlinux.org/{developers,trustedusers}/ |
                 awk -F\" '(/pgp.mit.edu/) {sub(/.*search=0x/,"");print $1}' |
                 xargs pacman-key --recv-keys
