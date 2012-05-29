@@ -277,7 +277,8 @@ AUTOMATIC_MODE=0
     # 5) Inkscape
     # 6) MComix
     # 7) Mypaint
-    # 8) Shotwell
+    # 8) Scribus
+    # 9) Shotwell
     GRAPHICS_OPTIONS="2-8"
 #}}}
 #INTERNET {{{

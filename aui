@@ -2244,7 +2244,8 @@ do
     echo " 5) $(menu_item "inkscape")"
     echo " 6) $(menu_item "mcomix")"
     echo " 7) $(menu_item "mypaint")"
-    echo " 8) $(menu_item "shotwell")"
+    echo " 8) $(menu_item "scribus")"
+    echo " 9) $(menu_item "shotwell")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2275,6 +2276,9 @@ do
                 aur_package_install "mypaint"
                 ;;
             8)
+                aur_package_install "scribus"
+                ;;
+            9)
                 aur_package_install "shotwell"
                 ;;
             "b")
