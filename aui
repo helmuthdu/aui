@@ -1836,7 +1836,7 @@ function install_nm_wicd(){
             fi
             remove_daemon "networkmanager"
             remove_daemon "network"
-            add_daemon "wicd"
+            insert_daemon_after "dbus" "wicd"
             CURRENT_STATUS=1
             sumary "Wicd installation"
             ;;
