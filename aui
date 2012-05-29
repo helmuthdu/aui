@@ -416,9 +416,14 @@ function add_custom_repositories(){
     # this option will avoid any problem with packages install
     if [[ $ARCHI == x86_64 ]]; then
         multilib=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
-        sed -i "${multilib}s/^#//" /etc/pacman.conf
-        multilib=$(( $multilib + 2 ))
-        sed -i "${multilib}s/^#//" /etc/pacman.conf
+        if $multilib &> /dev/null; then
+            echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+            echo -e '\nMultilib repository added into pacman.conf file'
+        else
+            sed -i "${multilib}s/^#//" /etc/pacman.conf
+            multilib=$(( $multilib + 2 ))
+            sed -i "${multilib}s/^#//" /etc/pacman.conf
+        fi
         pacman -Sy
     fi
     #}}}
