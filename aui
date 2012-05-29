@@ -1097,7 +1097,7 @@ function install_desktop_environment(){
         elihw
         done
     } #}}}
-    function install_themes() { #{{{
+    function install_gtk_themes() { #{{{
         while [[ 1 ]]
         do
             print_title "GTK2/GTK3 THEMES"
@@ -1210,7 +1210,7 @@ function install_desktop_environment(){
                             OPT=1
                             ;;
                         4)
-                            install_themes
+                            install_gtk_themes
                             OPT=2
                             ;;
                         5)
@@ -1309,7 +1309,7 @@ function install_desktop_environment(){
                             package_install "scrot"
                             ;;
                         10)
-                            install_themes
+                            install_gtk_themes
                             OPT=8
                             ;;
                         11)
@@ -1372,7 +1372,7 @@ function install_desktop_environment(){
                             OPT=1
                             ;;
                         2)
-                            install_themes
+                            install_gtk_themes
                             OPT=2
                             ;;
                         3)
@@ -1622,7 +1622,7 @@ function install_desktop_environment(){
                             config_dm "lxdm"
                             ;;
                         3)
-                            install_themes
+                            install_gtk_themes
                             OPT=3
                             ;;
                         4)
@@ -1710,7 +1710,7 @@ function install_desktop_environment(){
                             config_dm "slim"
                             ;;
                         9)
-                            install_themes
+                            install_gtk_themes
                             OPT=9
                             ;;
                         10)
@@ -1770,7 +1770,7 @@ function install_desktop_environment(){
                             OPT=1
                             ;;
                         2)
-                            install_themes
+                            install_gtk_themes
                             OPT=2
                             ;;
                         3)

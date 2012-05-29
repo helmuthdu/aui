@@ -52,3 +52,5 @@ You can try it first with a `virtualbox`
 - Install Fonts [Liberation, MS-Fonts, Google-webfonts...]
 - Install and configure LAMP Server
 - Many More...
+
+If you like my work, please consider a small Paypal donation at helmuthdu@gmail.com :)
