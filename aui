@@ -138,8 +138,10 @@ function print_warning (){ #{{{
 function remove_daemon(){ #{{{
     sed -i '/DAEMONS[=]/s/ '"$1"'//' /etc/rc.conf
 } #}}}
-function replace_daemon(){ #{{{
-    sed -i '/DAEMONS[=]/s/'"$1"'/'"$2"'/' /etc/rc.conf
+function insert_daemon_after(){ #{{{
+    remove_daemon "$2"
+    sed -i '/DAEMONS[=]/s/'"$1"'/& '"$2"'/' /etc/rc.conf
+    start_daemon "$2"
 } #}}}
 function start_daemon(){ #{{{
     DAEMON_LIST=`echo "$1" | sed 's/@//g'`
@@ -647,7 +649,7 @@ function choose_aurhelper(){
                 ;;
             2)
                 if ! check_package "packer" ; then
-                    package_install "base-devel git jshon curl"
+                    package_install "base-devel git jshon"
                     su -l $USERNAME --command="
                         wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
                         tar zxvf packer.tar.gz;
@@ -682,7 +684,6 @@ function configure_pacman_package_signing(){
     read_input_text "Automatically configure pacman package signing" $PACKAGESIGN
     case "$OPTION" in
         "y")
-            package_install "base-devel"
             aur_package_install "rng-tools"
             sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
             rngd -f -r /dev/urandom &
@@ -721,7 +722,7 @@ function install_basic_setup(){
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
     print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
     package_install "dbus"
-    add_daemon "dbus"
+    insert_daemon_after "syslog-ng" "dbus"
     print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
     print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD service discovery. It allows programs to publish and discover services and hosts running on a local network with no specific configuration."
     package_install "avahi nss-mdns"
@@ -1819,7 +1820,7 @@ function install_nm_wicd(){
             remove_daemon "networkmanager"
             remove_daemon "network"
             remove_daemon "wicd"
-            add_daemon "networkmanager"
+            insert_daemon_after "dbus" "networkmanager"
             CURRENT_STATUS=1
             sumary "Networkmanager installation"
             ;;
@@ -1842,18 +1843,11 @@ function install_nm_wicd(){
         *)
             remove_daemon "networkmanager"
             remove_daemon "wicd"
-            add_daemon "network"
+            insert_daemon_after "dbus" "network"
             CURRENT_STATUS=0
             sumary "Network manager installation"
             ;;
     esac
-    if check_package "nfs-utils" ; then
-        add_daemon "rpcbind nfs-common @netfs nfs-server"
-    fi
-    if check_package "avahi" ; then
-        add_daemon "avahi-daemon avahi-dnsconfd"
-    fi
-    pause_function
 }
 #}}}
 #ACCESSORIES {{{
