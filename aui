@@ -2654,13 +2654,16 @@ do
                 do
                     print_title "ACTION AND ADVENTURE"
                     echo " 1) $(menu_item "astromenace")"
-                    echo " 2) $(menu_item "opentyrian-hg") $AUR"
-                    echo " 3) $(menu_item "mars-shooter" "M.A.R.S.") $AUR"
-                    echo " 4) $(menu_item "yofrankie" "Yo Frankie!") $AUR"
-                    echo " 5) $(menu_item "counter-strike-2d" "Counter-Strike 2D") $AUR"
+                    echo " 2) $(menu_item "counter-strike-2d" "Counter-Strike 2D") $AUR"
+                    echo " 3) $(menu_item "dead-cyborg-episode1" "Dead Cyborg") $AUR"
+                    echo " 4) $(menu_item "mars-shooter" "M.A.R.S.") $AUR"
+                    echo " 5) $(menu_item "opentyrian-hg") $AUR"
+                    echo " 6) $(menu_item "steelstorm") $AUR"
+                    echo " 7) $(menu_item "yofrankie" "Yo Frankie!") $AUR"
                     echo ""
                     echo " b) BACK"
                     echo ""
+
                     ACTION+=" b"
                     read_input_options "$ACTION"
                     for OPT in ${OPTIONS[@]}; do
@@ -2669,16 +2672,22 @@ do
                                 package_install "astromenace"
                                 ;;
                             2)
-                                aur_package_install "opentyrian-hg"
+                                aur_package_install "counter-strike-2d"
                                 ;;
                             3)
-                                aur_package_install "mars-shooter"
+                                aur_package_install "dead-cyborg-episode1"
                                 ;;
                             4)
-                                aur_package_install "yofrankie"
+                                aur_package_install "mars-shooter"
                                 ;;
                             5)
-                                aur_package_install "counter-strike-2d"
+                                aur_package_install "opentyrian-hg"
+                                ;;
+                            6)
+                                aur_package_install "steelstorm"
+                                ;;
+                            7)
+                                aur_package_install "yofrankie"
                                 ;;
                             "b")
                                 break
@@ -2698,14 +2707,18 @@ do
                 while [[ 1 ]]
                 do
                     print_title "ARCADE AND PLATFORMER"
-                    echo " 1) $(menu_item "opensonic") $AUR"
-                    echo " 2) $(menu_item "frogatto")"
+                    echo " 1) $(menu_item "abuse")"
+                    echo " 2) $(menu_item "btanks" "Battle Tanks")"
                     echo " 3) $(menu_item "bomberclone")"
-                    echo " 4) $(menu_item "goonies") $AUR"
-                    echo " 5) $(menu_item "mari0") $AUR"
-                    echo " 6) $(menu_item "neverball")"
-                    echo " 7) $(menu_item "smc" "Super Mario Chronicles")"
-                    echo " 8) $(menu_item "xmoto")"
+                    echo " 4) $(menu_item "funguloids" "Those Funny Funguloids") $AUR"
+                    echo " 5) $(menu_item "frogatto")"
+                    echo " 6) $(menu_item "goonies") $AUR"
+                    echo " 7) $(menu_item "mari0") $AUR"
+                    echo " 8) $(menu_item "neverball")"
+                    echo " 9) $(menu_item "opensonic") $AUR"
+                    echo "10) $(menu_item "robombs_bin" "Robombs") $AUR"
+                    echo "11) $(menu_item "smc" "Super Mario Chronicles")"
+                    echo "12) $(menu_item "xmoto")"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2714,27 +2727,39 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                aur_package_install "opensonic"
+                                package_install "abuse"
                                 ;;
                             2)
-                                package_install "frogatto"
+                                package_install "btanks"
                                 ;;
                             3)
                                 package_install "bomberclone"
                                 ;;
                             4)
-                                aur_package_install "goonies"
+                                aur_package_install "funguloids"
                                 ;;
                             5)
-                                aur_package_install "mari0"
+                                package_install "frogatto"
                                 ;;
                             6)
-                                package_install "neverball"
+                                aur_package_install "goonies"
                                 ;;
                             7)
-                                package_install "smc"
+                                aur_package_install "mari0"
                                 ;;
                             8)
+                                package_install "neverball"
+                                ;;
+                            9)
+                                aur_package_install "opensonic"
+                                ;;
+                            10)
+                                aur_package_install "robombs_bin"
+                                ;;
+                            11)
+                                package_install "smc"
+                                ;;
+                            12)
                                 package_install "xmoto"
                                 ;;
                             "b")
@@ -2907,6 +2932,7 @@ do
                     echo " 2) $(menu_item "manaplus") $AUR"
                     echo " 3) $(menu_item "savage2") $AUR"
                     echo " 4) $(menu_item "spiral-knights") $AUR"
+                    echo " 5) $(menu_item "wakfu") $AUR"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2925,6 +2951,9 @@ do
                                 ;;
                             4)
                                 aur_package_install "spiral-knights"
+                                ;;
+                            5)
+                                aur_package_install "wakfu"
                                 ;;
                             "b")
                                 break
@@ -3099,9 +3128,10 @@ do
                     echo " 1) $(menu_item "0ad")"
                     echo " 2) $(menu_item "hedgewars")"
                     echo " 3) $(menu_item "megaglest")"
-                    echo " 4) $(menu_item "warzone2100")"
-                    echo " 5) $(menu_item "wesnoth")"
-                    echo " 6) $(menu_item "zod") $AUR"
+                    echo " 4) $(menu_item "unknown-horizons") $AUR"
+                    echo " 5) $(menu_item "warzone2100")"
+                    echo " 6) $(menu_item "wesnoth")"
+                    echo " 7) $(menu_item "zod") $AUR"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -3119,12 +3149,15 @@ do
                                 package_install "megaglest"
                                 ;;
                             4)
-                                package_install "warzone2100"
+                                package_install "unknow-horizons"
                                 ;;
                             5)
-                                package_install "wesnoth"
+                                package_install "warzone2100"
                                 ;;
                             6)
+                                package_install "wesnoth"
+                                ;;
+                            7)
                                 aur_package_install "commander-zod"
                                 ;;
                             "b")

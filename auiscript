@@ -127,13 +127,13 @@ AUTOMATIC_MODE=0
             # 6) system-monitor
             # 7) user-theme
             # 8) weather
-            GNOME_EXTENSIONS="1 3-8"
+            GNOME_EXTENSIONS="1-8"
         #}}}
         #GNOME SHELL THEMES {{{
             # 1) Dark Shine
             # 2) Elegance
             # 3) Frieze
-            GNOME_SHELL_THEMES="1 2"
+            GNOME_SHELL_THEMES="1-3"
         #}}}
     #}}}
     #KDE {{{
@@ -142,10 +142,10 @@ AUTOMATIC_MODE=0
         # 3) Choqok
         # 4) Digikam
         # 5) K3b
-        # 6) KDE Icons [Rosa, KFaenza]
+        # 6) Rosa Icon
         # 7) Plasma Themes [Caledonia, Produkt, Ronak]
         # 8) Yakuake
-        KDE_OPTIONS=""
+        KDE_OPTIONS="1-8"
     #}}}
     #LXDE {{{
         # 1) Icons
@@ -173,7 +173,7 @@ AUTOMATIC_MODE=0
         # 1) Icons
         # 2) Themes
         # 3) Slim
-        XFCE_OPTIONS="1 2 3"
+        XFCE_OPTIONS="1-3"
     #}}}
     #E17/GNOME/LXDE/OPENBOX/XFCE ICONS {{{
         # 1) Awoken
@@ -192,7 +192,7 @@ AUTOMATIC_MODE=0
         # 6) Orion
         # 7) Zukini
         # 8) Zukitwo
-        GTK_THEMES="1-8"
+        GTK_THEMES="2-8"
     #}}}
     #NETWORKMANAGER #{{{
         # 1) Networkmanager
@@ -216,7 +216,7 @@ AUTOMATIC_MODE=0
     #12) Synapse
     #13) Terminator
     #14) Zim
-    ACCESSORIES_OPTIONS="11 13"
+    ACCESSORIES_OPTIONS="2 13"
 #}}}
 #DEVELOPEMENT {{{
     # 1) Aptana Studio
@@ -234,7 +234,7 @@ AUTOMATIC_MODE=0
     #13) MySQL Workbench
     #14) Meld
     #15) RabbitVCS
-    DEVELOPMENT_OPTIONS="5 9"
+    DEVELOPMENT_OPTIONS="9 5 12"
     #ECLIPSE {{{
         # 1) Eclipse Classic
         # 2) Eclipse IDE for C/C++ Developers
@@ -279,7 +279,7 @@ AUTOMATIC_MODE=0
     # 7) Mypaint
     # 8) Scribus
     # 9) Shotwell
-    GRAPHICS_OPTIONS="2-8"
+    GRAPHICS_OPTIONS="2-7 9"
 #}}}
 #INTERNET {{{
     # 1) Dropbox
@@ -298,7 +298,7 @@ AUTOMATIC_MODE=0
     #14) Teamviewer
     #15) Trasmission
     #16) X-Chat/Konversation
-    INTERNET_OPTIONS="1 4 5 7"
+    INTERNET_OPTIONS="1 3 4 5 8"
 #}}}
 #LAMP {{{
     LAMP="n"
@@ -319,7 +319,7 @@ AUTOMATIC_MODE=0
     #13) Audacity
     #14) MIDI
     #15) Codecs
-    AUDIO_OPTIONS="5 13 17"
+    AUDIO_OPTIONS="4 11 15"
 #}}}
 #VIDEO {{{
     # 1) Audience
@@ -355,21 +355,27 @@ AUTOMATIC_MODE=0
     FUN="1-11"
     #ACTION {{{
         # 1) Astromenace
-        # 2) OpenTyrian
-        # 3) M.A.R.S.
-        # 4) Yo Frankie!
-        # 5) Counter-Strike 2D
+        # 2) Counter-Strike 2D
+        # 3) Dead Cyborg
+        # 4) M.A.R.S.
+        # 5) OpenTyrian
+        # 6) SteelStorm
+        # 7) Yo Frankie!
         ACTION=""
     #}}}
     #ARCADE {{{
-        # 1) Opensonic
-        # 2) Frogatto
+        # 1) Abuse
+        # 2) Battle Tanks
         # 3) Bomberclone
-        # 4) Goonies
-        # 5) Mari0
-        # 6) Neverball
-        # 7) Super Mario Chronicles
-        # 8) X-Moto
+        # 4) Those Funny Funguloids
+        # 5) Frogatto
+        # 6) Goonies
+        # 7) Mari0
+        # 8) Neverball
+        # 9) Opensonic
+        #10) Robombs
+        #11) Super Mario Chronicles
+        #12) X-Moto
         ARCADE=""
     #}}}
     #DUNGEON {{{
@@ -403,6 +409,7 @@ AUTOMATIC_MODE=0
         # 2) Heroes of Newerth
         # 3) Savage II
         # 4) Spiral Knights
+        # 5) Wakfu
         MMO=""
     #}}}
     #PUZZLE {{{
@@ -456,5 +463,5 @@ AUTOMATIC_MODE=0
     # 2) Cleartype patched packages
     # 3) Infinality patched packages
     # 4) Reverting to unpatched packages
-    FONTSCONFIG_OPTION="1"
+    FONTSCONFIG_OPTION=""
 #}}}
