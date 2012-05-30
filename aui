@@ -1353,13 +1353,14 @@ function install_desktop_environment(){
             while [[ 1 ]]
             do
                 print_title "GNOME CUSTOMIZATION"
-                echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
-                echo " 2) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
-                echo " 3) $(menu_item "gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git" "GnomeShell Extensions") $AUR"
-                echo " 4) $(menu_item "gnome-shell-theme-frieze gnome-shell-theme-elegance" "GnomeShell Themes") $AUR"
-                echo " 5) $(menu_item "gnome-activity-journal") $AUR"
-                echo " 6) $(menu_item "gloobus-sushi-bzr") $AUR"
-                echo " 7) $(menu_item "gnome-packagekit")"
+                echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "GNOME Icons") $AUR"
+                echo " 2) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GNOME Themes") $AUR"
+                echo " 3) $(menu_item "gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git" "GNOME Shell Extensions") $AUR"
+                echo " 4) $(menu_item "gnome-shell-theme-frieze gnome-shell-theme-elegance" "GNOME Shell Themes") $AUR"
+                echo " 5) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
+                echo " 6) $(menu_item "gnome-activity-journal" "activity-journal") $AUR"
+                echo " 7) $(menu_item "activity-log-manager") $AUR"
+                echo " 8) $(menu_item "gloobus-sushi-bzr") $AUR"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1471,14 +1472,17 @@ function install_desktop_environment(){
                             OPT=4
                             ;;
                         5)
+                            package_install "gnome-packagekit gnome-settings-daemon-updates"
+                            ;;
+                        6)
                             aur_package_install "libzeitgeist python2-rdflib zeitgeist-datahub"
                             aur_package_install "gnome-activity-journal"
                             ;;
-                        6)
-                            aur_package_install "gloobus-sushi-bzr"
-                            ;;
                         7)
-                            package_install "gnome-packagekit gnome-settings-daemon-updates"
+                            aur_package_install "activity-log-manager"
+                            ;;
+                        8)
+                            aur_package_install "gloobus-sushi-bzr"
                             ;;
                         "d")
                             break
@@ -2110,11 +2114,12 @@ do
     echo " 3) $(menu_item "texlive-core" "latex")"
     echo " 4) $(menu_item "kchmviewer chmsee" "$([[ $KDE -eq 1 ]] && echo "Kchmviewer" || echo "Chmsee";)")"
     echo " 5) $(menu_item "gcstar")"
-    echo " 6) $(menu_item "impressive")"
-    echo " 7) $(menu_item "nitrotasks") $AUR"
-    echo " 8) $(menu_item "ocrfeeder")"
-    echo " 9) $(menu_item "xmind") $AUR"
-    echo "10) $(menu_item "zathura")"
+    echo " 6) $(menu_item "homebank")"
+    echo " 7) $(menu_item "impressive")"
+    echo " 8) $(menu_item "nitrotasks") $AUR"
+    echo " 9) $(menu_item "ocrfeeder")"
+    echo "10) $(menu_item "xmind") $AUR"
+    echo "11) $(menu_item "zathura")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2157,19 +2162,22 @@ do
                 package_install "gcstar"
                 ;;
             6)
-                package_install "impressive"
+                package_install "homebank"
                 ;;
             7)
-                aur_package_install "nitrotasks"
+                package_install "impressive"
                 ;;
             8)
+                aur_package_install "nitrotasks"
+                ;;
+            9)
                 package_install "ocrfeeder tesseract gocr"
                 aur_package_install "aspell-$LANGUAGE_AS"
                 ;;
-            9)
+            10)
                 aur_package_install "xmind"
                 ;;
-            10)
+            11)
                 package_install "zathura"
                 ;;
             "b")
@@ -2310,10 +2318,11 @@ do
     echo "10) $(menu_item "pidgin")"
     echo "11) $(menu_item "remmina")"
     echo "12) $(menu_item "skype")"
-    echo "13) $(menu_item "teamspeak3") $AUR"
-    echo "14) $(menu_item "teamviewer") $AUR"
-    echo "15) $(menu_item "transmission-qt transmission-gtk" "Trasmission")"
-    echo "16) $(menu_item "konversation xchat" "$([[ $KDE -eq 1 ]] && echo "Konversation" || echo "X-Chat";)")"
+    echo "13) $(menu_item "steadyflow-bzr") $AUR"
+    echo "14) $(menu_item "teamspeak3") $AUR"
+    echo "15) $(menu_item "teamviewer") $AUR"
+    echo "16) $(menu_item "transmission-qt transmission-gtk" "Trasmission")"
+    echo "17) $(menu_item "konversation xchat" "$([[ $KDE -eq 1 ]] && echo "Konversation" || echo "X-Chat";)")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2457,12 +2466,13 @@ do
     echo " 7) $(menu_item "musique") $AUR"
     echo " 8) $(menu_item "nuvola-bzr-stable") $AUR"
     echo " 9) $(menu_item "rhythmbox")"
-    echo "10) $(menu_item "spotify") $AUR"
-    echo "11) $(menu_item "soundconverter")"
-    echo "12) $(menu_item "puddletag") $AUR"
-    echo "13) $(menu_item "audacity")"
-    echo "14) $(menu_item "timidity++")"
-    echo "15) $(menu_item "gstreamer0.10-ugly" "Codecs")"
+    echo "10) $(menu_item "radiotray") $AUR"
+    echo "11) $(menu_item "spotify") $AUR"
+    echo "12) $(menu_item "soundconverter")"
+    echo "13) $(menu_item "puddletag") $AUR"
+    echo "14) $(menu_item "audacity")"
+    echo "15) $(menu_item "timidity++")"
+    echo "16) $(menu_item "gstreamer0.10-ugly" "Codecs")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2498,22 +2508,25 @@ do
                 package_install "rhythmbox"
                 ;;
             10)
-                aur_package_install "spotify"
+                aur_package_install "radiotray"
                 ;;
             11)
-                package_install "soundconverter"
+                aur_package_install "spotify"
                 ;;
             12)
-                aur_package_install "puddletag"
+                package_install "soundconverter"
                 ;;
             13)
-                package_install "audacity"
+                aur_package_install "puddletag"
                 ;;
             14)
+                package_install "audacity"
+                ;;
+            15)
                 aur_package_install "timidity++ fluidr3"
                 echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                 ;;
-            15)
+            16)
                 package_install "gstreamer0.10-plugins"
                 ;;
             "b")
@@ -2658,8 +2671,9 @@ do
                     echo " 3) $(menu_item "dead-cyborg-episode1" "Dead Cyborg") $AUR"
                     echo " 4) $(menu_item "mars-shooter" "M.A.R.S.") $AUR"
                     echo " 5) $(menu_item "opentyrian-hg") $AUR"
-                    echo " 6) $(menu_item "steelstorm") $AUR"
-                    echo " 7) $(menu_item "yofrankie" "Yo Frankie!") $AUR"
+                    echo " 6) $(menu_item "srb2" "Sonic Robot Bast 2") $AUR"
+                    echo " 7) $(menu_item "steelstorm") $AUR"
+                    echo " 8) $(menu_item "yofrankie" "Yo Frankie!") $AUR"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2684,9 +2698,12 @@ do
                                 aur_package_install "opentyrian-hg"
                                 ;;
                             6)
-                                aur_package_install "steelstorm"
+                                aur_package_install "srb2"
                                 ;;
                             7)
+                                aur_package_install "steelstorm"
+                                ;;
+                            8)
                                 aur_package_install "yofrankie"
                                 ;;
                             "b")

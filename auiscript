@@ -16,7 +16,7 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-# Create a custom install with all options pre-selected
+# Create a custom install with all options pre-selected, use with care.
 # Active:
 # 0) No
 # 1) Yes
@@ -110,13 +110,14 @@ AUTOMATIC_MODE=0
         E17_OPTIONS=""
     #}}}
     #GNOME {{{
-        # 1) Gnome Icons [Faience, Faenza, Elementary]
-        # 2) Gnome Themes [Zukitwo, Orion, eGTK, Light, Aldabra]
-        # 3) GnomeShell Extensions
-        # 4) GnomeShell Themes [eOS, Nord, Faience, Dark Shine]
-        # 5) Gnome Activity Journal
-        # 6) Gloobus Preview
-        # 7) Packagekit
+        # 1) GNOME Icons
+        # 2) GNOME Themes
+        # 3) GNOME Shell
+        # 4) GNOME Shell
+        # 5) Packagekit
+        # 6) Activity Journal
+        # 7) Activity Log Manager
+        # 8) Gloobus Preview
         GNOME_OPTIONS="1-5 7"
         #GNOME EXTENSIONS {{{
             # 1) gpaste
@@ -250,16 +251,17 @@ AUTOMATIC_MODE=0
 #}}}
 #OFFICE {{{
     # 1) LibreOffice
-    # 2) GnomeOffice [Abiword, Gnumeric]
+    # 2) GNOME Office [Abiword, Gnumeric]
     # 3) Latex + Texmaker
     # 4) CHM Viewer
     # 5) GCStar
-    # 6) Impressive
-    # 7) Nitrotask
-    # 8) OCRFeeder
-    # 9) Xmind
-    #10) Zathura
-    OFFICE_OPTIONS="1 3 6 7 10"
+    # 6) Homebank
+    # 7) Impressive
+    # 8) Nitrotask
+    # 9) OCRFeeder
+    #10) Xmind
+    #11) Zathura
+    OFFICE_OPTIONS="1 3 6-8 11"
 #}}}
 #SYSTEM TOOLS {{{
     # 1) Gparted
@@ -294,10 +296,11 @@ AUTOMATIC_MODE=0
     #10) Pidgin
     #11) Remmina
     #12) Skype
-    #13) Teamspeak
-    #14) Teamviewer
-    #15) Trasmission
-    #16) X-Chat/Konversation
+    #13) Steadyflow
+    #14) Teamspeak
+    #15) Teamviewer
+    #16) Trasmission
+    #17) X-Chat/Konversation
     INTERNET_OPTIONS="1 3 4 5 8"
 #}}}
 #LAMP {{{
@@ -313,13 +316,14 @@ AUTOMATIC_MODE=0
     # 7) Musique
     # 8) Nuvola
     # 9) Rhythmbox
-    #10) Spotify
-    #11) Soundconverter
-    #12) Puddletag
-    #13) Audacity
-    #14) MIDI
-    #15) Codecs
-    AUDIO_OPTIONS="4 11 15"
+    #10) Radiotray
+    #11) Spotify
+    #12) Soundconverter
+    #13) Puddletag
+    #14) Audacity
+    #15) MIDI
+    #16) Codecs
+    AUDIO_OPTIONS="4 12 16"
 #}}}
 #VIDEO {{{
     # 1) Audience
@@ -359,8 +363,9 @@ AUTOMATIC_MODE=0
         # 3) Dead Cyborg
         # 4) M.A.R.S.
         # 5) OpenTyrian
-        # 6) SteelStorm
-        # 7) Yo Frankie!
+        # 6) Sonic Robot Bast 2
+        # 7) SteelStorm
+        # 8) Yo Frankie!
         ACTION=""
     #}}}
     #ARCADE {{{
