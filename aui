@@ -1172,7 +1172,7 @@ function install_desktop_environment(){
             aur_package_install "cinnamon"
             package_install "gnome-extra gedit-plugins"
             package_install "telepathy"
-            package_install "gksu nautilus-open-terminal xdg-user-dirs-gtk"
+            package_install "gksu nautilus-open-terminal gnome-tweak-tool xdg-user-dirs-gtk"
             package_install "gvfs-smb"
             package_install "pulseaudio"
             package_install "deja-dup"
@@ -1187,11 +1187,11 @@ function install_desktop_environment(){
                 print_title "CINNAMON CUSTOMIZATION"
                 echo " 1) $(menu_item "cinnamon-applets") $AUR"
                 echo " 2) $(menu_item "cinnamon-themes") $AUR"
-                echo " 3) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
-                echo " 4) $(menu_item "zukini-theme gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes" "GTK2/GTK3 Themes") $AUR"
-                echo " 5) $(menu_item "gnome-activity-journal") $AUR"
-                echo " 6) $(menu_item "gloobus-sushi-bzr") $AUR"
-                echo " 7) $(menu_item "gnome-packagekit")"
+                echo " 3) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "GNOME Icons") $AUR"
+                echo " 4) $(menu_item "zukini-theme gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes" "GNOME Themes") $AUR"
+                echo " 5) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
+                echo " 6) $(menu_item "gnome-activity-journal") $AUR"
+                echo " 7) $(menu_item "gloobus-sushi-bzr") $AUR"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1214,14 +1214,14 @@ function install_desktop_environment(){
                             OPT=2
                             ;;
                         5)
+                            package_install "gnome-packagekit gnome-settings-daemon-updates"
+                            ;;
+                        6)
                             aur_package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
                             aur_package_install "gnome-activity-journal"
                             ;;
-                        6)
-                            aur_package_install "gloobus-sushi-bzr"
-                            ;;
                         7)
-                            package_install "gnome-packagekit gnome-settings-daemon-updates"
+                            aur_package_install "gloobus-sushi-bzr"
                             ;;
                         "d")
                             break

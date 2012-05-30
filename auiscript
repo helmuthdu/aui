@@ -87,11 +87,11 @@ AUTOMATIC_MODE=0
     #CINNAMON {{{
         # 1) Cinnamon Applets
         # 2) Cinnamon Themes
-        # 3) Gnome Icons
-        # 4) Gnome Themes
-        # 5) Gnome Activity Journal
-        # 6) Gloobus Preview
-        # 7) Packagekit
+        # 3) GNOME Icons
+        # 4) GNOME Themes
+        # 5) GNOME Packagekit
+        # 6) Activity Journal
+        # 7) Gloobus Preview
         CINNAMON_OPTIONS="1-5"
     #}}}
     #E17 {{{
