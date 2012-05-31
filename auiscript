@@ -455,12 +455,13 @@ AUTOMATIC_MODE=0
 #FONTS {{{
     # 1) ttf-dejavu
     # 2) ttf-google-webfonts
-    # 3) ttf-kochi-substitute
-    # 4) ttf-liberation
-    # 5) ttf-ms-fonts
-    # 6) ttf-vista-fonts
-    # 7) ttf-mac-fonts
-    FONTS_OPTIONS="1-7"
+    # 3) ttf-funfonts
+    # 4) ttf-kochi-substitute
+    # 5) ttf-liberation
+    # 6) ttf-mac-fonts
+    # 7) ttf-ms-fonts
+    # 8) ttf-vista-fonts
+    FONTS_OPTIONS="1 2 4-8"
     GOOGLE_FONTS="n"
 #}}}
 #FONTS CONFIGURATION {{{
