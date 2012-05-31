@@ -1340,7 +1340,7 @@ function install_desktop_environment(){
             print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
             package_install "gnome gnome-extra telepathy"
             gpasswd -a $USERNAME camera
-            package_install "gksu nautilus-open-terminal gedit-plugins gnome-tweak-tool"
+            package_install "gksu nautilus-open-terminal gnome-search-tool gedit-plugins gnome-tweak-tool"
             package_install "gvfs-smb"
             package_install "zeitgeist"
             package_install "deja-dup"
