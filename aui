@@ -961,11 +961,10 @@ function install_additional_firmwares(){
                 echo " 4) $(menu_item "b43-firmware") $AUR"
                 echo " 5) $(menu_item "b43-firmware-legacy") $AUR"
                 echo " 6) $(menu_item "broadcom-wl") $AUR"
-                echo " 7) $(menu_item "rt2860-firmware") $AUR"
-                echo " 8) $(menu_item "bluez-firmware") "
-                echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
-                echo "10) $(menu_item "libraw1394") [IEEE1394 Driver]"
-                echo "11) $(menu_item "sane-gt68xx-firmware")"
+                echo " 7) $(menu_item "bluez-firmware") "
+                echo " 8) $(menu_item "libffado") [Fireware Audio Devices]"
+                echo " 9) $(menu_item "libraw1394") [IEEE1394 Driver]"
+                echo "10) $(menu_item "sane-gt68xx-firmware")"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -992,18 +991,15 @@ function install_additional_firmwares(){
                             aur_package_install "broadcom-wl"
                             ;;
                         7)
-                            aur_package_install "rt2860-firmware"
-                            ;;
-                        8)
                             package_install "bluez-firmware"
                             ;;
-                        9)
+                        8)
                             package_install "libffado"
                             ;;
-                        10)
+                        9)
                             package_install "libraw1394"
                             ;;
-                        11)
+                        10)
                             package_install "sane-gt68xx-firmware"
                             ;;
                         "d")
@@ -1894,8 +1890,6 @@ do
                 ;;
             2)
                 aur_package_install "conky-lua conky-colors"
-                sensors-detect
-                add_daemon "sensors"
                 ;;
             3)
                 aur_package_install "deepin-scrot-git"
