@@ -17,23 +17,21 @@
 #-------------------------------------------------------------------------------
 # Run this script after your first boot with archlinux (as root)
 
-#This script is used to active the automatic mode
 source auiscript
-
 #VARIABLES {{{
-# Desktop Environment
+# DESKTOP ENVIRONMENT {{{
 E17=0
 GNOME=0
 KDE=0
 LXDE=0
 OPENBOX=0
 XFCE=0
-
-# Aur Helper
+#}}}
+# AUR HELPER {{{
 YAOURT=0
 PACKER=0
-
-# Main menu
+#}}}
+# MAIN MENU {{{
 BASICSETUP=0
 DESKTOPENVIRONMENT=0
 ACCESSORIES=0
@@ -49,15 +47,15 @@ GAMES=0
 FONTS=0
 FONTSCONFIG=0
 CLEANPACKAGES=0
-
-# Arch
+#}}}
+# ARCH {{{
 ARCHI=`uname -m`
-
-# Prompt
+#}}}
+# PROMPT {{{
 prompt1="Enter your option: "
 prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
-
-# Colors
+#}}}
+# COLORS {{{
 # Regular Colors
 Black='\e[0;30m'        # Black
 Blue='\e[0;34m'         # Blue
@@ -76,9 +74,7 @@ BPurple='\e[1;35m'      # Purple
 BRed='\e[1;31m'         # Red
 BWhite='\e[1;37m'       # White
 BYellow='\e[1;33m'      # Yellow
-# Background
-On_Blue='\e[37;44m'        # Blue
-
+#}}}
 AUR=`echo -e "(${BPurple}aur${White})"`
 #}}}
 
@@ -133,7 +129,8 @@ function print_info (){ #{{{
     echo -e "${BWhite}$1${White}\n" | fold -sw $(( $T_COLS - 18 )) | sed 's/^/\t/'
 } #}}}
 function print_warning (){ #{{{
-    echo -e "${BRed}$1${White}\n"
+    T_COLS=`tput cols`
+    echo -e "${BRed}$1${White}\n" | fold -sw $(( $T_COLS - 1 ))
 } #}}}
 function remove_daemon(){ #{{{
     sed -i '/DAEMONS[=]/s/ '"$1"'//' /etc/rc.conf
@@ -680,6 +677,22 @@ function choose_aurhelper(){
     done
     sumary "AUR Helper installation"
     pause_function
+}
+#}}}
+#AUTOMATIC MODE{{{
+function automatic_mode(){
+    AUTOMATIC_MODE=0
+    print_title "AUTOMATIC MODE"
+    print_info "Create a custom install with all options pre-selected.\nUse this option with care."
+    print_warning "\tUse this mode only if you already know all the option.\n\tYou won't be able to select anything later."
+    read_input_text "Enable Automatic Mode"
+    if [[ $OPTION == y ]]; then
+        [[ -f packages_not_installed.txt ]] && rm packages_not_installed.txt;
+        $EDITOR auiscript
+        echo -e "The installation will start now."
+        pause_function
+        AUTOMATIC_MODE=1
+    fi
 }
 #}}}
 #PACKMAN PACKAGE SIGNING {{{
@@ -2655,8 +2668,8 @@ do
     echo ""
     echo " b) BACK"
     echo ""
-    FUN+=" b"
-    read_input_options "$FUN"
+    GAMES_OPTIONS+=" b"
+    read_input_options "$GAMES_OPTIONS"
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
@@ -3354,6 +3367,7 @@ language_selector
 system_upgrade
 select_user
 choose_aurhelper
+automatic_mode
 
 while [[ 1 ]]
 do
