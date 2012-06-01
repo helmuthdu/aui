@@ -17,7 +17,6 @@
 #-------------------------------------------------------------------------------
 # Run this script after your first boot with archlinux (as root)
 
-source auiscript
 #VARIABLES {{{
 # DESKTOP ENVIRONMENT {{{
 E17=0
@@ -75,6 +74,7 @@ BRed='\e[1;31m'         # Red
 BWhite='\e[1;37m'       # White
 BYellow='\e[1;33m'      # Yellow
 #}}}
+AUTOMATIC_MODE=0
 AUR=`echo -e "(${BPurple}aur${White})"`
 #}}}
 
@@ -681,7 +681,6 @@ function choose_aurhelper(){
 #}}}
 #AUTOMATIC MODE{{{
 function automatic_mode(){
-    AUTOMATIC_MODE=0
     print_title "AUTOMATIC MODE"
     print_info "Create a custom install with all options pre-selected.\nUse this option with care."
     print_warning "\tUse this mode only if you already know all the option.\n\tYou won't be able to select anything later."
@@ -689,6 +688,7 @@ function automatic_mode(){
     if [[ $OPTION == y ]]; then
         [[ -f packages_not_installed.txt ]] && rm packages_not_installed.txt;
         $EDITOR auiscript
+        source auiscript
         echo -e "The installation will start now."
         pause_function
         AUTOMATIC_MODE=1
@@ -974,10 +974,11 @@ function install_additional_firmwares(){
                 echo " 4) $(menu_item "b43-firmware") $AUR"
                 echo " 5) $(menu_item "b43-firmware-legacy") $AUR"
                 echo " 6) $(menu_item "broadcom-wl") $AUR"
-                echo " 7) $(menu_item "bluez-firmware") "
-                echo " 8) $(menu_item "libffado") [Fireware Audio Devices]"
-                echo " 9) $(menu_item "libraw1394") [IEEE1394 Driver]"
-                echo "10) $(menu_item "sane-gt68xx-firmware")"
+                echo " 7) $(menu_item "zd1211-firmware ")"
+                echo " 8) $(menu_item "bluez-firmware") "
+                echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
+                echo "10) $(menu_item "libraw1394") [IEEE1394 Driver]"
+                echo "11) $(menu_item "sane-gt68xx-firmware")"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1004,15 +1005,18 @@ function install_additional_firmwares(){
                             aur_package_install "broadcom-wl"
                             ;;
                         7)
-                            package_install "bluez-firmware"
+                            package_install "zd1211-firmware"
                             ;;
                         8)
-                            package_install "libffado"
+                            package_install "bluez-firmware"
                             ;;
                         9)
-                            package_install "libraw1394"
+                            package_install "libffado"
                             ;;
                         10)
+                            package_install "libraw1394"
+                            ;;
+                        11)
                             package_install "sane-gt68xx-firmware"
                             ;;
                         "d")
