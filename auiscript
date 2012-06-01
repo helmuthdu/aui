@@ -35,16 +35,17 @@
     MAINMENU="1-10 13"
 #}}}
 #BASIC SETUP{{{
-    LANGSELECT="y"
-    REFLECTOR="n"
-    PACKAGESIGN="n"
+    FIRMWARE="n"
     CUPS="y"
+    CUSTOMREPO="n"
     GITTOR="y"
+    LANGSELECT="y"
     NFS="n"
+    PACKAGESIGN="n"
+    REFLECTOR="n"
     SAMBA="y"
     SSH="y"
     TLP="n"
-    CUSTOMREPO="n"
     #VIDEOCARD {{{
         # 1) Intel
         # 2) ATI
@@ -55,17 +56,17 @@
         VIDEOCARD=3
     #}}}
     #ADDITIONAL FIRMWARE {{{
-        FIRMWARE="n"
         # 1) alsa-firmware
         # 2) ipw2100
         # 3) ipw2200
         # 4) b43
         # 5) b43legacy
         # 6) broadcom-wl
-        # 7) bluez-firmware
-        # 8) libffado [Fireware Audio Devices]
-        # 8) libraw1394 [IEE1394 Driver]
-        # 9) sane-gt68xx-firmware
+        # 7) zd1211-firmware
+        # 8) bluez-firmware
+        # 9) libffado [Fireware Audio Devices]
+        #10) libraw1394 [IEE1394 Driver]
+        #11) sane-gt68xx-firmware
         FIRMWARE_OPTIONS=""
     #}}}
 #}}}
