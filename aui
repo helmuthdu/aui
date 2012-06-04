@@ -711,9 +711,9 @@ function configure_pacman_package_signing(){
             sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
             rngd -f -r /dev/urandom &
             pacman-key --init --keyserver pgp.mit.edu
+            pacman-key --populate archlinux
             killall rngd
             package_remove "rng-tools"
-            pacman-key --populate
             #DEVELOPER AND TU KEYS {{{
             KEYS="y"
             read_input_text "Install Developer and TU Keys" $KEYS
