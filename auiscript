@@ -128,8 +128,9 @@
         #GNOME SHELL THEMES {{{
             # 1) Dark Shine
             # 2) Elegance
-            # 3) Frieze
-            GNOME_SHELL_THEMES="1-3"
+            # 3) eOS
+            # 4) Frieze
+            GNOME_SHELL_THEMES="1-4"
         #}}}
     #}}}
     #KDE {{{
@@ -283,20 +284,21 @@
     # 2) Chromium
     # 3) Google Earth
     # 4) Google Chrome
-    # 5) Jdownloader
-    # 6) Irssi
-    # 7) Midori
-    # 8) Mozilla Firefox
-    # 9) Mozilla Thunderbird
-    #10) Pidgin
-    #11) Remmina
-    #12) Skype
-    #13) Steadyflow
-    #14) Teamspeak
-    #15) Teamviewer
-    #16) Trasmission
-    #17) X-Chat/Konversation
-    INTERNET_OPTIONS="1 3 4 5 8"
+    # 5) Google Talk-Plugin
+    # 6) Jdownloader
+    # 7) Irssi
+    # 8) Midori
+    # 9) Mozilla Firefox
+    #10) Mozilla Thunderbird
+    #11) Pidgin
+    #12) Remmina
+    #13) Skype
+    #14) Steadyflow
+    #15) Teamspeak
+    #16) Teamviewer
+    #17) Trasmission
+    #18) X-Chat/Konversation
+    INTERNET_OPTIONS="3-6 9"
 #}}}
 #LAMP {{{
     LAMP="y"
@@ -464,5 +466,5 @@
     # 2) Cleartype patched packages
     # 3) Infinality patched packages
     # 4) Reverting to unpatched packages
-    FONTSCONFIG_OPTION=""
+    FONTSCONFIG_OPTION="3"
 #}}}

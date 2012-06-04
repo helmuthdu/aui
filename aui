@@ -189,9 +189,9 @@ function aur_package_install(){ #{{{
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
             if [[ $YAOURT -eq 1 ]]; then
-                su -l $USERNAME --command="yaourt -S --noconfirm $PACKAGE"
+                sudo -u $USERNAME yaourt -S --noconfirm $PACKAGE
             else
-                su -l $USERNAME --command="packer -S --noconfirm $PACKAGE"
+                sudo -u $USERNAME packer -S --noconfirm $PACKAGE
             fi
             #RECHECK #{{{
             if ! check_package "$PACKAGE" ; then
@@ -201,9 +201,9 @@ function aur_package_install(){ #{{{
                     read_input_text "Package $PACKAGE not installed, try install again?"
                     if [[ $OPTION == y ]]; then
                         if [[ $YAOURT -eq 1 ]]; then
-                            su -l $USERNAME --command="yaourt -S $PACKAGE"
+                            sudo -u $USERNAME yaourt -S $PACKAGE
                         else
-                            su -l $USERNAME --command="packer -S $PACKAGE"
+                            sudo -u $USERNAME packer -S $PACKAGE
                         fi
                     fi
                 fi
@@ -507,7 +507,8 @@ function select_user(){
     ## Same thing without a password (not secure)
     #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
     #}}}
-    create_new_user(){ #{{{
+    #CREATE NEW USER {{{
+    create_new_user(){
         read -p "Username: " USERNAME
         useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
         passwd $USERNAME
@@ -588,7 +589,7 @@ function select_user(){
             chown -R $USERNAME:users /home/$USERNAME
         #}}}
     } #}}}
-    print_title "SELECT USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
+    print_title "SELECT/CREATE USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
     users=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
     PS3="$prompt1"
     echo "Avaliable Users:"
@@ -708,7 +709,7 @@ function configure_pacman_package_signing(){
             pacman-key --init --keyserver pgp.mit.edu
             killall rngd
             package_remove "rng-tools"
-            package_install "archlinux-keyring"
+            pacman-key --populate
             #DEVELOPER AND TU KEYS {{{
             KEYS="y"
             read_input_text "Install Developer and TU Keys" $KEYS
@@ -765,18 +766,28 @@ function install_basic_setup(){
     add_daemon "@sshd"
     [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
     #CONFIGURE SSHD_CONF #{{{
-        sed -i '/ListenAddress/s/^#//' /etc/ssh/sshd_config
+        sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
+        sed -i '/Protocol 2/s/^#//' /etc/ssh/sshd_config
+        sed -i '/HostKey \/etc\/ssh/ssh_host_rsa_key/s/^#//' /etc/ssh/sshd_config
+        sed -i '/HostKey \/etc\/ssh/ssh_host_dsa_key/s/^#//' /etc/ssh/sshd_config
+        sed -i '/HostKey \/etc\/ssh/ssh_host_ecdsa_key/s/^#//' /etc/ssh/sshd_config
+        sed -i '/KeyRegenerationInterval/s/^#//' /etc/ssh/sshd_config
+        sed -i '/ServerKeyBits/s/^#//' /etc/ssh/sshd_config
         sed -i '/SyslogFacility/s/^#//' /etc/ssh/sshd_config
         sed -i '/LogLevel/s/^#//' /etc/ssh/sshd_config
         sed -i '/LoginGraceTime/s/^#//' /etc/ssh/sshd_config
         sed -i '/PermitRootLogin/s/^#//' /etc/ssh/sshd_config
+        sed -i '/HostbasedAuthentication/s/^#//' /etc/ssh/sshd_config
         sed -i '/StrictModes/s/^#//' /etc/ssh/sshd_config
         sed -i '/RSAAuthentication/s/^#//' /etc/ssh/sshd_config
         sed -i '/PubkeyAuthentication/s/^#//' /etc/ssh/sshd_config
         sed -i '/IgnoreRhosts/s/^#//' /etc/ssh/sshd_config
         sed -i '/PermitEmptyPasswords/s/^#//' /etc/ssh/sshd_config
+        sed -i '/AllowTcpForwarding/s/^#//' /etc/ssh/sshd_config
+        sed -i '/AllowTcpForwarding no/d' /etc/ssh/sshd_config
         sed -i '/X11Forwarding/s/^#//' /etc/ssh/sshd_config
         sed -i '/X11Forwarding/s/no/yes/' /etc/ssh/sshd_config
+        sed -i -e '/\tX11Forwarding yes/d' /etc/ssh/sshd_config
         sed -i '/X11DisplayOffset/s/^#//' /etc/ssh/sshd_config
         sed -i '/X11UseLocalhost/s/^#//' /etc/ssh/sshd_config
         sed -i '/PrintMotd/s/^#//' /etc/ssh/sshd_config
@@ -785,7 +796,7 @@ function install_basic_setup(){
         sed -i '/TCPKeepAlive/s/^#//' /etc/ssh/sshd_config
         sed -i '/the setting of/s/^/#/' /etc/ssh/sshd_config
         sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
-        sed -i '/ListenAddress\ ::/s/^/#/' /etc/ssh/sshd_config
+        ln -sv `dirname $(xauth info | awk '/Authority file/{print $3}')` /home/$USERNAME/.Xauthority
     #}}}
     #SAMBA #{{{
     print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
@@ -1054,7 +1065,7 @@ function install_git_tor(){
                 chmod +x /usr/bin/proxy-wrapper
                 echo -e '\nexport GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"' >> /etc/bash.bashrc
                 export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
-                su -l $USERNAME --command='export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"'
+                sudo -u $USERNAME export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
             fi
             groupadd -g 42 privoxy
             useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
@@ -1171,7 +1182,7 @@ function install_desktop_environment(){
     print_title "DESKTOP ENVIRONMENT - https://wiki.archlinux.org/index.php/Desktop_Environment"
     print_info "Desktop environments provide a complete graphical user interface (GUI) for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries."
     echo -e "Choose your desktop-environment:\n"
-    echo " 1) Cinnamon"
+    echo " 1) Cinnamon $AUR"
     echo " 2) E17"
     echo " 3) GNOME"
     echo " 4) KDE"
@@ -1251,6 +1262,8 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
+            sudo -u "$USERNAME" gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"
+            sudo -u "$USERNAME" gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"
             config_dm "gdm"
             CURRENT_STATUS=1
             GNOME=1
@@ -1458,7 +1471,8 @@ function install_desktop_environment(){
                                 print_title "GNOMESHELL THEMES"
                                 echo " 1) $(menu_item "gnome-shell-theme-dark-shine")"
                                 echo " 2) $(menu_item "gnome-shell-theme-elegance")"
-                                echo " 3) $(menu_item "gnome-shell-theme-frieze")"
+                                echo " 3) $(menu_item "gnome-shell-theme-eos")"
+                                echo " 4) $(menu_item "gnome-shell-theme-frieze")"
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
@@ -1473,6 +1487,9 @@ function install_desktop_environment(){
                                             aur_package_install "gnome-shell-theme-elegance"
                                             ;;
                                         3)
+                                            aur_package_install "gnome-shell-theme-eos"
+                                            ;;
+                                        4)
                                             aur_package_install "gnome-shell-theme-frieze"
                                             ;;
                                         "b")
@@ -1512,6 +1529,8 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
+            sudo -u "$USERNAME" gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"
+            sudo -u "$USERNAME" gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"
             config_dm "gdm"
             CURRENT_STATUS=1
             GNOME=1
@@ -2325,19 +2344,20 @@ do
     echo " 2) $(menu_item "chromium")"
     echo " 3) $(menu_item "google-earth") $AUR"
     echo " 4) $(menu_item "google-chrome") $AUR"
-    echo " 5) $(menu_item "jdownloader") $AUR"
-    echo " 6) $(menu_item "irssi")"
-    echo " 7) $(menu_item "midori")"
-    echo " 8) $(menu_item "firefox")"
-    echo " 9) $(menu_item "thunderbird")"
-    echo "10) $(menu_item "pidgin")"
-    echo "11) $(menu_item "remmina")"
-    echo "12) $(menu_item "skype")"
-    echo "13) $(menu_item "steadyflow-bzr") $AUR"
-    echo "14) $(menu_item "teamspeak3") $AUR"
-    echo "15) $(menu_item "teamviewer") $AUR"
-    echo "16) $(menu_item "transmission-qt transmission-gtk" "Trasmission")"
-    echo "17) $(menu_item "konversation xchat" "$([[ $KDE -eq 1 ]] && echo "Konversation" || echo "X-Chat";)")"
+    echo " 5) $(menu_item "google-talkplugin") $AUR"
+    echo " 6) $(menu_item "jdownloader") $AUR"
+    echo " 7) $(menu_item "irssi")"
+    echo " 8) $(menu_item "midori")"
+    echo " 9) $(menu_item "firefox")"
+    echo "10) $(menu_item "thunderbird")"
+    echo "11) $(menu_item "pidgin")"
+    echo "12) $(menu_item "remmina")"
+    echo "13) $(menu_item "skype")"
+    echo "14) $(menu_item "steadyflow-bzr") $AUR"
+    echo "15) $(menu_item "teamspeak3") $AUR"
+    echo "16) $(menu_item "teamviewer") $AUR"
+    echo "17) $(menu_item "transmission-qt transmission-gtk" "Trasmission")"
+    echo "18) $(menu_item "konversation xchat" "$([[ $KDE -eq 1 ]] && echo "Konversation" || echo "X-Chat";)")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2367,43 +2387,49 @@ do
                 aur_package_install "google-chrome flashplugin"
                 ;;
             5)
-                aur_package_install "jdownloader"
+                aur_package_install "google-talkplugin"
                 ;;
             6)
-                package_install "irssi"
+                aur_package_install "jdownloader"
                 ;;
             7)
-                package_install "midori"
+                package_install "irssi"
                 ;;
             8)
-                package_install "firefox firefox-i18n-$LANGUAGE_FF flashplugin "
+                package_install "midori"
                 ;;
             9)
-                package_install "thunderbird thunderbird-i18n-$LANGUAGE_FF"
+                package_install "firefox firefox-i18n-$LANGUAGE_FF flashplugin "
                 ;;
             10)
-                package_install "pidgin"
+                package_install "thunderbird thunderbird-i18n-$LANGUAGE_FF"
                 ;;
             11)
-                package_install "remmina"
+                package_install "pidgin"
                 ;;
             12)
-                package_install "skype"
+                package_install "remmina"
                 ;;
             13)
-                aur_package_install "teamspeak3"
+                package_install "skype"
                 ;;
             14)
-                aur_package_install "teamviewer"
+                package_install "steadyflow-bzr"
                 ;;
             15)
+                aur_package_install "teamspeak3"
+                ;;
+            16)
+                aur_package_install "teamviewer"
+                ;;
+            17)
                 if [[ $KDE -eq 1 ]]; then
                     package_install "transmission-qt"
                 else
                     package_install "transmission-gtk"
                 fi
                 ;;
-            16)
+            18)
                 if [[ $KDE -eq 1 ]]; then
                     package_install "konversation"
                 else
@@ -2451,8 +2477,8 @@ case "$OPTION" in
             sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
             #}}}
         fi
-        su -l $USERNAME --command="mkdir -p ~/Sites"
-        su -l $USERNAME --command="chmod o+x ~/ && chmod -R o+x ~/Sites"
+        sudo -u $USERNAME mkdir -p ~/Sites
+        sudo -u $USERNAME chmod o+x ~/ && chmod -R o+x ~/Sites
         rc.d restart httpd mysqld
         CURRENT_STATUS=1
         print_line
@@ -3305,17 +3331,7 @@ function configure_fonts(){
             pacman -Rdd --noconfirm freetype2
             aur_package_install "freetype2-infinality fontconfig-infinality"
             /etc/profile.d/infinality-settings.sh
-            infctl=("infinality" "linux" "osx" "osx2" "win7" "winxp")
-            PS3="$prompt1"
-            echo ""
-            select OPT in "${infctl[@]}"; do
-                if contains_element "$OPT" "${infctl[@]}"; then
-                    /etc/fonts/infinality/infctl.sh setstyle $OPT
-                    break
-                else
-                    invalid_option
-                fi
-            done
+            infctl setstyle
             CURRENT_STATUS=1
             ;;
         4)
