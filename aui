@@ -688,7 +688,7 @@ function automatic_mode(){
     read_input_text "Enable Automatic Mode"
     if [[ $OPTION == y ]]; then
         [[ -f packages_not_installed.txt ]] && rm packages_not_installed.txt;
-        sudo -u $USERNAME $EDITOR auiscript
+        $EDITOR auiscript
         source auiscript
         echo -e "The installation will start now."
         pause_function
