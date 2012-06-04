@@ -714,15 +714,6 @@ function configure_pacman_package_signing(){
             pacman-key --populate archlinux
             killall rngd
             package_remove "rng-tools"
-            #DEVELOPER AND TU KEYS {{{
-            KEYS="y"
-            read_input_text "Install Developer and TU Keys" $KEYS
-            if [[ $OPTION == y ]]; then
-                curl https://www.archlinux.org/{developers,trustedusers}/ |
-                awk -F\" '(/pgp.mit.edu/) {sub(/.*search=0x/,"");print $1}' |
-                xargs pacman-key --recv-keys
-            fi
-            #}}}
             sed -i '/SigLevel = Optional TrustAll/s/^#//' /etc/pacman.conf
             sed -i '/SigLevel = Never/s/^/#/' /etc/pacman.conf
             CURRENT_STATUS=1
