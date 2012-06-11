@@ -704,26 +704,17 @@ function automatic_mode(){
 function configure_pacman_package_signing(){
     print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
     print_info "Pacman-key is a new tool available with pacman 4. It allows the user to manage pacman's list of trusted keys in the new package signing implementation."
-    read_input_text "Automatically configure pacman package signing" $PACKAGESIGN
-    case "$OPTION" in
-        "y")
-            aur_package_install "rng-tools"
-            sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
-            rngd -f -r /dev/urandom &
-            pacman-key --init --keyserver pgp.mit.edu
-            pacman-key --populate archlinux
-            killall rngd
-            package_remove "rng-tools"
-            sed -i '/SigLevel = Optional TrustAll/s/^#//' /etc/pacman.conf
-            sed -i '/SigLevel = Never/s/^/#/' /etc/pacman.conf
-            CURRENT_STATUS=1
-            ;;
-        *)
-            CURRENT_STATUS=0
-            ;;
-    esac
-    sumary "Pacman signing configuration"
-    pause_function
+    if [[ ! -d /etc/pacman.d/gnupg ]]; then
+        aur_package_install "rng-tools"
+        sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
+        rngd -f -r /dev/urandom &
+        pacman-key --init --keyserver pgp.mit.edu
+        pacman-key --populate archlinux
+        killall rngd
+        package_remove "rngd"
+    else
+        echo "Warning: Pacman-key configured"
+    fi
 }
 #}}}
 #BASIC SETUP{{{
