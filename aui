@@ -497,16 +497,6 @@ function system_upgrade(){
 #}}}
 #SELECT/CREATE USER {{{
 function select_user(){
-    #ENABLE SUDO {{{
-    if ! check_package "sudo" ; then
-        print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
-        package_install "sudo"
-    fi
-    ## Uncomment to allow members of group wheel to execute any command
-    sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
-    ## Same thing without a password (not secure)
-    #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
-    #}}}
     #CREATE NEW USER {{{
     create_new_user(){
         read -p "Username: " USERNAME
@@ -611,6 +601,20 @@ function select_user(){
     done
 }
 #}}}
+#CONFIGURE SUDO {{{
+function configure_sudo(){
+    #ENABLE SUDO {{{
+    if ! check_package "sudo" ; then
+        print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
+        package_install "sudo"
+    fi
+    ## Uncomment to allow members of group wheel to execute any command
+    sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
+    ## Same thing without a password (not secure)
+    #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
+    #}}}
+}
+#}}}
 #AUR HELPER {{{
 function choose_aurhelper(){
     print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
@@ -702,18 +706,23 @@ function automatic_mode(){
 #}}}
 #PACKMAN PACKAGE SIGNING {{{
 function configure_pacman_package_signing(){
-    print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
-    print_info "Pacman-key is a new tool available with pacman 4. It allows the user to manage pacman's list of trusted keys in the new package signing implementation."
     if [[ ! -d /etc/pacman.d/gnupg ]]; then
-        aur_package_install "rng-tools"
+        print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
+        print_info "Pacman-key is a new tool available with pacman 4. It allows the user to manage pacman's list of trusted keys in the new package signing implementation."
+        su -l $USERNAME --command="
+            wget http://aur.archlinux.org/packages/rng-tools/rng-tools.tar.gz;
+            tar zxvf rng-tools.tar.gz;
+            cd rng-tools;
+            makepkg -si --noconfirm;
+            cd ..;
+            rm -fr rng-tools*
+        "
         sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
         rngd -f -r /dev/urandom &
         pacman-key --init --keyserver pgp.mit.edu
         pacman-key --populate archlinux
         killall rngd
-        package_remove "rngd"
-    else
-        echo "Warning: Pacman-key configured"
+        package_remove "rng-tools"
     fi
 }
 #}}}
@@ -3370,8 +3379,10 @@ function finish(){
 welcome
 check_root
 language_selector
-system_upgrade
 select_user
+configure_pacman_package_signing
+configure_sudo
+system_upgrade
 choose_aurhelper
 automatic_mode
 
@@ -3402,7 +3413,6 @@ do
         case "$OPT" in
             1)
                 add_custom_repositories
-                configure_pacman_package_signing
                 install_reflector
                 install_basic_setup
                 install_tlp
