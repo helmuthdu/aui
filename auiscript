@@ -41,7 +41,6 @@
     GITTOR="y"
     LANGSELECT="y"
     NFS="n"
-    PACKAGESIGN="n"
     REFLECTOR="n"
     SAMBA="y"
     SSH="y"
