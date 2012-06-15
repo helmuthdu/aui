@@ -763,9 +763,9 @@ function install_basic_setup(){
     #CONFIGURE SSHD_CONF #{{{
         sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
         sed -i '/Protocol 2/s/^#//' /etc/ssh/sshd_config
-        sed -i '/HostKey \/etc\/ssh/ssh_host_rsa_key/s/^#//' /etc/ssh/sshd_config
-        sed -i '/HostKey \/etc\/ssh/ssh_host_dsa_key/s/^#//' /etc/ssh/sshd_config
-        sed -i '/HostKey \/etc\/ssh/ssh_host_ecdsa_key/s/^#//' /etc/ssh/sshd_config
+        sed -i '/HostKey \/etc\/ssh\/ssh_host_rsa_key/s/^#//' /etc/ssh/sshd_config
+        sed -i '/HostKey \/etc\/ssh\/ssh_host_dsa_key/s/^#//' /etc/ssh/sshd_config
+        sed -i '/HostKey \/etc\/ssh\/ssh_host_ecdsa_key/s/^#//' /etc/ssh/sshd_config
         sed -i '/KeyRegenerationInterval/s/^#//' /etc/ssh/sshd_config
         sed -i '/ServerKeyBits/s/^#//' /etc/ssh/sshd_config
         sed -i '/SyslogFacility/s/^#//' /etc/ssh/sshd_config
