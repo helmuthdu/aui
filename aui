@@ -828,6 +828,40 @@ function install_basic_setup(){
     sumary "Nfs installation"
     pause_function
     #}}}
+    #PRELOAD #{{{
+    print_title "PRELOAD - https://wiki.archlinux.org/index.php/Preload"
+    print_info "Preload is a program which runs as a daemon and records statistics about usage of programs using Markov chains; files of more frequently-used programs are, during a computer's spare time, loaded into memory. This results in faster startup times as less data needs to be fetched from disk. preload is often paired with prelink."
+    read_input_text "Install Preload" $PRELOAD
+    case "$OPTION" in
+        "y")
+            package_install "preload"
+            add_daemon "@preload"
+            CURRENT_STATUS=1
+            ;;
+        *)
+            CURRENT_STATUS=0
+            ;;
+    esac
+    sumary "Samba installation"
+    pause_function
+    #}}}
+    #ZRAM #{{{
+    print_title "ZRAM - https://wiki.archlinux.org/index.php/Maximizing_Performance"
+    print_info "Zram creates a device in RAM and compresses it. If you use for swap means that part of the RAM can hold much more information but uses more CPU. Still, it is much quicker than swapping to a hard drive. If a system often falls back to swap, this could improve responsiveness. Zram is in mainline staging (therefore its not stable yet, use with caution)."
+    read_input_text "Install Zram" $ZRAM
+    case "$OPTION" in
+        "y")
+            aur_package_install "zramswap"
+            add_daemon "@zramswap"
+            CURRENT_STATUS=1
+            ;;
+        *)
+            CURRENT_STATUS=0
+            ;;
+    esac
+    sumary "Samba installation"
+    pause_function
+    #}}}
 }
 #}}}
 #TLP #{{{
@@ -2342,7 +2376,7 @@ do
     echo " 5) $(menu_item "google-talkplugin") $AUR"
     echo " 6) $(menu_item "jdownloader") $AUR"
     echo " 7) $(menu_item "irssi")"
-    echo " 8) $(menu_item "midori")"
+    echo " 8) $(menu_item "rekonq midori" "$([[ $KDE -eq 1 ]] && echo "Rekonq" || echo "Midori";)")"
     echo " 9) $(menu_item "firefox")"
     echo "10) $(menu_item "thunderbird")"
     echo "11) $(menu_item "pidgin")"
@@ -2391,7 +2425,11 @@ do
                 package_install "irssi"
                 ;;
             8)
-                package_install "midori"
+                if [[ $KDE -eq 1 ]]; then
+                    package_install "rekonq"
+                else
+                    package_install "midori"
+                fi
                 ;;
             9)
                 package_install "firefox firefox-i18n-$LANGUAGE_FF flashplugin "

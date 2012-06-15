@@ -41,10 +41,12 @@
     GITTOR="y"
     LANGSELECT="y"
     NFS="n"
+    PRELOAD="y"
     REFLECTOR="n"
     SAMBA="y"
     SSH="y"
     TLP="n"
+    ZRAM="y"
     #VIDEOCARD {{{
         # 1) Intel
         # 2) ATI
@@ -286,7 +288,7 @@
     # 5) Google Talk-Plugin
     # 6) Jdownloader
     # 7) Irssi
-    # 8) Midori
+    # 8) Midori|Rekonq
     # 9) Mozilla Firefox
     #10) Mozilla Thunderbird
     #11) Pidgin
@@ -296,7 +298,7 @@
     #15) Teamspeak
     #16) Teamviewer
     #17) Trasmission
-    #18) X-Chat/Konversation
+    #18) X-Chat|Konversation
     INTERNET_OPTIONS="3-6 9"
 #}}}
 #LAMP {{{
@@ -341,8 +343,8 @@
     VIDEO_OPTIONS="8 9 16"
 #}}}
 #GAMES {{{
-    # 1) Action/Adventure
-    # 2) Arcade/Platformer
+    # 1) Action|Adventure
+    # 2) Arcade|Platformer
     # 3) Dungeon
     # 4) Emulators
     # 5) FPS
@@ -465,5 +467,5 @@
     # 2) Cleartype patched packages
     # 3) Infinality patched packages
     # 4) Reverting to unpatched packages
-    FONTSCONFIG_OPTION="3"
+    FONTSCONFIG_OPTION="1"
 #}}}
