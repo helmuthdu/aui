@@ -2385,7 +2385,7 @@ do
     echo "14) $(menu_item "steadyflow-bzr") $AUR"
     echo "15) $(menu_item "teamspeak3") $AUR"
     echo "16) $(menu_item "teamviewer") $AUR"
-    echo "17) $(menu_item "transmission-qt transmission-gtk" "Trasmission")"
+    echo "17) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
     echo "18) $(menu_item "konversation xchat" "$([[ $KDE -eq 1 ]] && echo "Konversation" || echo "X-Chat";)")"
     echo ""
     echo " b) BACK"
