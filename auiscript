@@ -183,13 +183,14 @@
     #}}}
     #GTK2/GTK3 THEMES {{{
         # 1) Adwaita Cupertino
-        # 2) Bluebird
-        # 3) eGTK
-        # 4) Greybird
-        # 5) Light (Aka Ambiance/Radiance)
-        # 6) Orion
-        # 7) Zukini
-        # 8) Zukitwo
+        # 2) Boomerang
+        # 3) Bluebird
+        # 4) eGTK
+        # 5) Greybird
+        # 6) Light (Aka Ambiance/Radiance)
+        # 7) Orion
+        # 8) Zukini
+        # 9) Zukitwo
         GTK_THEMES="2-8"
     #}}}
     #NETWORKMANAGER #{{{

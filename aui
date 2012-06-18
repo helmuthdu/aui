@@ -1167,13 +1167,14 @@ function install_desktop_environment(){
         do
             print_title "GTK2/GTK3 THEMES"
             echo " 1) $(menu_item "gtk-theme-adwaita-cupertino" "Adwaita Cupertino")"
-            echo " 2) $(menu_item "xfce-theme-bluebird" "Bluebird")"
-            echo " 3) $(menu_item "egtk-bzr" "eGTK")"
-            echo " 4) $(menu_item "xfce-theme-greybird" "Greybird")"
-            echo " 5) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
-            echo " 6) $(menu_item "orion-gtk-theme" "Orion")"
-            echo " 7) $(menu_item "zukini-theme" "Zukini")"
-            echo " 8) $(menu_item "zukitwo-themes" "Zukitwo")"
+            echo " 2) $(menu_item "gtk-theme-boomerang" "Boomerang")"
+            echo " 3) $(menu_item "xfce-theme-bluebird" "Bluebird")"
+            echo " 4) $(menu_item "egtk-bzr" "eGTK")"
+            echo " 5) $(menu_item "xfce-theme-greybird" "Greybird")"
+            echo " 6) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
+            echo " 7) $(menu_item "orion-gtk-theme" "Orion")"
+            echo " 8) $(menu_item "zukini-theme" "Zukini")"
+            echo " 9) $(menu_item "zukitwo-themes" "Zukitwo")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -1185,24 +1186,27 @@ function install_desktop_environment(){
                         aur_package_install "gtk-theme-adwaita-cupertino"
                         ;;
                     2)
-                        aur_package_install "xfce-theme-bluebird"
+                        aur_package_install "gtk-theme-boomerang"
                         ;;
                     3)
-                        aur_package_install "egtk-bzr"
+                        aur_package_install "xfce-theme-bluebird"
                         ;;
                     4)
-                        aur_package_install "xfce-theme-greybird"
+                        aur_package_install "egtk-bzr"
                         ;;
                     5)
-                        aur_package_install "light-themes"
+                        aur_package_install "xfce-theme-greybird"
                         ;;
                     6)
-                        aur_package_install "orion-gtk-theme"
+                        aur_package_install "light-themes"
                         ;;
                     7)
-                        aur_package_install "zukini-theme"
+                        aur_package_install "orion-gtk-theme"
                         ;;
                     8)
+                        aur_package_install "zukini-theme"
+                        ;;
+                    9)
                         aur_package_install "zukitwo-themes"
                         ;;
                     "b")
@@ -3462,8 +3466,8 @@ do
                 add_custom_repositories
                 install_reflector
                 install_basic_setup
-                install_samba
                 install_nfs
+                install_samba
                 install_tlp
                 install_preload
                 install_zram
