@@ -793,7 +793,29 @@ function install_basic_setup(){
         sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
         ln -sv `dirname $(xauth info | awk '/Authority file/{print $3}')` /home/$USERNAME/.Xauthority
     #}}}
-    #SAMBA #{{{
+}
+#}}}
+#NFS #{{{
+function install_nfs(){
+    print_title "NFS - https://wiki.archlinux.org/index.php/Nfs"
+    print_info "NFS allowing a user on a client computer to access files over a network in a manner similar to how local storage is accessed."
+    read_input_text "Install nfs" $NFS
+    case "$OPTION" in
+        "y")
+            package_install "nfs-utils"
+            add_daemon "rpcbind nfs-common @netfs nfs-server"
+            CURRENT_STATUS=1
+            ;;
+        *)
+            CURRENT_STATUS=0
+            ;;
+    esac
+    sumary "Nfs installation"
+    pause_function
+}
+#}}}
+#SAMBA #{{{
+function install_samba(){
     print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
     print_info "Samba is a re-implementation of the SMB/CIFS networking protocol, it facilitates file and printer sharing among Linux and Windows systems as an alternative to NFS."
     read_input_text "Install Samba" $SAMBA
@@ -810,25 +832,10 @@ function install_basic_setup(){
     esac
     sumary "Samba installation"
     pause_function
-    #}}}
-    #NFS #{{{
-    print_title "NFS - https://wiki.archlinux.org/index.php/Nfs"
-    print_info "NFS allowing a user on a client computer to access files over a network in a manner similar to how local storage is accessed."
-    read_input_text "Install nfs" $NFS
-    case "$OPTION" in
-        "y")
-            package_install "nfs-utils"
-            add_daemon "rpcbind nfs-common @netfs nfs-server"
-            CURRENT_STATUS=1
-            ;;
-        *)
-            CURRENT_STATUS=0
-            ;;
-    esac
-    sumary "Nfs installation"
-    pause_function
-    #}}}
-    #PRELOAD #{{{
+}
+#}}}
+#PRELOAD #{{{
+function install_preload(){
     print_title "PRELOAD - https://wiki.archlinux.org/index.php/Preload"
     print_info "Preload is a program which runs as a daemon and records statistics about usage of programs using Markov chains; files of more frequently-used programs are, during a computer's spare time, loaded into memory. This results in faster startup times as less data needs to be fetched from disk. preload is often paired with prelink."
     read_input_text "Install Preload" $PRELOAD
@@ -842,10 +849,12 @@ function install_basic_setup(){
             CURRENT_STATUS=0
             ;;
     esac
-    sumary "Samba installation"
+    sumary "Preload installation"
     pause_function
-    #}}}
-    #ZRAM #{{{
+}
+#}}}
+#ZRAM #{{{
+function install_zram(){
     print_title "ZRAM - https://wiki.archlinux.org/index.php/Maximizing_Performance"
     print_info "Zram creates a device in RAM and compresses it. If you use for swap means that part of the RAM can hold much more information but uses more CPU. Still, it is much quicker than swapping to a hard drive. If a system often falls back to swap, this could improve responsiveness. Zram is in mainline staging (therefore its not stable yet, use with caution)."
     read_input_text "Install Zram" $ZRAM
@@ -859,9 +868,8 @@ function install_basic_setup(){
             CURRENT_STATUS=0
             ;;
     esac
-    sumary "Samba installation"
+    sumary "Zram installation"
     pause_function
-    #}}}
 }
 #}}}
 #TLP #{{{
@@ -2405,6 +2413,7 @@ do
                 else
                     aur_package_install "dropbox-cli"
                 fi
+                add_daemon "@dropboxd"
                 ;;
             2)
                 package_install "chromium flashplugin"
@@ -3454,6 +3463,8 @@ do
                 install_reflector
                 install_basic_setup
                 install_tlp
+                install_preload
+                install_zram
                 install_xorg
                 install_video_cards
                 install_cups
