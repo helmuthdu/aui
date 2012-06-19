@@ -603,7 +603,6 @@ function select_user(){
 #}}}
 #CONFIGURE SUDO {{{
 function configure_sudo(){
-    #ENABLE SUDO {{{
     if ! check_package "sudo" ; then
         print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
         package_install "sudo"
@@ -612,7 +611,6 @@ function configure_sudo(){
     sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
     ## Same thing without a password (not secure)
     #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
-    #}}}
 }
 #}}}
 #AUR HELPER {{{
@@ -917,6 +915,10 @@ function install_xorg(){
             if [[ $LANGUAGE == pt_BR ]]; then
                 kblayout="\\\tOption \"XkbLayout\" \"br\""
                 kblayout+="\n\\tOption \"XkbVariant\" \"abnt2\""
+                sed -i "${line}a $kblayout" $file
+            elif [[ $LANGUAGE == it_IT ]]; then
+                kblayout="\\\tOption \"XkbLayout\" \"it\""
+                kblayout+="\n\\tOption \"XkbOptions\" \"terminate:ctrl_alt_bksp\""
                 sed -i "${line}a $kblayout" $file
             elif [[ $LANGUAGE == fr_FR ]]; then
                 kblayout="\\\tOption \"XkbLayout\" \"fr\""
