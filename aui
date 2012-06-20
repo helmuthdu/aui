@@ -125,47 +125,57 @@ function print_title (){ #{{{
     echo ""
 } #}}}
 function print_info (){ #{{{
+    #Console width number
     T_COLS=`tput cols`
     echo -e "${BWhite}$1${White}\n" | fold -sw $(( $T_COLS - 18 )) | sed 's/^/\t/'
 } #}}}
 function print_warning (){ #{{{
+    #Console width number
     T_COLS=`tput cols`
     echo -e "${BRed}$1${White}\n" | fold -sw $(( $T_COLS - 1 ))
 } #}}}
 function remove_daemon(){ #{{{
+    #remove a daemon from DAEMONS line in rc.conf
     sed -i '/DAEMONS[=]/s/ '"$1"'//' /etc/rc.conf
 } #}}}
 function insert_daemon_after(){ #{{{
     remove_daemon "$2"
+    #Insert into DAEMONS line after a daemon
     sed -i '/DAEMONS[=]/s/'"$1"'/& '"$2"'/' /etc/rc.conf
     start_daemon "$2"
 } #}}}
 function start_daemon(){ #{{{
+    #remove the @ from the dameon
     DAEMON_LIST=`echo "$1" | sed 's/@//g'`
+    #start daemon
     for DAEMON in $DAEMON_LIST; do
         ! ls -1 /var/run/daemons/$DAEMON &> /dev/null && rc.d start $DAEMON;
     done
 } #}}}
 function add_daemon(){ #{{{
     remove_daemon "$1"
+    #add a daemon into DAEMONS line in rc.conf
     sed -i '/DAEMONS[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
     start_daemon "$1"
 } #}}}
 function remove_module(){ #{{{
+    #remove a module from MODULES line in rc.conf
     sed -i '/MODULES[=]/s/ '"$1"'//' /etc/rc.conf
 } #}}}
 function start_module(){ #{{{
+    #modprobe module
     for MODULE in $1; do
         modprobe $MODULE;
     done
 } #}}}
 function add_module(){ #{{{
     remove_module "$1"
+    #add a module into MODULES line in rc.conf
     sed -i '/MODULES[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
-    #sed -i '/MODULES[=]/s/^[^ ]*\>/& '"$1"'/' /etc/rc.conf
     start_module "$1"
 } #}}}
 function config_dm(){ #{{{
+    #configure display manager
     sed -i '/'"$1"'/s/^#//' /etc/inittab
     sed -i '/xdm/s/^#//' /etc/inittab
     sed -i '/xdm/s/^/#/' /etc/inittab
@@ -174,18 +184,22 @@ function config_dm(){ #{{{
     sed -i '/id:5:initdefault/s/^#//' /etc/inittab
 } #}}}
 function check_package(){ #{{{
+    #check if a package is already installed
     for PACKAGE in $1; do
         pacman -Q $PACKAGE &> /dev/null && return 0;
     done
     return 1
 } #}}}
 function checkbox(){ #{{{
+    #display [X] or [ ]
     [[ $1 -eq 1 ]] && echo -e "${BBlue}[${BWhite}X${BBlue}]${White}" || echo -e "${BBlue}[${White} ${BBlue}]${White}";
 } #}}}
 function checkbox_package(){ #{{{
+    #check if [X] or [ ]
     check_package "$1" && checkbox 1 || checkbox 0
 } #}}}
 function aur_package_install(){ #{{{
+    #install package from aur
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
             if [[ $YAOURT -eq 1 ]]; then
@@ -194,6 +208,7 @@ function aur_package_install(){ #{{{
                 sudo -u $USERNAME packer -S --noconfirm $PACKAGE
             fi
             #RECHECK #{{{
+            #check if the package wasnt installed
             if ! check_package "$PACKAGE" ; then
                 if [[ $AUTOMATIC_MODE -eq 1 ]]; then
                     echo "$PACKAGE" >> packages_not_installed.txt
@@ -215,6 +230,7 @@ function aur_package_install(){ #{{{
     done
 } #}}}
 function package_install(){ #{{{
+    #install packages using pacman
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
         pacman -S --noconfirm --needed $1
     else
@@ -222,6 +238,7 @@ function package_install(){ #{{{
     fi
 } #}}}
 function package_remove(){ #{{{
+    #remove package
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
         pacman -Rcsn --noconfirm $1
     else
@@ -229,17 +246,25 @@ function package_remove(){ #{{{
     fi
 } #}}}
 function contains_element(){ #{{{
+    #check if an element exist in a string
     for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
 } #}}}
 function create_xinitrc(){ #{{{
-    echo -e ' #!/bin/sh\n
+    #create a xinitrc file in home user directory
+    echo -e '#!/bin/sh\n
 if [ -d /etc/X11/xinit/xinitrc.d ]; then
   for f in /etc/X11/xinit/xinitrc.d/*; do
     [ -x "$f" ] && . "$f"
   done
   unset f
 fi\n' > /home/$USERNAME/.xinitrc
-    echo -e "exec ck-launch-session $1" >> /home/$USERNAME/.xinitrc
+
+    if [[ $1 == startxfce4 ]]; then
+        echo -e "exec $1" >> /home/$USERNAME/.xinitrc
+    else
+        echo -e "exec ck-launch-session $1" >> /home/$USERNAME/.xinitrc
+    fi
+
     chown -R $USERNAME:users /home/$USERNAME/.xinitrc
 } #}}}
 function invalid_option(){ #{{{
@@ -266,9 +291,13 @@ function sumary(){ #{{{
     esac
 } #}}}
 function menu_item(){ #{{{
+    #check if the number of arguments is less then 2
     [[ $# -lt 2 ]] && PACKAGE_NAME="$1" || PACKAGE_NAME="$2";
+    #list of chars to remove program a package name
     CHARS_TO_REMOVE=("Ttf-" "-bzr" "-hg" "-svn" "-git" "-bin" "-stable" "Gnome-shell-theme-" "Gnome-shell-extension-");
+    #remove chars from package name
     for CHARS in ${CHARS_TO_REMOVE[@]}; do PACKAGE_NAME=`echo ${PACKAGE_NAME^} | sed 's/'$CHARS'//'`; done
+    #display checkbox and package name
     echo -e "$(checkbox_package "$1") ${BWhite}$PACKAGE_NAME${White}"
 } #}}}
 function mainmenu_item(){ #{{{
@@ -902,11 +931,16 @@ function install_xorg(){
     [[ ! -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && cp -v /etc/X11/xorg.conf.d/10-evdev.conf /etc/X11/xorg.conf.d/10-evdev.conf.aui;
     #CONFIGURE QWERTY KEYBOARD IN XORG {{{
     local file="/etc/X11/xorg.conf.d/10-evdev.conf"
+    #get the line number that has "keyboard" in 10-evdev.conf
     local line=`grep -n "keyboard" $file | cut -f1 -d:`
+    #sum that line with more 2
+    #this script will insert the patch right there
     local line=$(( $line + 2 ))
+    #variable to check if the file wasnt already patched
     local patch=`cat $file | sed ''$(( $line + 1 ))'!d'`
+    #get the keymap from rc.conf
     local keymap=`cat /etc/rc.conf | sed -n '/KEYMAP[=]/p' | sed 's/.*"\(.*\)".*/\1/g'`
-
+    #check if the file wasnt already patched
     if [[ $patch != *"XkbLayout"* ]]; then
         if [[ $keymap == us-acentos ]]; then
             kblayout="\\\tOption \"XkbLayout\" \"us_intl\""
