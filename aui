@@ -294,7 +294,7 @@ function menu_item(){ #{{{
     #check if the number of arguments is less then 2
     [[ $# -lt 2 ]] && PACKAGE_NAME="$1" || PACKAGE_NAME="$2";
     #list of chars to remove program a package name
-    CHARS_TO_REMOVE=("Ttf-" "-bzr" "-hg" "-svn" "-git" "-bin" "-stable" "Gnome-shell-theme-" "Gnome-shell-extension-");
+    CHARS_TO_REMOVE=("Ttf-" "-bzr" "-hg" "-svn" "-git" "-stable" "Gnome-shell-theme-" "Gnome-shell-extension-");
     #remove chars from package name
     for CHARS in ${CHARS_TO_REMOVE[@]}; do PACKAGE_NAME=`echo ${PACKAGE_NAME^} | sed 's/'$CHARS'//'`; done
     #display checkbox and package name
@@ -2674,7 +2674,7 @@ do
     echo " 3) $(menu_item "parole")"
     echo " 4) $(menu_item "minitube") $AUR"
     echo " 5) $(menu_item "miro")"
-    echo " 6) $(menu_item "rosa-media-player-bin") $AUR"
+    echo " 6) $(menu_item "rosa-media-player") $AUR"
     echo " 7) $(menu_item "smplayer")"
     echo " 8) $(menu_item "vlc")"
     echo " 9) $(menu_item "xbmc")"
@@ -2708,7 +2708,7 @@ do
                 package_install "miro"
                 ;;
             6)
-                aur_package_install "rosa-media-player-bin"
+                aur_package_install "rosa-media-player"
                 ;;
             7)
                 package_install "smplayer smplayer-themes"
