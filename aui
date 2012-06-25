@@ -2297,7 +2297,8 @@ do
     echo " 2) $(menu_item "grsync")"
     echo " 3) $(menu_item "htop")"
     echo " 4) $(menu_item "virtualbox")"
-    echo " 5) $(menu_item "wine")"
+    echo " 5) $(menu_item "webmin")"
+    echo " 6) $(menu_item "wine")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2321,6 +2322,10 @@ do
                 gpasswd -a $USERNAME vboxusers
                 ;;
             5)
+                package_install "webmin perl-net-ssleay"
+                add_daemon "@webmin"
+                ;;
+            6)
                 package_install "wine wine_gecko winetricks"
                 ;;
             "b")
