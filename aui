@@ -333,6 +333,9 @@ function welcome(){
     [[ -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && echo "/etc/X11/xorg.conf.d/10-evdev.conf.aui";
     [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui";
     pause_function
+    cur_dir=`pwd`
+    chmod 755 $cur_dir
+    pacman -Sy --noprogressbar
 }
 #}}}
 #CHECK ROOT {{{
@@ -1285,7 +1288,6 @@ function install_desktop_environment(){
             package_install "system-config-printer-gnome"
             aur_package_install "empathy-theme-ubuntu-adium-bzr"
             aur_package_install "automounter gnome-defaults-list"
-            gpasswd -a $USERNAME camera
             create_xinitrc "gnome-session-cinnamon"
             #CINNAMON CUSTOMIZATION {{{
             while [[ 1 ]]
@@ -1447,7 +1449,6 @@ function install_desktop_environment(){
             print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
             print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
             package_install "gnome gnome-extra telepathy"
-            gpasswd -a $USERNAME camera
             package_install "gksu nautilus-open-terminal gnome-search-tool gedit-plugins gnome-tweak-tool"
             package_install "gvfs-smb"
             package_install "zeitgeist"
@@ -2334,7 +2335,6 @@ do
                 package_install "virtualbox virtualbox-additions"
                 aur_package_install "virtualbox-ext-oracle"
                 add_module "vboxdrv"
-                groupadd vboxusers
                 gpasswd -a $USERNAME vboxusers
                 ;;
             5)
@@ -2497,7 +2497,7 @@ do
                 package_install "skype"
                 ;;
             14)
-                package_install "steadyflow-bzr"
+                aur_package_install "steadyflow-bzr"
                 ;;
             15)
                 aur_package_install "teamspeak3"
@@ -3598,12 +3598,12 @@ function finish(){
 welcome
 check_root
 language_selector
-system_upgrade
 select_user
 configure_pacman_package_signing
 configure_sudo
 choose_aurhelper
 automatic_mode
+system_upgrade
 
 while [[ 1 ]]
 do
