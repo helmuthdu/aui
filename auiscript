@@ -472,6 +472,29 @@
     FONTSCONFIG_OPTION="1"
 #}}}
 #EXTRA {{{
-EXTRA_OPTIONS=""
-ELEMENTARY_OPTIONS=""
+    # 1) Elementary Project
+    EXTRA_OPTIONS=""
+    #ELEMENTARY PROJECT {{{
+        # 1) Audience
+        # 2) Contractor
+        # 3) Eidete
+        # 4) Dexter
+        # 5) Feedler
+        # 6) Files
+        # 7) Footnote
+        # 8) Geary
+        # 9) Lingo
+        #10) Maya
+        #11) Midori
+        #12) Noise
+        #13) Scratch
+        #14) Plank
+        #15) Pantheon Terminal
+        #16) Slingshot
+        #17) Switchboard
+        #18) Wingpanel
+        #19) eICONS
+        #20) eGTK
+        ELEMENTARY_OPTIONS="1-20"
+    #}}}
 #}}}
