@@ -3598,10 +3598,10 @@ function finish(){
 welcome
 check_root
 language_selector
+system_upgrade
 select_user
 configure_pacman_package_signing
 configure_sudo
-system_upgrade
 choose_aurhelper
 automatic_mode
 
