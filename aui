@@ -45,6 +45,7 @@ LAMP=0
 GAMES=0
 FONTS=0
 FONTSCONFIG=0
+EXTRA=0
 CLEANPACKAGES=0
 #}}}
 # ARCH {{{
@@ -3436,6 +3437,137 @@ function configure_fonts(){
     pacman-optimize
 }
 #}}}
+#EXTRA {{{
+function install_extra(){
+while [[ 1 ]]
+do
+    print_title "EXTRA"
+    echo " 1) Elementary Project $AUR"
+    echo ""
+    echo " b) BACK"
+    echo ""
+    EXTRA_OPTIONS+=" b"
+    read_input_options "$GAMES_OPTIONS"
+    for OPT in ${OPTIONS[@]}; do
+        case "$OPT" in
+            1)
+                #ELEMENTARY PROJECT {{{
+                while [[ 1 ]]
+                do
+                    print_title "ELEMENTARY PROJECT"
+                    print_warning "\tsome of these programs still in alpha stage and may not work"
+                    echo " 1) $(menu_item "audience-bzr") (media player)"
+                    echo " 2) $(menu_item "contractor-bzr") (sharing service)"
+                    echo " 3) $(menu_item "eidete-bzr") (screencasting)"
+                    echo " 4) $(menu_item "dexter-contacts-bzr") (contacts manager)"
+                    echo " 5) $(menu_item "feedler-bzr") (RSS feeds Reader)"
+                    echo " 6) $(menu_item "files-bzr") (file manager)"
+                    echo " 7) $(menu_item "footnote-bzr") (note taking)"
+                    echo " 8) $(menu_item "geary-git") (email client)"
+                    echo " 9) $(menu_item "lingo-dictionary-bzr") (dictionary)"
+                    echo "10) $(menu_item "maya-bzr") (calendar)"
+                    echo "11) $(menu_item "midori") (web browser)"
+                    echo "12) $(menu_item "noise-bzr") (audio player)"
+                    echo "13) $(menu_item "scratch-bzr") (text editor)"
+                    echo "14) $(menu_item "plank-bzr") (dock)"
+                    echo "15) $(menu_item "pantheon-terminal-bzr") (terminal)"
+                    echo "16) $(menu_item "slingshot-bzr") (app launcher)"
+                    echo "17) $(menu_item "switchboard-bzr") (desktop settings hub)"
+                    echo "18) $(menu_item "wingpanel-bzr") (indicators topbar)"
+                    echo "19) $(menu_item "elementary-icons-bzr" "eICONS")"
+                    echo "20) $(menu_item "egtk-bzr" "eGTK")"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    ELEMENTARY_OPTIONS+=" b"
+                    read_input_options "$ELEMENTARY_OPTIONS"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                aur_package_install "audience-bzr"
+                                ;;
+                            2)
+                                aur_package_install "contractor-bzr"
+                                ;;
+                            3)
+                                aur_package_install "eidete-bzr"
+                                ;;
+                            4)
+                                aur_package_install "dexter-contacts-bzr"
+                                ;;
+                            5)
+                                aur_package_install "feedler-bzr"
+                                ;;
+                            6)
+                                aur_package_install "files-bzr tumbler"
+                                ;;
+                            7)
+                                aur_package_install "footnote-bzr"
+                                ;;
+                            8)
+                                aur_package_install "geary-git"
+                                ;;
+                            9)
+                                aur_package_install "lingo-dictionary-bzr"
+                                ;;
+                            10)
+                                aur_package_install "maya-bzr"
+                                ;;
+                            11)
+                                aur_package_install "midori"
+                                ;;
+                            12)
+                                aur_package_install "noise-bzr"
+                                ;;
+                            13)
+                                aur_package_install "scratch-bzr"
+                                ;;
+                            14)
+                                aur_package_install "plank-bzr"
+                                ;;
+                            15)
+                                aur_package_install "pantheon-terminal-bzr"
+                                ;;
+                            16)
+                                aur_package_install "slingshot-bzr"
+                                ;;
+                            17)
+                                aur_package_install "switchboard-bzr"
+                                ;;
+                            18)
+                                aur_package_install "wingpanel-bzr"
+                                ;;
+                            19)
+                                aur_package_install "elementary-icons-bzr"
+                                ;;
+                            20)
+                                aur_package_install "egtk-bzr"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                    elihw
+                done
+                #}}}
+                OPT=1
+                ;;
+             "b")
+                break
+                ;;
+            *)
+                invalid_option
+                ;;
+        esac
+    done
+elihw
+done
+}
+#}}}
 #FINISH {{{
 function finish(){
     print_title "WARNING: PACKAGES INSTALLED FROM AUR"
@@ -3490,7 +3622,8 @@ do
     echo "12) $(mainmenu_item $LAMP "LAMP")"
     echo "13) $(mainmenu_item $FONTS "Fonts")"
     echo "14) $(mainmenu_item $FONTSCONFIG "Fonts Configuration")"
-    echo "15) $(mainmenu_item $CLEANPACKAGES "Clean Orphan Packages")"
+    echo "15) $(mainmenu_item $EXTRA "Extra")"
+    echo "16) $(mainmenu_item $CLEANPACKAGES "Clean Orphan Packages")"
     echo ""
     echo " q) Quit"
     echo ""
@@ -3576,6 +3709,10 @@ do
                 FONTSCONFIG=1
                 ;;
             15)
+                install_extra
+                EXTRA=1
+                ;;
+            16)
                 clean_orphan_packages
                 CLEANPACKAGES=1
                 ;;

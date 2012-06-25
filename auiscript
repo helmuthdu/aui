@@ -31,7 +31,8 @@
     #12) LAMP
     #13) Fonts
     #14) Fonts Configuration
-    #15) Clean Orphan Packages
+    #15) Extra
+    #16) Clean Orphan Packages
     MAINMENU="1-10 13"
 #}}}
 #BASIC SETUP{{{
@@ -469,4 +470,8 @@
     # 3) Infinality patched packages
     # 4) Reverting to unpatched packages
     FONTSCONFIG_OPTION="1"
+#}}}
+#EXTRA {{{
+EXTRA_OPTIONS=""
+ELEMENTARY_OPTIONS=""
 #}}}
