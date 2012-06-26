@@ -267,7 +267,8 @@
     # 2) Grsync
     # 3) Htop
     # 4) Virtualbox
-    # 5) Wine
+    # 5) Webmin
+    # 6) Wine
     SYSTEMTOOLS_OPTIONS="2 3 5"
 #}}}
 #GRAPHICS {{{
