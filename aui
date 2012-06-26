@@ -745,14 +745,14 @@ function configure_pacman_package_signing(){
     if [[ ! -d /etc/pacman.d/gnupg ]]; then
         print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
         print_info "Pacman-key is a new tool available with pacman 4. It allows the user to manage pacman's list of trusted keys in the new package signing implementation."
-        su -l $USERNAME --command="
+        #install rng-tools {{{
             wget http://aur.archlinux.org/packages/rng-tools/rng-tools.tar.gz;
             tar zxvf rng-tools.tar.gz;
             cd rng-tools;
-            makepkg -si --noconfirm;
+            makepkg -si --asroot --noconfirm;
             cd ..;
             rm -fr rng-tools*
-        "
+        #}}}
         sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
         rngd -f -r /dev/urandom &
         pacman-key --init --keyserver pgp.mit.edu
@@ -3588,13 +3588,13 @@ function finish(){
 #MAIN {{{
 welcome
 check_root
+configure_pacman_package_signing
+system_upgrade
 language_selector
 select_user
-configure_pacman_package_signing
 configure_sudo
 choose_aurhelper
 automatic_mode
-system_upgrade
 
 while [[ 1 ]]
 do
