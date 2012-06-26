@@ -333,11 +333,14 @@ function welcome(){
     [[ -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && echo "/etc/X11/xorg.conf.d/10-evdev.conf.aui";
     [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui";
     pause_function
-    #fix problem when the normal user download and compile an app
-    #in the current directory
+    #make possible normal users download and compile an app in the current directory
     cur_dir=`pwd`
     chmod 755 $cur_dir
-    pacman -Sy --noprogressbar
+    #check if all database are present
+    database_dir="/var/lib/pacman/sync"
+    if [[ ! -f ${database_dir}/community.db || ! -f ${database_dir}/core.db || ! -f ${database_dir}/extra.db ]]; then
+        pacman -Sy
+    fi
 }
 #}}}
 #CHECK ROOT {{{
