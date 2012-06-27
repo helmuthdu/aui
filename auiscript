@@ -226,14 +226,15 @@
     # 5) Gvim
     # 6) Geany
     # 7) IntelliJ IDEA
-    # 8) Netbeans
-    # 9) Oracle Java
-    #10) QT Creator
-    #11) Sublime Text 2
-    #12) Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]
-    #13) MySQL Workbench
-    #14) Meld
-    #15) RabbitVCS
+    # 8) Kdevelop
+    # 9) Netbeans
+    #10) Oracle Java
+    #11) QT Creator
+    #12) Sublime Text 2
+    #13) Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]
+    #14) MySQL Workbench
+    #15) Meld
+    #16) RabbitVCS
     DEVELOPMENT_OPTIONS="9 5 12"
     #ECLIPSE {{{
         # 1) Eclipse Classic
