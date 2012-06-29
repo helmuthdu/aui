@@ -1613,8 +1613,7 @@ function install_desktop_environment(){
             print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
             package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
             package_install "kdeadmin-system-config-printer-kde xdg-user-dirs"
-            package_install "kde-telepathy telepathy"
-            package_remove "kdenetwork-kopete kdemultimedia-kscd kdemultimedia-juk"
+            package_remove "kdemultimedia-kscd kdemultimedia-juk"
             aur_package_install "kde-gtk-config-git"
             aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
             create_xinitrc "startkde"
@@ -2593,7 +2592,7 @@ do
     echo " 9) $(menu_item "rhythmbox")"
     echo "10) $(menu_item "radiotray") $AUR"
     echo "11) $(menu_item "spotify") $AUR"
-    echo "12) $(menu_item "soundconverter")"
+    echo "12) $(menu_item "soundconverter soundkonverter" "$([[ $KDE -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
     echo "13) $(menu_item "puddletag") $AUR"
     echo "14) $(menu_item "audacity")"
     echo "15) $(menu_item "timidity++")"
@@ -2639,7 +2638,11 @@ do
                 aur_package_install "spotify"
                 ;;
             12)
-                package_install "soundconverter"
+                if [[ $KDE -eq 1 ]]; then
+                    package_install "soundkonverter"
+                else
+                    package_install "soundconverter"
+                fi
                 ;;
             13)
                 aur_package_install "puddletag"
