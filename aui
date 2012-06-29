@@ -531,86 +531,88 @@ function system_upgrade(){
 #SELECT/CREATE USER {{{
 function select_user(){
     #CREATE NEW USER {{{
-    create_new_user(){
+    function create_new_user(){
         read -p "Username: " USERNAME
         useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
         passwd $USERNAME
+        configure_user_account
+    } #}}}
+    #CONFIGURE USER ACCOUNT {{{
+    function configure_user_account(){
         cp /etc/skel/.* /home/$USERNAME/
-        #BASHRC {{{
-            print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
-            package_install "git"
-            git clone https://github.com/helmuthdu/dotfiles
-            cp dotfiles/.* ~/
-            cp dotfiles/.* /home/$USERNAME/
-            rm -fr dotfiles
-            print_title "DEFAULT EDITOR"
-            EDITOR=("Emacs" "Joe" "Nano" "Vim");
-            PS3="$prompt1"
-            echo -e "Choose default editor\n"
-            select OPT in "${EDITOR[@]}"; do
-                case "$REPLY" in
-                    1)
-                        package_install "emacs"
-                        sed -i '/EDITOR/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
-                        sed -i '/VISUAL/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
-                        sed -i '/EDITOR/s/vim/emacs\ -nw/' ~/.bashrc
-                        sed -i '/VISUAL/s/vim/emacs\ -nw/' ~/.bashrc
-                        break
-                        ;;
-                    2)
-                        if ! check_package "joe" ; then
-                            su -l $USERNAME --command="
-                                wget http://aur.archlinux.org/packages/jo/joe/joe.tar.gz;
-                                tar zxvf joe.tar.gz;
-                                cd joe;
-                                makepkg -si --noconfirm;
-                                cd ..;
-                                rm -fr joe*
-                            "
-                        fi
-                        sed -i '/EDITOR/s/vim/joe/' /home/$USERNAME/.bashrc
-                        sed -i '/VISUAL/s/vim/joe/' /home/$USERNAME/.bashrc
-                        sed -i '/EDITOR/s/vim/joe/' ~/.bashrc
-                        sed -i '/VISUAL/s/vim/joe/' ~/.bashrc
-                        break
-                        ;;
-                    3)
-                        sed -i '/EDITOR/s/vim/nano/' /home/$USERNAME/.bashrc
-                        sed -i '/VISUAL/s/vim/nano/' /home/$USERNAME/.bashrc
-                        sed -i '/EDITOR/s/vim/nano/' ~/.bashrc
-                        sed -i '/VISUAL/s/vim/nano/' ~/.bashrc
-                        break
-                        ;;
-                    4)
-                        # VIM
-                        package_install "vim ctags ack"
-                        if ! check_package "discount" ; then
-                            su -l $USERNAME --command="
-                                wget http://aur.archlinux.org/packages/discount/discount.tar.gz;
-                                tar zxvf discount.tar.gz;
-                                cd discount;
-                                makepkg -si --noconfirm;
-                                cd ..;
-                                rm -fr discount*
-                            "
-                        fi
-                        # VIMRC
-                        git clone https://github.com/helmuthdu/vim
-                        mv vim /home/$USERNAME/.vim
-                        ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
-                        # PENTADACTYL [FIREFOX]
-                        git clone https://github.com/helmuthdu/pentadactyl
-                        mv pentadactyl /home/$USERNAME/.pentadactyl
-                        ln -sf /home/$USERNAME/.pentadactyl/pentadactylrc /home/$USERNAME/.pentadactylrc
-                        break
-                        ;;
-                    *)
-                        invalid_option
-                        ;;
-                esac
-            done
-            chown -R $USERNAME:users /home/$USERNAME
-        #}}}
+        print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
+        package_install "git"
+        git clone https://github.com/helmuthdu/dotfiles
+        cp dotfiles/.* ~/
+        cp dotfiles/.* /home/$USERNAME/
+        rm -fr dotfiles
+        print_title "DEFAULT EDITOR"
+        EDITOR=("Emacs" "Joe" "Nano" "Vim");
+        PS3="$prompt1"
+        echo -e "Choose default editor\n"
+        select OPT in "${EDITOR[@]}"; do
+            case "$REPLY" in
+                1)
+                    package_install "emacs"
+                    sed -i '/EDITOR/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
+                    sed -i '/VISUAL/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
+                    sed -i '/EDITOR/s/vim/emacs\ -nw/' ~/.bashrc
+                    sed -i '/VISUAL/s/vim/emacs\ -nw/' ~/.bashrc
+                    break
+                    ;;
+                2)
+                    if ! check_package "joe" ; then
+                        su -l $USERNAME --command="
+                            wget http://aur.archlinux.org/packages/jo/joe/joe.tar.gz;
+                            tar zxvf joe.tar.gz;
+                            cd joe;
+                            makepkg -si --noconfirm;
+                            cd ..;
+                            rm -fr joe*
+                        "
+                    fi
+                    sed -i '/EDITOR/s/vim/joe/' /home/$USERNAME/.bashrc
+                    sed -i '/VISUAL/s/vim/joe/' /home/$USERNAME/.bashrc
+                    sed -i '/EDITOR/s/vim/joe/' ~/.bashrc
+                    sed -i '/VISUAL/s/vim/joe/' ~/.bashrc
+                    break
+                    ;;
+                3)
+                    sed -i '/EDITOR/s/vim/nano/' /home/$USERNAME/.bashrc
+                    sed -i '/VISUAL/s/vim/nano/' /home/$USERNAME/.bashrc
+                    sed -i '/EDITOR/s/vim/nano/' ~/.bashrc
+                    sed -i '/VISUAL/s/vim/nano/' ~/.bashrc
+                    break
+                    ;;
+                4)
+                    # VIM
+                    package_install "vim ctags ack"
+                    if ! check_package "discount" ; then
+                        su -l $USERNAME --command="
+                            wget http://aur.archlinux.org/packages/discount/discount.tar.gz;
+                            tar zxvf discount.tar.gz;
+                            cd discount;
+                            makepkg -si --noconfirm;
+                            cd ..;
+                            rm -fr discount*
+                        "
+                    fi
+                    # VIMRC
+                    git clone https://github.com/helmuthdu/vim
+                    mv vim /home/$USERNAME/.vim
+                    ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
+                    # PENTADACTYL [FIREFOX]
+                    git clone https://github.com/helmuthdu/pentadactyl
+                    mv pentadactyl /home/$USERNAME/.pentadactyl
+                    ln -sf /home/$USERNAME/.pentadactyl/pentadactylrc /home/$USERNAME/.pentadactylrc
+                    break
+                    ;;
+                *)
+                    invalid_option
+                    ;;
+            esac
+        done
+        chown -R $USERNAME:users /home/$USERNAME
     } #}}}
     print_title "SELECT/CREATE USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
     users=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
@@ -632,6 +634,7 @@ function select_user(){
             invalid_option
         fi
     done
+    [[ ! -f /home/$USERNAME/.bashrc ]] && configure_user_account;
 }
 #}}}
 #CONFIGURE SUDO {{{
