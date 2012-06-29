@@ -918,8 +918,7 @@ function install_xorg(){
     local file="/etc/X11/xorg.conf.d/10-evdev.conf"
     #get the line number that has "keyboard" in 10-evdev.conf
     local line=`grep -n "keyboard" $file | cut -f1 -d:`
-    #sum that line with more 2
-    #this script will insert the patch right there
+    #sum that line with more 2, it will insert the patch there
     local line=$(( $line + 2 ))
     #variable to check if the file wasnt already patched
     local patch=`cat $file | sed ''$(( $line + 1 ))'!d'`
@@ -929,21 +928,33 @@ function install_xorg(){
     if [[ $patch != *"XkbLayout"* ]]; then
         if [[ $keymap == us-acentos ]]; then
             kblayout="\\\tOption \"XkbLayout\" \"us_intl\""
-            sed -i "${line}a $kblayout" $file
         else
-            if [[ $LANGUAGE == pt_BR ]]; then
-                kblayout="\\\tOption \"XkbLayout\" \"br\""
-                kblayout+="\n\\tOption \"XkbVariant\" \"abnt2\""
-                sed -i "${line}a $kblayout" $file
-            elif [[ $LANGUAGE == it_IT ]]; then
-                kblayout="\\\tOption \"XkbLayout\" \"it\""
-                kblayout+="\n\\tOption \"XkbOptions\" \"terminate:ctrl_alt_bksp\""
-                sed -i "${line}a $kblayout" $file
-            elif [[ $LANGUAGE == fr_FR ]]; then
-                kblayout="\\\tOption \"XkbLayout\" \"fr\""
-                sed -i "${line}a $kblayout" $file
-            fi
+            case "$LANGUAGE" in
+                de_DE)
+                    kblayout="\\\tOption \"XkbLayout\" \"de\""
+                    ;;
+                es_ES)
+                    kblayout="\\\tOption \"XkbLayout\" \"es\""
+                    kblayout+="\n\\tOption \"XkbOptions\" \"terminate:ctrl_alt_bksp\""
+                    ;;
+                it_IT)
+                    kblayout="\\\tOption \"XkbLayout\" \"it\""
+                    kblayout+="\n\\tOption \"XkbOptions\" \"terminate:ctrl_alt_bksp\""
+                    ;;
+                fr_FR)
+                    kblayout="\\\tOption \"XkbLayout\" \"fr\""
+                    ;;
+                pt_BR)
+                    kblayout="\\\tOption \"XkbLayout\" \"br\""
+                    kblayout+="\n\\tOption \"XkbVariant\" \"abnt2\""
+                    ;;
+                pt_PT)
+                    kblayout="\\\tOption \"XkbLayout\" \"pt-latin9\""
+                    ;;
+            esac
         fi
+        #patch file
+        sed -i "${line}a $kblayout" $file
     fi
     #}}}
 }
