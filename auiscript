@@ -47,7 +47,6 @@
     SAMBA="y"
     SSH="y"
     TLP="n"
-    ZRAM="y"
     #VIDEOCARD {{{
         # 1) Intel
         # 2) ATI
@@ -55,7 +54,7 @@
         # 4) Nouveau
         # 5) Virtualbox
         # 6) Vesa
-        VIDEOCARD=3
+        VIDEOCARD=4
     #}}}
     #ADDITIONAL FIRMWARE {{{
         # 1) alsa-firmware
@@ -192,7 +191,7 @@
         # 7) Orion
         # 8) Zukini
         # 9) Zukitwo
-        GTK_THEMES="2-8"
+        GTK_THEMES="2-9"
     #}}}
     #NETWORKMANAGER #{{{
         # 1) Networkmanager
@@ -216,7 +215,7 @@
     #12) Synapse
     #13) Terminator
     #14) Zim
-    ACCESSORIES_OPTIONS="2 13"
+    ACCESSORIES_OPTIONS=""
 #}}}
 #DEVELOPEMENT {{{
     # 1) Aptana Studio
@@ -235,7 +234,7 @@
     #14) MySQL Workbench
     #15) Meld
     #16) RabbitVCS
-    DEVELOPMENT_OPTIONS="9 5 12"
+    DEVELOPMENT_OPTIONS="10 5 13"
     #ECLIPSE {{{
         # 1) Eclipse Classic
         # 2) Eclipse IDE for C/C++ Developers
@@ -261,7 +260,7 @@
     # 9) OCRFeeder
     #10) Xmind
     #11) Zathura
-    OFFICE_OPTIONS="1 3 6-8 11"
+    OFFICE_OPTIONS="1 3 6-8 10"
 #}}}
 #SYSTEM TOOLS {{{
     # 1) Gparted
@@ -270,7 +269,7 @@
     # 4) Virtualbox
     # 5) Webmin
     # 6) Wine
-    SYSTEMTOOLS_OPTIONS="2 3 5"
+    SYSTEMTOOLS_OPTIONS="1-3 5 6"
 #}}}
 #GRAPHICS {{{
     # 1) Blender
@@ -463,7 +462,7 @@
     # 6) ttf-mac-fonts
     # 7) ttf-ms-fonts
     # 8) ttf-vista-fonts
-    FONTS_OPTIONS="1 2 4-8"
+    FONTS_OPTIONS="1 3-8"
     GOOGLE_FONTS="y"
 #}}}
 #FONTS CONFIGURATION {{{
@@ -471,7 +470,7 @@
     # 2) Cleartype patched packages
     # 3) Infinality patched packages
     # 4) Reverting to unpatched packages
-    FONTSCONFIG_OPTION="1"
+    FONTSCONFIG_OPTION="3"
 #}}}
 #EXTRA {{{
     # 1) Elementary Project
