@@ -333,9 +333,6 @@ function welcome(){
     [[ -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && echo "/etc/X11/xorg.conf.d/10-evdev.conf.aui";
     [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui";
     pause_function
-    #make possible normal users download and compile an app in the current directory
-    cur_dir=`pwd`
-    chmod 755 $cur_dir
 }
 #}}}
 #CHECK ROOT {{{
