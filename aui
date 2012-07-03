@@ -771,7 +771,7 @@ function automatic_mode(){
 #BASIC SETUP {{{
 function install_basic_setup(){
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-    package_install "bc rsync mlocate bash-completion net-tools"
+    package_install "bc rsync mlocate bash-completion net-tools wifi-select"
     print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
     package_install "zip unzip unrar p7zip atool"
     aur_package_install "rar"
@@ -1298,7 +1298,7 @@ function install_desktop_environment(){
                         sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
                         ;;
                     4)
-                        aur_package_install "lxdm"
+                        package_install "lxdm"
                         local lxdm=`cat /etc/inittab | sed -n '/lxdm/p'`
                         if [[ -z "$lxdm" ]]; then
                             echo -e "x:5:respawn:/usr/sbin/lxdm >& /dev/null" >> /etc/inittab
@@ -2212,7 +2212,9 @@ do
                 ;;
             5)
                 package_remove "vim"
-                package_install "gvim"
+                package_install "gvim ctags ack"
+                package_install "ttf-liberation"
+                aur_package_install "discount"
                 ;;
             6)
                 package_install "geany"
