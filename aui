@@ -1263,6 +1263,63 @@ function install_desktop_environment(){
             elihw
         done
     } #}}}
+    function install_display_manager() { #{{{
+        while [[ 1 ]]
+        do
+            print_title "DISPLAY MANAGER - https://wiki.archlinux.org/index.php/Display_Manager"
+            print_info "A display manager, or login manager, is a graphical interface screen that is displayed at the end of the boot process in place of the default shell."
+            echo " 1) $(menu_item "elsa-svn-arch" "Elsa") $AUR"
+            echo " 2) $(menu_item "gdm" "GDM")"
+            echo " 3) $(menu_item "lightdm" "LightDM") $AUR"
+            echo " 4) $(menu_item "lxdm" "LXDM")"
+            echo " 5) $(menu_item "slim")"
+            echo ""
+            echo " b) BACK"
+            echo ""
+            DISPLAY_MANAGER+=" b"
+            read_input_options "$DISPLAY_MANAGER"
+            for OPT in ${OPTIONS[@]}; do
+                case "$OPT" in
+                    1)
+                        aur_package_install "elsa-svn-arch"
+                        local elsa=`cat /etc/inittab | sed -n '/elsa/p'`
+                        if [[ -z "$elsa" ]]; then
+                            echo -e "x:5:respawn:/usr/sbin/elsa >& /dev/null" >> /etc/inittab
+                        fi
+                        config_dm "elsa"
+                        ;;
+                    2)
+                        package_install "gdm"
+                        config_dm "gdm"
+                        ;;
+                    3)
+                        aur_package_install "lightdm lightdm-gtk-greeter"
+                        config_dm "lightdm"
+                        sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
+                        ;;
+                    4)
+                        aur_package_install "lxdm"
+                        local lxdm=`cat /etc/inittab | sed -n '/lxdm/p'`
+                        if [[ -z "$lxdm" ]]; then
+                            echo -e "x:5:respawn:/usr/sbin/lxdm >& /dev/null" >> /etc/inittab
+                        fi
+                        config_dm "lxdm"
+                        ;;
+                    5)
+                        package_install "slim"
+                        config_dm "slim"
+                        ;;
+                    "b")
+                        break
+                        ;;
+                    *)
+                        invalid_option
+                        ;;
+                esac
+            done
+        elihw
+        done
+    } #}}}
     print_title "DESKTOP ENVIRONMENT - https://wiki.archlinux.org/index.php/Desktop_Environment"
     print_info "Desktop environments provide a complete graphical user interface (GUI) for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries."
     echo -e "Choose your desktop-environment:\n"
@@ -1345,8 +1402,8 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
-            sudo -u "$USERNAME" gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"
-            sudo -u "$USERNAME" gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"
+            sudo -u $USERNAME gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"
+            sudo -u $USERNAME gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"
             config_dm "gdm"
             CURRENT_STATUS=1
             GNOME=1
@@ -1371,7 +1428,7 @@ function install_desktop_environment(){
                 print_title "E17 CUSTOMIZATION"
                 echo " 1) $(menu_item "e17-icons") $AUR"
                 echo " 2) $(menu_item "e17-themes") $AUR"
-                echo " 3) $(menu_item "elsa-svn-arch" "Elsa") $AUR"
+                echo " 3) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
                 echo " 4) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "GNOME Icons") $AUR"
                 echo " 5) $(menu_item "geeqie")"
                 echo " 6) $(menu_item "gmrun")"
@@ -1395,16 +1452,12 @@ function install_desktop_environment(){
                             aur_package_install "e17-themes"
                             ;;
                         3)
-                            aur_package_install "elsa-svn-arch"
-                            local elsa=`cat /etc/inittab | sed -n '/elsa/p'`
-                            if [[ -z "$elsa" ]]; then
-                                echo -e "x:5:respawn:/usr/sbin/elsa >& /dev/null" >> /etc/inittab
-                            fi
-                            config_dm "elsa"
+                            install_display_manager
+                            OPT=3
                             ;;
                         4)
                             install_icons
-                            OPT=2
+                            OPT=4
                             ;;
                         5)
                             package_install "geeqie"
@@ -1423,7 +1476,7 @@ function install_desktop_environment(){
                             ;;
                         10)
                             install_gtk_themes
-                            OPT=8
+                            OPT=10
                             ;;
                         11)
                             package_install "polkit-gnome thunar tumbler"
@@ -1611,8 +1664,8 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
-            sudo -u "$USERNAME" gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"
-            sudo -u "$USERNAME" gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"
+            sudo -u $USERNAME gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"
+            sudo -u $USERNAME gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"
             config_dm "gdm"
             CURRENT_STATUS=1
             GNOME=1
@@ -1720,7 +1773,7 @@ function install_desktop_environment(){
             do
                 print_title "LXDE CUSTOMIZATION"
                 echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
-                echo " 2) $(menu_item "lxdm" "LXDM") $AUR"
+                echo " 2) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
                 echo " 3) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
                 echo " 4) $(menu_item "xfburn")"
                 echo ""
@@ -1735,12 +1788,8 @@ function install_desktop_environment(){
                             OPT=1
                             ;;
                         2)
-                            aur_package_install "lxdm"
-                            local lxdm=`cat /etc/inittab | sed -n '/lxdm/p'`
-                            if [[ -z "$lxdm" ]]; then
-                                echo -e "x:5:respawn:/usr/sbin/lxdm >& /dev/null" >> /etc/inittab
-                            fi
-                            config_dm "lxdm"
+                            install_display_manager
+                            OPT=2
                             ;;
                         3)
                             install_gtk_themes
@@ -1791,7 +1840,7 @@ function install_desktop_environment(){
                 echo " 5) $(menu_item "pcmanfm" "PCManFM")"
                 echo " 6) $(menu_item "rxvt-unicode")"
                 echo " 7) $(menu_item "scrot")"
-                echo " 8) $(menu_item "slim")"
+                echo " 8) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
                 echo " 9) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
                 echo "10) $(menu_item "thunar")"
                 echo "11) $(menu_item "tint2")"
@@ -1827,8 +1876,8 @@ function install_desktop_environment(){
                             package_install "scrot"
                             ;;
                         8)
-                            package_install "slim"
-                            config_dm "slim"
+                            install_display_manager
+                            OPT=8
                             ;;
                         9)
                             install_gtk_themes
@@ -1878,7 +1927,7 @@ function install_desktop_environment(){
                 print_title "XFCE CUSTOMIZATION"
                 echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
                 echo " 2) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
-                echo " 3) $(menu_item "slim")"
+                echo " 3) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1895,8 +1944,8 @@ function install_desktop_environment(){
                             OPT=2
                             ;;
                         3)
-                            package_install "slim"
-                            config_dm "slim"
+                            install_display_manager
+                            OPT=3
                             ;;
                         "d")
                             break

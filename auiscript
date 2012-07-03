@@ -93,14 +93,14 @@
     #E17 {{{
         # 1) E17 Icons
         # 2) E17 Themes
-        # 3) Elsa
+        # 3) Display Manager
         # 4) Icons
         # 5) Geeqie
         # 6) Gmrun
         # 7) PCManFM
         # 8) rxvt-unicode
         # 9) Scrot
-        #10) Themes
+        #10) GTK Themes
         #11) Thunar
         #12) Xfburn
         E17_OPTIONS=""
@@ -147,8 +147,9 @@
     #}}}
     #LXDE {{{
         # 1) Icons
-        # 2) LXDM
-        # 3) Xfburn
+        # 2) Display Manager
+        # 3) GTK Themes
+        # 4) Xfburn
         LXDE_OPTIONS=""
     #}}}
     #OPENBOX {{{
@@ -159,7 +160,7 @@
         # 5) PCManFM
         # 6) rxvt-unicode
         # 7) Scrot
-        # 8) Slim
+        # 8) Display Manager
         # 9) GTK Themes
         #10) Thunar
         #11) Tint2
@@ -169,11 +170,11 @@
     #}}}
     #XFCE {{{
         # 1) Icons
-        # 2) Themes
-        # 3) Slim
+        # 2) GTK Themes
+        # 3) Display Manager
         XFCE_OPTIONS="1-3"
     #}}}
-    #E17/GNOME/LXDE/OPENBOX/XFCE ICONS {{{
+    #ICONS {{{
         # 1) Awoken
         # 2) Faenza
         # 3) Faenza-Cupertino
@@ -181,7 +182,7 @@
         # 5) Elementary
         GNOME_ICONS="2-5"
     #}}}
-    #GTK2/GTK3 THEMES {{{
+    #GTK THEMES {{{
         # 1) Adwaita Cupertino
         # 2) Boomerang
         # 3) Bluebird
@@ -192,6 +193,14 @@
         # 8) Zukini
         # 9) Zukitwo
         GTK_THEMES="2-9"
+    #}}}
+    #DISPLAY MANAGER {{{
+        # 1) Elsa
+        # 2) GDM
+        # 3) LightDM
+        # 4) LXDM
+        # 5) Slim
+        DISPLAY_MANAGER="4"
     #}}}
     #NETWORKMANAGER #{{{
         # 1) Networkmanager
