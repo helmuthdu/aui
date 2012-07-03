@@ -26,10 +26,6 @@ LXDE=0
 OPENBOX=0
 XFCE=0
 #}}}
-# AUR HELPER {{{
-YAOURT=0
-PACKER=0
-#}}}
 # MAIN MENU {{{
 BASICSETUP=0
 DESKTOPENVIRONMENT=0
@@ -78,7 +74,7 @@ BYellow='\e[1;33m'      # Yellow
 AUTOMATIC_MODE=0
 AUR=`echo -e "(${BPurple}aur${White})"`
 #}}}
-
+#SUPPORT FUNCTIONS {{{
 function read_input(){ #{{{
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
         OPTION=$1
@@ -203,11 +199,7 @@ function aur_package_install(){ #{{{
     #install package from aur
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
-            if [[ $YAOURT -eq 1 ]]; then
-                sudo -u $USERNAME yaourt -S --noconfirm $PACKAGE
-            else
-                sudo -u $USERNAME packer -S --noconfirm $PACKAGE
-            fi
+            su -c "$AUR_HELPER -S --noconfirm $PACKAGE" $USERNAME
             #RECHECK #{{{
             #check if the package wasnt installed
             if ! check_package "$PACKAGE" ; then
@@ -216,11 +208,7 @@ function aur_package_install(){ #{{{
                 else
                     read_input_text "Package $PACKAGE not installed, try install again?"
                     if [[ $OPTION == y ]]; then
-                        if [[ $YAOURT -eq 1 ]]; then
-                            sudo -u $USERNAME yaourt -S $PACKAGE
-                        else
-                            sudo -u $USERNAME packer -S $PACKAGE
-                        fi
+                        su -c "$AUR_HELPER -S --noconfirm $PACKAGE" $USERNAME
                     fi
                 fi
             fi
@@ -307,7 +295,7 @@ function mainmenu_item(){ #{{{
 function elihw() { #{{{
     [[ $OPT == b || $OPT == d ]] && break;
 } #}}}
-
+#}}}
 #WELCOME {{{
 function welcome(){
     clear
@@ -437,6 +425,247 @@ function language_selector(){
     pause_function
 }
 #}}}
+#PACKMAN PACKAGE SIGNING {{{
+function configure_pacman_package_signing(){
+    if [[ ! -d /etc/pacman.d/gnupg ]]; then
+        print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
+        print_info "Pacman-key is a new tool available with pacman 4. It allows the user to manage pacman's list of trusted keys in the new package signing implementation."
+        #install rng-tools {{{
+            wget http://aur.archlinux.org/packages/rng-tools/rng-tools.tar.gz;
+            tar zxvf rng-tools.tar.gz;
+            cd rng-tools;
+            makepkg -si --asroot --noconfirm;
+            cd ..;
+            rm -fr rng-tools*
+        #}}}
+        sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
+        rngd -f -r /dev/urandom &
+        pacman-key --init --keyserver pgp.mit.edu
+        pacman-key --populate archlinux
+        killall rngd
+        package_remove "rng-tools"
+    fi
+}
+#}}}
+#SYSTEM UPDATE {{{
+function system_upgrade(){
+    print_title "UPDATING YOUR SYSTEM"
+    pacman -Syu
+}
+#}}}
+#SELECT/CREATE USER {{{
+function select_user(){
+    #CREATE NEW USER {{{
+    function create_new_user(){
+        read -p "Username: " USERNAME
+        useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
+        passwd $USERNAME
+        configure_user_account
+    } #}}}
+    #CONFIGURE USER ACCOUNT {{{
+    function configure_user_account(){
+        cp /etc/skel/.* /home/$USERNAME/
+        print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
+        package_install "git"
+        git clone https://github.com/helmuthdu/dotfiles
+        cp dotfiles/.* ~/
+        cp dotfiles/.* /home/$USERNAME/
+        rm -fr dotfiles
+        print_title "DEFAULT EDITOR"
+        EDITOR=("Emacs" "Joe" "Nano" "Vim");
+        PS3="$prompt1"
+        echo -e "Choose default editor\n"
+        select OPT in "${EDITOR[@]}"; do
+            case "$REPLY" in
+                1)
+                    package_install "emacs"
+                    sed -i '/EDITOR/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
+                    sed -i '/VISUAL/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
+                    sed -i '/EDITOR/s/vim/emacs\ -nw/' ~/.bashrc
+                    sed -i '/VISUAL/s/vim/emacs\ -nw/' ~/.bashrc
+                    EDITOR=emacs
+                    break
+                    ;;
+                2)
+                    if ! check_package "joe" ; then
+                        su -l $USERNAME --command="
+                            wget http://aur.archlinux.org/packages/jo/joe/joe.tar.gz;
+                            tar zxvf joe.tar.gz;
+                            cd joe;
+                            makepkg -si --noconfirm;
+                            cd ..;
+                            rm -fr joe*
+                        "
+                    fi
+                    sed -i '/EDITOR/s/vim/joe/' /home/$USERNAME/.bashrc
+                    sed -i '/VISUAL/s/vim/joe/' /home/$USERNAME/.bashrc
+                    sed -i '/EDITOR/s/vim/joe/' ~/.bashrc
+                    sed -i '/VISUAL/s/vim/joe/' ~/.bashrc
+                    EDITOR=joe
+                    break
+                    ;;
+                3)
+                    sed -i '/EDITOR/s/vim/nano/' /home/$USERNAME/.bashrc
+                    sed -i '/VISUAL/s/vim/nano/' /home/$USERNAME/.bashrc
+                    sed -i '/EDITOR/s/vim/nano/' ~/.bashrc
+                    sed -i '/VISUAL/s/vim/nano/' ~/.bashrc
+                    EDITOR=nano
+                    break
+                    ;;
+                4)
+                    # VIM
+                    package_install "vim ctags ack"
+                    # VIMRC
+                    git clone https://github.com/helmuthdu/vim
+                    mv vim /home/$USERNAME/.vim
+                    ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
+                    # PENTADACTYL [FIREFOX]
+                    git clone https://github.com/helmuthdu/pentadactyl
+                    mv pentadactyl /home/$USERNAME/.pentadactyl
+                    ln -sf /home/$USERNAME/.pentadactyl/pentadactylrc /home/$USERNAME/.pentadactylrc
+                    EDITOR=vim
+                    break
+                    ;;
+                *)
+                    invalid_option
+                    ;;
+            esac
+        done
+        chown -R $USERNAME:users /home/$USERNAME
+    } #}}}
+    print_title "SELECT/CREATE USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
+    users=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
+    PS3="$prompt1"
+    echo "Avaliable Users:"
+    if [[ $(( ${#users[@]} )) -gt 0 ]]; then
+        print_warning "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES"
+    else
+        echo ""
+    fi
+    select OPT in "${users[@]}" "Create new user"; do
+        if [ "$OPT" == "Create new user" ]; then
+            create_new_user
+            break
+        elif contains_element "$OPT" "${users[@]}"; then
+            USERNAME=$OPT
+            break
+        else
+            invalid_option
+        fi
+    done
+    [[ ! -f /home/$USERNAME/.bashrc ]] && configure_user_account;
+}
+#}}}
+#CONFIGURE SUDO {{{
+function configure_sudo(){
+    if ! check_package "sudo" ; then
+        print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
+        package_install "sudo"
+    fi
+    ## Uncomment to allow members of group wheel to execute any command
+    sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
+    ## Same thing without a password (not secure)
+    #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
+}
+#}}}
+#AUR HELPER {{{
+function choose_aurhelper(){
+    print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
+    print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
+    print_warning "\tNone of these tools are officially supported by Arch devs."
+    aurhelper=("Yaourt" "Pacaur" "Packer")
+    PS3="$prompt1"
+    echo -e "Choose your default AUR helper to install\n"
+    select OPT in "${aurhelper[@]}"; do
+        case "$REPLY" in
+            1)
+                if ! check_package "yaourt" ; then
+                    package_install "base-devel yajl namcap"
+                    su -c '
+                        wget http://aur.archlinux.org/packages/pa/package-query/package-query.tar.gz
+                        tar zxvf package-query.tar.gz;
+                        cd package-query;
+                        makepkg -si --noconfirm;
+                        cd ..;
+                        rm -fr package-query*
+                    ' $USERNAME
+                    su -c '
+                        wget http://aur.archlinux.org/packages/ya/yaourt/yaourt.tar.gz
+                        tar zxvf yaourt.tar.gz;
+                        cd yaourt;
+                        makepkg -si --noconfirm;
+                        cd ..;
+                        rm -fr yaourt*
+                    ' $USERNAME
+                    if ! check_package "yaourt" ; then
+                        echo "Yaourt not installed. EXIT now"
+                        pause_function
+                        exit 0
+                    fi
+                fi
+                CURRENT_STATUS=1
+                AUR_HELPER="yaourt"
+                break
+                ;;
+            2)
+                if ! check_package "pacaur" ; then
+                    package_install "base-devel expac"
+                    su -c '
+                        wget http://aur.archlinux.org/packages/co/cower/cower.tar.gz
+                        tar zxvf cower.tar.gz;
+                        cd cower;
+                        makepkg -si --noconfirm;
+                        cd ..;
+                        rm -fr cower*
+                    ' $USERNAME
+                    su -c '
+                        wget http://aur.archlinux.org/packages/pa/pacaur/pacaur.tar.gz
+                        tar zxvf pacaur.tar.gz;
+                        cd pacaur;
+                        makepkg -si --noconfirm;
+                        cd ..;
+                        rm -fr pacaur*
+                    ' $USERNAME
+                    if ! check_package "pacaur" ; then
+                        echo "Pacaur not installed. EXIT now"
+                        pause_function
+                        exit 0
+                    fi
+                fi
+                CURRENT_STATUS=1
+                AUR_HELPER="pacaur"
+                break
+                ;;
+            3)
+                if ! check_package "packer" ; then
+                    package_install "base-devel git jshon"
+                    su -c '
+                        wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
+                        tar zxvf packer.tar.gz;
+                        cd packer;
+                        makepkg -si --noconfirm;
+                        cd ..;
+                        rm -fr packer*
+                    ' $USERNAME
+                    if ! check_package "packer" ; then
+                        echo "Packer not installed. EXIT now"
+                        pause_function
+                        exit 0
+                    fi
+                fi
+                CURRENT_STATUS=1
+                AUR_HELPER="packer"
+                break
+                ;;
+            *)
+                invalid_option
+                ;;
+        esac
+    done
+    sumary "AUR Helper installation"
+    pause_function
+}
+#}}}
 #CUSTOM REPOSITORIES {{{
 function add_custom_repositories(){
     # ENABLE MULTILIB REPOSITORY {{{
@@ -519,207 +748,7 @@ function install_reflector(){
     pause_function
 }
 #}}}
-#SYSTEM UPDATE {{{
-function system_upgrade(){
-    print_title "UPDATING YOUR SYSTEM"
-    pacman -Syu
-}
-#}}}
-#SELECT/CREATE USER {{{
-function select_user(){
-    #CREATE NEW USER {{{
-    function create_new_user(){
-        read -p "Username: " USERNAME
-        useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
-        passwd $USERNAME
-        configure_user_account
-    } #}}}
-    #CONFIGURE USER ACCOUNT {{{
-    function configure_user_account(){
-        cp /etc/skel/.* /home/$USERNAME/
-        print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
-        package_install "git"
-        git clone https://github.com/helmuthdu/dotfiles
-        cp dotfiles/.* ~/
-        cp dotfiles/.* /home/$USERNAME/
-        rm -fr dotfiles
-        print_title "DEFAULT EDITOR"
-        EDITOR=("Emacs" "Joe" "Nano" "Vim");
-        PS3="$prompt1"
-        echo -e "Choose default editor\n"
-        select OPT in "${EDITOR[@]}"; do
-            case "$REPLY" in
-                1)
-                    package_install "emacs"
-                    sed -i '/EDITOR/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
-                    sed -i '/VISUAL/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
-                    sed -i '/EDITOR/s/vim/emacs\ -nw/' ~/.bashrc
-                    sed -i '/VISUAL/s/vim/emacs\ -nw/' ~/.bashrc
-                    EDITOR=emacs
-                    break
-                    ;;
-                2)
-                    if ! check_package "joe" ; then
-                        su -l $USERNAME --command="
-                            wget http://aur.archlinux.org/packages/jo/joe/joe.tar.gz;
-                            tar zxvf joe.tar.gz;
-                            cd joe;
-                            makepkg -si --noconfirm;
-                            cd ..;
-                            rm -fr joe*
-                        "
-                    fi
-                    sed -i '/EDITOR/s/vim/joe/' /home/$USERNAME/.bashrc
-                    sed -i '/VISUAL/s/vim/joe/' /home/$USERNAME/.bashrc
-                    sed -i '/EDITOR/s/vim/joe/' ~/.bashrc
-                    sed -i '/VISUAL/s/vim/joe/' ~/.bashrc
-                    EDITOR=joe
-                    break
-                    ;;
-                3)
-                    sed -i '/EDITOR/s/vim/nano/' /home/$USERNAME/.bashrc
-                    sed -i '/VISUAL/s/vim/nano/' /home/$USERNAME/.bashrc
-                    sed -i '/EDITOR/s/vim/nano/' ~/.bashrc
-                    sed -i '/VISUAL/s/vim/nano/' ~/.bashrc
-                    EDITOR=nano
-                    break
-                    ;;
-                4)
-                    # VIM
-                    package_install "vim ctags ack"
-                    if ! check_package "discount" ; then
-                        su -l $USERNAME --command="
-                            wget http://aur.archlinux.org/packages/discount/discount.tar.gz;
-                            tar zxvf discount.tar.gz;
-                            cd discount;
-                            makepkg -si --noconfirm;
-                            cd ..;
-                            rm -fr discount*
-                        "
-                    fi
-                    # VIMRC
-                    git clone https://github.com/helmuthdu/vim
-                    mv vim /home/$USERNAME/.vim
-                    ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
-                    # PENTADACTYL [FIREFOX]
-                    git clone https://github.com/helmuthdu/pentadactyl
-                    mv pentadactyl /home/$USERNAME/.pentadactyl
-                    ln -sf /home/$USERNAME/.pentadactyl/pentadactylrc /home/$USERNAME/.pentadactylrc
-                    EDITOR=vim
-                    break
-                    ;;
-                *)
-                    invalid_option
-                    ;;
-            esac
-        done
-        chown -R $USERNAME:users /home/$USERNAME
-    } #}}}
-    print_title "SELECT/CREATE USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
-    users=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
-    PS3="$prompt1"
-    echo "Avaliable Users:"
-    if [[ $(( ${#users[@]} )) -gt 0 ]]; then
-        print_warning "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES"
-    else
-        echo ""
-    fi
-    select OPT in "${users[@]}" "Create new user"; do
-        if [ "$OPT" == "Create new user" ]; then
-            create_new_user
-            break
-        elif contains_element "$OPT" "${users[@]}"; then
-            USERNAME=$OPT
-            break
-        else
-            invalid_option
-        fi
-    done
-    [[ ! -f /home/$USERNAME/.bashrc ]] && configure_user_account;
-}
-#}}}
-#CONFIGURE SUDO {{{
-function configure_sudo(){
-    if ! check_package "sudo" ; then
-        print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
-        package_install "sudo"
-    fi
-    ## Uncomment to allow members of group wheel to execute any command
-    sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
-    ## Same thing without a password (not secure)
-    #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
-}
-#}}}
-#AUR HELPER {{{
-function choose_aurhelper(){
-    print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
-    print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
-    print_warning "\tNone of these tools are officially supported by Arch devs."
-    aurhelper=("Yaourt" "Packer")
-    PS3="$prompt1"
-    echo -e "Choose your default AUR helper to install\n"
-    select OPT in "${aurhelper[@]}"; do
-        case "$REPLY" in
-            1)
-                if ! check_package "yaourt" ; then
-                    package_install "base-devel yajl namcap"
-                    su -l $USERNAME --command="
-                        wget http://aur.archlinux.org/packages/package-query/package-query.tar.gz;
-                        tar zxvf package-query.tar.gz;
-                        cd package-query;
-                        makepkg -si --noconfirm;
-                        cd ..;
-                        rm -fr package-query*
-                    "
-                    su -l $USERNAME --command="
-                        wget http://aur.archlinux.org/packages/yaourt/yaourt.tar.gz;
-                        tar zxvf yaourt.tar.gz;
-                        cd yaourt;
-                        makepkg -si --noconfirm;
-                        cd ..;
-                        rm -fr yaourt*
-                    "
-                    if ! check_package "yaourt" ; then
-                        echo "Yaourt not installed. EXIT now"
-                        pause_function
-                        exit 0
-                    fi
-                fi
-                CURRENT_STATUS=1
-                YAOURT=1
-                break
-                ;;
-            2)
-                if ! check_package "packer" ; then
-                    package_install "base-devel git jshon"
-                    su -l $USERNAME --command="
-                        wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
-                        tar zxvf packer.tar.gz;
-                        cd packer;
-                        makepkg -si --noconfirm;
-                        cd ..;
-                        rm -fr packer*
-                    "
-                    if ! check_package "packer" ; then
-                        echo "Packer not installed. EXIT now"
-                        pause_function
-                        exit 0
-                    fi
-                fi
-                CURRENT_STATUS=1
-                PACKER=1
-                break
-                ;;
-            *)
-                invalid_option
-                ;;
-        esac
-    done
-    sumary "AUR Helper installation"
-    pause_function
-}
-#}}}
-#AUTOMATIC MODE{{{
+#AUTOMATIC MODE {{{
 function automatic_mode(){
     print_title "AUTOMATIC MODE"
     print_info "Create a custom install with all options pre-selected.\nUse this option with care."
@@ -739,29 +768,7 @@ function automatic_mode(){
     fi
 }
 #}}}
-#PACKMAN PACKAGE SIGNING {{{
-function configure_pacman_package_signing(){
-    if [[ ! -d /etc/pacman.d/gnupg ]]; then
-        print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
-        print_info "Pacman-key is a new tool available with pacman 4. It allows the user to manage pacman's list of trusted keys in the new package signing implementation."
-        #install rng-tools {{{
-            wget http://aur.archlinux.org/packages/rng-tools/rng-tools.tar.gz;
-            tar zxvf rng-tools.tar.gz;
-            cd rng-tools;
-            makepkg -si --asroot --noconfirm;
-            cd ..;
-            rm -fr rng-tools*
-        #}}}
-        sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
-        rngd -f -r /dev/urandom &
-        pacman-key --init --keyserver pgp.mit.edu
-        pacman-key --populate archlinux
-        killall rngd
-        package_remove "rng-tools"
-    fi
-}
-#}}}
-#BASIC SETUP{{{
+#BASIC SETUP {{{
 function install_basic_setup(){
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
     package_install "bc rsync mlocate bash-completion net-tools"
@@ -830,7 +837,7 @@ function install_basic_setup(){
     #}}}
 }
 #}}}
-#NFS #{{{
+#NFS {{{
 function install_nfs(){
     print_title "NFS - https://wiki.archlinux.org/index.php/Nfs"
     print_info "NFS allowing a user on a client computer to access files over a network in a manner similar to how local storage is accessed."
@@ -849,7 +856,7 @@ function install_nfs(){
     pause_function
 }
 #}}}
-#SAMBA #{{{
+#SAMBA {{{
 function install_samba(){
     print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
     print_info "Samba is a re-implementation of the SMB/CIFS networking protocol, it facilitates file and printer sharing among Linux and Windows systems as an alternative to NFS."
@@ -869,7 +876,7 @@ function install_samba(){
     pause_function
 }
 #}}}
-#PRELOAD #{{{
+#PRELOAD {{{
 function install_preload(){
     print_title "PRELOAD - https://wiki.archlinux.org/index.php/Preload"
     print_info "Preload is a program which runs as a daemon and records statistics about usage of programs using Markov chains; files of more frequently-used programs are, during a computer's spare time, loaded into memory. This results in faster startup times as less data needs to be fetched from disk. preload is often paired with prelink."
@@ -888,7 +895,7 @@ function install_preload(){
     pause_function
 }
 #}}}
-#TLP #{{{
+#TLP {{{
 function install_tlp(){
     print_title "TLP - https://wiki.archlinux.org/index.php/TLP"
     print_info "TLP is a set of scripts that bring you the benefits of advanced power management for Linux without the need to understand every technical detail. The default configuration provides optimized power saving out of the box."
@@ -2467,7 +2474,7 @@ do
                 aur_package_install "google-earth"
                 ;;
             4)
-                aur_package_install "google-chrome flashplugin"
+                aur_package_install "google-chrome openssl098 flashplugin"
                 ;;
             5)
                 aur_package_install "google-talkplugin"
@@ -2535,7 +2542,7 @@ elihw
 done
 }
 #}}}
-#LAMP #{{{
+#LAMP {{{
 function install_lamp(){
 print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlinux.org/index.php/LAMP"
 read_input_text "Install LAMP" $LAMP
