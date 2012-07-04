@@ -207,9 +207,7 @@ function aur_package_install(){ #{{{
                     echo "$PACKAGE" >> packages_not_installed.txt
                 else
                     read_input_text "Package $PACKAGE not installed, try install again?"
-                    if [[ $OPTION == y ]]; then
-                        su -c "$AUR_HELPER -S --noconfirm $PACKAGE" $USERNAME
-                    fi
+                    [[ $OPTION == y ]] && su -c "$AUR_HELPER -S --noconfirm $PACKAGE" $USERNAME;
                 fi
             fi
             #}}}
@@ -895,23 +893,22 @@ function install_preload(){
     pause_function
 }
 #}}}
-#TLP {{{
-function install_tlp(){
-    print_title "TLP - https://wiki.archlinux.org/index.php/TLP"
-    print_info "TLP is a set of scripts that bring you the benefits of advanced power management for Linux without the need to understand every technical detail. The default configuration provides optimized power saving out of the box."
-    read_input_text "Install TLP" $TLP
+#LAPTOP MODE TOOLS {{{
+function install_lmt(){
+    print_title "LAPTOP MODE TOOLS- https://wiki.archlinux.org/index.php/Laptop_Mode_Tools"
+    print_info "Laptop Mode Tools is a laptop power saving package for Linux systems. It is the primary way to enable the Laptop Mode feature of the Linux kernel, which lets your hard drive spin down. In addition, it allows you to tweak a number of other power-related settings using a simple configuration file."
+    read_input_text "Install Laptop Mode Tools" $LMT
     case "$OPTION" in
         "y")
-            package_install "upower"
-            aur_package_install "tlp"
-            add_daemon "@tlp"
+            package_install "laptop-mode-tools"
+            add_daemon "@laptop-mode"
             CURRENT_STATUS=1
             ;;
         *)
             CURRENT_STATUS=0
             ;;
     esac
-    sumary "TLP installation"
+    sumary "Laptop Mode Tools installation"
     pause_function
 }
 #}}}
@@ -1677,6 +1674,7 @@ function install_desktop_environment(){
             print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
             package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
             package_install "kdeadmin-system-config-printer-kde xdg-user-dirs"
+            #package_install "kde-telepathy telepathy"
             package_remove "kdemultimedia-kscd kdemultimedia-juk"
             aur_package_install "kde-gtk-config-git"
             aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
@@ -2280,7 +2278,7 @@ while [[ 1 ]]
 do
     print_title "OFFICE APPS"
     echo " 1) $(menu_item "libreoffice-common" "LibreOffice")"
-    echo " 2) $(menu_item "goffice" "Abiword + Gnumeric")"
+    echo " 2) $(menu_item "goffice calligra" "$([[ $KDE -eq 1 ]] && echo "Caligra" || echo "Abiword + Gnumeric";)")"
     echo " 3) $(menu_item "texlive-core" "latex")"
     echo " 4) $(menu_item "kchmviewer chmsee" "$([[ $KDE -eq 1 ]] && echo "Kchmviewer" || echo "Chmsee";)")"
     echo " 5) $(menu_item "gcstar")"
@@ -2309,7 +2307,11 @@ do
                 fi
                 ;;
             2)
-                package_install "gnumeric abiword abiword-plugins"
+                if [[ $KDE -eq 1 ]]; then
+                    package_install "calligra"
+                else
+                    package_install "gnumeric abiword abiword-plugins"
+                fi
                 aur_package_install "hunspell-$LANGUAGE_HS"
                 aur_package_install "aspell-$LANGUAGE_AS"
                 ;;
@@ -2497,7 +2499,7 @@ do
     echo "15) $(menu_item "teamspeak3") $AUR"
     echo "16) $(menu_item "teamviewer") $AUR"
     echo "17) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
-    echo "18) $(menu_item "konversation xchat" "$([[ $KDE -eq 1 ]] && echo "Konversation" || echo "X-Chat";)")"
+    echo "18) $(menu_item "quassel xchat" "$([[ $KDE -eq 1 ]] && echo "Quassel" || echo "X-Chat";)")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2576,7 +2578,7 @@ do
                 ;;
             18)
                 if [[ $KDE -eq 1 ]]; then
-                    package_install "konversation"
+                    package_install "quassel"
                 else
                     package_install "xchat"
                 fi
@@ -2648,12 +2650,12 @@ do
     echo " 3) $(menu_item "banshee")"
     echo " 4) $(menu_item "clementine")"
     echo " 5) $(menu_item "deadbeef")"
-    echo " 6) $(menu_item "exaile") $AUR"
-    echo " 7) $(menu_item "musique") $AUR"
-    echo " 8) $(menu_item "nuvola-bzr-stable") $AUR"
-    echo " 9) $(menu_item "rhythmbox")"
-    echo "10) $(menu_item "radiotray") $AUR"
-    echo "11) $(menu_item "spotify") $AUR"
+    echo " 6) $(menu_item "musique") $AUR"
+    echo " 7) $(menu_item "nuvola-bzr-stable") $AUR"
+    echo " 8) $(menu_item "rhythmbox")"
+    echo " 9) $(menu_item "radiotray") $AUR"
+    echo "10) $(menu_item "spotify") $AUR"
+    echo "11) $(menu_item "tomahawk") $AUR"
     echo "12) $(menu_item "soundconverter soundkonverter" "$([[ $KDE -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
     echo "13) $(menu_item "puddletag") $AUR"
     echo "14) $(menu_item "audacity")"
@@ -2682,22 +2684,22 @@ do
                 package_install "deadbeef"
                 ;;
             6)
-                aur_package_install "exaile"
-                ;;
-            7)
                 aur_package_install "musique"
                 ;;
-            8)
+            7)
                 aur_package_install "nuvola-bzr-stable"
                 ;;
-            9)
+            8)
                 package_install "rhythmbox"
                 ;;
-            10)
+            9)
                 aur_package_install "radiotray"
                 ;;
-            11)
+            10)
                 aur_package_install "spotify"
+                ;;
+            11)
+                aur_package_install "tomahawk"
                 ;;
             12)
                 if [[ $KDE -eq 1 ]]; then
@@ -2747,11 +2749,10 @@ do
     echo " 9) $(menu_item "xbmc")"
     echo "10) $(menu_item "arista-transcoder" "Arista")"
     echo "11) $(menu_item "transmageddon")"
-    echo "12) $(menu_item "kdenlive")"
-    echo "13) $(menu_item "openshot")"
-    echo "14) $(menu_item "pitivi")"
-    echo "15) $(menu_item "kazam-bzr") $AUR"
-    echo "16) $(menu_item "codecs codecs64" "Codecs") $AUR"
+    echo "12) $(menu_item "openshot")"
+    echo "13) $(menu_item "pitivi kdenlive" "$([[ $KDE -eq 1 ]] && echo "Kdenlive" || echo "Pitivi";)")"
+    echo "14) $(menu_item "kazam-bzr") $AUR"
+    echo "15) $(menu_item "codecs codecs64" "Codecs") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2796,19 +2797,20 @@ do
                 package_install "transmageddon"
                 ;;
             12)
-                package_install "kdenlive"
-                ;;
-            13)
                 package_install "openshot"
                 ;;
-            14)
-                package_install "pitivi"
+            13)
+                if [[ $KDE -eq 1 ]]; then
+                    package_install "kdenlive"
+                else
+                    package_install "pitivi"
+                fi
                 ;;
-            15)
+            14)
                 aur_package_install "python-rsvg"
                 aur_package_install "kazam-bzr"
                 ;;
-            16)
+            15)
                 package_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
                 if [[ $ARCHI == i686 ]]; then
                     aur_package_install "codecs"
@@ -3405,6 +3407,7 @@ do
     echo " 6) $(menu_item "ttf-mac-fonts") $AUR"
     echo " 7) $(menu_item "ttf-ms-fonts") $AUR"
     echo " 8) $(menu_item "ttf-vista-fonts") $AUR"
+    echo " 9) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support) $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -3441,6 +3444,9 @@ do
                 ;;
             8)
                 aur_package_install "ttf-vista-fonts"
+                ;;
+            9)
+                aur_package_install "wqy-microhei"
                 ;;
             "b")
                 break
@@ -3671,6 +3677,8 @@ configure_sudo
 choose_aurhelper
 automatic_mode
 
+if check_package "kdebase-workspace"; then KDE=1; fi
+
 while [[ 1 ]]
 do
     print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
@@ -3703,7 +3711,7 @@ do
                 install_basic_setup
                 install_nfs
                 install_samba
-                install_tlp
+                install_lmt
                 install_preload
                 install_xorg
                 install_video_cards

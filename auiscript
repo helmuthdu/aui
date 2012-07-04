@@ -259,7 +259,7 @@
 #}}}
 #OFFICE {{{
     # 1) LibreOffice
-    # 2) GNOME Office [Abiword, Gnumeric]
+    # 2) Abiword+Gnumeric|Calligra
     # 3) Latex + Texmaker
     # 4) CHM Viewer
     # 5) GCStar
@@ -310,7 +310,7 @@
     #15) Teamspeak
     #16) Teamviewer
     #17) Trasmission
-    #18) X-Chat|Konversation
+    #18) X-Chat|Quassel
     INTERNET_OPTIONS="3-6 9"
 #}}}
 #LAMP {{{
@@ -322,12 +322,12 @@
     # 3) Banshee
     # 4) Clementine
     # 5) Deadbeef
-    # 6) Exaile
-    # 7) Musique
-    # 8) Nuvola
-    # 9) Rhythmbox
-    #10) Radiotray
-    #11) Spotify
+    # 6) Musique
+    # 7) Nuvola
+    # 8) Rhythmbox
+    # 9) Radiotray
+    #10) Spotify
+    #11) Tomahawk
     #12) Soundconverter
     #13) Puddletag
     #14) Audacity
@@ -347,12 +347,11 @@
     # 9) XBMC
     #10) Arista
     #11) Transmageddon
-    #12) Kdenlive
-    #13) Openshot
-    #14) Pitivi
-    #15) Kazam
-    #16) Codecs
-    VIDEO_OPTIONS="8 9 16"
+    #12) Openshot
+    #13) Pitivi|Kdenlive
+    #14) Kazam
+    #15) Codecs
+    VIDEO_OPTIONS="8 9 15"
 #}}}
 #GAMES {{{
     # 1) Action|Adventure
@@ -471,7 +470,8 @@
     # 6) ttf-mac-fonts
     # 7) ttf-ms-fonts
     # 8) ttf-vista-fonts
-    FONTS_OPTIONS="1 3-8"
+    # 9) ttf-wgy-microhei
+    FONTS_OPTIONS="1 3-9"
     GOOGLE_FONTS="y"
 #}}}
 #FONTS CONFIGURATION {{{
