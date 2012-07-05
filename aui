@@ -221,7 +221,7 @@ function download_package_aur(){ #{{{
     PACKAGE_DIR=`echo "$PACKAGE_NAME" | sed 's/.tar.gz//'`
     su -l $USERNAME -c "
         [[ ! -d downloaded_packages ]] && mkdir downloaded_packages
-        cd /tmp/downloaded_packages
+        cd downloaded_packages
         [[ ! -f $PACKAGE_NAME ]] && wget $1
         tar zxvf $PACKAGE_NAME
         cd $PACKAGE_DIR
