@@ -219,7 +219,7 @@ function aur_package_install(){ #{{{
 function download_package_aur(){ #{{{
     PACKAGE_NAME=`echo "$1" | sed 's/.*\///'`
     PACKAGE_DIR=`echo "$PACKAGE_NAME" | sed 's/.tar.gz//'`
-    [[ ! -d downloaded_packages ]] && sudo -u $USERNAME mkdir downloaded_packages;
+    [[ ! -d downloaded_packages ]] && mkdir downloaded_packages;
     cd downloaded_packages
     [[ ! -f $PACKAGE_NAME ]] && wget $1;
     tar zxvf $PACKAGE_NAME
