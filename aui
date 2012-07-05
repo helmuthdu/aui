@@ -199,7 +199,7 @@ function aur_package_install(){ #{{{
     #install package from aur
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
-            su -c "$AUR_HELPER -S --noconfirm $PACKAGE" $USERNAME
+            su -l $USERNAME -c "$AUR_HELPER -S --noconfirm $PACKAGE"
             #RECHECK #{{{
             #check if the package wasnt installed
             if ! check_package "$PACKAGE" ; then
@@ -207,7 +207,7 @@ function aur_package_install(){ #{{{
                     echo "$PACKAGE" >> packages_not_installed.txt
                 else
                     read_input_text "Package $PACKAGE not installed, try install again?"
-                    [[ $OPTION == y ]] && su -c "$AUR_HELPER -S --noconfirm $PACKAGE" $USERNAME;
+                    [[ $OPTION == y ]] && su -l $USERNAME -c "$AUR_HELPER -S --noconfirm $PACKAGE"
                 fi
             fi
             #}}}
@@ -608,22 +608,22 @@ function choose_aurhelper(){
             2)
                 if ! check_package "pacaur" ; then
                     package_install "base-devel expac"
-                    su -c '
+                    su -l $USERNAME -c '
                         wget http://aur.archlinux.org/packages/co/cower/cower.tar.gz
                         tar zxvf cower.tar.gz;
                         cd cower;
                         makepkg -si --noconfirm;
                         cd ..;
                         rm -fr cower*
-                    ' $USERNAME
-                    su -c '
+                    '
+                    su -l $USERNAME -c '
                         wget http://aur.archlinux.org/packages/pa/pacaur/pacaur.tar.gz
                         tar zxvf pacaur.tar.gz;
                         cd pacaur;
                         makepkg -si --noconfirm;
                         cd ..;
                         rm -fr pacaur*
-                    ' $USERNAME
+                    '
                     if ! check_package "pacaur" ; then
                         echo "Pacaur not installed. EXIT now"
                         pause_function
@@ -637,14 +637,14 @@ function choose_aurhelper(){
             3)
                 if ! check_package "packer" ; then
                     package_install "base-devel git jshon"
-                    su -c '
+                    su -l $USERNAME -c '
                         wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
                         tar zxvf packer.tar.gz;
                         cd packer;
                         makepkg -si --noconfirm;
                         cd ..;
                         rm -fr packer*
-                    ' $USERNAME
+                    '
                     if ! check_package "packer" ; then
                         echo "Packer not installed. EXIT now"
                         pause_function
