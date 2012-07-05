@@ -216,6 +216,19 @@ function aur_package_install(){ #{{{
         fi
     done
 } #}}}
+function download_package_aur(){ #{{{
+    PACKAGE_NAME=`echo "$1" | sed 's/.*\///'`
+    PACKAGE_DIR=`echo "$PACKAGE_NAME" | sed 's/.tar.gz//'`
+    [[ ! -d downloaded_packages ]] && sudo -u $USERNAME mkdir downloaded_packages;
+    cd downloaded_packages
+    [[ ! -f $PACKAGE_NAME ]] && wget $1;
+    tar zxvf $PACKAGE_NAME
+    chown $USERNAME:users -R $PACKAGE_DIR
+    cd $PACKAGE_DIR
+    sudo -u $USERNAME makepkg -si --noconfirm
+    cd ..
+    rm -fr $PACKAGE_DIR
+} #}}}
 function package_install(){ #{{{
     #install packages using pacman
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
@@ -579,22 +592,8 @@ function choose_aurhelper(){
             1)
                 if ! check_package "yaourt" ; then
                     package_install "base-devel yajl namcap"
-                    su -l $USERNAME -c '
-                        wget http://aur.archlinux.org/packages/pa/package-query/package-query.tar.gz
-                        tar zxvf package-query.tar.gz;
-                        cd package-query;
-                        makepkg -si --noconfirm;
-                        cd ..;
-                        rm -fr package-query*
-                    '
-                    su -l $USERNAME -c '
-                        wget http://aur.archlinux.org/packages/ya/yaourt/yaourt.tar.gz
-                        tar zxvf yaourt.tar.gz;
-                        cd yaourt;
-                        makepkg -si --noconfirm;
-                        cd ..;
-                        rm -fr yaourt*
-                    '
+                    download_package_aur "http://aur.archlinux.org/packages/pa/package-query/package-query.tar.gz"
+                    download_package_aur "http://aur.archlinux.org/packages/ya/yaourt/yaourt.tar.gz"
                     if ! check_package "yaourt" ; then
                         echo "Yaourt not installed. EXIT now"
                         pause_function
@@ -608,22 +607,8 @@ function choose_aurhelper(){
             2)
                 if ! check_package "pacaur" ; then
                     package_install "base-devel expac"
-                    su -l $USERNAME -c '
-                        wget http://aur.archlinux.org/packages/co/cower/cower.tar.gz
-                        tar zxvf cower.tar.gz;
-                        cd cower;
-                        makepkg -si --noconfirm;
-                        cd ..;
-                        rm -fr cower*
-                    '
-                    su -l $USERNAME -c '
-                        wget http://aur.archlinux.org/packages/pa/pacaur/pacaur.tar.gz
-                        tar zxvf pacaur.tar.gz;
-                        cd pacaur;
-                        makepkg -si --noconfirm;
-                        cd ..;
-                        rm -fr pacaur*
-                    '
+                    download_package_aur "http://aur.archlinux.org/packages/co/cower/cower.tar.gz"
+                    download_package_aur "http://aur.archlinux.org/packages/pa/pacaur/pacaur.tar.gz"
                     if ! check_package "pacaur" ; then
                         echo "Pacaur not installed. EXIT now"
                         pause_function
@@ -637,14 +622,7 @@ function choose_aurhelper(){
             3)
                 if ! check_package "packer" ; then
                     package_install "base-devel git jshon"
-                    su -l $USERNAME -c '
-                        wget http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;
-                        tar zxvf packer.tar.gz;
-                        cd packer;
-                        makepkg -si --noconfirm;
-                        cd ..;
-                        rm -fr packer*
-                    '
+                    download_package_aur "http://aur.archlinux.org/packages/pa/packer/packer.tar.gz;"
                     if ! check_package "packer" ; then
                         echo "Packer not installed. EXIT now"
                         pause_function
