@@ -579,22 +579,22 @@ function choose_aurhelper(){
             1)
                 if ! check_package "yaourt" ; then
                     package_install "base-devel yajl namcap"
-                    su -c '
+                    su -l $USERNAME -c '
                         wget http://aur.archlinux.org/packages/pa/package-query/package-query.tar.gz
                         tar zxvf package-query.tar.gz;
                         cd package-query;
                         makepkg -si --noconfirm;
                         cd ..;
                         rm -fr package-query*
-                    ' $USERNAME
-                    su -c '
+                    '
+                    su -l $USERNAME -c '
                         wget http://aur.archlinux.org/packages/ya/yaourt/yaourt.tar.gz
                         tar zxvf yaourt.tar.gz;
                         cd yaourt;
                         makepkg -si --noconfirm;
                         cd ..;
                         rm -fr yaourt*
-                    ' $USERNAME
+                    '
                     if ! check_package "yaourt" ; then
                         echo "Yaourt not installed. EXIT now"
                         pause_function
