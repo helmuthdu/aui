@@ -1318,10 +1318,11 @@ function install_desktop_environment(){
             package_install "gnome-extra gedit-plugins"
             package_install "telepathy"
             package_install "gksu nautilus-open-terminal gnome-tweak-tool xdg-user-dirs-gtk"
-            package_install "gvfs-smb"
+            package_install "gvfs-smb gvfs-afc"
             package_install "pulseaudio"
             package_install "deja-dup"
             package_install "system-config-printer-gnome"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
             aur_package_install "empathy-theme-ubuntu-adium-bzr"
             aur_package_install "automounter gnome-defaults-list"
             create_xinitrc "gnome-session-cinnamon"
@@ -1390,11 +1391,12 @@ function install_desktop_environment(){
             print_title "E17 - http://wiki.archlinux.org/index.php/E17"
             print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
             package_install "e-svn e17-extra-svn consolekit"
-            package_install "ttf-dejavu ttf-bitstream-vera"
             package_install "xdg-user-dirs"
+            package_install "gvfs-smb gvfs-afc"
             package_install "leafpad epdfview"
             package_install "lxappearance consolekit"
-            aur_package_install "xarchiver"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
+            aur_package_install "file-roller2-nn"
             aur_package_install "gnome-defaults-list"
             chown -R $USERNAME:users /home/$USERNAME/.config
             create_xinitrc "enlightenment_start"
@@ -1442,7 +1444,7 @@ function install_desktop_environment(){
                             package_install "gmrun"
                             ;;
                         7)
-                            package_install "gksu gvfs pcmanfm"
+                            package_install "pcmanfm"
                             ;;
                         8)
                             package_install "rxvt-unicode"
@@ -1455,8 +1457,7 @@ function install_desktop_environment(){
                             OPT=10
                             ;;
                         11)
-                            package_install "polkit-gnome thunar tumbler"
-                            package_install "gvfs-smb"
+                            package_install "thunar tumbler"
                             ;;
                         12)
                             package_install "xfburn"
@@ -1482,11 +1483,12 @@ function install_desktop_environment(){
             print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
             package_install "gnome gnome-extra telepathy"
             package_install "gksu nautilus-open-terminal gnome-search-tool gedit-plugins gnome-tweak-tool"
-            package_install "gvfs-smb"
+            package_install "gvfs-smb gvfs-afc"
             package_install "zeitgeist"
             package_install "deja-dup"
             package_install "pulseaudio"
             package_install "system-config-printer-gnome"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
             aur_package_install "empathy-theme-ubuntu-adium-bzr"
             aur_package_install "automounter gnome-defaults-list"
             create_xinitrc "gnome-session"
@@ -1740,9 +1742,11 @@ function install_desktop_environment(){
             print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
             package_install "lxde obconf consolekit"
             package_install "pm-utils upower"
-            package_install "polkit-gnome gvfs gvfs-smb xdg-user-dirs"
+            package_install "polkit-gnome xdg-user-dirs"
+            package_install "gvfs-smb gvfs-afc"
             package_install "leafpad epdfview"
-            aur_package_install "xarchiver"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
+            aur_package_install "file-roller2-nn"
             aur_package_install "gnome-defaults-list"
             create_xinitrc "startlxde"
             #LXDE CUSTOMIZATION{{{
@@ -1798,7 +1802,9 @@ function install_desktop_environment(){
             package_install "lxappearance consolekit"
             package_install "xdg-user-dirs"
             package_install "leafpad epdfview nitrogen"
-            aur_package_install "xarchiver"
+            package_install "gvfs-smb gvfs-afc"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
+            aur_package_install "file-roller2-nn"
             aur_package_install "gnome-defaults-list"
             mkdir -p /home/$USERNAME/.config/openbox/
             cp /etc/xdg/openbox/rc.xml /home/$USERNAME/.config/openbox/
@@ -1844,7 +1850,7 @@ function install_desktop_environment(){
                             package_install "gmrun"
                             ;;
                         5)
-                            package_install "gksu gvfs pcmanfm"
+                            package_install "pcmanfm"
                             ;;
                         6)
                             package_install "rxvt-unicode"
@@ -1862,7 +1868,6 @@ function install_desktop_environment(){
                             ;;
                         10)
                             package_install "thunar tumbler"
-                            package_install "gvfs-smb"
                             ;;
                         11)
                             package_install "tint2"
@@ -1893,8 +1898,10 @@ function install_desktop_environment(){
             print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
             print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
             package_install "xfce4 xfce4-goodies"
-            package_install "gvfs-smb"
+            package_install "gvfs-smb gvfs-afc"
             package_install "polkit-gnome xdg-user-dirs"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
+            aur_package_install "file-roller2-nn"
             aur_package_install "automounter"
             aur_package_install "gnome-defaults-list"
             create_xinitrc "startxfce4"
@@ -1905,6 +1912,7 @@ function install_desktop_environment(){
                 echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
                 echo " 2) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
                 echo " 3) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
+                echo " 4) $(menu_item "xfce4-volumed") $AUR"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1923,6 +1931,9 @@ function install_desktop_environment(){
                         3)
                             install_display_manager
                             OPT=3
+                            ;;
+                        4)
+                            aur_package_install "xfce4-volumed"
                             ;;
                         "d")
                             break
