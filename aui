@@ -950,41 +950,47 @@ function install_xorg(){
 function install_video_cards(){
     print_title "VIDEO CARD"
     echo "Select your GPU:"
-    echo " 1) Intel"
-    echo " 2) ATI"
-    echo " 3) nVidia"
-    echo " 4) Nouveau"
-    echo " 5) Virtualbox"
-    echo " 6) Vesa"
+    echo " 1) Intel [SNA] (Sandy Bridge CPUs Only)"
+    echo " 2) Intel [UXA] (Recommended)"
+    echo " 3) ATI"
+    echo " 4) nVidia"
+    echo " 5) Nouveau"
+    echo " 6) Virtualbox"
+    echo " 7) Vesa"
     echo ""
     echo " s) SKIP"
     echo ""
     read_input $VIDEOCARD
     case "$OPTION" in
         1)
-            package_install "libgl xf86-video-intel"
+            package_install "libgl xf86-video-intel-sna"
             CURRENT_STATUS=1
-            sumary "Intel GPU driver installation"
+            sumary "Intel SNA GPU driver installation"
             ;;
         2)
+            package_install "libgl xf86-video-intel-uxa"
+            CURRENT_STATUS=1
+            sumary "Intel UXA GPU driver installation"
+            ;;
+        3)
             package_install "libgl xf86-video-ati"
             add_module "radeon"
             CURRENT_STATUS=1
             sumary "ATI GPU driver installation"
             ;;
-        3)
+        4)
             package_remove "$(pacman -Qe | grep xf86-video | awk '{print $1}')"
             pacman -S --needed nvidia nvidia-utils
             CURRENT_STATUS=1
             sumary "nVidia GPU driver installation"
             ;;
-        4)
+        5)
             package_install "libgl xf86-video-nouveau nouveau-dri"
             add_module "nouveau"
             CURRENT_STATUS=1
             sumary "Nouveau GPU driver installation"
             ;;
-        5)
+        6)
             package_install "virtualbox-archlinux-additions"
             add_module "vboxguest vboxsf vboxvideo"
             groupadd vboxsf
@@ -992,7 +998,7 @@ function install_video_cards(){
             CURRENT_STATUS=1
             sumary "Virtualbox guest additions (incl. video drivers) installation"
             ;;
-        6)
+        7)
             package_install "xf86-video-vesa"
             CURRENT_STATUS=1
             sumary "Vesa GPU driver installation"
