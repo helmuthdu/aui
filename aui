@@ -1592,6 +1592,7 @@ function install_desktop_environment(){
                                 echo " 2) $(menu_item "gnome-shell-theme-elegance")"
                                 echo " 3) $(menu_item "gnome-shell-theme-eos")"
                                 echo " 4) $(menu_item "gnome-shell-theme-frieze")"
+                                echo " 5) $(menu_item "gnome-shell-theme-google+")"
                                 echo ""
                                 echo " b) BACK"
                                 echo ""
@@ -1610,6 +1611,9 @@ function install_desktop_environment(){
                                             ;;
                                         4)
                                             aur_package_install "gnome-shell-theme-frieze"
+                                            ;;
+                                        5)
+                                            aur_package_install "gnome-shell-theme-google+"
                                             ;;
                                         "b")
                                             break
@@ -2426,6 +2430,7 @@ do
     echo " 7) $(menu_item "mypaint")"
     echo " 8) $(menu_item "scribus")"
     echo " 9) $(menu_item "shotwell")"
+    echo "10) $(menu_item "xnviewmp") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2450,16 +2455,19 @@ do
                 aur_package_install "sozi"
                 ;;
             6)
-                aur_package_install "mcomix"
+                package_install "mcomix"
                 ;;
             7)
-                aur_package_install "mypaint"
+                package_install "mypaint"
                 ;;
             8)
-                aur_package_install "scribus"
+                package_install "scribus"
                 ;;
             9)
-                aur_package_install "shotwell"
+                package_install "shotwell"
+                ;;
+            10)
+                aur_package_install "xnviewmp"
                 ;;
             "b")
                 break
@@ -2478,24 +2486,27 @@ function install_internet_apps(){
 while [[ 1 ]]
 do
     print_title "INTERNET APPS"
-    echo " 1) $(menu_item "dropbox") $AUR"
-    echo " 2) $(menu_item "chromium")"
-    echo " 3) $(menu_item "google-earth") $AUR"
-    echo " 4) $(menu_item "google-chrome") $AUR"
+    echo " 1) $(menu_item "chromium")"
+    echo " 2) $(menu_item "dropbox") $AUR"
+    echo " 3) $(menu_item "google-chrome") $AUR"
+    echo " 4) $(menu_item "google-earth") $AUR"
     echo " 5) $(menu_item "google-talkplugin") $AUR"
-    echo " 6) $(menu_item "jdownloader") $AUR"
-    echo " 7) $(menu_item "irssi")"
-    echo " 8) $(menu_item "rekonq midori" "$([[ $KDE -eq 1 ]] && echo "Rekonq" || echo "Midori";)")"
-    echo " 9) $(menu_item "firefox")"
-    echo "10) $(menu_item "thunderbird")"
-    echo "11) $(menu_item "pidgin")"
-    echo "12) $(menu_item "remmina")"
-    echo "13) $(menu_item "skype")"
-    echo "14) $(menu_item "steadyflow-bzr") $AUR"
-    echo "15) $(menu_item "teamspeak3") $AUR"
-    echo "16) $(menu_item "teamviewer") $AUR"
-    echo "17) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
-    echo "18) $(menu_item "quassel xchat" "$([[ $KDE -eq 1 ]] && echo "Quassel" || echo "X-Chat";)")"
+    echo " 6) $(menu_item "irssi")"
+    echo " 7) $(menu_item "jdownloader") $AUR"
+    echo " 8) $(menu_item "lightread") $AUR"
+    echo " 9) $(menu_item "rekonq midori" "$([[ $KDE -eq 1 ]] && echo "Rekonq" || echo "Midori";)")"
+    echo "10) $(menu_item "firefox")"
+    echo "11) $(menu_item "thunderbird")"
+    echo "12) $(menu_item "nitroshare") $AUR"
+    echo "13) $(menu_item "pidgin")"
+    echo "14) $(menu_item "remmina")"
+    echo "15) $(menu_item "skype")"
+    echo "16) $(menu_item "sparkleshare")"
+    echo "17) $(menu_item "steadyflow-bzr") $AUR"
+    echo "18) $(menu_item "teamspeak3") $AUR"
+    echo "19) $(menu_item "teamviewer") $AUR"
+    echo "20) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+    echo "21) $(menu_item "quassel xchat" "$([[ $KDE -eq 1 ]] && echo "Quassel" || echo "X-Chat";)")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2504,6 +2515,9 @@ do
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
+                package_install "chromium flashplugin"
+                ;;
+            2)
                 aur_package_install "dropbox"
                 if check_package "nautilus" ; then
                     aur_package_install "nautilus-dropbox"
@@ -2516,63 +2530,69 @@ do
                 fi
                 add_daemon "@dropboxd"
                 ;;
-            2)
-                package_install "chromium flashplugin"
-                ;;
             3)
-                aur_package_install "google-earth"
+                aur_package_install "google-chrome openssl098 flashplugin"
                 ;;
             4)
-                aur_package_install "google-chrome openssl098 flashplugin"
+                aur_package_install "google-earth"
                 ;;
             5)
                 aur_package_install "google-talkplugin"
                 ;;
             6)
-                aur_package_install "jdownloader"
-                ;;
-            7)
                 package_install "irssi"
                 ;;
+            7)
+                aur_package_install "jdownloader"
+                ;;
             8)
+                aur_package_install "lightread"
+                ;;
+            9)
                 if [[ $KDE -eq 1 ]]; then
                     package_install "rekonq"
                 else
                     package_install "midori"
                 fi
                 ;;
-            9)
+            10)
                 package_install "firefox firefox-i18n-$LANGUAGE_FF flashplugin "
                 ;;
-            10)
+            11)
                 package_install "thunderbird thunderbird-i18n-$LANGUAGE_FF"
                 ;;
-            11)
-                package_install "pidgin"
-                ;;
             12)
-                package_install "remmina"
+                aur_package_install "nitroshare"
                 ;;
             13)
-                package_install "skype"
+                package_install "pidgin"
                 ;;
             14)
-                aur_package_install "steadyflow-bzr"
+                package_install "remmina"
                 ;;
             15)
-                aur_package_install "teamspeak3"
+                package_install "skype"
                 ;;
             16)
-                aur_package_install "teamviewer"
+                package_install "sparkleshare"
                 ;;
             17)
+                aur_package_install "steadyflow-bzr"
+                ;;
+            18)
+                aur_package_install "teamspeak3"
+                ;;
+            19)
+                aur_package_install "teamviewer"
+                ;;
+            20)
                 if [[ $KDE -eq 1 ]]; then
                     package_install "transmission-qt"
                 else
                     package_install "transmission-gtk"
                 fi
                 ;;
-            18)
+            21)
                 if [[ $KDE -eq 1 ]]; then
                     package_install "quassel"
                 else
@@ -3135,9 +3155,10 @@ do
                     print_title "MMO"
                     echo " 1) $(menu_item "hon" "Heroes of Newerth") $AUR"
                     echo " 2) $(menu_item "manaplus") $AUR"
-                    echo " 3) $(menu_item "savage2") $AUR"
-                    echo " 4) $(menu_item "spiral-knights") $AUR"
-                    echo " 5) $(menu_item "wakfu") $AUR"
+                    echo " 3) $(menu_item "unix-runescape-client" "Runescape") $AUR"
+                    echo " 4) $(menu_item "savage2") $AUR"
+                    echo " 5) $(menu_item "spiral-knights") $AUR"
+                    echo " 6) $(menu_item "wakfu") $AUR"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -3152,12 +3173,15 @@ do
                                 aur_package_install "manaplus"
                                 ;;
                             3)
-                                aur_package_install "savage2"
+                                aur_package_install "unix-runescape-client"
                                 ;;
                             4)
-                                aur_package_install "spiral-knights"
+                                aur_package_install "savage2"
                                 ;;
                             5)
+                                aur_package_install "spiral-knights"
+                                ;;
+                            6)
                                 aur_package_install "wakfu"
                                 ;;
                             "b")

@@ -131,7 +131,8 @@
             # 2) Elegance
             # 3) eOS
             # 4) Frieze
-            GNOME_SHELL_THEMES="1-4"
+            # 5) Google+
+            GNOME_SHELL_THEMES="1-5"
         #}}}
     #}}}
     #KDE {{{
@@ -290,28 +291,32 @@
     # 7) Mypaint
     # 8) Scribus
     # 9) Shotwell
+    #10) XnViewMP
     GRAPHICS_OPTIONS="2-7 9"
 #}}}
 #INTERNET {{{
-    # 1) Dropbox
-    # 2) Chromium
-    # 3) Google Earth
-    # 4) Google Chrome
+    # 1) Chromium
+    # 2) Dropbox
+    # 3) Google Chrome
+    # 4) Google Earth
     # 5) Google Talk-Plugin
-    # 6) Jdownloader
-    # 7) Irssi
-    # 8) Midori|Rekonq
-    # 9) Mozilla Firefox
-    #10) Mozilla Thunderbird
-    #11) Pidgin
-    #12) Remmina
-    #13) Skype
-    #14) Steadyflow
-    #15) Teamspeak
-    #16) Teamviewer
-    #17) Trasmission
-    #18) X-Chat|Quassel
-    INTERNET_OPTIONS="3-6 9"
+    # 6) Irssi
+    # 7) Jdownloader
+    # 8) LightRead
+    # 9) Midori|Rekonq
+    #10) Mozilla Firefox
+    #11) Mozilla Thunderbird
+    #12) Nitroshare
+    #13) Pidgin
+    #14) Remmina
+    #15) Skype
+    #16) Sparkleshare
+    #17) Steadyflow
+    #18) Teamspeak
+    #19) Teamviewer
+    #20) Trasmission
+    #21) X-Chat|Quassel
+    INTERNET_OPTIONS="2-5 7 10"
 #}}}
 #LAMP {{{
     LAMP="y"
@@ -421,9 +426,10 @@
     #MMO {{{
         # 1) ManaPlus
         # 2) Heroes of Newerth
-        # 3) Savage II
-        # 4) Spiral Knights
-        # 5) Wakfu
+        # 3) Runescape
+        # 4) Savage II
+        # 5) Spiral Knights
+        # 6) Wakfu
         MMO=""
     #}}}
     #PUZZLE {{{
