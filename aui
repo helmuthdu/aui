@@ -2486,27 +2486,13 @@ function install_internet_apps(){
 while [[ 1 ]]
 do
     print_title "INTERNET APPS"
-    echo " 1) $(menu_item "chromium")"
-    echo " 2) $(menu_item "dropbox") $AUR"
-    echo " 3) $(menu_item "google-chrome") $AUR"
-    echo " 4) $(menu_item "google-earth") $AUR"
-    echo " 5) $(menu_item "google-talkplugin") $AUR"
-    echo " 6) $(menu_item "irssi")"
-    echo " 7) $(menu_item "jdownloader") $AUR"
-    echo " 8) $(menu_item "lightread") $AUR"
-    echo " 9) $(menu_item "rekonq midori" "$([[ $KDE -eq 1 ]] && echo "Rekonq" || echo "Midori";)")"
-    echo "10) $(menu_item "firefox")"
-    echo "11) $(menu_item "thunderbird")"
-    echo "12) $(menu_item "nitroshare") $AUR"
-    echo "13) $(menu_item "pidgin")"
-    echo "14) $(menu_item "remmina")"
-    echo "15) $(menu_item "skype")"
-    echo "16) $(menu_item "sparkleshare")"
-    echo "17) $(menu_item "steadyflow-bzr") $AUR"
-    echo "18) $(menu_item "teamspeak3") $AUR"
-    echo "19) $(menu_item "teamviewer") $AUR"
-    echo "20) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
-    echo "21) $(menu_item "quassel xchat" "$([[ $KDE -eq 1 ]] && echo "Quassel" || echo "X-Chat";)")"
+    echo " 1) Browser"
+    echo " 2) Download|Fileshare"
+    echo " 3) Email|RSS"
+    echo " 4) Instant Messaging"
+    echo " 5) IRC"
+    echo " 6) Mapping Tools"
+    echo " 7) VNC|Desktop Share"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2515,89 +2501,301 @@ do
     for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
             1)
-                package_install "chromium flashplugin"
+                #BROWSER {{{
+                while [[ 1 ]]
+                do
+                    print_title "BROWSER"
+                    echo " 1) $(menu_item "chromium")"
+                    echo " 2) $(menu_item "google-chrome")"
+                    echo " 3) $(menu_item "rekonq midori" "$([[ $KDE -eq 1 ]] && echo "Rekonq" || echo "Midori";)")"
+                    echo " 4) $(menu_item "firefox")"
+                    echo " 5) $(menu_item "opera")"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    BROWSERS_OPTIONS+=" b"
+                    read_input_options "$BROWSERS_OPTIONS"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "chromium flashplugin"
+                                ;;
+                            2)
+                                aur_package_install "google-chrome openssl098 flashplugin"
+                                ;;
+                            3)
+                                if [[ $KDE -eq 1 ]]; then
+                                    package_install "rekonq"
+                                else
+                                    package_install "midori"
+                                fi
+                                ;;
+                            4)
+                                package_install "firefox firefox-i18n-$LANGUAGE_FF flashplugin "
+                                ;;
+                            5)
+                                package_install "opera flashplugin "
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                elihw
+                done
+                #}}}
+                OPT=1
                 ;;
             2)
-                aur_package_install "dropbox"
-                if check_package "nautilus" ; then
-                    aur_package_install "nautilus-dropbox"
-                elif check_package "thunar" ; then
-                    aur_package_install "thunar-dropbox"
-                elif check_package "kdebase-dolphin" ; then
-                    aur_package_install "kfilebox"
-                else
-                    aur_package_install "dropbox-cli"
-                fi
-                add_daemon "@dropboxd"
+                #DOWNLOAD|FILESHARE {{{
+                while [[ 1 ]]
+                do
+                    print_title "DOWNLOAD|FILESHARE"
+                    echo " 1) $(menu_item "deluge") $AUR"
+                    echo " 2) $(menu_item "dropbox") $AUR"
+                    echo " 3) $(menu_item "jdownloader") $AUR"
+                    echo " 4) $(menu_item "nitroshare") $AUR"
+                    echo " 5) $(menu_item "sparkleshare")"
+                    echo " 6) $(menu_item "steadyflow-bzr") $AUR"
+                    echo " 7) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    DOWNLOAD_OPTIONS+=" b"
+                    read_input_options "$DOWNLOAD_OPTIONS"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "deluge"
+                                ;;
+                            2)
+                                aur_package_install "dropbox"
+                                if check_package "nautilus" ; then
+                                    aur_package_install "nautilus-dropbox"
+                                elif check_package "thunar" ; then
+                                    aur_package_install "thunar-dropbox"
+                                elif check_package "kdebase-dolphin" ; then
+                                    aur_package_install "kfilebox"
+                                else
+                                    aur_package_install "dropbox-cli"
+                                fi
+                                add_daemon "@dropboxd"
+                                ;;
+                            3)
+                                aur_package_install "jdownloader"
+                                ;;
+                            4)
+                                aur_package_install "nitroshare"
+                                ;;
+                            5)
+                                package_install "sparkleshare"
+                                ;;
+                            6)
+                                aur_package_install "steadyflow-bzr"
+                                ;;
+                            7)
+                                if [[ $KDE -eq 1 ]]; then
+                                    package_install "transmission-qt"
+                                else
+                                    package_install "transmission-gtk"
+                                fi
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                elihw
+                done
+                #}}}
+                OPT=2
                 ;;
             3)
-                aur_package_install "google-chrome openssl098 flashplugin"
+                #EMAIL {{{
+                while [[ 1 ]]
+                do
+                    print_title "EMAIL|RSS"
+                    echo " 1) $(menu_item "thunderbird")"
+                    echo " 2) $(menu_item "liferea")"
+                    echo " 3) $(menu_item "lightread") $AUR"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    EMAIL_OPTIONS+=" b"
+                    read_input_options "$EMAIL_OPTIONS"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "thunderbird thunderbird-i18n-$LANGUAGE_FF"
+                                ;;
+                            2)
+                                package_install "liferea"
+                                ;;
+                            3)
+                                aur_package_install "lightread"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                elihw
+                done
+                #}}}
+                OPT=3
                 ;;
             4)
-                aur_package_install "google-earth"
+                #IM {{{
+                while [[ 1 ]]
+                do
+                    print_title "IM - INSTANT MESSAGING"
+                    echo " 1) $(menu_item "google-talkplugin") $AUR"
+                    echo " 2) $(menu_item "pidgin")"
+                    echo " 3) $(menu_item "skype")"
+                    echo " 4) $(menu_item "teamspeak3") $AUR"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    IM_OPTIONS+=" b"
+                    read_input_options "$IM_OPTIONS"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                aur_package_install "google-talkplugin"
+                                ;;
+                            2)
+                                package_install "pidgin"
+                                ;;
+                            3)
+                                package_install "skype"
+                                ;;
+                            4)
+                                aur_package_install "teamspeak3"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                elihw
+                done
+                #}}}
+                OPT=4
                 ;;
             5)
-                aur_package_install "google-talkplugin"
+                #IRC {{{
+                while [[ 1 ]]
+                do
+                    print_title "IRC"
+                    echo " 1) $(menu_item "irssi")"
+                    echo " 2) $(menu_item "quassel xchat" "$([[ $KDE -eq 1 ]] && echo "Quassel" || echo "X-Chat";)")"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    IRC_OPTIONS+=" b"
+                    read_input_options "$IRC_OPTIONS"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "irssi"
+                                ;;
+                            2)
+                                if [[ $KDE -eq 1 ]]; then
+                                    package_install "quassel"
+                                else
+                                    package_install "xchat"
+                                fi
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                elihw
+                done
+                #}}}
+                OPT=5
                 ;;
             6)
-                package_install "irssi"
+                #MAPPING {{{
+                while [[ 1 ]]
+                do
+                    print_title "MAPPING TOOLS"
+                    echo " 1) $(menu_item "google-earth") $AUR"
+                    echo " 2) $(menu_item "worldwind" "NASA World Wind") $AUR"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    MAPPING_OPTIONS+=" b"
+                    read_input_options "$MAPPING_OPTIONS"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                aur_package_install "google-earth"
+                                ;;
+                            2)
+                                aur_package_install "worldwind"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                elihw
+                done
+                #}}}
+                OPT=6
                 ;;
             7)
-                aur_package_install "jdownloader"
-                ;;
-            8)
-                aur_package_install "lightread"
-                ;;
-            9)
-                if [[ $KDE -eq 1 ]]; then
-                    package_install "rekonq"
-                else
-                    package_install "midori"
-                fi
-                ;;
-            10)
-                package_install "firefox firefox-i18n-$LANGUAGE_FF flashplugin "
-                ;;
-            11)
-                package_install "thunderbird thunderbird-i18n-$LANGUAGE_FF"
-                ;;
-            12)
-                aur_package_install "nitroshare"
-                ;;
-            13)
-                package_install "pidgin"
-                ;;
-            14)
-                package_install "remmina"
-                ;;
-            15)
-                package_install "skype"
-                ;;
-            16)
-                package_install "sparkleshare"
-                ;;
-            17)
-                aur_package_install "steadyflow-bzr"
-                ;;
-            18)
-                aur_package_install "teamspeak3"
-                ;;
-            19)
-                aur_package_install "teamviewer"
-                ;;
-            20)
-                if [[ $KDE -eq 1 ]]; then
-                    package_install "transmission-qt"
-                else
-                    package_install "transmission-gtk"
-                fi
-                ;;
-            21)
-                if [[ $KDE -eq 1 ]]; then
-                    package_install "quassel"
-                else
-                    package_install "xchat"
-                fi
+                #DESKTOP SHARE {{{
+                while [[ 1 ]]
+                do
+                    print_title "DESKTOP SHARE"
+                    echo " 1) $(menu_item "remmina")"
+                    echo " 2) $(menu_item "teamviewer") $AUR"
+                    echo ""
+                    echo " b) BACK"
+                    echo ""
+                    VNC_OPTIONS+=" b"
+                    read_input_options "$VNC_OPTIONS"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "remmina"
+                                ;;
+                            2)
+                                aur_package_install "teamviewer"
+                                ;;
+                            "b")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                elihw
+                done
+                #}}}
+                OPT=7
                 ;;
             "b")
                 break

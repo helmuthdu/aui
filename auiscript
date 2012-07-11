@@ -295,28 +295,60 @@
     GRAPHICS_OPTIONS="2-7 9"
 #}}}
 #INTERNET {{{
-    # 1) Chromium
-    # 2) Dropbox
-    # 3) Google Chrome
-    # 4) Google Earth
-    # 5) Google Talk-Plugin
-    # 6) Irssi
-    # 7) Jdownloader
-    # 8) LightRead
-    # 9) Midori|Rekonq
-    #10) Mozilla Firefox
-    #11) Mozilla Thunderbird
-    #12) Nitroshare
-    #13) Pidgin
-    #14) Remmina
-    #15) Skype
-    #16) Sparkleshare
-    #17) Steadyflow
-    #18) Teamspeak
-    #19) Teamviewer
-    #20) Trasmission
-    #21) X-Chat|Quassel
-    INTERNET_OPTIONS="2-5 7 10"
+    # 1) Browser
+    # 2) Download|Fileshare
+    # 3) Email|RSS
+    # 4) Instant Messaging
+    # 5) IRC
+    # 6) Mapping Tools
+    # 7) VNC|Desktop Share
+    INTERNET_OPTIONS="1-7"
+    #BROWSER {{{
+        # 1) Chromium
+        # 2) Google Chrome
+        # 3) Midori|Rekonq
+        # 4) Mozilla Firefox
+        # 5) Opera
+        BROWSERS_OPTIONS="2 4"
+    #}}}
+    #DOWNLOAD|FILESHARE {{{
+        # 1) Deluge
+        # 2) Dropbox
+        # 3) Jdownloader
+        # 4) Nitroshare
+        # 5) Sparkleshare
+        # 6) Steadyflow
+        # 7) Trasmission
+        DOWNLOAD_OPTIONS="3"
+    #}}}
+    #EMAIL|RSS {{{
+        # 1) Mozilla Thunderbird
+        # 2) Liferea
+        # 3) LightRead
+        EMAIL_OPTIONS="3"
+    #}}}
+    #IM {{{
+        # 1) Google Talk-Plugin
+        # 2) Pidgin
+        # 3) Skype
+        # 4) Teamspeak
+        IM_OPTIONS="3"
+    #}}}
+    #IRC {{{
+        # 1) Irssi
+        # 2) X-Chat|Quassel
+        IRC_OPTIONS=""
+    #}}}
+    #MAPPING {{{
+        # 1) Google Earth
+        # 2) NASA World Wind
+        MAPPING_OPTIONS=""
+    #}}}
+    #VNC|Desktop Share {{{
+        # 1) Remmina
+        # 2) Teamviewer
+        VNC_OPTIONS=""
+    #}}}
 #}}}
 #LAMP {{{
     LAMP="y"
