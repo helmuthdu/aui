@@ -1127,7 +1127,7 @@ function install_git_tor(){
                 chmod +x /usr/bin/proxy-wrapper
                 echo -e '\nexport GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"' >> /etc/bash.bashrc
                 export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
-                sudo -u $USERNAME export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
+                su -l $USERNAME -c 'export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"'
             fi
             groupadd -g 42 privoxy
             useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
@@ -1385,8 +1385,8 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
-            sudo -u $USERNAME gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"
-            sudo -u $USERNAME gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"
+            su -l $USERNAME -c 'gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"'
+            su -l $USERNAME -c 'gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"'
             config_dm "gdm"
             CURRENT_STATUS=1
             GNOME=1
@@ -1652,8 +1652,8 @@ function install_desktop_environment(){
             elihw
             done
             #}}}
-            sudo -u $USERNAME gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"
-            sudo -u $USERNAME gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"
+            su -l $USERNAME -c 'gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"'
+            su -l $USERNAME -c 'gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"'
             config_dm "gdm"
             CURRENT_STATUS=1
             GNOME=1
@@ -2658,10 +2658,11 @@ do
                 while [[ 1 ]]
                 do
                     print_title "IM - INSTANT MESSAGING"
-                    echo " 1) $(menu_item "google-talkplugin") $AUR"
-                    echo " 2) $(menu_item "pidgin")"
-                    echo " 3) $(menu_item "skype")"
-                    echo " 4) $(menu_item "teamspeak3") $AUR"
+                    echo " 1) $(menu_item "emesene")"
+                    echo " 2) $(menu_item "google-talkplugin") $AUR"
+                    echo " 3) $(menu_item "pidgin")"
+                    echo " 4) $(menu_item "skype")"
+                    echo " 5) $(menu_item "teamspeak3") $AUR"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -2670,15 +2671,18 @@ do
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
-                                aur_package_install "google-talkplugin"
+                                package_install "emesene"
                                 ;;
                             2)
-                                package_install "pidgin"
+                                aur_package_install "google-talkplugin"
                                 ;;
                             3)
-                                package_install "skype"
+                                package_install "pidgin"
                                 ;;
                             4)
+                                package_install "skype"
+                                ;;
+                            5)
                                 aur_package_install "teamspeak3"
                                 ;;
                             "b")
@@ -2838,8 +2842,8 @@ case "$OPTION" in
             sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
             #}}}
         fi
-        sudo -u $USERNAME mkdir -p ~/Sites
-        sudo -u $USERNAME chmod o+x ~/ && chmod -R o+x ~/Sites
+        su -l $USERNAME -c "mkdir -p ~/Sites"
+        su -l $USERNAME -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
         rc.d restart httpd mysqld
         CURRENT_STATUS=1
         print_line

@@ -328,11 +328,12 @@
         EMAIL_OPTIONS="3"
     #}}}
     #IM {{{
-        # 1) Google Talk-Plugin
-        # 2) Pidgin
-        # 3) Skype
-        # 4) Teamspeak
-        IM_OPTIONS="3"
+        # 1) Emesene
+        # 2) Google Talk-Plugin
+        # 3) Pidgin
+        # 4) Skype
+        # 5) Teamspeak
+        IM_OPTIONS="4"
     #}}}
     #IRC {{{
         # 1) Irssi
