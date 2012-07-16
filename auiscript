@@ -95,7 +95,7 @@
         # 2) E17 Themes
         # 3) Display Manager
         # 4) Icons
-        # 5) Geeqie
+        # 5) Viewnior
         # 6) Gmrun
         # 7) PCManFM
         # 8) rxvt-unicode
@@ -150,13 +150,14 @@
         # 1) Icons
         # 2) Display Manager
         # 3) GTK Themes
-        # 4) Xfburn
+        # 4) Viewnior
+        # 5) Xfburn
         LXDE_OPTIONS=""
     #}}}
     #OPENBOX {{{
         # 1) Xcompmgr
         # 2) Icons
-        # 3) Geeqie
+        # 3) Viewnior
         # 4) Gmrun
         # 5) PCManFM
         # 6) rxvt-unicode
@@ -409,10 +410,11 @@
         # 2) Counter-Strike 2D
         # 3) Dead Cyborg
         # 4) M.A.R.S.
-        # 5) OpenTyrian
-        # 6) Sonic Robot Bast 2
-        # 7) SteelStorm
-        # 8) Yo Frankie!
+        # 5) Nikki
+        # 6) OpenTyrian
+        # 7) Sonic Robot Bast 2
+        # 8) SteelStorm
+        # 9) Yo Frankie!
         ACTION=""
     #}}}
     #ARCADE {{{

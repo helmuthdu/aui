@@ -1414,7 +1414,7 @@ function install_desktop_environment(){
                 echo " 2) $(menu_item "e17-themes") $AUR"
                 echo " 3) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
                 echo " 4) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "GNOME Icons") $AUR"
-                echo " 5) $(menu_item "geeqie")"
+                echo " 5) $(menu_item "viewnior")"
                 echo " 6) $(menu_item "gmrun")"
                 echo " 7) $(menu_item "pcmanfm" "PCManFM")"
                 echo " 8) $(menu_item "rxvt-unicode")"
@@ -1444,7 +1444,7 @@ function install_desktop_environment(){
                             OPT=4
                             ;;
                         5)
-                            package_install "geeqie"
+                            package_install "viewnior"
                             ;;
                         6)
                             package_install "gmrun"
@@ -1766,7 +1766,8 @@ function install_desktop_environment(){
                 echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
                 echo " 2) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
                 echo " 3) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
-                echo " 4) $(menu_item "xfburn")"
+                echo " 4) $(menu_item "viewnior")"
+                echo " 5) $(menu_item "xfburn")"
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -1787,6 +1788,9 @@ function install_desktop_environment(){
                             OPT=3
                             ;;
                         4)
+                            package_install "viewnior"
+                            ;;
+                        5)
                             package_install "xfburn"
                             ;;
                         "d")
@@ -1828,7 +1832,7 @@ function install_desktop_environment(){
                 print_title "OPENBOX CUSTOMIZATION"
                 echo " 1) $(menu_item "xcompmgr")"
                 echo " 2) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
-                echo " 3) $(menu_item "geeqie")"
+                echo " 3) $(menu_item "viewnior")"
                 echo " 4) $(menu_item "gmrun")"
                 echo " 5) $(menu_item "pcmanfm" "PCManFM")"
                 echo " 6) $(menu_item "rxvt-unicode")"
@@ -1854,7 +1858,7 @@ function install_desktop_environment(){
                             OPT=2
                             ;;
                         3)
-                            package_install "geeqie"
+                            package_install "viewnior"
                             ;;
                         4)
                             package_install "gmrun"
@@ -3053,8 +3057,8 @@ function install_games(){
 while [[ 1 ]]
 do
     print_title "GAMES - https://wiki.archlinux.org/index.php/Games"
-    echo " 1) Action/Adventure"
-    echo " 2) Arcade/Platformer"
+    echo " 1) Action|Adventure"
+    echo " 2) Arcade|Platformer"
     echo " 3) Dungeon"
     echo " 4) Emulators"
     echo " 5) FPS"
@@ -3080,10 +3084,11 @@ do
                     echo " 2) $(menu_item "counter-strike-2d" "Counter-Strike 2D") $AUR"
                     echo " 3) $(menu_item "dead-cyborg-episode1" "Dead Cyborg") $AUR"
                     echo " 4) $(menu_item "mars-shooter" "M.A.R.S.") $AUR"
-                    echo " 5) $(menu_item "opentyrian-hg") $AUR"
-                    echo " 6) $(menu_item "srb2" "Sonic Robot Bast 2") $AUR"
-                    echo " 7) $(menu_item "steelstorm") $AUR"
-                    echo " 8) $(menu_item "yofrankie" "Yo Frankie!") $AUR"
+                    echo " 5) $(menu_item "nikki") $AUR"
+                    echo " 6) $(menu_item "opentyrian-hg") $AUR"
+                    echo " 7) $(menu_item "srb2" "Sonic Robot Bast 2") $AUR"
+                    echo " 8) $(menu_item "steelstorm") $AUR"
+                    echo " 9) $(menu_item "yofrankie" "Yo Frankie!") $AUR"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -3105,15 +3110,18 @@ do
                                 aur_package_install "mars-shooter"
                                 ;;
                             5)
-                                aur_package_install "opentyrian-hg"
+                                aur_package_install "nikki"
                                 ;;
                             6)
-                                aur_package_install "srb2"
+                                aur_package_install "opentyrian-hg"
                                 ;;
                             7)
-                                aur_package_install "steelstorm"
+                                aur_package_install "srb2"
                                 ;;
                             8)
+                                aur_package_install "steelstorm"
+                                ;;
+                            9)
                                 aur_package_install "yofrankie"
                                 ;;
                             "b")
@@ -3254,7 +3262,7 @@ do
                     echo " 4) $(menu_item "epsxe") $AUR"
                     echo " 5) $(menu_item "project64") $AUR"
                     echo " 6) $(menu_item "vba-m-gtk-svn" "VisualBoyAdvanced") $AUR"
-                    echo " 7) $(menu_item "wxmupen64plus-hg") $AUR"
+                    echo " 7) $(menu_item "wxmupen64plus") $AUR"
                     echo " 8) $(menu_item "zsnes")"
                     echo ""
                     echo " b) BACK"
@@ -3282,11 +3290,7 @@ do
                                 aur_package_install "vba-m-gtk-svn"
                                 ;;
                             7)
-                                aur_package_install "wxmupen64plus-hg"
-                                aur_package_install "mupen64plus-video-rice-hg"
-                                aur_package_install "mupen64plus-audio-sdl-hg"
-                                aur_package_install "mupen64plus-input-sdl-hg"
-                                aur_package_install "mupen64plus-rsp-hle-hg"
+                                aur_package_install "wxmupen64plus"
                                 ;;
                             8)
                                 package_install "zsnes"
