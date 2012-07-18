@@ -367,12 +367,13 @@
     # 9) Radiotray
     #10) Spotify
     #11) Tomahawk
-    #12) Soundconverter
+    #12) Soundconverter|Soundkonverter
     #13) Puddletag
     #14) Audacity
-    #15) MIDI
-    #16) Codecs
-    AUDIO_OPTIONS="4 12 16"
+    #15) OceanAudio
+    #16) MIDI
+    #17) Codecs
+    AUDIO_OPTIONS="4 12 17"
 #}}}
 #VIDEO {{{
     # 1) Audience

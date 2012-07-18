@@ -2881,8 +2881,9 @@ do
     echo "12) $(menu_item "soundconverter soundkonverter" "$([[ $KDE -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
     echo "13) $(menu_item "puddletag") $AUR"
     echo "14) $(menu_item "audacity")"
-    echo "15) $(menu_item "timidity++")"
-    echo "16) $(menu_item "gstreamer0.10-ugly" "Codecs")"
+    echo "15) $(menu_item "oceanaudio") $AUR"
+    echo "16) $(menu_item "timidity++")"
+    echo "17) $(menu_item "gstreamer0.10-ugly" "Codecs")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2937,10 +2938,13 @@ do
                 package_install "audacity"
                 ;;
             15)
+                aur_package_install "oceanaudio"
+                ;;
+            16)
                 aur_package_install "timidity++ fluidr3"
                 echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                 ;;
-            16)
+            17)
                 package_install "gstreamer0.10-plugins"
                 ;;
             "b")
