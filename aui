@@ -3084,7 +3084,7 @@ do
                     echo " 4) $(menu_item "mars-shooter" "M.A.R.S.") $AUR"
                     echo " 5) $(menu_item "nikki") $AUR"
                     echo " 6) $(menu_item "opentyrian-hg") $AUR"
-                    echo " 7) $(menu_item "srb2" "Sonic Robot Bast 2") $AUR"
+                    echo " 7) $(menu_item "srb2" "Sonic Robot Blast 2") $AUR"
                     echo " 8) $(menu_item "steelstorm") $AUR"
                     echo " 9) $(menu_item "yofrankie" "Yo Frankie!") $AUR"
                     echo ""
