@@ -3891,26 +3891,35 @@ function finish(){
 #}}}
 
 if [[ $1 == --install ]]; then
-#ARCHLINUX INSTALL {{{
+#ARCHLINUX SETUP {{{
     print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
     print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
-    read -p "Keyboard Layout [ex: br-abnt2]: " OPTION
-    loadkeys $OPTION
-    nano /etc/vconsole.conf
+    read -p "Keyboard Layout [ex: br-abnt2]: " KBLAYOUT
+    loadkeys $KBLAYOUT
     print_title "https://wiki.archlinux.org/index.php/Partitioning"
     print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
     cfdisk
     pause_function
     print_title "https://wiki.archlinux.org/index.php/Format_a_device"
     print_info "This step will select and format the selected partiton where the archlinxu will be installed"
-    print_warning "This step will FORMAT the selected partition DESTROY all data"
+    print_warning "\tAll data on the specified partition will be LOST."
     partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`);
     PS3="$prompt1"
-    echo "Select partition:"
-    select PARTITION in "${partitions[@]}"; do
-        if contains_element "$PARTITION" "${partitions[@]}"; then
-            mkfs.ext4 $PARTITION
-            fsck $PARTITION
+    echo "Select your root partition:"
+    select ROOT in "${partitions[@]}"; do
+        if contains_element "$ROOT" "${partitions[@]}"; then
+            mkfs.ext4 $ROOT
+            fsck $ROOT
+            break
+        else
+            invalid_option
+        fi
+    done
+    echo -e "\nSelect your swap partition:"
+    select SWAP in "${partitions[@]}"; do
+        if contains_element "$SWAP" "${partitions[@]}"; then
+            mkswap $SWAP
+            swapon $SWAP
             break
         else
             invalid_option
@@ -3918,16 +3927,16 @@ if [[ $1 == --install ]]; then
     done
     print_title "Mount the partitions"
     print_info "We now must mount the root partition on /mnt. You should also create directories for and mount any other partitions (/mnt/boot, /mnt/home, ..)."
-    print_warning "genfstab will be launched now"
     pause_function
-    genfstab
+    mount  $ROOT /mnt
     connection_type=("Wired Connection" "Wireless Connection")
     PS3="$prompt1"
     echo -e "Select your connection type:\n"
     select OPT in "${connection_type[@]}"; do
         case "$REPLY" in
             1)
-                dhclient
+                ip link set eth0 up
+                dhclient eth0
                 break
                 ;;
             2)
@@ -3958,7 +3967,7 @@ if [[ $1 == --install ]]; then
                 pacstrap /mnt syslinux
                 break
                 ;;
-            2)
+            3)
                 break
                 ;;
             *)
@@ -4005,7 +4014,7 @@ if [[ $1 == --install ]]; then
     nano /etc/mkinitcpio.conf
     mkinitcpio -p linux
     if [[ $BOOTLOADER == "GRUB" ]]; then
-        grub-install /dev/$PARTITION
+        grub-install $ROOT
         grub-mkconfig -o /boot/grub/grub.cfg
     elif [[ $BOOTLOADER == "Syslinux" ]]; then
         nano /boot/syslinux/syslinux.cfg
