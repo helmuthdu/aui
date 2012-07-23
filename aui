@@ -555,7 +555,7 @@ function select_user(){
         echo ""
     fi
     select OPT in "${users[@]}" "Create new user"; do
-        if [ "$OPT" == "Create new user" ]; then
+        if [[ $OPT == "Create new user" ]]; then
             create_new_user
             break
         elif contains_element "$OPT" "${users[@]}"; then
@@ -748,7 +748,7 @@ function automatic_mode(){
 #BASIC SETUP {{{
 function install_basic_setup(){
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-    package_install "bc rsync mlocate bash-completion net-tools wifi-select"
+    package_install "bc rsync mlocate bash-completion wifi-select"
     print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
     package_install "zip unzip unrar p7zip atool"
     aur_package_install "rar"
@@ -3894,6 +3894,7 @@ if [[ $1 == --install ]]; then
 #ARCHLINUX SETUP {{{
     print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
     print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
+    print_warning "This option still in alpha stage, it may break or not even work"
     read -p "Keyboard Layout [ex: br-abnt2]: " KBLAYOUT
     loadkeys $KBLAYOUT
     print_title "https://wiki.archlinux.org/index.php/Partitioning"
@@ -3948,9 +3949,6 @@ if [[ $1 == --install ]]; then
                 ;;
         esac
     done
-    echo "You need edit your mirrorlist file now"
-    pause_function
-    nano /etc/pacman.d/mirrorlist
     print_title "Install the base system"
     print_info "Using the pacstrap script we install the base system. The base-devel package group should also be installed if you plan on compiling software from the AUR or using ABS."
     pacstrap /mnt base base-devel
@@ -3979,12 +3977,6 @@ if [[ $1 == --install ]]; then
     echo "Generate an fstab"
     pause_function
     genfstab -p /mnt >> /mnt/etc/fstab
-    echo "Chroot into newly installed system"
-    pause_function
-    arch-chroot /mnt
-    echo "Edit your hostname"
-    pause_function
-    nano /etc/hostname
     print_title "Localtime"
     zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europa" "Indian" "Mexico" "Midest" "Pacific" "US");
     PS3="$prompt1"
@@ -3994,10 +3986,12 @@ if [[ $1 == --install ]]; then
             subzone=(`ls /usr/share/zoneinfo/$ZONE/`)
             PS3="$prompt1"
             echo "Select subzone:"
-            select SUBZONE in "${subzone[@]}"; do
+            select SUBZONE in "${subzone[@]}" "Back"; do
             if contains_element "$SUBZONE" "${subzone[@]}"; then
-                ln -s /usr/share/zoneinfo/$ZONE/$SUBZONE /etc/localtime
+                chroot /mnt ln -s /usr/share/zoneinfo/$ZONE/$SUBZONE /etc/localtime
                 break
+            elif [[ $SUBZONE == Back ]]; then
+                continue
             else
                 invalid_option
             fi
@@ -4007,21 +4001,25 @@ if [[ $1 == --install ]]; then
             invalid_option
         fi
     done
-    nano /etc/locale.conf
-    nano /etc/locale.gen
-    locale-gen
+    echo "Chroot into newly installed system"
+    pause_function
+    echo 'HOSTNAME=""' > /mnt/etc/hostname
+    nano /mnt/etc/hostname
+    echo 'LANG="en_US.UTF-8"' > /mnt/etc/locale.conf
+    nano /mnt/etc/locale.conf
+    nano /mnt/etc/locale.gen
+    chroot /mnt locale-gen
     print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
-    nano /etc/mkinitcpio.conf
-    mkinitcpio -p linux
-    if [[ $BOOTLOADER == "GRUB" ]]; then
-        grub-install $ROOT
-        grub-mkconfig -o /boot/grub/grub.cfg
-    elif [[ $BOOTLOADER == "Syslinux" ]]; then
-        nano /boot/syslinux/syslinux.cfg
-        syslinux-install_update -iam
+    nano /mnt/etc/mkinitcpio.conf
+    chroot /mnt mkinitcpio -p linux
+    if [[ $BOOTLOADER == GRUB ]]; then
+        chroot /mnt grub-install $ROOT
+        chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+    elif [[ $BOOTLOADER == Syslinux ]]; then
+        chroot /mnt nano /boot/syslinux/syslinux.cfg
+        chroot /mnt syslinux-install_update -iam
     fi
-    passwd
-    exit
+    chroot /mnt passwd
 #}}}
 else
 #MAIN {{{
