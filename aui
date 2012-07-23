@@ -3890,136 +3890,262 @@ function finish(){
 }
 #}}}
 
-#MAIN {{{
-welcome
-check_root
-configure_pacman_package_signing
-system_upgrade
-language_selector
-select_user
-configure_sudo
-choose_aurhelper
-automatic_mode
-
-if check_package "kdebase-workspace"; then KDE=1; fi
-
-while [[ 1 ]]
-do
-    print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
-    echo " 1) $(mainmenu_item $BASICSETUP "Basic Setup")"
-    echo " 2) $(mainmenu_item $DESKTOPENVIRONMENT "Desktop Environment")"
-    echo " 3) $(mainmenu_item $ACCESSORIES "Accessories Apps")"
-    echo " 4) $(mainmenu_item $DEVELOPMENT "Development Apps")"
-    echo " 5) $(mainmenu_item $OFFICE "Office Apps")"
-    echo " 6) $(mainmenu_item $SYSTEM "System Apps")"
-    echo " 7) $(mainmenu_item $GRAPHICS "Graphics Apps")"
-    echo " 8) $(mainmenu_item $INTERNET "Internet Apps")"
-    echo " 9) $(mainmenu_item $AUDIO "Audio Apps")"
-    echo "10) $(mainmenu_item $VIDEO "Video Apps")"
-    echo "11) $(mainmenu_item $GAMES "Games")"
-    echo "12) $(mainmenu_item $LAMP "LAMP")"
-    echo "13) $(mainmenu_item $FONTS "Fonts")"
-    echo "14) $(mainmenu_item $FONTSCONFIG "Fonts Configuration")"
-    echo "15) $(mainmenu_item $EXTRA "Extra")"
-    echo "16) $(mainmenu_item $CLEANPACKAGES "Clean Orphan Packages")"
-    echo ""
-    echo " q) Quit"
-    echo ""
-    MAINMENU+=" q"
-    read_input_options "$MAINMENU"
-    for OPT in ${OPTIONS[@]}; do
-        case "$OPT" in
+if [[ $1 == --install ]]; then
+#ARCHLINUX INSTALL {{{
+    print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
+    print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
+    read -p "Keyboard Layout [ex: br-abnt2]: " OPTION
+    loadkeys $OPTION
+    nano /etc/vconsole.conf
+    print_title "https://wiki.archlinux.org/index.php/Partitioning"
+    print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
+    cfdisk
+    pause_function
+    print_title "https://wiki.archlinux.org/index.php/Format_a_device"
+    print_info "This step will select and format the selected partiton where the archlinxu will be installed"
+    print_warning "This step will FORMAT the selected partition DESTROY all data"
+    partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`);
+    PS3="$prompt1"
+    echo "Select partition:"
+    select PARTITION in "${partitions[@]}"; do
+        if contains_element "$PARTITION" "${partitions[@]}"; then
+            mkfs.ext4 $PARTITION
+            fsck $PARTITION
+            break
+        else
+            invalid_option
+        fi
+    done
+    print_title "Mount the partitions"
+    print_info "We now must mount the root partition on /mnt. You should also create directories for and mount any other partitions (/mnt/boot, /mnt/home, ..)."
+    print_warning "genfstab will be launched now"
+    pause_function
+    genfstab
+    connection_type=("Wired Connection" "Wireless Connection")
+    PS3="$prompt1"
+    echo -e "Select your connection type:\n"
+    select OPT in "${connection_type[@]}"; do
+        case "$REPLY" in
             1)
-                add_custom_repositories
-                install_reflector
-                install_basic_setup
-                install_nfs
-                install_samba
-                install_lmt
-                install_preload
-                install_xorg
-                install_video_cards
-                install_cups
-                install_additional_firmwares
-                install_git_tor
-                CURRENT_STATUS=1
-                sumary "Basic setup installation"
-                pause_function
-                BASICSETUP=1
+                dhclient
+                break
                 ;;
             2)
-                if [[ $BASICSETUP -eq 0 ]]; then
-                    echo -e "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
-                    read_input_text "Are you sure you want to continue?"
-                    if [[ $OPTION == n ]]; then continue; fi
-                fi
-                install_desktop_environment
-                install_nm_wicd
-                DESKTOPENVIRONMENT=1
-                ;;
-            3)
-                install_accessories_apps
-                ACCESSORIES=1
-                ;;
-            4)
-                install_development_apps
-                DEVELOPMENT=1
-                ;;
-            5)
-                install_office_apps
-                OFFICE=1
-                ;;
-            6)
-                install_system_apps
-                SYSTEM=1
-                ;;
-            7)
-                install_graphics_apps
-                GRAPHICS=1
-                ;;
-            8)
-                install_internet_apps
-                INTERNET=1
-                ;;
-            9)
-                install_audio_apps
-                AUDIO=1
-                ;;
-            10)
-                install_video_apps
-                VIDEO=1
-                ;;
-            11)
-                install_games
-                GAMES=1
-                ;;
-            12)
-                install_lamp
-                LAMP=1
-                ;;
-            13)
-                install_fonts
-                FONTS=1
-                ;;
-            14)
-                configure_fonts
-                FONTSCONFIG=1
-                ;;
-            15)
-                install_extra
-                EXTRA=1
-                ;;
-            16)
-                clean_orphan_packages
-                CLEANPACKAGES=1
-                ;;
-            "q")
-                finish
+                wifi-menu
+                break
                 ;;
             *)
                 invalid_option
                 ;;
         esac
     done
-done
+    echo "You need edit your mirrorlist file now"
+    pause_function
+    nano /etc/pacman.d/mirrorlist
+    print_title "Install the base system"
+    print_info "Using the pacstrap script we install the base system. The base-devel package group should also be installed if you plan on compiling software from the AUR or using ABS."
+    pacstrap /mnt base base-devel
+    bootloader=("GRUB" "Syslinux" "Skip")
+    PS3="$prompt1"
+    echo -e "Select a bootloader:\n"
+    select BOOTLOADER in "${bootloader[@]}"; do
+        case "$REPLY" in
+            1)
+                pacstrap /mnt grub-bios
+                break
+                ;;
+            2)
+                pacstrap /mnt syslinux
+                break
+                ;;
+            2)
+                break
+                ;;
+            *)
+                invalid_option
+                ;;
+        esac
+    done
+    print_title "Configure system"
+    echo "Generate an fstab"
+    pause_function
+    genfstab -p /mnt >> /mnt/etc/fstab
+    echo "Chroot into newly installed system"
+    pause_function
+    arch-chroot /mnt
+    echo "Edit your hostname"
+    pause_function
+    nano /etc/hostname
+    print_title "Localtime"
+    zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europa" "Indian" "Mexico" "Midest" "Pacific" "US");
+    PS3="$prompt1"
+    echo "Select zone:"
+    select ZONE in "${zone[@]}"; do
+        if contains_element "$ZONE" "${zone[@]}"; then
+            subzone=(`ls /usr/share/zoneinfo/$ZONE/`)
+            PS3="$prompt1"
+            echo "Select subzone:"
+            select SUBZONE in "${subzone[@]}"; do
+            if contains_element "$SUBZONE" "${subzone[@]}"; then
+                ln -s /usr/share/zoneinfo/$ZONE/$SUBZONE /etc/localtime
+                break
+            else
+                invalid_option
+            fi
+            done
+            break
+        else
+            invalid_option
+        fi
+    done
+    nano /etc/locale.conf
+    nano /etc/locale.gen
+    locale-gen
+    print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
+    nano /etc/mkinitcpio.conf
+    mkinitcpio -p linux
+    if [[ $BOOTLOADER == "GRUB" ]]; then
+        grub-install /dev/$PARTITION
+        grub-mkconfig -o /boot/grub/grub.cfg
+    elif [[ $BOOTLOADER == "Syslinux" ]]; then
+        nano /boot/syslinux/syslinux.cfg
+        syslinux-install_update -iam
+    fi
+    passwd
+    exit
 #}}}
+else
+#MAIN {{{
+    welcome
+    check_root
+    configure_pacman_package_signing
+    system_upgrade
+    language_selector
+    select_user
+    configure_sudo
+    choose_aurhelper
+    automatic_mode
+
+    if check_package "kdebase-workspace"; then KDE=1; fi
+
+    while [[ 1 ]]
+    do
+        print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
+        echo " 1) $(mainmenu_item $BASICSETUP "Basic Setup")"
+        echo " 2) $(mainmenu_item $DESKTOPENVIRONMENT "Desktop Environment")"
+        echo " 3) $(mainmenu_item $ACCESSORIES "Accessories Apps")"
+        echo " 4) $(mainmenu_item $DEVELOPMENT "Development Apps")"
+        echo " 5) $(mainmenu_item $OFFICE "Office Apps")"
+        echo " 6) $(mainmenu_item $SYSTEM "System Apps")"
+        echo " 7) $(mainmenu_item $GRAPHICS "Graphics Apps")"
+        echo " 8) $(mainmenu_item $INTERNET "Internet Apps")"
+        echo " 9) $(mainmenu_item $AUDIO "Audio Apps")"
+        echo "10) $(mainmenu_item $VIDEO "Video Apps")"
+        echo "11) $(mainmenu_item $GAMES "Games")"
+        echo "12) $(mainmenu_item $LAMP "LAMP")"
+        echo "13) $(mainmenu_item $FONTS "Fonts")"
+        echo "14) $(mainmenu_item $FONTSCONFIG "Fonts Configuration")"
+        echo "15) $(mainmenu_item $EXTRA "Extra")"
+        echo "16) $(mainmenu_item $CLEANPACKAGES "Clean Orphan Packages")"
+        echo ""
+        echo " q) Quit"
+        echo ""
+        MAINMENU+=" q"
+        read_input_options "$MAINMENU"
+        for OPT in ${OPTIONS[@]}; do
+            case "$OPT" in
+                1)
+                    add_custom_repositories
+                    install_reflector
+                    install_basic_setup
+                    install_nfs
+                    install_samba
+                    install_lmt
+                    install_preload
+                    install_xorg
+                    install_video_cards
+                    install_cups
+                    install_additional_firmwares
+                    install_git_tor
+                    CURRENT_STATUS=1
+                    sumary "Basic setup installation"
+                    pause_function
+                    BASICSETUP=1
+                    ;;
+                2)
+                    if [[ $BASICSETUP -eq 0 ]]; then
+                        echo -e "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
+                        read_input_text "Are you sure you want to continue?"
+                        if [[ $OPTION == n ]]; then continue; fi
+                    fi
+                    install_desktop_environment
+                    install_nm_wicd
+                    DESKTOPENVIRONMENT=1
+                    ;;
+                3)
+                    install_accessories_apps
+                    ACCESSORIES=1
+                    ;;
+                4)
+                    install_development_apps
+                    DEVELOPMENT=1
+                    ;;
+                5)
+                    install_office_apps
+                    OFFICE=1
+                    ;;
+                6)
+                    install_system_apps
+                    SYSTEM=1
+                    ;;
+                7)
+                    install_graphics_apps
+                    GRAPHICS=1
+                    ;;
+                8)
+                    install_internet_apps
+                    INTERNET=1
+                    ;;
+                9)
+                    install_audio_apps
+                    AUDIO=1
+                    ;;
+                10)
+                    install_video_apps
+                    VIDEO=1
+                    ;;
+                11)
+                    install_games
+                    GAMES=1
+                    ;;
+                12)
+                    install_lamp
+                    LAMP=1
+                    ;;
+                13)
+                    install_fonts
+                    FONTS=1
+                    ;;
+                14)
+                    configure_fonts
+                    FONTSCONFIG=1
+                    ;;
+                15)
+                    install_extra
+                    EXTRA=1
+                    ;;
+                16)
+                    clean_orphan_packages
+                    CLEANPACKAGES=1
+                    ;;
+                "q")
+                    finish
+                    ;;
+                *)
+                    invalid_option
+                    ;;
+            esac
+        done
+    done
+#}}}
+fi
