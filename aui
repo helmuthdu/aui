@@ -3900,7 +3900,7 @@ if [[ $1 == --ais ]]; then
     print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
     print_warning "\tThis option still in beta stage"
     pause_function
-    command_info="\nNow you have to manual enter the following commands, then press CTRL+D or type exit:"
+    command_info="\nNow you have to manual enter the following commands, then press ${BYellow}CTRL+D${White} or type ${BYellow}exit${White}:"
     #CONFIGURE KEYMAP {{{
         print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
         print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
@@ -3993,7 +3993,7 @@ if [[ $1 == --ais ]]; then
     #}}}
     #CONFIGURE NETWORK {{{
         print_title "CONFIGURING NETWORK - https://wiki.archlinux.org/index.php/Configuring_network"
-        connection_type=("Wired Connection (eth0)" "Wireless Connection (wlan)")
+        connection_type=("Wired Connection (eth0)" "Wireless Connection (wlan0)")
         PS3="$prompt1"
         echo -e "Select your connection type:\n"
         select OPT in "${connection_type[@]}"; do
@@ -4019,7 +4019,7 @@ if [[ $1 == --ais ]]; then
         pacstrap /mnt base base-devel
     #}}}
     #INSTALL BOOTLOADER {{{
-        bootloader=("GRUB" "Syslinux" "Skip")
+        bootloader=("GRUB2" "Syslinux" "Skip")
         PS3="$prompt1"
         echo -e "Select a bootloader:\n"
         select BOOTLOADER in "${bootloader[@]}"; do
@@ -4041,29 +4041,37 @@ if [[ $1 == --ais ]]; then
             esac
         done
     #}}}
-    #CONFIGURE LOCALTIME {{{
-        print_title "LOCALTIME"
-        [[ -f /mnt/etc/localtime ]] && rm /mnt/etc/localtime;
-        zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europa" "Indian" "Mexico" "Midest" "Pacific" "US");
-        PS3="$prompt1"
-        echo "Select zone:"
-        select ZONE in "${zone[@]}"; do
-            if contains_element "$ZONE" "${zone[@]}"; then
-                subzone=(`ls /usr/share/zoneinfo/$ZONE/`)
-                PS3="$prompt1"
-                echo "Select subzone:"
-                select SUBZONE in "${subzone[@]}"; do
-                if contains_element "$SUBZONE" "${subzone[@]}"; then
-                    chroot /mnt ln -s /usr/share/zoneinfo/$ZONE/$SUBZONE /etc/localtime
+    #CONFIGURE TIMEZONE {{{
+        function settimezone(){
+            [[ -f /mnt/etc/localtime ]] && rm /mnt/etc/localtime;
+            local zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europa" "Indian" "Mexico" "Midest" "Pacific" "US");
+            PS3="$prompt1"
+            echo "Select zone:"
+            select ZONE in "${zone[@]}"; do
+                if contains_element "$ZONE" "${zone[@]}"; then
+                    local subzone=(`ls /usr/share/zoneinfo/$ZONE/`)
+                    PS3="$prompt1"
+                    echo "Select subzone:"
+                    select SUBZONE in "${subzone[@]}"; do
+                    if contains_element "$SUBZONE" "${subzone[@]}"; then
+                        chroot /mnt ln -s /usr/share/zoneinfo/$ZONE/$SUBZONE /etc/localtime
+                        break
+                    else
+                        invalid_option
+                    fi
+                    done
                     break
                 else
                     invalid_option
                 fi
-                done
-                break
-            else
-                invalid_option
-            fi
+            done
+        }
+        print_title "TIMEZONE - https://wiki.archlinux.org/index.php/Timezone"
+        print_info "In an operating system the time (clock) is determined by four parts: Time value, Time standard, Time Zone, and DST (Daylight Saving Time if applicable)."
+        OPTION=n
+        while [[ $OPTION != y ]]; do
+            settimezone
+            read_input_text "Confirm timezone ($ZONE/$SUBZONE)"
         done
     #}}}
     #CONFIGURE HOSTNAME {{{
@@ -4075,13 +4083,21 @@ if [[ $1 == --ais ]]; then
     #CONFIGURE LOCALE {{{
         print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
         if [[ ! -f /mnt/etc/locale.conf ]]; then
-            echo 'LANG="en_US.UTF-8"' > /mnt/etc/locale.conf
-            nano /mnt/etc/locale.conf
+            read -p "Locale [ex: pt_BR.UTF-8]: " LOCALE
+            echo 'LANG="'$LOCALE'"' > /mnt/etc/locale.conf
         fi
-        nano /mnt/etc/locale.gen
+        sed -i '/'$LOCALE'/s/^#//' /mnt/etc/locale.gen
         echo -e $command_info
         print_warning "locale-gen"
         arch-chroot /mnt
+    #}}}
+    #CONFIGURE RC.CONF {{{
+        sed -i '/HARDWARECLOCK=/HARDWARECLOCK="localtime"/' /mnt/etc/rc.conf
+        sed -i '/TIMEZONE=/TIMEZONE='"$ZONE\/$SUBZONE"'/' /mnt/etc/rc.conf
+        sed -i '/KEYMAP=/KEYMAP='"$KEYMAP"'/' /mnt/etc/rc.conf
+        sed -i '/LOCALE=/LOCALE='"$LOCALE"'/' /mnt/etc/rc.conf
+        sed -i '/HOSTNAME=/HOTSNAME='"$HOSTNAME"'/' /mnt/etc/rc.conf
+        sed -i '/interface=/interface=eth0/' /mnt/etc/rc.conf
     #}}}
     #CONFIGURE MKINITCPIO {{{
         print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
@@ -4091,13 +4107,15 @@ if [[ $1 == --ais ]]; then
     #}}}
     #CONFIGURE BOOTLOADER {{{
         BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
-        if [[ $BOOTLOADER == GRUB ]]; then
-            print_title "https://wiki.archlinux.org/index.php/GRUB2"
+        if [[ $BOOTLOADER == GRUB2 ]]; then
+            print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
+            print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
             echo -e $command_info
             print_warning "grub-install $BOOTLOADER_PARTITION\ngrub-mkconfig -o /boot/grub/grub.cfg"
             arch-chroot /mnt
         elif [[ $BOOTLOADER == Syslinux ]]; then
-            print_title "https://wiki.archlinux.org/index.php/Syslinux"
+            print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
+            print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
             echo -e $command_info
             print_warning "nano /boot/syslinux/syslinux.cfg\nsyslinux-install_update -iam"
             arch-chroot /mnt
