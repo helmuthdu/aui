@@ -534,19 +534,20 @@
         # 5) Feedler
         # 6) Files
         # 7) Footnote
-        # 8) Geary
-        # 9) Lingo
-        #10) Maya
-        #11) Midori
-        #12) Noise
-        #13) Scratch
-        #14) Plank
-        #15) Pantheon Terminal
-        #16) Slingshot
-        #17) Switchboard
-        #18) Wingpanel
-        #19) eICONS
-        #20) eGTK
+        # 8) Gala
+        # 9) Geary
+        #10) Lingo
+        #11) Maya
+        #12) Midori
+        #13) Noise
+        #14) Scratch
+        #15) Plank
+        #16) Pantheon Terminal
+        #17) Slingshot
+        #18) Switchboard
+        #19) Wingpanel
+        #20) eICONS
+        #21) eGTK
         ELEMENTARY_OPTIONS="1-20"
     #}}}
 #}}}
