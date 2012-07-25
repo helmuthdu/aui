@@ -4139,6 +4139,16 @@ if [[ $1 == --ais ]]; then
         fi
     #}}}
 #}}}
+elif [[ $1 == --help || $1 == -h ]]; then
+#MINI-HELP {{{
+    echo "Usage: "  1>&2
+    echo " aui               - install programs and other stuffs"  1>&2
+    echo " aui --ais         - install archlinux with aui + aif (archlinux install scripts)"  1>&2
+    echo "Options: "  1>&2
+    echo " --help            - print this help text"  1>&2
+    echo ""
+    exit 1
+#}}}
 else
 #MAIN {{{
     welcome
