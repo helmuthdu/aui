@@ -3995,11 +3995,14 @@ if [[ $1 == --install ]]; then
                 chroot /mnt ln -s /usr/share/zoneinfo/$ZONE/$SUBZONE /etc/localtime
                 break
             elif [[ $SUBZONE == Back ]]; then
-                continue
+                break
             else
                 invalid_option
             fi
             done
+            if [[ $SUBZONE == Back ]]; then
+                continue
+            fi
             break
         else
             invalid_option
@@ -4013,17 +4016,19 @@ if [[ $1 == --install ]]; then
     nano /mnt/etc/locale.gen
     chroot /mnt locale-gen
     print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
-    nano /mnt/etc/mkinitcpio.conf
-    chroot /mnt mkinitcpio -p linux
+    echo -e "\nNow you have to manual enter the following commands, then exit:"
+    echo "mkinitcpio -p linux"
+    arch-chroot
     BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
     if [[ $BOOTLOADER == GRUB ]]; then
         print_title "https://wiki.archlinux.org/index.php/GRUB2"
-        chroot /mnt grub-install $BOOTLOADER_PARTITION
-        chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+        grub-install --boot-directory=/mnt/boot $BOOTLOADER_PARTITION
+        grub-mkconfig -o /mnt/boot/grub/grub.cfg
     elif [[ $BOOTLOADER == Syslinux ]]; then
         print_title "https://wiki.archlinux.org/index.php/Syslinux"
-        nano /mnt/boot/syslinux/syslinux.cfg
-        chroot /mnt syslinux-install_update -iam
+        echo -e "\nNow you have to manual edit the /boot/syslinux/syslinux.cfg to set the right partition and enter the following commands:"
+        echo "syslinux-install_update -iam"
+        arch-chroot
     fi
     chroot /mnt passwd
 #}}}
