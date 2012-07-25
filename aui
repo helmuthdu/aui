@@ -3877,17 +3877,25 @@ function finish(){
     less aur_pkglist.txt
     print_title "INSTALL COMPLETED"
     echo -e "Thanks for using the Archlinux Ultimate Install script by helmuthdu\n"
-    pause_function
-    if [[ $LXDE -eq 1 ]]; then
-        DM="lxdm"
-    elif [[ $XFCE -eq 1 || $OPENBOX -eq 1 ]]; then
-        DM="slim"
+    read_input_text "Reboot yourt system"
+    #REBOOT
+    if [[ $OPTION == y ]]; then
+        reboot
+        exit 0
+    fi
+    #START DM
+    if check_package "gdm" ; then
+        DM="gdm"
     elif [[ $KDE -eq 1 ]]; then
         DM="kdm"
-    elif [[ $E17 -eq 1 ]]; then
+    elif check_package "slim" ; then
+        DM="slim"
+    elif check_package "lightdm" ; then
+        DM="lightdm"
+    elif check_package "lxdm" ; then
+        DM="lxdm"
+    elif check_package "elsa-svn-arch" ; then
         DM="elsa"
-    else
-        DM="gdm"
     fi
     [[ ! -n $DISPLAY ]] && start_daemon "$DM"
     exit 0
@@ -3900,96 +3908,12 @@ if [[ $1 == --ais ]]; then
     print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
     print_warning "\tThis option still in beta stage"
     pause_function
-    command_info="\nNow you have to manual enter the following commands, then press ${BYellow}CTRL+D${White} or type ${BYellow}exit${White}:"
+    command_info="\nYou have to manual enter the following commands, then press ${BYellow}ctrl+d${White} or type ${BYellow}exit${White}:"
     #CONFIGURE KEYMAP {{{
         print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
         print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
-        read -p "Keyboard Layout [ex: us-acentos OR br-abnt2]: " KEYMAP
+        read -p "Keyboard Layout [ex: us-acentos]: " KEYMAP
         loadkeys $KEYMAP
-    #}}}
-    #CREATE PARTITION {{{
-        print_title "https://wiki.archlinux.org/index.php/Partitioning"
-        print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
-        pause_function
-        cfdisk
-    #}}}
-    #FORMATING DEVICE {{{
-        print_title "https://wiki.archlinux.org/index.php/Format_a_device"
-        print_info "This step will select and format the selected partiton where the archlinxu will be installed"
-        print_warning "\tAll data on the specified partition will be LOST."
-        partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`);
-        PS3="$prompt1"
-        echo "Select your root partition:"
-        select ROOT in "${partitions[@]}"; do
-            if contains_element "$ROOT" "${partitions[@]}"; then
-                read_input_text "Are you sure you want format the selected partition ($ROOT)"
-                if [[ $OPTION == y ]]; then
-                    mkfs.ext4 $ROOT
-                    fsck $ROOT
-                    break
-                fi
-            else
-                invalid_option
-            fi
-        done
-        read_input_text "Create SWAP"
-        if [[ $OPTION == y ]]; then
-            echo -e "\nSelect your swap partition:"
-            select SWAP in "${partitions[@]}"; do
-                if contains_element "$SWAP" "${partitions[@]}"; then
-                read_input_text "Are you sure you want format the selected partition ($SWAP)"
-                if [[ $OPTION == y ]]; then
-                    mkswap $SWAP
-                    swapon $SWAP
-                    break
-                fi
-                else
-                    invalid_option
-                fi
-            done
-        fi
-    #}}}
-    #MOUNTING DEVICES {{{
-        print_title "MOUNTING DEVICES"
-        print_info "We now must mount the root partition on /mnt. You should also create directories for and mount any other partitions (/mnt/boot, /mnt/home, ..)."
-        pause_function
-        mount  $ROOT /mnt
-        #MOUNTING PARTITIONS {{{
-        read_input_text "Add more partitions"
-        if [[ $OPTION = y ]]; then
-            while [[ 1 ]]
-            do
-                print_title "MOUNTING PARTITIONS"
-                echo " 1) \"mount new partition\""
-                echo ""
-                echo " d) DONE"
-                echo ""
-                read_input_options
-                for OPT in ${OPTIONS[@]}; do
-                    case $OPT in
-                        1)
-                            read -p "Enter partition name [ex: sda2] " PARTITION
-                            read -p "Enter mountpoint [ex: /media/docs]" MOUNTPOINT
-                            read -p "Enter filesystem [ex: vfat]" FILESYSTEM
-                            mkdir -p $MOUNTPOINT
-                            mount -t $FILESYSTEM $PARTITION $MOUNTPOINT
-                            echo -e '\n'
-                            pause_function
-                            ;;
-                        "d")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
-                done
-            elihw
-            done
-        fi
-        #}}}
-        #CREATE FSTAB
-        genfstab -p /mnt >> /mnt/etc/fstab
     #}}}
     #CONFIGURE NETWORK {{{
         print_title "CONFIGURING NETWORK - https://wiki.archlinux.org/index.php/Configuring_network"
@@ -4013,9 +3937,93 @@ if [[ $1 == --ais ]]; then
             esac
         done
     #}}}
+    #CREATE PARTITION {{{
+        print_title "https://wiki.archlinux.org/index.php/Partitioning"
+        print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
+        pause_function
+        cfdisk
+    #}}}
+    #FORMATING DEVICE {{{
+        print_title "https://wiki.archlinux.org/index.php/Format_a_device"
+        print_info "This step will select and format the selected partiton where the archlinux will be installed"
+        print_warning "\tAll data on the specified partition will be LOST."
+        partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`);
+        PS3="$prompt1"
+        echo "Select your root partition:"
+        select ROOT in "${partitions[@]}"; do
+            if contains_element "$ROOT" "${partitions[@]}"; then
+                read_input_text "Are you sure you want format the $ROOT partition"
+                if [[ $OPTION == y ]]; then
+                    mkfs.ext4 $ROOT
+                    fsck $ROOT
+                    break
+                fi
+            else
+                invalid_option
+            fi
+        done
+        read_input_text "Format partition as SWAP"
+        if [[ $OPTION == y ]]; then
+            echo -e "\nSelect your swap partition:"
+            select SWAP in "${partitions[@]}"; do
+                if contains_element "$SWAP" "${partitions[@]}"; then
+                read_input_text "Are you sure you want format the $SWAP partition"
+                if [[ $OPTION == y ]]; then
+                    mkswap $SWAP
+                    swapon $SWAP
+                    break
+                fi
+                else
+                    invalid_option
+                fi
+            done
+        fi
+    #}}}
+    #MOUNTING DEVICES {{{
+        print_title "MOUNTING DEVICES"
+        print_info "Mounting the root partition on /mnt. You should also create directories for and mount any other partitions (/mnt/boot, /mnt/home, ..)."
+        pause_function
+        mount  $ROOT /mnt
+        #MOUNTING PARTITIONS {{{
+        read_input_text "Add more partitions"
+        if [[ $OPTION = y ]]; then
+            while [[ 1 ]]
+            do
+                print_title "MOUNTING PARTITIONS"
+                echo " 1) \"mount new partition\""
+                echo ""
+                echo " d) DONE"
+                echo ""
+                read_input_options
+                for OPT in ${OPTIONS[@]}; do
+                    case $OPT in
+                        1)
+                            read -p "Enter partition name [ex: sda2] " PARTITION
+                            read -p "Enter mountpoint [ex: /media/docs]" MOUNTPOINT
+                            read -p "Enter filesystem [ex: vfat]" FILESYSTEM
+                            mkdir -p /mnt/$MOUNTPOINT
+                            mount -t $FILESYSTEM $PARTITION /mnt/$MOUNTPOINT
+                            echo -e '\n'
+                            pause_function
+                            ;;
+                        "d")
+                            break
+                            ;;
+                        *)
+                            invalid_option
+                            ;;
+                    esac
+                done
+            elihw
+            done
+        fi
+        #}}}
+        #CREATE FSTAB
+        genfstab -p /mnt >> /mnt/etc/fstab
+    #}}}
     #INSTALL BASE SYSTEM {{{
         print_title "INSTALL BASE SYSTEM"
-        print_info "Using the pacstrap script we install the base system. The base-devel package group should also be installed if you plan on compiling software from the AUR or using ABS."
+        print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
         pacstrap /mnt base base-devel
     #}}}
     #INSTALL BOOTLOADER {{{
@@ -4075,29 +4083,25 @@ if [[ $1 == --ais ]]; then
         done
     #}}}
     #CONFIGURE HOSTNAME {{{
-        if [[ ! -f /mnt/etc/hostname ]]; then
-            read -p "Hostname [ex: Terminator]: " HOTSNAME
-            echo "$HOSTNAME" > /mnt/etc/hostname
-        fi
+        read -p "Hostname [ex: archlinux]: " HOTSNAME
+        echo "$HOSTNAME" > /mnt/etc/hostname
     #}}}
     #CONFIGURE LOCALE {{{
         print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
-        if [[ ! -f /mnt/etc/locale.conf ]]; then
-            read -p "Locale [ex: pt_BR.UTF-8]: " LOCALE
-            echo 'LANG="'$LOCALE'"' > /mnt/etc/locale.conf
-        fi
+        read -p "Locale [ex: pt_BR.UTF-8]: " LOCALE
+        echo 'LANG="'$LOCALE'"' > /mnt/etc/locale.conf
         sed -i '/'$LOCALE'/s/^#//' /mnt/etc/locale.gen
         echo -e $command_info
         print_warning "locale-gen"
         arch-chroot /mnt
     #}}}
     #CONFIGURE RC.CONF {{{
-        sed -i '/HARDWARECLOCK=/HARDWARECLOCK="localtime"/' /mnt/etc/rc.conf
-        sed -i '/TIMEZONE=/TIMEZONE='"$ZONE\/$SUBZONE"'/' /mnt/etc/rc.conf
-        sed -i '/KEYMAP=/KEYMAP='"$KEYMAP"'/' /mnt/etc/rc.conf
-        sed -i '/LOCALE=/LOCALE='"$LOCALE"'/' /mnt/etc/rc.conf
-        sed -i '/HOSTNAME=/HOTSNAME='"$HOSTNAME"'/' /mnt/etc/rc.conf
-        sed -i '/interface=/interface=eth0/' /mnt/etc/rc.conf
+        sed -i 's/HARDWARECLOCK=.*$/HARDWARECLOCK="localtime"/' /mnt/etc/rc.conf
+        sed -i 's/TIMEZONE=.*$/TIMEZONE="'"$ZONE\/$SUBZONE"'"/' /mnt/etc/rc.conf
+        sed -i 's/KEYMAP=.*$/KEYMAP="'"$KEYMAP"'"/' /mnt/etc/rc.conf
+        sed -i 's/LOCALE=.*$/LOCALE="'"$LOCALE"'"/' /mnt/etc/rc.conf
+        sed -i 's/HOSTNAME=.*$/HOSTNAME='"$HOSTNAME"'/' /mnt/etc/rc.conf
+        sed -i 's/interface=.*$/interface=eth0/' /mnt/etc/rc.conf
     #}}}
     #CONFIGURE MKINITCPIO {{{
         print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
@@ -4121,7 +4125,19 @@ if [[ $1 == --ais ]]; then
             arch-chroot /mnt
         fi
     #}}}
-    chroot /mnt passwd
+    #FINISH #{{{
+        print_title "INSTALL COMPLETED"
+        echo "Enter your new root password:"
+        chroot /mnt passwd
+        #COPY AUI TO ROOT FOLDER IN THE NEW SYSTEM
+        print_warning "\nA copy of the AUI will be placed in /root directory of your new system\n"
+        cp -R `pwd` /mnt/root
+        read_input_text "Reboot system"
+        if [[ $OPTION == y ]]; then
+            reboot
+            exit 0
+        fi
+    #}}}
 #}}}
 else
 #MAIN {{{
