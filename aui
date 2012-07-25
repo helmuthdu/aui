@@ -3977,9 +3977,7 @@ if [[ $1 == --install ]]; then
                 ;;
         esac
     done
-    print_title "Configure system"
-    echo "Generate an fstab"
-    pause_function
+    # create fstab
     genfstab -p /mnt >> /mnt/etc/fstab
     print_title "Localtime"
     zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europa" "Indian" "Mexico" "Midest" "Pacific" "US");
@@ -4016,14 +4014,16 @@ if [[ $1 == --install ]]; then
     nano /mnt/etc/locale.gen
     chroot /mnt locale-gen
     print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
-    echo -e "\nNow you have to manual enter the following commands, then exit:"
+    echo -e "\nNow you have to manual enter the following command, then exit:"
     echo "mkinitcpio -p linux"
     arch-chroot
     BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
     if [[ $BOOTLOADER == GRUB ]]; then
         print_title "https://wiki.archlinux.org/index.php/GRUB2"
-        grub-install --boot-directory=/mnt/boot $BOOTLOADER_PARTITION
-        grub-mkconfig -o /mnt/boot/grub/grub.cfg
+        grub-install --root-directory=/mnt/ $BOOTLOADER_PARTITION
+        echo -e "\nNow you have to manual enter the following command, then exit:"
+        echo "grub-mkconfig -o /boot/grub/grub.cfg"
+        arch-chroot
     elif [[ $BOOTLOADER == Syslinux ]]; then
         print_title "https://wiki.archlinux.org/index.php/Syslinux"
         echo -e "\nNow you have to manual edit the /boot/syslinux/syslinux.cfg to set the right partition and enter the following commands:"
