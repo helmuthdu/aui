@@ -3759,19 +3759,20 @@ do
                     echo " 5) $(menu_item "feedler-bzr") (RSS feeds Reader)"
                     echo " 6) $(menu_item "files-bzr") (file manager)"
                     echo " 7) $(menu_item "footnote-bzr") (note taking)"
-                    echo " 8) $(menu_item "geary-git") (email client)"
-                    echo " 9) $(menu_item "lingo-dictionary-bzr") (dictionary)"
-                    echo "10) $(menu_item "maya-bzr") (calendar)"
-                    echo "11) $(menu_item "midori") (web browser)"
-                    echo "12) $(menu_item "noise-bzr") (audio player)"
-                    echo "13) $(menu_item "scratch-bzr") (text editor)"
-                    echo "14) $(menu_item "plank-bzr") (dock)"
-                    echo "15) $(menu_item "pantheon-terminal-bzr") (terminal)"
-                    echo "16) $(menu_item "slingshot-bzr") (app launcher)"
-                    echo "17) $(menu_item "switchboard-bzr") (desktop settings hub)"
-                    echo "18) $(menu_item "wingpanel-bzr") (indicators topbar)"
-                    echo "19) $(menu_item "elementary-icons-bzr" "eICONS")"
-                    echo "20) $(menu_item "egtk-bzr" "eGTK")"
+                    echo " 8) $(menu_item "gala-bzr") (compositing manager)"
+                    echo " 9) $(menu_item "geary-git") (email client)"
+                    echo "10) $(menu_item "lingo-dictionary-bzr") (dictionary)"
+                    echo "11) $(menu_item "maya-bzr") (calendar)"
+                    echo "12) $(menu_item "midori") (web browser)"
+                    echo "13) $(menu_item "noise-bzr") (audio player)"
+                    echo "14) $(menu_item "scratch-bzr") (text editor)"
+                    echo "15) $(menu_item "plank-bzr") (dock)"
+                    echo "16) $(menu_item "pantheon-terminal-bzr") (terminal)"
+                    echo "17) $(menu_item "slingshot-bzr") (app launcher)"
+                    echo "18) $(menu_item "switchboard-bzr") (desktop settings hub)"
+                    echo "19) $(menu_item "wingpanel-bzr") (indicators topbar)"
+                    echo "20) $(menu_item "elementary-icons-bzr" "eICONS")"
+                    echo "21) $(menu_item "egtk-bzr" "eGTK")"
                     echo ""
                     echo " b) BACK"
                     echo ""
@@ -3801,42 +3802,45 @@ do
                                 aur_package_install "footnote-bzr"
                                 ;;
                             8)
-                                aur_package_install "geary-git"
+                                aur_package_install "footnote-bzr"
                                 ;;
                             9)
-                                aur_package_install "lingo-dictionary-bzr"
+                                aur_package_install "geary-git"
                                 ;;
                             10)
-                                aur_package_install "maya-bzr"
+                                aur_package_install "lingo-dictionary-bzr"
                                 ;;
                             11)
-                                aur_package_install "midori"
+                                aur_package_install "maya-bzr"
                                 ;;
                             12)
-                                aur_package_install "noise-bzr"
+                                aur_package_install "midori"
                                 ;;
                             13)
-                                aur_package_install "scratch-bzr"
+                                aur_package_install "noise-bzr"
                                 ;;
                             14)
-                                aur_package_install "plank-bzr"
+                                aur_package_install "scratch-bzr"
                                 ;;
                             15)
-                                aur_package_install "pantheon-terminal-bzr"
+                                aur_package_install "plank-bzr"
                                 ;;
                             16)
-                                aur_package_install "slingshot-bzr"
+                                aur_package_install "pantheon-terminal-bzr"
                                 ;;
                             17)
-                                aur_package_install "switchboard-bzr"
+                                aur_package_install "slingshot-bzr"
                                 ;;
                             18)
-                                aur_package_install "wingpanel-bzr"
+                                aur_package_install "switchboard-bzr"
                                 ;;
                             19)
-                                aur_package_install "elementary-icons-bzr"
+                                aur_package_install "wingpanel-bzr"
                                 ;;
                             20)
+                                aur_package_install "elementary-icons-bzr"
+                                ;;
+                            21)
                                 aur_package_install "egtk-bzr"
                                 ;;
                             "b")
@@ -4001,10 +4005,9 @@ if [[ $1 == --install ]]; then
             invalid_option
         fi
     done
-    echo "Chroot into newly installed system"
-    pause_function
-    echo 'HOSTNAME=""' > /mnt/etc/hostname
-    nano /mnt/etc/hostname
+    read -p "Hostname [ex: Terminator]: " HOTSNAME
+    echo "$HOSTNAME" > /mnt/etc/hostname
+    print_title "https://wiki.archlinux.org/index.php/Locale"
     echo 'LANG="en_US.UTF-8"' > /mnt/etc/locale.conf
     nano /mnt/etc/locale.conf
     nano /mnt/etc/locale.gen
@@ -4012,11 +4015,14 @@ if [[ $1 == --install ]]; then
     print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
     nano /mnt/etc/mkinitcpio.conf
     chroot /mnt mkinitcpio -p linux
+    BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
     if [[ $BOOTLOADER == GRUB ]]; then
-        chroot /mnt grub-install $ROOT
+        print_title "https://wiki.archlinux.org/index.php/GRUB2"
+        chroot /mnt grub-install $BOOTLOADER_PARTITION
         chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
     elif [[ $BOOTLOADER == Syslinux ]]; then
-        chroot /mnt nano /boot/syslinux/syslinux.cfg
+        print_title "https://wiki.archlinux.org/index.php/Syslinux"
+        nano /mnt/boot/syslinux/syslinux.cfg
         chroot /mnt syslinux-install_update -iam
     fi
     chroot /mnt passwd
