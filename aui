@@ -3894,141 +3894,215 @@ function finish(){
 }
 #}}}
 
-if [[ $1 == --install ]]; then
+if [[ $1 == --ais ]]; then
 #ARCHLINUX SETUP {{{
     print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
     print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
-    print_warning "This option still in alpha stage, it may break or not even work"
-    read -p "Keyboard Layout [ex: br-abnt2]: " KBLAYOUT
-    loadkeys $KBLAYOUT
-    print_title "https://wiki.archlinux.org/index.php/Partitioning"
-    print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
-    cfdisk
+    print_warning "\tThis option still in beta stage"
     pause_function
-    print_title "https://wiki.archlinux.org/index.php/Format_a_device"
-    print_info "This step will select and format the selected partiton where the archlinxu will be installed"
-    print_warning "\tAll data on the specified partition will be LOST."
-    partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`);
-    PS3="$prompt1"
-    echo "Select your root partition:"
-    select ROOT in "${partitions[@]}"; do
-        if contains_element "$ROOT" "${partitions[@]}"; then
-            mkfs.ext4 $ROOT
-            fsck $ROOT
-            break
-        else
-            invalid_option
-        fi
-    done
-    echo -e "\nSelect your swap partition:"
-    select SWAP in "${partitions[@]}"; do
-        if contains_element "$SWAP" "${partitions[@]}"; then
-            mkswap $SWAP
-            swapon $SWAP
-            break
-        else
-            invalid_option
-        fi
-    done
-    print_title "Mount the partitions"
-    print_info "We now must mount the root partition on /mnt. You should also create directories for and mount any other partitions (/mnt/boot, /mnt/home, ..)."
-    pause_function
-    mount  $ROOT /mnt
-    connection_type=("Wired Connection" "Wireless Connection")
-    PS3="$prompt1"
-    echo -e "Select your connection type:\n"
-    select OPT in "${connection_type[@]}"; do
-        case "$REPLY" in
-            1)
-                ip link set eth0 up
-                dhclient eth0
-                break
-                ;;
-            2)
-                wifi-menu
-                break
-                ;;
-            *)
+    command_info="\nNow you have to manual enter the following commands, then press CTRL+D or type exit:"
+    #CONFIGURE KEYMAP {{{
+        print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
+        print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
+        read -p "Keyboard Layout [ex: us-acentos OR br-abnt2]: " KEYMAP
+        loadkeys $KEYMAP
+    #}}}
+    #CREATE PARTITION {{{
+        print_title "https://wiki.archlinux.org/index.php/Partitioning"
+        print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
+        pause_function
+        cfdisk
+    #}}}
+    #FORMATING DEVICE {{{
+        print_title "https://wiki.archlinux.org/index.php/Format_a_device"
+        print_info "This step will select and format the selected partiton where the archlinxu will be installed"
+        print_warning "\tAll data on the specified partition will be LOST."
+        partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`);
+        PS3="$prompt1"
+        echo "Select your root partition:"
+        select ROOT in "${partitions[@]}"; do
+            if contains_element "$ROOT" "${partitions[@]}"; then
+                read_input_text "Are you sure you want format the selected partition ($ROOT)"
+                if [[ $OPTION == y ]]; then
+                    mkfs.ext4 $ROOT
+                    fsck $ROOT
+                    break
+                fi
+            else
                 invalid_option
-                ;;
-        esac
-    done
-    print_title "Install the base system"
-    print_info "Using the pacstrap script we install the base system. The base-devel package group should also be installed if you plan on compiling software from the AUR or using ABS."
-    pacstrap /mnt base base-devel
-    bootloader=("GRUB" "Syslinux" "Skip")
-    PS3="$prompt1"
-    echo -e "Select a bootloader:\n"
-    select BOOTLOADER in "${bootloader[@]}"; do
-        case "$REPLY" in
-            1)
-                pacstrap /mnt grub-bios
-                break
-                ;;
-            2)
-                pacstrap /mnt syslinux
-                break
-                ;;
-            3)
-                break
-                ;;
-            *)
-                invalid_option
-                ;;
-        esac
-    done
-    # create fstab
-    genfstab -p /mnt >> /mnt/etc/fstab
-    print_title "Localtime"
-    zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europa" "Indian" "Mexico" "Midest" "Pacific" "US");
-    PS3="$prompt1"
-    echo "Select zone:"
-    select ZONE in "${zone[@]}"; do
-        if contains_element "$ZONE" "${zone[@]}"; then
-            subzone=(`ls /usr/share/zoneinfo/$ZONE/`)
-            PS3="$prompt1"
-            echo "Select subzone:"
-            select SUBZONE in "${subzone[@]}" "Back"; do
-            if contains_element "$SUBZONE" "${subzone[@]}"; then
-                chroot /mnt ln -s /usr/share/zoneinfo/$ZONE/$SUBZONE /etc/localtime
-                break
-            elif [[ $SUBZONE == Back ]]; then
+            fi
+        done
+        read_input_text "Create SWAP"
+        if [[ $OPTION == y ]]; then
+            echo -e "\nSelect your swap partition:"
+            select SWAP in "${partitions[@]}"; do
+                if contains_element "$SWAP" "${partitions[@]}"; then
+                read_input_text "Are you sure you want format the selected partition ($SWAP)"
+                if [[ $OPTION == y ]]; then
+                    mkswap $SWAP
+                    swapon $SWAP
+                    break
+                fi
+                else
+                    invalid_option
+                fi
+            done
+        fi
+    #}}}
+    #MOUNTING DEVICES {{{
+        print_title "MOUNTING DEVICES"
+        print_info "We now must mount the root partition on /mnt. You should also create directories for and mount any other partitions (/mnt/boot, /mnt/home, ..)."
+        pause_function
+        mount  $ROOT /mnt
+        #MOUNTING PARTITIONS {{{
+        read_input_text "Add more partitions"
+        if [[ $OPTION = y ]]; then
+            while [[ 1 ]]
+            do
+                print_title "MOUNTING PARTITIONS"
+                echo " 1) \"mount new partition\""
+                echo ""
+                echo " d) DONE"
+                echo ""
+                read_input_options
+                for OPT in ${OPTIONS[@]}; do
+                    case $OPT in
+                        1)
+                            read -p "Enter partition name [ex: sda2] " PARTITION
+                            read -p "Enter mountpoint [ex: /media/docs]" MOUNTPOINT
+                            read -p "Enter filesystem [ex: vfat]" FILESYSTEM
+                            mkdir -p $MOUNTPOINT
+                            mount -t $FILESYSTEM $PARTITION $MOUNTPOINT
+                            echo -e '\n'
+                            pause_function
+                            ;;
+                        "d")
+                            break
+                            ;;
+                        *)
+                            invalid_option
+                            ;;
+                    esac
+                done
+            elihw
+            done
+        fi
+        #}}}
+        #CREATE FSTAB
+        genfstab -p /mnt >> /mnt/etc/fstab
+    #}}}
+    #CONFIGURE NETWORK {{{
+        print_title "CONFIGURING NETWORK - https://wiki.archlinux.org/index.php/Configuring_network"
+        connection_type=("Wired Connection (eth0)" "Wireless Connection (wlan)")
+        PS3="$prompt1"
+        echo -e "Select your connection type:\n"
+        select OPT in "${connection_type[@]}"; do
+            case "$REPLY" in
+                1)
+                    ip link set eth0 up
+                    dhclient eth0
+                    break
+                    ;;
+                2)
+                    wifi-menu
+                    break
+                    ;;
+                *)
+                    invalid_option
+                    ;;
+            esac
+        done
+    #}}}
+    #INSTALL BASE SYSTEM {{{
+        print_title "INSTALL BASE SYSTEM"
+        print_info "Using the pacstrap script we install the base system. The base-devel package group should also be installed if you plan on compiling software from the AUR or using ABS."
+        pacstrap /mnt base base-devel
+    #}}}
+    #INSTALL BOOTLOADER {{{
+        bootloader=("GRUB" "Syslinux" "Skip")
+        PS3="$prompt1"
+        echo -e "Select a bootloader:\n"
+        select BOOTLOADER in "${bootloader[@]}"; do
+            case "$REPLY" in
+                1)
+                    pacstrap /mnt grub-bios
+                    break
+                    ;;
+                2)
+                    pacstrap /mnt syslinux
+                    break
+                    ;;
+                3)
+                    break
+                    ;;
+                *)
+                    invalid_option
+                    ;;
+            esac
+        done
+    #}}}
+    #CONFIGURE LOCALTIME {{{
+        print_title "LOCALTIME"
+        [[ -f /mnt/etc/localtime ]] && rm /mnt/etc/localtime;
+        zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europa" "Indian" "Mexico" "Midest" "Pacific" "US");
+        PS3="$prompt1"
+        echo "Select zone:"
+        select ZONE in "${zone[@]}"; do
+            if contains_element "$ZONE" "${zone[@]}"; then
+                subzone=(`ls /usr/share/zoneinfo/$ZONE/`)
+                PS3="$prompt1"
+                echo "Select subzone:"
+                select SUBZONE in "${subzone[@]}"; do
+                if contains_element "$SUBZONE" "${subzone[@]}"; then
+                    chroot /mnt ln -s /usr/share/zoneinfo/$ZONE/$SUBZONE /etc/localtime
+                    break
+                else
+                    invalid_option
+                fi
+                done
                 break
             else
                 invalid_option
             fi
-            done
-            if [[ $SUBZONE == Back ]]; then
-                continue
-            fi
-            break
-        else
-            invalid_option
+        done
+    #}}}
+    #CONFIGURE HOSTNAME {{{
+        if [[ ! -f /mnt/etc/hostname ]]; then
+            read -p "Hostname [ex: Terminator]: " HOTSNAME
+            echo "$HOSTNAME" > /mnt/etc/hostname
         fi
-    done
-    read -p "Hostname [ex: Terminator]: " HOTSNAME
-    echo "$HOSTNAME" > /mnt/etc/hostname
-    print_title "https://wiki.archlinux.org/index.php/Locale"
-    echo 'LANG="en_US.UTF-8"' > /mnt/etc/locale.conf
-    nano /mnt/etc/locale.conf
-    nano /mnt/etc/locale.gen
-    chroot /mnt locale-gen
-    print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
-    echo -e "\nNow you have to manual enter the following command, then exit:"
-    print_warning "mkinitcpio -p linux"
-    arch-chroot /mnt
-    BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
-    if [[ $BOOTLOADER == GRUB ]]; then
-        print_title "https://wiki.archlinux.org/index.php/GRUB2"
-        echo -e "\nNow you have to manual enter the following command, then exit:"
-        print_warning "grub-install $BOOTLOADER_PARTITION\ngrub-mkconfig -o /boot/grub/grub.cfg"
+    #}}}
+    #CONFIGURE LOCALE {{{
+        print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
+        if [[ ! -f /mnt/etc/locale.conf ]]; then
+            echo 'LANG="en_US.UTF-8"' > /mnt/etc/locale.conf
+            nano /mnt/etc/locale.conf
+        fi
+        nano /mnt/etc/locale.gen
+        echo -e $command_info
+        print_warning "locale-gen"
         arch-chroot /mnt
-    elif [[ $BOOTLOADER == Syslinux ]]; then
-        print_title "https://wiki.archlinux.org/index.php/Syslinux"
-        echo -e "\nNow you have to manual edit the /boot/syslinux/syslinux.cfg to set the right partition and enter the following commands:"
-        print_warning "syslinux-install_update -iam"
+    #}}}
+    #CONFIGURE MKINITCPIO {{{
+        print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
+        echo -e $command_info
+        print_warning "mkinitcpio -p linux"
         arch-chroot /mnt
-    fi
+    #}}}
+    #CONFIGURE BOOTLOADER {{{
+        BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
+        if [[ $BOOTLOADER == GRUB ]]; then
+            print_title "https://wiki.archlinux.org/index.php/GRUB2"
+            echo -e $command_info
+            print_warning "grub-install $BOOTLOADER_PARTITION\ngrub-mkconfig -o /boot/grub/grub.cfg"
+            arch-chroot /mnt
+        elif [[ $BOOTLOADER == Syslinux ]]; then
+            print_title "https://wiki.archlinux.org/index.php/Syslinux"
+            echo -e $command_info
+            print_warning "nano /boot/syslinux/syslinux.cfg\nsyslinux-install_update -iam"
+            arch-chroot /mnt
+        fi
+    #}}}
     chroot /mnt passwd
 #}}}
 else
