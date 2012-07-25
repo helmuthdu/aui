@@ -4015,20 +4015,19 @@ if [[ $1 == --install ]]; then
     chroot /mnt locale-gen
     print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
     echo -e "\nNow you have to manual enter the following command, then exit:"
-    echo "mkinitcpio -p linux"
-    arch-chroot
+    print_warning "mkinitcpio -p linux"
+    arch-chroot /mnt
     BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
     if [[ $BOOTLOADER == GRUB ]]; then
         print_title "https://wiki.archlinux.org/index.php/GRUB2"
-        grub-install --root-directory=/mnt/ $BOOTLOADER_PARTITION
         echo -e "\nNow you have to manual enter the following command, then exit:"
-        echo "grub-mkconfig -o /boot/grub/grub.cfg"
-        arch-chroot
+        print_warning "grub-install $BOOTLOADER_PARTITION\ngrub-mkconfig -o /boot/grub/grub.cfg"
+        arch-chroot /mnt
     elif [[ $BOOTLOADER == Syslinux ]]; then
         print_title "https://wiki.archlinux.org/index.php/Syslinux"
         echo -e "\nNow you have to manual edit the /boot/syslinux/syslinux.cfg to set the right partition and enter the following commands:"
-        echo "syslinux-install_update -iam"
-        arch-chroot
+        print_warning "syslinux-install_update -iam"
+        arch-chroot /mnt
     fi
     chroot /mnt passwd
 #}}}
