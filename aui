@@ -3985,7 +3985,7 @@ if [[ $1 == --ais ]]; then
         print_title "MOUNTING DEVICES"
         print_info "Mounting the root partition on /mnt. You should also create directories for and mount any other partitions (/mnt/boot, /mnt/home, ..)."
         pause_function
-        mount  $ROOT /mnt
+        mount $ROOT /mnt
         #MOUNTING PARTITIONS {{{
         read_input_text "Add more partitions"
         if [[ $OPTION = y ]]; then
@@ -4051,14 +4051,14 @@ if [[ $1 == --ais ]]; then
     #}}}
     #CONFIGURE HOSTNAME {{{
         read -p "Hostname [ex: archlinux]: " HNAME
-        chroot /mnt echo "$HNAME" > /etc/hostname
+        echo "$HNAME" > /mnt/etc/hostname
         chroot /mnt sed -i '/127.0.0.1/s/.$/ '$HNAME'/' /etc/hosts
-        chroot /mnt sed -i '/::1/s/.$/'$HNAME'/' /etc/hosts
+        chroot /mnt sed -i '/::1/s/.$/ '$HNAME'/' /etc/hosts
     #}}}
     #CONFIGURE CONSOLE FONTS AND KEYMAP{{{
-        chroot /mnt echo "KEYMAP=$KEYMAP" > /etc/vconsole.conf
-        chroot /mnt echo "FONT=\"\"" >> /etc/vconsole.conf
-        chroot /mnt echo "FONT_MAP=\"\"" >> /etc/vconsole.conf
+        echo "KEYMAP=$KEYMAP" > /mnt/etc/vconsole.conf
+        echo "FONT=\"\"" >> /mnt/etc/vconsole.conf
+        echo "FONT_MAP=\"\"" >> /mnt/etc/vconsole.conf
     #}}}
     #CONFIGURE TIMEZONE {{{
         function settimezone(){
@@ -4097,7 +4097,7 @@ if [[ $1 == --ais ]]; then
     #CONFIGURE HARDWARECLOCK {{{
         print_title "https://wiki.archlinux.org/index.php/Internationalization"
         echo -e $command_info
-        print_warning "hwclock --systohc --utc\n\t\t\tOR\nhwclock --systohc --localtime"
+        print_warning "hwclock --systohc --utc\nOR\nhwclock --systohc --localtime"
         arch-chroot /mnt
     #}}}
     #CONFIGURE LOCALE {{{
@@ -4105,7 +4105,7 @@ if [[ $1 == --ais ]]; then
         read -p "Locale [ex: pt_BR]: " LOCALE
         LOCALE_8859="$LOCALE ISO-8859"
         LOCALE_UTF8="$LOCALE.UTF-8"
-        chroot /mnt echo 'LANG="'$LOCALE_UTF8'"' > /etc/locale.conf
+        echo 'LANG="'$LOCALE_UTF8'"' > /mnt/etc/locale.conf
         chroot /mnt sed -i '/'$LOCALE'/s/^#//' /etc/locale.gen
         echo -e $command_info
         print_warning "locale-gen"
@@ -4124,7 +4124,7 @@ if [[ $1 == --ais ]]; then
     #CONFIGURE BOOTLOADER {{{
         BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
         if [[ $BOOTLOADER == GRUB2 ]]; then
-            chroot mkdir -p /boot/grub/locale
+            chroot /mnt mkdir -p /boot/grub/locale
             chroot /mnt cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
             print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
             print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
@@ -4141,7 +4141,7 @@ if [[ $1 == --ais ]]; then
     #}}}
     #FINISH #{{{
         print_title "INSTALL COMPLETED"
-        echo "Enter your new root password:"
+        echo "Enter your new root password\n"
         chroot /mnt passwd
         #COPY AUI TO ROOT FOLDER IN THE NEW SYSTEM
         print_warning "\nA copy of the AUI will be placed in /root directory of your new system\n"
