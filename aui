@@ -4097,7 +4097,8 @@ if [[ $1 == --ais ]]; then
     #CONFIGURE HARDWARECLOCK {{{
         print_title "https://wiki.archlinux.org/index.php/Internationalization"
         echo -e $command_info
-        print_warning "hwclock --systohc --utc\nOR\nhwclock --systohc --localtime"
+        echo "      UTC:$(print_warning "hwclock --systohc --utc")"
+        echo "Localtime:$(print_warning "hwclock --systohc --localtime")"
         arch-chroot /mnt
     #}}}
     #CONFIGURE LOCALE {{{
