@@ -3998,11 +3998,9 @@ if [[ $1 == --ais ]]; then
                 for OPT in ${OPTIONS[@]}; do
                     case $OPT in
                         1)
-                            read -p "Enter partition name [ex: sda2] " PARTITION
-                            read -p "Enter mountpoint [ex: /media/docs]" MOUNTPOINT
-                            read -p "Enter filesystem [ex: vfat]" FILESYSTEM
-                            mkdir -p /mnt/$MOUNTPOINT
-                            mount -t $FILESYSTEM /dev/$PARTITION /mnt$MOUNTPOINT
+                            read -p "Enter <device> <location> <type> [ex: /dev/sda2 /media/docs ext4] " PARTITION MOUNTPOINT FILESYSTEM
+                            mkdir -p /mnt$MOUNTPOINT
+                            mount -t $FILESYSTEM $PARTITION /mnt$MOUNTPOINT
                             echo -e '\n'
                             pause_function
                             ;;
@@ -4085,6 +4083,7 @@ if [[ $1 == --ais ]]; then
     #CONFIGURE HOSTNAME {{{
         read -p "Hostname [ex: archlinux]: " HOTSNAME
         echo "$HOSTNAME" > /mnt/etc/hostname
+        sed -i '/127.0.0.1/s/.$/'$HOSTNAME'/' /mnt/etc/hosts
     #}}}
     #CONFIGURE LOCALE {{{
         print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
@@ -4100,6 +4099,7 @@ if [[ $1 == --ais ]]; then
         sed -i 's/TIMEZONE=.*$/TIMEZONE="'"$ZONE\/$SUBZONE"'"/' /mnt/etc/rc.conf
         sed -i 's/KEYMAP=.*$/KEYMAP="'"$KEYMAP"'"/' /mnt/etc/rc.conf
         sed -i 's/LOCALE=.*$/LOCALE="'"$LOCALE"'"/' /mnt/etc/rc.conf
+        sed -i 's/DAEMON_LOCALE=.*$/DAEMON_LOCALE="yes"/' /mnt/etc/rc.conf
         sed -i 's/HOSTNAME=.*$/HOSTNAME='"$HOSTNAME"'/' /mnt/etc/rc.conf
         sed -i 's/interface=.*$/interface=eth0/' /mnt/etc/rc.conf
     #}}}
