@@ -4002,7 +4002,7 @@ if [[ $1 == --ais ]]; then
                             read -p "Enter mountpoint [ex: /media/docs]" MOUNTPOINT
                             read -p "Enter filesystem [ex: vfat]" FILESYSTEM
                             mkdir -p /mnt/$MOUNTPOINT
-                            mount -t $FILESYSTEM $PARTITION /mnt/$MOUNTPOINT
+                            mount -t $FILESYSTEM /dev/$PARTITION /mnt$MOUNTPOINT
                             echo -e '\n'
                             pause_function
                             ;;
