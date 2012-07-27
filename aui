@@ -4041,11 +4041,18 @@ if [[ $1 == --ais ]]; then
             done
         fi
         #}}}
-        #GENERATE FSTAB
+        #CONFIGURE FSTAB {{{
+        if [[ ! -f /mnt/etc/fstab ]]; then
+            cp -v /mnt/etc/fstab /mnt/etc/fstab.aui
+        else
+            #restore in case of re-run the script
+            cp -v /mnt/etc/fstab.aui /mnt/etc/fstab
+        fi
         genfstab -p /mnt >> /mnt/etc/fstab
         echo "Review your fstab"
         pause_function
         nano /mnt/etc/fstab
+        #}}}
     #}}}
     #INSTALL BOOTLOADER {{{
         bootloader=("GRUB2" "Syslinux" "Skip")
