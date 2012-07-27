@@ -4009,7 +4009,7 @@ if [[ $1 == --ais ]]; then
         print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
         print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific device or partition."
         pause_function
-        #CONFIGURING FSTAB {{{
+        #ADD PARTITIONS {{{
         read_input_text "Add more partitions to your fstab"
         if [[ $OPTION = y ]]; then
             while [[ 1 ]]
@@ -4026,7 +4026,6 @@ if [[ $1 == --ais ]]; then
                             read -p "Enter <device> <dir> <type> [ex: /dev/sda2 /media/docs ext4]: " DEVICE DIR TYPE
                             mkdir -p /mnt$DIR
                             mount -t $TYPE $DEVICE /mnt$DIR
-                            echo "Successfully added to your Fstab"
                             pause_function
                             ;;
                         "d")
@@ -4043,9 +4042,9 @@ if [[ $1 == --ais ]]; then
         #}}}
         #CONFIGURE FSTAB {{{
         if [[ ! -f /mnt/etc/fstab ]]; then
-            cp -v /mnt/etc/fstab /mnt/etc/fstab.aui
+            cp /mnt/etc/fstab /mnt/etc/fstab.aui
         else
-            cp -v /mnt/etc/fstab.aui /mnt/etc/fstab
+            cp /mnt/etc/fstab.aui /mnt/etc/fstab
         fi
         genfstab -p /mnt >> /mnt/etc/fstab
         echo "Review your fstab"
@@ -4124,9 +4123,9 @@ if [[ $1 == --ais ]]; then
     #CONFIGURE HARDWARECLOCK {{{
         print_title "https://wiki.archlinux.org/index.php/Internationalization"
         echo -e $command_info
-        echo "      UTC:$(print_warning "hwclock --systohc --utc")"
-        echo "        OR"
-        echo -e "Localtime:$(print_warning "hwclock --systohc --localtime")"
+        echo -e "      UTC:$(print_warning "hwclock --systohc --utc")"
+        echo -e "    ${BYellow}OR${White}"
+        echo -e "Localtime:$(print_warning "hwclock --systohc --localtime")\n"
         arch-chroot /mnt
     #}}}
     #CONFIGURE LOCALE {{{
