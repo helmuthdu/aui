@@ -4022,11 +4022,11 @@ if [[ $1 == --ais ]]; then
                 read_input_options
                 for OPT in ${OPTIONS[@]}; do
                     case $OPT in
-                        1)
+                        1)r
                             read -p "Enter <device> <dir> <type> [ex: /dev/sda2 /media/docs ext4]: " DEVICE DIR TYPE
                             mkdir -p /mnt$DIR
                             mount -t $TYPE $DEVICE /mnt$DIR
-                            echo "Successfully mounted"
+                            echo "Successfully added to your Fstab"
                             pause_function
                             ;;
                         "d")
@@ -4040,12 +4040,12 @@ if [[ $1 == --ais ]]; then
             elihw
             done
         fi
-        echo "Review your fstab"
-        pause_function
-        nano /mnt/etc/fstab
         #}}}
         #GENERATE FSTAB
         genfstab -p /mnt >> /mnt/etc/fstab
+        echo "Review your fstab"
+        pause_function
+        nano /mnt/etc/fstab
     #}}}
     #INSTALL BOOTLOADER {{{
         bootloader=("GRUB2" "Syslinux" "Skip")
