@@ -4045,7 +4045,6 @@ if [[ $1 == --ais ]]; then
         if [[ ! -f /mnt/etc/fstab ]]; then
             cp -v /mnt/etc/fstab /mnt/etc/fstab.aui
         else
-            #restore in case of re-run the script
             cp -v /mnt/etc/fstab.aui /mnt/etc/fstab
         fi
         genfstab -p /mnt >> /mnt/etc/fstab
