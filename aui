@@ -4165,6 +4165,13 @@ if [[ $1 == --ais ]]; then
             arch-chroot /mnt
         fi
     #}}}
+    #CONFIGURE MIRRORLIST {{{
+        print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
+        print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific device or partition."
+        echo "Edit your mirrorlist"
+        pause_function
+        nano /mnt/etc/pacman.d/mirrorlist
+    #}}}
     #FINISH {{{
         print_title "INSTALL COMPLETED"
         print_warning "Enter your new root password"
