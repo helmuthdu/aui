@@ -348,8 +348,8 @@ function check_root() {
 #LANGUAGE SELECTOR {{{
 function language_selector(){
     #DETECTS THE SYSTEM LANGUAGE {{{
-    #automatically detects the system language based on your rc.conf
-    LANGUAGE=`cat /etc/rc.conf | sed -n '/LOCALE=/p' | sed '1!d' | sed 's/.*"\(.*\)".*/\1/g' | cut -c1-5`
+    #automatically detects the system language based on your locale
+    LANGUAGE=`locale | sed '1!d' | sed 's/LANG=//' | cut -c1-5`
     #KDE #{{{
     if [[ $LANGUAGE == pt_BR || $LANGUAGE == en_GB || $LANGUAGE == zh_CN ]]; then
         LANGUAGE_KDE=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]'`
