@@ -2280,7 +2280,7 @@ do
     echo " 1) $(menu_item "libreoffice-common" "LibreOffice")"
     echo " 2) $(menu_item "goffice calligra" "$([[ $KDE -eq 1 ]] && echo "Caligra" || echo "Abiword + Gnumeric";)")"
     echo " 3) $(menu_item "texlive-core" "latex")"
-    echo " 4) $(menu_item "kchmviewer chmsee" "$([[ $KDE -eq 1 ]] && echo "Kchmviewer" || echo "Chmsee";)")"
+    echo " 4) $(menu_item "calibre")"
     echo " 5) $(menu_item "gcstar")"
     echo " 6) $(menu_item "homebank")"
     echo " 7) $(menu_item "impressive")"
@@ -2324,11 +2324,7 @@ do
                 fi
                 ;;
             4)
-                if [[ $KDE -eq 1 ]]; then
-                    package_install "kchmviewer"
-                else
-                    package_install "chmsee"
-                fi
+                package_install "calibre"
                 ;;
             5)
                 package_install "gcstar"
@@ -3905,7 +3901,7 @@ function finish(){
 #}}}
 
 if [[ $1 == --ais ]]; then
-#ARCHLINUX SETUP {{{
+#ARCHLINUX INSTALL SCRIPTS GUIDE {{{
     print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
     print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
     print_warning "\tThis option still in beta stage"
@@ -3952,27 +3948,50 @@ if [[ $1 == --ais ]]; then
         partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`);
         PS3="$prompt1"
         echo "Select your root partition:"
-        select ROOT in "${partitions[@]}"; do
-            if contains_element "$ROOT" "${partitions[@]}"; then
-                read_input_text "Are you sure you want format the $ROOT partition"
+        select _root in "${partitions[@]}"; do
+            if contains_element "$_root" "${partitions[@]}"; then
+                read_input_text "Are you sure you want format the $_root partition"
                 if [[ $OPTION == y ]]; then
-                    mkfs.ext4 $ROOT
-                    fsck $ROOT
+                    mkfs.ext4 $_root
+                    fsck $_root
+                    mount $_root /mnt
                     break
                 fi
             else
                 invalid_option
             fi
         done
-        read_input_text "Format partition as SWAP"
+        #remove root partition from array
+        partitions=(${partitions[@]#$_root});
+        read_input_text "Create SWAP"
         if [[ $OPTION == y ]]; then
             echo -e "\nSelect your swap partition:"
-            select SWAP in "${partitions[@]}"; do
-                if contains_element "$SWAP" "${partitions[@]}"; then
-                read_input_text "Are you sure you want format the $SWAP partition"
+            select _swap in "${partitions[@]}"; do
+                if contains_element "$_swap" "${partitions[@]}"; then
+                read_input_text "Are you sure you want format the $_swap partition"
                 if [[ $OPTION == y ]]; then
-                    mkswap $SWAP
-                    swapon $SWAP
+                    mkswap $_swap
+                    swapon $_swap
+                    break
+                fi
+                else
+                    invalid_option
+                fi
+            done
+        fi
+        #remove swap partition from array
+        partitions=(${partitions[@]#$_swap})
+        read_input_text "Create HOME"
+        if [[ $OPTION == y ]]; then
+            echo -e "\nSelect your home partition:"
+            select _home in "${partitions[@]}"; do
+                if contains_element "$_home" "${partitions[@]}"; then
+                read_input_text "Are you sure you want format the $_home partition"
+                if [[ $OPTION == y ]]; then
+                    mkfs.ext4 $_home
+                    fsck $_home
+                    mkdir /mnt/home
+                    mount $_home /mnt/home
                     break
                 fi
                 else
@@ -3981,18 +4000,19 @@ if [[ $1 == --ais ]]; then
             done
         fi
     #}}}
-    #MOUNTING DEVICES {{{
-        print_title "MOUNTING DEVICES"
-        print_info "Mounting the root partition on /mnt. You should also create directories for and mount any other partitions (/mnt/boot, /mnt/home, ..)."
+    #CONFIGURE FSTAB {{{
+        print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
+        print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific device or partition."
         pause_function
-        mount $ROOT /mnt
-        #MOUNTING PARTITIONS {{{
-        read_input_text "Add more partitions"
+        #GENERATE FSTAB
+        genfstab -p /mnt >> /mnt/etc/fstab
+        #CONFIGURING FSTAB {{{
+        read_input_text "Add more partitions to your fstab"
         if [[ $OPTION = y ]]; then
             while [[ 1 ]]
             do
-                print_title "MOUNTING PARTITIONS"
-                echo " 1) \"mount new partition\""
+                print_title "ADDITIONAL PARTITIONS"
+                echo " 1) \"add new partition\""
                 echo ""
                 echo " d) DONE"
                 echo ""
@@ -4000,10 +4020,13 @@ if [[ $1 == --ais ]]; then
                 for OPT in ${OPTIONS[@]}; do
                     case $OPT in
                         1)
-                            read -p "Enter <device> <dir> <type> [ex: /dev/sda2 /media/docs ext4] " DEVICE DIR TYPE
+                            read -p "Enter <device> <dir> <type> [ex: /dev/sda2 /media/docs ext4]: " DEVICE DIR TYPE
                             mkdir -p /mnt$DIR
-                            mount -t $TYPE $DEVICE /mnt$DIR
-                            echo -e '\n'
+                            case $TYPE in
+                               ntfs* | vfat) echo "${DEVICE}   ${DIR}  $TYPE   defaults    0   0" >> /mnt/etc/fstab;;
+                                          *) echo "${DEVICE}   ${DIR}  $TYPE   defaults,noatime    0   2" >> /mnt/etc/fstab;;
+                            esac
+                            echo "Successfully added to your fstab"
                             pause_function
                             ;;
                         "d")
@@ -4017,9 +4040,10 @@ if [[ $1 == --ais ]]; then
             elihw
             done
         fi
+        echo "Review your fstab"
+        pause_function
+        nano /mnt/etc/fstab
         #}}}
-        #CREATE FSTAB
-        genfstab -p /mnt >> /mnt/etc/fstab
     #}}}
     #INSTALL BASE SYSTEM {{{
         print_title "INSTALL BASE SYSTEM"
@@ -4098,7 +4122,8 @@ if [[ $1 == --ais ]]; then
         print_title "https://wiki.archlinux.org/index.php/Internationalization"
         echo -e $command_info
         echo "      UTC:$(print_warning "hwclock --systohc --utc")"
-        echo "Localtime:$(print_warning "hwclock --systohc --localtime")"
+        echo "        OR"
+        echo -e "Localtime:$(print_warning "hwclock --systohc --localtime")"
         arch-chroot /mnt
     #}}}
     #CONFIGURE LOCALE {{{
@@ -4123,7 +4148,7 @@ if [[ $1 == --ais ]]; then
         arch-chroot /mnt
     #}}}
     #CONFIGURE BOOTLOADER {{{
-        BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
+        BOOTLOADER_PARTITION=`echo $_root | sed 's/[0-9]//'`
         if [[ $BOOTLOADER == GRUB2 ]]; then
             chroot /mnt mkdir -p /boot/grub/locale
             chroot /mnt cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
@@ -4140,7 +4165,7 @@ if [[ $1 == --ais ]]; then
             arch-chroot /mnt
         fi
     #}}}
-    #FINISH #{{{
+    #FINISH {{{
         print_title "INSTALL COMPLETED"
         print_warning "Enter your new root password"
         chroot /mnt passwd
@@ -4155,7 +4180,7 @@ if [[ $1 == --ais ]]; then
     #}}}
 #}}}
 elif [[ $1 == --help || $1 == -h ]]; then
-#MINI-HELP {{{
+#HELP {{{
     echo "Usage: "  1>&2
     echo " aui               - install programs and other stuffs"  1>&2
     echo " aui --ais         - install archlinux with aui + aif (archlinux install scripts)"  1>&2
