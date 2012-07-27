@@ -4009,8 +4009,6 @@ if [[ $1 == --ais ]]; then
         print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
         print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific device or partition."
         pause_function
-        #GENERATE FSTAB
-        genfstab -p /mnt >> /mnt/etc/fstab
         #CONFIGURING FSTAB {{{
         read_input_text "Add more partitions to your fstab"
         if [[ $OPTION = y ]]; then
@@ -4027,11 +4025,8 @@ if [[ $1 == --ais ]]; then
                         1)
                             read -p "Enter <device> <dir> <type> [ex: /dev/sda2 /media/docs ext4]: " DEVICE DIR TYPE
                             mkdir -p /mnt$DIR
-                            case $TYPE in
-                               ntfs* | vfat) echo "${DEVICE}   ${DIR}  $TYPE   defaults    0   0" >> /mnt/etc/fstab;;
-                                          *) echo "${DEVICE}   ${DIR}  $TYPE   defaults,noatime    0   2" >> /mnt/etc/fstab;;
-                            esac
-                            echo "Successfully added to your fstab"
+                            mount -t $TYPE $DEVICE /mnt$DIR
+                            echo "Successfully mounted"
                             pause_function
                             ;;
                         "d")
@@ -4049,6 +4044,8 @@ if [[ $1 == --ais ]]; then
         pause_function
         nano /mnt/etc/fstab
         #}}}
+        #GENERATE FSTAB
+        genfstab -p /mnt >> /mnt/etc/fstab
     #}}}
     #INSTALL BOOTLOADER {{{
         bootloader=("GRUB2" "Syslinux" "Skip")
