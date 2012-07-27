@@ -3904,7 +3904,7 @@ if [[ $1 == --ais ]]; then
 #ARCHLINUX INSTALL SCRIPTS GUIDE {{{
     print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
     print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
-    print_warning "\tThis option still in beta stage"
+    print_warning "\tThis option still in beta* stage"
     pause_function
     command_info="\nYou have to manual enter the following commands, then press ${BYellow}ctrl+d${White} or type ${BYellow}exit${White}:"
     #CONFIGURE KEYMAP {{{
