@@ -3979,7 +3979,7 @@ if [[ $1 == --ais ]]; then
                 mkswap $1
                 swapon $1
             else
-                i=$(( i - 1 ));
+                i=$(( i - 1 ))
             fi
         }
         i=0
@@ -4010,9 +4010,9 @@ if [[ $1 == --ais ]]; then
                             ;;
                     esac
                     #remove the selected partition from list
-                    partitions=(${partitions[@]#$DEVICE});
+                    partitions=(${partitions[@]#$DEVICE})
                     #increase i
-                    [[ ${device_name[i]} != other ]] && i=$(( i + 1 ));
+                    [[ ${device_name[i]} != other ]] && i=$(( i + 1 ))
                     break
                 else
                     invalid_option
