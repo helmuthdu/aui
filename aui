@@ -3999,7 +3999,7 @@ if [[ $1 == --ais ]]; then
                         other)
                             read -p "Mountpoint [ex: /home]:" $DIR
                             read -p "Type [ex: ext4]:" $TYPE
-                            read_input_text "Format $1 partition"
+                            read_input_text "Format $PARTITION partition"
                             if [[ $OPTION == y ]]; then
                                 mkdir -p /mnt$DIR
                                 format_partition "$TYPE" "$DEVICE" "/mnt$DIR"
