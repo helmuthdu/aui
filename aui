@@ -3992,6 +3992,7 @@ if [[ $1 == --ais ]]; then
                     case ${device_name[i]} in
                         root)
                             format_partition "ext4" "$DEVICE" "/mnt"
+                            ROOT=$DEVICE
                             ;;
                         swap)
                             format_swap_partition "$DEVICE"
@@ -4140,7 +4141,7 @@ if [[ $1 == --ais ]]; then
         arch-chroot /mnt
     #}}}
     #CONFIGURE BOOTLOADER {{{
-        BOOTLOADER_PARTITION=`echo $_root | sed 's/[0-9]//'`
+        BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
         if [[ $BOOTLOADER == GRUB2 ]]; then
             chroot /mnt mkdir -p /boot/grub/locale
             chroot /mnt cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
