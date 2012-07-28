@@ -3970,7 +3970,7 @@ if [[ $1 == --ais ]]; then
             if [[ $OPTION == y ]]; then
                 mkfs.$1 $2
                 fsck $2
-                mount $2 $3
+                mount -t $1 $2 $3
             fi
         }
         format_swap_partition(){
@@ -4004,7 +4004,8 @@ if [[ $1 == --ais ]]; then
                                 mkdir -p /mnt$DIR
                                 format_partition "$TYPE" "$DEVICE" "/mnt$DIR"
                             else
-                                mount.$TYPE $DEVICE /mnt$DIR
+                                mkdir -p /mnt$DIR
+                                mount -t $TYPE $DEVICE /mnt$DIR
                             fi
                             ;;
                     esac
@@ -4017,7 +4018,7 @@ if [[ $1 == --ais ]]; then
                     invalid_option
                 fi
             done
-            [[ ${device_name[i]} == other ]] && read_input_text "Add more partitions";
+            [[ ${device_name[i]} == other ]] && read_input_text "Add other partitions";
         done
     #}}}
     #INSTALL BASE SYSTEM {{{
