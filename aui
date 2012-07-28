@@ -75,14 +75,14 @@ AUTOMATIC_MODE=0
 AUR=`echo -e "(${BPurple}aur${White})"`
 #}}}
 #SUPPORT FUNCTIONS {{{
-function read_input(){ #{{{
+read_input(){ #{{{
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
         OPTION=$1
     else
         read -p "$prompt1" OPTION
     fi
 } #}}}
-function read_input_text(){ #{{{
+read_input_text(){ #{{{
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
         OPTION=$2
     else
@@ -91,7 +91,7 @@ function read_input_text(){ #{{{
     fi
     OPTION=`echo "$OPTION" | tr '[:upper:]' '[:lower:]'`
 } #}}}
-function read_input_options(){ #{{{
+read_input_options(){ #{{{
     local line
     local packages
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
@@ -111,37 +111,37 @@ function read_input_options(){ #{{{
     done
     OPTIONS=("${packages[@]}")
 } #}}}
-function print_line(){ #{{{
+print_line(){ #{{{
     printf "%$(tput cols)s\n"|tr ' ' '-'
 } #}}}
-function print_title (){ #{{{
+print_title (){ #{{{
     clear
     print_line
     echo -e "# ${BWhite}$1${White}"
     print_line
     echo ""
 } #}}}
-function print_info (){ #{{{
+print_info (){ #{{{
     #Console width number
     T_COLS=`tput cols`
     echo -e "${BWhite}$1${White}\n" | fold -sw $(( $T_COLS - 18 )) | sed 's/^/\t/'
 } #}}}
-function print_warning (){ #{{{
+print_warning (){ #{{{
     #Console width number
     T_COLS=`tput cols`
     echo -e "${BRed}$1${White}\n" | fold -sw $(( $T_COLS - 1 ))
 } #}}}
-function remove_daemon(){ #{{{
+remove_daemon(){ #{{{
     #remove a daemon from DAEMONS line in rc.conf
     sed -i '/DAEMONS[=]/s/ '"$1"'//' /etc/rc.conf
 } #}}}
-function insert_daemon_after(){ #{{{
+insert_daemon_after(){ #{{{
     remove_daemon "$2"
     #Insert into DAEMONS line after a daemon
     sed -i '/DAEMONS[=]/s/'"$1"'/& '"$2"'/' /etc/rc.conf
     start_daemon "$2"
 } #}}}
-function start_daemon(){ #{{{
+start_daemon(){ #{{{
     #remove the @ from the dameon
     DAEMON_LIST=`echo "$1" | sed 's/@//g'`
     #start daemon
@@ -149,29 +149,29 @@ function start_daemon(){ #{{{
         ! ls -1 /var/run/daemons/$DAEMON &> /dev/null && rc.d start $DAEMON;
     done
 } #}}}
-function add_daemon(){ #{{{
+add_daemon(){ #{{{
     remove_daemon "$1"
     #add a daemon into DAEMONS line in rc.conf
     sed -i '/DAEMONS[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
     start_daemon "$1"
 } #}}}
-function remove_module(){ #{{{
+remove_module(){ #{{{
     #remove a module from MODULES line in rc.conf
     sed -i '/MODULES[=]/s/ '"$1"'//' /etc/rc.conf
 } #}}}
-function start_module(){ #{{{
+start_module(){ #{{{
     #modprobe module
     for MODULE in $1; do
         modprobe $MODULE;
     done
 } #}}}
-function add_module(){ #{{{
+add_module(){ #{{{
     remove_module "$1"
     #add a module into MODULES line in rc.conf
     sed -i '/MODULES[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
     start_module "$1"
 } #}}}
-function config_dm(){ #{{{
+config_dm(){ #{{{
     #configure display manager
     sed -i '/'"$1"'/s/^#//' /etc/inittab
     sed -i '/xdm/s/^#//' /etc/inittab
@@ -180,22 +180,22 @@ function config_dm(){ #{{{
     sed -i '/id:3:initdefault/s/^/#/' /etc/inittab
     sed -i '/id:5:initdefault/s/^#//' /etc/inittab
 } #}}}
-function check_package(){ #{{{
+check_package(){ #{{{
     #check if a package is already installed
     for PACKAGE in $1; do
         pacman -Q $PACKAGE &> /dev/null && return 0;
     done
     return 1
 } #}}}
-function checkbox(){ #{{{
+checkbox(){ #{{{
     #display [X] or [ ]
     [[ $1 -eq 1 ]] && echo -e "${BBlue}[${BWhite}X${BBlue}]${White}" || echo -e "${BBlue}[${White} ${BBlue}]${White}";
 } #}}}
-function checkbox_package(){ #{{{
+checkbox_package(){ #{{{
     #check if [X] or [ ]
     check_package "$1" && checkbox 1 || checkbox 0
 } #}}}
-function aur_package_install(){ #{{{
+aur_package_install(){ #{{{
     #install package from aur
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
@@ -216,7 +216,7 @@ function aur_package_install(){ #{{{
         fi
     done
 } #}}}
-function download_package_aur(){ #{{{
+download_package_aur(){ #{{{
     PACKAGE_NAME=`echo "$1" | sed 's/.*\///'`
     PACKAGE_DIR=`echo "$PACKAGE_NAME" | sed 's/.tar.gz//'`
     su -l $USERNAME -c "
@@ -230,7 +230,7 @@ function download_package_aur(){ #{{{
         rm -fr $PACKAGE_DIR
     "
 } #}}}
-function package_install(){ #{{{
+package_install(){ #{{{
     #install packages using pacman
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
         pacman -S --noconfirm --needed $1
@@ -238,7 +238,7 @@ function package_install(){ #{{{
         pacman -S --needed $1
     fi
 } #}}}
-function package_remove(){ #{{{
+package_remove(){ #{{{
     #remove package
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
         pacman -Rcsn --noconfirm $1
@@ -246,11 +246,11 @@ function package_remove(){ #{{{
         pacman -Rcsn $1
     fi
 } #}}}
-function contains_element(){ #{{{
+contains_element(){ #{{{
     #check if an element exist in a string
     for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
 } #}}}
-function create_xinitrc(){ #{{{
+create_xinitrc(){ #{{{
     #create a xinitrc file in home user directory
     echo -e '#!/bin/sh\n
 if [ -d /etc/X11/xinit/xinitrc.d ]; then
@@ -268,18 +268,18 @@ fi\n' > /home/$USERNAME/.xinitrc
 
     chown -R $USERNAME:users /home/$USERNAME/.xinitrc
 } #}}}
-function invalid_option(){ #{{{
+invalid_option(){ #{{{
     print_line
     echo "Invalid option. Try another one."
     pause_function
 } #}}}
-function pause_function(){ #{{{
+pause_function(){ #{{{
     print_line
     if [[ $AUTOMATIC_MODE -ne 1 ]]; then
         read -e -sn 1 -p "Press any key to continue..."
     fi
 } #}}}
-function sumary(){ #{{{
+sumary(){ #{{{
     case $CURRENT_STATUS in
         1)
             print_line
@@ -291,7 +291,7 @@ function sumary(){ #{{{
             ;;
     esac
 } #}}}
-function menu_item(){ #{{{
+menu_item(){ #{{{
     #check if the number of arguments is less then 2
     [[ $# -lt 2 ]] && PACKAGE_NAME="$1" || PACKAGE_NAME="$2";
     #list of chars to remove program a package name
@@ -301,15 +301,15 @@ function menu_item(){ #{{{
     #display checkbox and package name
     echo -e "$(checkbox_package "$1") ${BWhite}$PACKAGE_NAME${White}"
 } #}}}
-function mainmenu_item(){ #{{{
+mainmenu_item(){ #{{{
     echo -e "$(checkbox "$1") ${BWhite}$2${White}"
 } #}}}
-function elihw() { #{{{
+elihw() { #{{{
     [[ $OPT == b || $OPT == d ]] && break;
 } #}}}
 #}}}
 #WELCOME {{{
-function welcome(){
+welcome(){
     clear
     echo -e "${BWhite}Welcome to the Archlinux Ultimate install script by helmuthdu${White}"
     print_line
@@ -336,7 +336,7 @@ function welcome(){
 }
 #}}}
 #CHECK ROOT {{{
-function check_root() {
+check_root() {
     CURRENTUSER="$(whoami)"
     if [[ $CURRENTUSER != root ]]; then
         echo "Current user is NOT 'root'. EXIT now"
@@ -346,7 +346,7 @@ function check_root() {
 }
 #}}}
 #LANGUAGE SELECTOR {{{
-function language_selector(){
+language_selector(){
     #DETECTS THE SYSTEM LANGUAGE {{{
     #automatically detects the system language based on your locale
     LANGUAGE=`locale | sed '1!d' | sed 's/LANG=//' | cut -c1-5`
@@ -438,7 +438,7 @@ function language_selector(){
 }
 #}}}
 #PACKMAN PACKAGE SIGNING {{{
-function configure_pacman_package_signing(){
+configure_pacman_package_signing(){
     if [[ ! -d /etc/pacman.d/gnupg ]]; then
         print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
         print_info "Pacman-key is a new tool available with pacman 4. It allows the user to manage pacman's list of trusted keys in the new package signing implementation."
@@ -460,22 +460,22 @@ function configure_pacman_package_signing(){
 }
 #}}}
 #SYSTEM UPDATE {{{
-function system_upgrade(){
+system_upgrade(){
     print_title "UPDATING YOUR SYSTEM"
     pacman -Syu
 }
 #}}}
 #SELECT/CREATE USER {{{
-function select_user(){
+select_user(){
     #CREATE NEW USER {{{
-    function create_new_user(){
+    create_new_user(){
         read -p "Username: " USERNAME
         useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
         passwd $USERNAME
         configure_user_account
     } #}}}
     #CONFIGURE USER ACCOUNT {{{
-    function configure_user_account(){
+    configure_user_account(){
         cp /etc/skel/.* /home/$USERNAME/
         print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
         package_install "git"
@@ -569,7 +569,7 @@ function select_user(){
 }
 #}}}
 #CONFIGURE SUDO {{{
-function configure_sudo(){
+configure_sudo(){
     if ! check_package "sudo" ; then
         print_title "SUDO - https://wiki.archlinux.org/index.php/Sudo"
         package_install "sudo"
@@ -581,7 +581,7 @@ function configure_sudo(){
 }
 #}}}
 #AUR HELPER {{{
-function choose_aurhelper(){
+choose_aurhelper(){
     print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
     print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
     print_warning "\tNone of these tools are officially supported by Arch devs."
@@ -644,7 +644,7 @@ function choose_aurhelper(){
 }
 #}}}
 #CUSTOM REPOSITORIES {{{
-function add_custom_repositories(){
+add_custom_repositories(){
     # ENABLE MULTILIB REPOSITORY {{{
     # this option will avoid any problem with packages install
     if [[ $ARCHI == x86_64 ]]; then
@@ -706,7 +706,7 @@ function add_custom_repositories(){
 }
 #}}}
 #REFLECTOR {{{
-function install_reflector(){
+install_reflector(){
     print_title "REFLECTOR - https://wiki.archlinux.org/index.php/Reflector"
     print_info "Reflector is a script which can retrieve the latest mirror list from the MirrorStatus page, filter the most up-to-date mirrors, sort them by speed and overwrite the file /etc/pacman.d/mirrorlist."
     read_input_text "Install and configure reflector" $REFLECTOR
@@ -726,7 +726,7 @@ function install_reflector(){
 }
 #}}}
 #AUTOMATIC MODE {{{
-function automatic_mode(){
+automatic_mode(){
     print_title "AUTOMATIC MODE"
     print_info "Create a custom install with all options pre-selected.\nUse this option with care."
     print_warning "\tUse this mode only if you already know all the option.\n\tYou won't be able to select anything later."
@@ -746,7 +746,7 @@ function automatic_mode(){
 }
 #}}}
 #BASIC SETUP {{{
-function install_basic_setup(){
+install_basic_setup(){
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
     package_install "bc rsync mlocate bash-completion wifi-select npd"
     insert_daemon_after "crond" "@ntpd"
@@ -816,7 +816,7 @@ function install_basic_setup(){
 }
 #}}}
 #NFS {{{
-function install_nfs(){
+install_nfs(){
     print_title "NFS - https://wiki.archlinux.org/index.php/Nfs"
     print_info "NFS allowing a user on a client computer to access files over a network in a manner similar to how local storage is accessed."
     read_input_text "Install nfs" $NFS
@@ -835,7 +835,7 @@ function install_nfs(){
 }
 #}}}
 #SAMBA {{{
-function install_samba(){
+install_samba(){
     print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
     print_info "Samba is a re-implementation of the SMB/CIFS networking protocol, it facilitates file and printer sharing among Linux and Windows systems as an alternative to NFS."
     read_input_text "Install Samba" $SAMBA
@@ -855,7 +855,7 @@ function install_samba(){
 }
 #}}}
 #PRELOAD {{{
-function install_preload(){
+install_preload(){
     print_title "PRELOAD - https://wiki.archlinux.org/index.php/Preload"
     print_info "Preload is a program which runs as a daemon and records statistics about usage of programs using Markov chains; files of more frequently-used programs are, during a computer's spare time, loaded into memory. This results in faster startup times as less data needs to be fetched from disk. preload is often paired with prelink."
     read_input_text "Install Preload" $PRELOAD
@@ -874,7 +874,7 @@ function install_preload(){
 }
 #}}}
 #LAPTOP MODE TOOLS {{{
-function install_lmt(){
+install_lmt(){
     print_title "LAPTOP MODE TOOLS- https://wiki.archlinux.org/index.php/Laptop_Mode_Tools"
     print_info "Laptop Mode Tools is a laptop power saving package for Linux systems. It is the primary way to enable the Laptop Mode feature of the Linux kernel, which lets your hard drive spin down. In addition, it allows you to tweak a number of other power-related settings using a simple configuration file."
     read_input_text "Install Laptop Mode Tools" $LMT
@@ -893,7 +893,7 @@ function install_lmt(){
 }
 #}}}
 #XORG {{{
-function install_xorg(){
+install_xorg(){
     print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
     print_info "Xorg is the public, open-source implementation of the X window system version 11."
     echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
@@ -948,7 +948,7 @@ function install_xorg(){
 }
 #}}}
 #VIDEO CARDS {{{
-function install_video_cards(){
+install_video_cards(){
     print_title "VIDEO CARD"
     echo "Select your GPU:"
     echo " 1) Intel"
@@ -1007,7 +1007,7 @@ function install_video_cards(){
 }
 #}}}
 #CUPS {{{
-function install_cups(){
+install_cups(){
     print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
     print_info "CUPS is the standards-based, open source printing system developed by Apple Inc. for Mac OS® X and other UNIX®-like operating systems."
     read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
@@ -1027,7 +1027,7 @@ function install_cups(){
 }
 #}}}
 #ADDITIONAL FIRMWARE {{{
-function install_additional_firmwares(){
+install_additional_firmwares(){
     print_title "INSTALL ADDITIONAL FIRMWARES"
     read_input_text "Install additional firmwares [Audio,Bluetooth,Scanner,Wireless]" $FIRMWARE
     case "$OPTION" in
@@ -1109,7 +1109,7 @@ function install_additional_firmwares(){
 }
 #}}}
 #GIT ACCESS THRU A FIREWALL {{{
-function install_git_tor(){
+install_git_tor(){
     print_title "GIT-TOR - https://wiki.archlinux.org/index.php/Tor"
     print_info "Tor is an open source implementation of 2nd generation onion routing that provides free access to an anonymous proxy network. Its primary goal is to enable online anonymity by protecting against traffic analysis attacks."
     read_input_text "Ensuring access to GIT through a firewall (bypass college/work firewall)" $GITTOR
@@ -1139,8 +1139,8 @@ function install_git_tor(){
 }
 #}}}
 #DESKTOP ENVIRONMENT {{{
-function install_desktop_environment(){
-    function install_icons() { #{{{
+install_desktop_environment(){
+    install_icons() { #{{{
         while [[ 1 ]]
         do
             print_title "GNOME ICONS"
@@ -1182,7 +1182,7 @@ function install_desktop_environment(){
         elihw
         done
     } #}}}
-    function install_gtk_themes() { #{{{
+    install_gtk_themes() { #{{{
         while [[ 1 ]]
         do
             print_title "GTK2/GTK3 THEMES"
@@ -1240,7 +1240,7 @@ function install_desktop_environment(){
             elihw
         done
     } #}}}
-    function install_display_manager() { #{{{
+    install_display_manager() { #{{{
         while [[ 1 ]]
         do
             print_title "DISPLAY MANAGER - https://wiki.archlinux.org/index.php/Display_Manager"
@@ -1968,7 +1968,7 @@ function install_desktop_environment(){
 }
 #}}}
 #NETWORKMANAGER/WICD {{{
-function install_nm_wicd(){
+install_nm_wicd(){
     print_title "NETWORK CONNECTION MANAGER"
     echo " 1) Networkmanager"
     echo " 2) Wicd"
@@ -2024,7 +2024,7 @@ function install_nm_wicd(){
 }
 #}}}
 #ACCESSORIES {{{
-function install_accessories_apps(){
+install_accessories_apps(){
 while [[ 1 ]]
 do
     print_title "ACCESSORIES APPS"
@@ -2110,7 +2110,7 @@ done
 }
 #}}}
 #DEVELOPEMENT {{{
-function install_development_apps(){
+install_development_apps(){
 while [[ 1 ]]
 do
     print_title "DEVELOPMENT APPS"
@@ -2273,7 +2273,7 @@ done
 }
 #}}}
 #OFFICE {{{
-function install_office_apps(){
+install_office_apps(){
 while [[ 1 ]]
 do
     print_title "OFFICE APPS"
@@ -2361,7 +2361,7 @@ done
 }
 #}}}
 #SYSTEM TOOLS {{{
-function install_system_apps(){
+install_system_apps(){
 while [[ 1 ]]
 do
     print_title "SYSTEM TOOLS APPS"
@@ -2413,7 +2413,7 @@ done
 }
 #}}}
 #GRAPHICS {{{
-function install_graphics_apps(){
+install_graphics_apps(){
 while [[ 1 ]]
 do
     print_title "GRAPHICS APPS"
@@ -2478,7 +2478,7 @@ done
 }
 #}}}
 #INTERNET {{{
-function install_internet_apps(){
+install_internet_apps(){
 while [[ 1 ]]
 do
     print_title "INTERNET APPS"
@@ -2810,7 +2810,7 @@ done
 }
 #}}}
 #LAMP {{{
-function install_lamp(){
+install_lamp(){
 print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlinux.org/index.php/LAMP"
 read_input_text "Install LAMP" $LAMP
 case "$OPTION" in
@@ -2855,7 +2855,7 @@ pause_function
 }
 #}}}
 #AUDIO {{{
-function install_audio_apps(){
+install_audio_apps(){
 while [[ 1 ]]
 do
     print_title "AUDIO APPS "
@@ -2952,7 +2952,7 @@ done
 }
 #}}}
 #VIDEO {{{
-function install_video_apps(){
+install_video_apps(){
 while [[ 1 ]]
 do
     print_title "VIDEO APPS"
@@ -3049,7 +3049,7 @@ done
 }
 #}}}
 #GAMES {{{
-function install_games(){
+install_games(){
 while [[ 1 ]]
 do
     print_title "GAMES - https://wiki.archlinux.org/index.php/Games"
@@ -3617,7 +3617,7 @@ done
 }
 #}}}
 #FONTS {{{
-function install_fonts(){
+install_fonts(){
 while [[ 1 ]]
 do
     print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
@@ -3683,7 +3683,7 @@ done
 }
 #}}}
 #FONTS CONFIGURATION {{{
-function configure_fonts(){
+configure_fonts(){
     print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
     echo " 1) Ubuntu patched packages"
     echo " 2) Cleartype patched packages"
@@ -3724,7 +3724,7 @@ function configure_fonts(){
 }
 #}}}
 #CLEAN ORPHAN PACKAGES {{{
-    function clean_orphan_packages(){
+    clean_orphan_packages(){
     print_title "CLEAN ORPHAN PACKAGES"
     pacman -Rsc --noconfirm $(pacman -Qqdt)
     #pacman -Sc --noconfirm
@@ -3732,7 +3732,7 @@ function configure_fonts(){
 }
 #}}}
 #EXTRA {{{
-function install_extra(){
+install_extra(){
 while [[ 1 ]]
 do
     print_title "EXTRA"
@@ -3867,7 +3867,7 @@ done
 }
 #}}}
 #FINISH {{{
-function finish(){
+finish(){
     print_title "WARNING: PACKAGES INSTALLED FROM AUR"
     print_warning "List of packages not officially supported that may kill your cat:"
     pause_function
@@ -3908,10 +3908,31 @@ if [[ $1 == --ais ]]; then
     pause_function
     command_info="\nYou have to manual enter the following commands, then press ${BYellow}ctrl+d${White} or type ${BYellow}exit${White}:"
     #CONFIGURE KEYMAP {{{
+        setkeymap(){
+        local keymaps=(`ls /usr/share/kbd/keymaps/i386/qwerty | sed 's/.map.gz//g'`)
+            PS3="$prompt1"
+            echo "Select keymap:"
+            select KEYMAP in "${keymaps[@]}" "None"; do
+                if contains_element "$KEYMAP" "${keymaps[@]}"; then
+                    loadkeys $KEYMAP
+                    break
+                if [[ $KEYMAP == None ]]; then
+                    read -p "Type your Keyboard Layout [ex: us-acentos]: " KEYMAP
+                    loadkeys $KEYMAP
+                    break
+                fi
+                else
+                    invalid_option
+                fi
+            done
+        }
         print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
         print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
-        read -p "Keyboard Layout [ex: us-acentos]: " KEYMAP
-        loadkeys $KEYMAP
+        OPTION=n
+        while [[ $OPTION != y ]]; do
+            setkeymap
+            read_input_text "Confirm keymap ($KEYMAP)"
+        done
     #}}}
     #CONFIGURE NETWORK {{{
         print_title "CONFIGURING NETWORK - https://wiki.archlinux.org/index.php/Configuring_network"
@@ -4087,7 +4108,7 @@ if [[ $1 == --ais ]]; then
         echo "FONT_MAP=\"\"" >> /mnt/etc/vconsole.conf
     #}}}
     #CONFIGURE TIMEZONE {{{
-        function settimezone(){
+        settimezone(){
             [[ -f /mnt/etc/localtime ]] && rm /mnt/etc/localtime;
             local zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europa" "Indian" "Mexico" "Midest" "Pacific" "US");
             PS3="$prompt1"
