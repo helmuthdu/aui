@@ -3991,7 +3991,7 @@ if [[ $1 == --ais ]]; then
                 if contains_element "$DEVICE" "${partitions[@]}"; then
                     case ${device_name[i]} in
                         root)
-                            format_partition "$DEVICE" "/" "ext4"
+                            format_partition "ext4" "$DEVICE" "/"
                             ;;
                         swap)
                             format_swap_partition "$DEVICE"
