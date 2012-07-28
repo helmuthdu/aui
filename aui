@@ -3991,7 +3991,7 @@ if [[ $1 == --ais ]]; then
                 if contains_element "$DEVICE" "${partitions[@]}"; then
                     case ${device_name[i]} in
                         root)
-                            format_partition "ext4" "$DEVICE" "/"
+                            format_partition "ext4" "$DEVICE" "/mnt"
                             ;;
                         swap)
                             format_swap_partition "$DEVICE"
@@ -4001,9 +4001,10 @@ if [[ $1 == --ais ]]; then
                             read -p "Type [ex: ext4]:" $TYPE
                             read_input_text "Format $1 partition"
                             if [[ $OPTION == y ]]; then
-                                format_partition "$TYPE" "$DEVICE" "$DIR"
+                                mkdir -p /mnt$DIR
+                                format_partition "$TYPE" "$DEVICE" "/mnt$DIR"
                             else
-                                mount.$TYPE $DEVICE $DIR
+                                mount.$TYPE $DEVICE /mnt$DIR
                             fi
                             ;;
                     esac
