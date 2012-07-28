@@ -3978,8 +3978,6 @@ if [[ $1 == --ais ]]; then
             if [[ $OPTION == y ]]; then
                 mkswap $1
                 swapon $1
-            else
-                i=$(( i - 1 ))
             fi
         }
         i=0
