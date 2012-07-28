@@ -4019,7 +4019,12 @@ if [[ $1 == --ais ]]; then
                     invalid_option
                 fi
             done
-            [[ ${device_name[i]} == other ]] && read_input_text "Add other partitions";
+
+            if [[ ${#partitions[*]} == 0 ]]; then
+                OPTION=n
+            elif [[ ${device_name[i]} == other ]]; then
+                read_input_text "Add other partitions"
+            fi
         done
     #}}}
     #INSTALL BASE SYSTEM {{{
