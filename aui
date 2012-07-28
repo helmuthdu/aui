@@ -114,19 +114,19 @@ read_input_options(){ #{{{
 print_line(){ #{{{
     printf "%$(tput cols)s\n"|tr ' ' '-'
 } #}}}
-print_title (){ #{{{
+print_title(){ #{{{
     clear
     print_line
     echo -e "# ${BWhite}$1${White}"
     print_line
     echo ""
 } #}}}
-print_info (){ #{{{
+print_info(){ #{{{
     #Console width number
     T_COLS=`tput cols`
     echo -e "${BWhite}$1${White}\n" | fold -sw $(( $T_COLS - 18 )) | sed 's/^/\t/'
 } #}}}
-print_warning (){ #{{{
+print_warning(){ #{{{
     #Console width number
     T_COLS=`tput cols`
     echo -e "${BRed}$1${White}\n" | fold -sw $(( $T_COLS - 1 ))
@@ -3912,11 +3912,11 @@ if [[ $1 == --ais ]]; then
         local keymaps=(`ls /usr/share/kbd/keymaps/i386/qwerty | sed 's/.map.gz//g'`)
             PS3="$prompt1"
             echo "Select keymap:"
-            select KEYMAP in "${keymaps[@]}" "None"; do
+            select KEYMAP in "${keymaps[@]}" "none"; do
                 if contains_element "$KEYMAP" "${keymaps[@]}"; then
                     loadkeys $KEYMAP
                     break
-                elif [[ $KEYMAP == None ]]; then
+                elif [[ $KEYMAP == none ]]; then
                     read -p "Type your Keyboard Layout [ex: us-acentos]: " KEYMAP
                     loadkeys $KEYMAP
                     break
@@ -3965,60 +3965,59 @@ if [[ $1 == --ais ]]; then
         print_title "https://wiki.archlinux.org/index.php/Format_a_device"
         print_info "This step will select and format the selected partiton where the archlinux will be installed"
         print_warning "\tAll data on the specified partition will be LOST."
-        partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`);
-        PS3="$prompt1"
-        echo "Select your root partition:"
-        select _root in "${partitions[@]}"; do
-            if contains_element "$_root" "${partitions[@]}"; then
-                read_input_text "Are you sure you want format the $_root partition"
-                if [[ $OPTION == y ]]; then
-                    mkfs.ext4 $_root
-                    fsck $_root
-                    mount $_root /mnt
-                    break
-                fi
-            else
-                invalid_option
+        format_partition(){
+            read_input_text "Confirm format ${BYellow}$1${White} partition"
+            if [[ $OPTION == y ]]; then
+                mkfs.$1 $2
+                fsck $2
+                mount $2 $3
             fi
+        }
+        format_swap_partition(){
+            read_input_text "Confirm format ${BYellow}$1${White} partition"
+            if [[ $OPTION == y ]]; then
+                mkswap $1
+                swapon $1
+            fi
+        }
+        i=0
+        partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
+        device_name=("root" "swap" "other")
+        OPTION=y
+        while [[ $OPTION == y ]]; do
+            PS3="$prompt1"
+            echo "Select ${BWhite}${device_name[i]}${White} partition:"
+            select DEVICE in "${partitions[@]}"; do
+                if contains_element "$DEVICE" "${partitions[@]}"; then
+                    case ${device_name[i]} in
+                        root)
+                            format_partition "$DEVICE" "/" "ext4"
+                            ;;
+                        swap)
+                            format_swap_partition "$DEVICE"
+                            ;;
+                        other)
+                            read -p "Mountpoint [ex: /home]:" $DIR
+                            read -p "Type [ex: ext4]:" $TYPE
+                            read_input_text "Format ${BYellow}$1${White} partition"
+                            if [[ $OPTION == y ]]; then
+                                format_partition "$TYPE" "$DEVICE" "$DIR"
+                            else
+                                mount.$TYPE $DEVICE $DIR
+                            fi
+                            ;;
+                    esac
+                    #remove the selected partition from list
+                    partitions=(${partitions[@]#$DEVICE});
+                    #increase i
+                    [[ ${device_name[i]} != other ]] && i=$(( i + 1 ));
+                    break
+                else
+                    invalid_option
+                fi
+            done
+            [[ ${device_name[i]} == other ]] && read_input_text "Add more partitions";
         done
-        #remove root partition from array
-        partitions=(${partitions[@]#$_root});
-        read_input_text "Create HOME"
-        if [[ $OPTION == y ]]; then
-            echo -e "\nSelect your home partition:"
-            select _home in "${partitions[@]}"; do
-                if contains_element "$_home" "${partitions[@]}"; then
-                read_input_text "Are you sure you want format the $_home partition"
-                if [[ $OPTION == y ]]; then
-                    mkfs.ext4 $_home
-                    fsck $_home
-                    mkdir /mnt/home
-                    mount $_home /mnt/home
-                    break
-                fi
-                else
-                    invalid_option
-                fi
-            done
-        fi
-        #remove swap partition from array
-        partitions=(${partitions[@]#$_home});
-        read_input_text "Create SWAP"
-        if [[ $OPTION == y ]]; then
-            echo -e "\nSelect your swap partition:"
-            select _swap in "${partitions[@]}"; do
-                if contains_element "$_swap" "${partitions[@]}"; then
-                read_input_text "Are you sure you want format the $_swap partition"
-                if [[ $OPTION == y ]]; then
-                    mkswap $_swap
-                    swapon $_swap
-                    break
-                fi
-                else
-                    invalid_option
-                fi
-            done
-        fi
     #}}}
     #INSTALL BASE SYSTEM {{{
         print_title "INSTALL BASE SYSTEM"
@@ -4029,37 +4028,6 @@ if [[ $1 == --ais ]]; then
         print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
         print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific device or partition."
         pause_function
-        #ADD PARTITIONS {{{
-        read_input_text "Add more partitions to your fstab"
-        if [[ $OPTION = y ]]; then
-            while [[ 1 ]]
-            do
-                print_title "ADDITIONAL PARTITIONS"
-                echo " 1) \"add new partition\""
-                echo ""
-                echo " d) DONE"
-                echo ""
-                read_input_options
-                for OPT in ${OPTIONS[@]}; do
-                    case $OPT in
-                        1)r
-                            read -p "Enter <device> <dir> <type> [ex: /dev/sda2 /media/docs ext4]: " DEVICE DIR TYPE
-                            mkdir -p /mnt$DIR
-                            mount -t $TYPE $DEVICE /mnt$DIR
-                            pause_function
-                            ;;
-                        "d")
-                            break
-                            ;;
-                        *)
-                            invalid_option
-                            ;;
-                    esac
-                done
-            elihw
-            done
-        fi
-        #}}}
         #CONFIGURE FSTAB {{{
         if [[ ! -f /mnt/etc/fstab ]]; then
             cp /mnt/etc/fstab /mnt/etc/fstab.aui
