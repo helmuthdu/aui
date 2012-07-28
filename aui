@@ -86,7 +86,7 @@ read_input_text(){ #{{{
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
         OPTION=$2
     else
-        read -pe "$1 [y/N]: " OPTION
+        read -p "$1 [y/N]: " OPTION
         echo ""
     fi
     OPTION=`echo "$OPTION" | tr '[:upper:]' '[:lower:]'`
