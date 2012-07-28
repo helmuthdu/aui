@@ -3916,11 +3916,10 @@ if [[ $1 == --ais ]]; then
                 if contains_element "$KEYMAP" "${keymaps[@]}"; then
                     loadkeys $KEYMAP
                     break
-                if [[ $KEYMAP == None ]]; then
+                elif [[ $KEYMAP == None ]]; then
                     read -p "Type your Keyboard Layout [ex: us-acentos]: " KEYMAP
                     loadkeys $KEYMAP
                     break
-                fi
                 else
                     invalid_option
                 fi
