@@ -86,7 +86,7 @@ read_input_text(){ #{{{
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
         OPTION=$2
     else
-        read -p "$1 [y/N]: " OPTION
+        read -pe "$1 [y/N]: " OPTION
         echo ""
     fi
     OPTION=`echo "$OPTION" | tr '[:upper:]' '[:lower:]'`
@@ -3986,7 +3986,7 @@ if [[ $1 == --ais ]]; then
         OPTION=y
         while [[ $OPTION == y ]]; do
             PS3="$prompt1"
-            echo "Select ${BWhite}${device_name[i]}${White} partition:"
+            echo -e "Select ${BWhite}${device_name[i]}${White} partition:"
             select DEVICE in "${partitions[@]}"; do
                 if contains_element "$DEVICE" "${partitions[@]}"; then
                     case ${device_name[i]} in
