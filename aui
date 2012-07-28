@@ -3966,7 +3966,7 @@ if [[ $1 == --ais ]]; then
         print_info "This step will select and format the selected partiton where the archlinux will be installed"
         print_warning "\tAll data on the specified partition will be LOST."
         format_partition(){
-            read_input_text "Confirm format ${BYellow}$1${White} partition"
+            read_input_text "Confirm format $1 partition"
             if [[ $OPTION == y ]]; then
                 mkfs.$1 $2
                 fsck $2
@@ -3974,7 +3974,7 @@ if [[ $1 == --ais ]]; then
             fi
         }
         format_swap_partition(){
-            read_input_text "Confirm format ${BYellow}$1${White} partition"
+            read_input_text "Confirm format $1 partition"
             if [[ $OPTION == y ]]; then
                 mkswap $1
                 swapon $1
