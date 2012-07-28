@@ -4037,7 +4037,7 @@ if [[ $1 == --ais ]]; then
         print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific device or partition."
         pause_function
         #CONFIGURE FSTAB {{{
-        if [[ ! -f /mnt/etc/fstab ]]; then
+        if [[ ! -f /mnt/etc/fstab.aui ]]; then
             cp /mnt/etc/fstab /mnt/etc/fstab.aui
         else
             cp /mnt/etc/fstab.aui /mnt/etc/fstab
