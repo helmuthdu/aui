@@ -3986,7 +3986,7 @@ if [[ $1 == --ais ]]; then
         OPTION=y
         while [[ $OPTION == y ]]; do
             PS3="$prompt1"
-            echo -e "Select ${BGreen}${device_name[i]}${White} partition:\n"
+            echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
             select DEVICE in "${partitions[@]}"; do
                 if contains_element "$DEVICE" "${partitions[@]}"; then
                     case ${device_name[i]} in
