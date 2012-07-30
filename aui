@@ -3936,9 +3936,6 @@ if [[ $1 == --ais ]]; then
             setkeymap
             read_input_text "Confirm keymap ($KEYMAP)"
         done
-        echo "KEYMAP=$KEYMAP" > /mnt/etc/vconsole.conf
-        echo "FONT=\"\"" >> /mnt/etc/vconsole.conf
-        echo "FONT_MAP=\"\"" >> /mnt/etc/vconsole.conf
     }
     #}}}
     #CONFIGURE NETWORK {{{
@@ -4046,6 +4043,10 @@ if [[ $1 == --ais ]]; then
         print_title "INSTALL BASE SYSTEM"
         print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
         pacstrap /mnt base base-devel
+        #add keymap to the new setup
+        echo "KEYMAP=$KEYMAP" > /mnt/etc/vconsole.conf
+        echo "FONT=\"\"" >> /mnt/etc/vconsole.conf
+        echo "FONT_MAP=\"\"" >> /mnt/etc/vconsole.conf
     }
     #}}}
     #CONFIGURE FSTAB {{{
