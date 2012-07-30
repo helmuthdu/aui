@@ -4070,8 +4070,13 @@ if [[ $1 == --ais ]]; then
         print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
         read -p "Hostname [ex: archlinux]: " HN
         echo "$HN" > /mnt/etc/hostname
-        chroot /mnt sed -i '/127.0.0.1/s/.$/t '$HN'/' /etc/hosts
-        chroot /mnt sed -i '/::1/s/.$/t '$HN'/' /etc/hosts
+        if [[ ! -f /mnt/etc/hosts.aui ]]; then
+            cp /mnt/etc/hosts /mnt/etc/hosts.aui
+        else
+            cp /mnt/etc/hosts.aui /mnt/etc/hosts
+        fi
+        chroot /mnt sed -i '/127.0.0.1/s/$/ '$HN'/' /etc/hosts
+        chroot /mnt sed -i '/::1/s/$/ '$HN'/' /etc/hosts
     }
     #}}}
     #CONFIGURE TIMEZONE {{{
