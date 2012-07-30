@@ -3914,7 +3914,7 @@ if [[ $1 == --ais ]]; then
     configure_keymap(){
         setkeymap(){
         local keymaps=(`ls /usr/share/kbd/keymaps/i386/qwerty | sed 's/.map.gz//g'`)
-        PS3="$prompt1 (you can use shift+pgup/pgdown)"
+        PS3="(shift+pgup/pgdown) $prompt1"
             echo "Select keymap:"
             select KEYMAP in "${keymaps[@]}" "more"; do
                 if contains_element "$KEYMAP" "${keymaps[@]}"; then
