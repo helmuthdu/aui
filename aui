@@ -748,7 +748,7 @@ automatic_mode(){
 #BASIC SETUP {{{
 install_basic_setup(){
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-    package_install "bc rsync mlocate bash-completion wifi-select npd"
+    package_install "bc rsync mlocate bash-completion systemd wireless_tools npd"
     insert_daemon_after "crond" "@ntpd"
     print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
     package_install "zip unzip unrar p7zip atool"
@@ -965,7 +965,7 @@ install_video_cards(){
         1)
             package_install "libgl xf86-video-intel"
             CURRENT_STATUS=1
-            sumary "Intel SNA GPU driver installation"
+            sumary "Intel GPU driver installation"
             ;;
         2)
             package_install "libgl xf86-video-ati"
@@ -4043,7 +4043,6 @@ if [[ $1 == --ais ]]; then
         print_title "INSTALL BASE SYSTEM"
         print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
         pacstrap /mnt base base-devel
-        chroot /mnt sed -i 's/interface=.*$/interface=eth0/' /etc/rc.conf
     }
     #}}}
     #CONFIGURE FSTAB {{{
@@ -4107,11 +4106,11 @@ if [[ $1 == --ais ]]; then
     #}}}
     #CONFIGURE HARDWARECLOCK {{{
     configure_hardwareclock(){
-        print_title "https://wiki.archlinux.org/index.php/Internationalization"
+        print_title "HARDWARE CLOCK TIME - https://wiki.archlinux.org/index.php/Internationalization"
+        print_info "This is set in /etc/adjtime. Set the hardware clock mode uniformly between your operating systems on the same machine. Otherwise, they will overwrite the time and cause clock shifts (which can cause time drift correction to be miscalibrated)."
         echo -e $command_info
-        echo -e "      UTC:$(print_warning "hwclock --systohc --utc")"
-        echo -e "    ${BYellow}OR${White}"
-        echo -e "Localtime:$(print_warning "hwclock --systohc --localtime")\n"
+        echo -e "You can replace ${BYellow}--utc${White} for ${BYellow}--localtime${White} (localtime (discouraged) - Used by default in Windows)."
+        print_warning "hwclock --systohc --utc"
         arch-chroot /mnt
     }
     #}}}
