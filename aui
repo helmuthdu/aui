@@ -3901,7 +3901,7 @@ finish(){
 #}}}
 
 if [[ $1 == --ais ]]; then
-#ARCHLINUX INSTALL SCRIPTS GUIDE {{{
+#ARCHLINUX INSTALL SCRIPTS MODE {{{
     print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
     print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
     print_warning "\tThis option still in beta* stage"
@@ -4062,10 +4062,12 @@ if [[ $1 == --ais ]]; then
     #}}}
     #CONFIGURE HOSTNAME {{{
     configure_hostname(){
-        read -p "Hostname [ex: archlinux]: " HNAME
-        echo "$HNAME" > /mnt/etc/hostname
-        chroot /mnt sed -i '/127.0.0.1/s/.$/ '$HNAME'/' /etc/hosts
-        chroot /mnt sed -i '/::1/s/.$/ '$HNAME'/' /etc/hosts
+        print_title "HOSTNAME"
+        print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
+        read -p "Hostname [ex: archlinux]: " HN
+        echo "$HN" > /mnt/etc/hostname
+        chroot /mnt sed -i '/127.0.0.1/s/.$/ '$HN'/' /etc/hosts
+        chroot /mnt sed -i '/::1/s/.$/ '$HN'/' /etc/hosts
     }
     #}}}
     #CONFIGURE TIMEZONE {{{
