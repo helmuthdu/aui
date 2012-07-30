@@ -748,8 +748,11 @@ automatic_mode(){
 #BASIC SETUP {{{
 install_basic_setup(){
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-    package_install "bc rsync mlocate bash-completion systemd wireless_tools npd"
+    package_install "bc rsync mlocate bash-completion npd"
     insert_daemon_after "crond" "@ntpd"
+    print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
+    print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
+    package_install "systemd "
     print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
     package_install "zip unzip unrar p7zip atool"
     aur_package_install "rar"
@@ -4111,7 +4114,7 @@ if [[ $1 == --ais ]]; then
         print_title "HARDWARE CLOCK TIME - https://wiki.archlinux.org/index.php/Internationalization"
         print_info "This is set in /etc/adjtime. Set the hardware clock mode uniformly between your operating systems on the same machine. Otherwise, they will overwrite the time and cause clock shifts (which can cause time drift correction to be miscalibrated)."
         echo -e $command_info
-        echo -e "You can replace ${BYellow}--utc${White} for ${BYellow}--localtime${White} (localtime (discouraged) - Used by default in Windows)."
+        echo -e "You can replace ${BYellow}--utc${White} for ${BYellow}--localtime${White} (discouraged)."
         print_warning "hwclock --systohc --utc"
         arch-chroot /mnt
     }
@@ -4140,7 +4143,7 @@ if [[ $1 == --ais ]]; then
     #}}}
     #INSTALL BOOTLOADER {{{
     install_bootloader(){
-        bootloader=("GRUB2" "Syslinux" "Skip")
+        bootloader=("Grub2" "Syslinux" "Skip")
         PS3="$prompt1"
         echo -e "Install bootloader:\n"
         select BOOTLOADER in "${bootloader[@]}"; do
@@ -4166,7 +4169,7 @@ if [[ $1 == --ais ]]; then
     #CONFIGURE BOOTLOADER {{{
     configure_bootloader(){
         BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
-        if [[ $BOOTLOADER == GRUB2 ]]; then
+        if [[ $BOOTLOADER == Grub2 ]]; then
             chroot /mnt mkdir -p /boot/grub/locale
             chroot /mnt cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
             print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
