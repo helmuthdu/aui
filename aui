@@ -3908,15 +3908,16 @@ if [[ $1 == --ais ]]; then
     pause_function
     command_info="\nYou have to manual enter the following commands, then press ${BYellow}ctrl+d${White} or type ${BYellow}exit${White}:"
     #CONFIGURE KEYMAP {{{
+    configure_keymap(){
         setkeymap(){
         local keymaps=(`ls /usr/share/kbd/keymaps/i386/qwerty | sed 's/.map.gz//g'`)
             PS3="$prompt1"
             echo "Select keymap:"
-            select KEYMAP in "${keymaps[@]}" "none"; do
+            select KEYMAP in "${keymaps[@]}" "more"; do
                 if contains_element "$KEYMAP" "${keymaps[@]}"; then
                     loadkeys $KEYMAP
                     break
-                elif [[ $KEYMAP == none ]]; then
+                elif [[ $KEYMAP == more ]]; then
                     read -p "Type your Keyboard Layout [ex: us-acentos]: " KEYMAP
                     loadkeys $KEYMAP
                     break
@@ -3932,8 +3933,13 @@ if [[ $1 == --ais ]]; then
             setkeymap
             read_input_text "Confirm keymap ($KEYMAP)"
         done
+        echo "KEYMAP=$KEYMAP" > /mnt/etc/vconsole.conf
+        echo "FONT=\"\"" >> /mnt/etc/vconsole.conf
+        echo "FONT_MAP=\"\"" >> /mnt/etc/vconsole.conf
+    }
     #}}}
     #CONFIGURE NETWORK {{{
+    configure_network(){
         print_title "CONFIGURING NETWORK - https://wiki.archlinux.org/index.php/Configuring_network"
         connection_type=("Wired Connection (eth0)" "Wireless Connection (wlan0)")
         PS3="$prompt1"
@@ -3954,14 +3960,18 @@ if [[ $1 == --ais ]]; then
                     ;;
             esac
         done
+    }
     #}}}
     #CREATE PARTITION {{{
+    create_partition(){
         print_title "https://wiki.archlinux.org/index.php/Partitioning"
         print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
         pause_function
         cfdisk
+    }
     #}}}
-    #FORMATING DEVICE {{{
+    #FORMAT DEVICE {{{
+    format_device(){
         print_title "https://wiki.archlinux.org/index.php/Format_a_device"
         print_info "This step will select and format the selected partiton where the archlinux will be installed"
         print_warning "\tAll data on the specified partition will be LOST."
@@ -4019,24 +4029,27 @@ if [[ $1 == --ais ]]; then
                     invalid_option
                 fi
             done
-
+            #check if there is no partitions left
             if [[ ${#partitions[*]} == 0 ]]; then
                 OPTION=n
             elif [[ ${device_name[i]} == other ]]; then
                 read_input_text "Add other partitions"
             fi
         done
+    }
     #}}}
     #INSTALL BASE SYSTEM {{{
+    install_base_system(){
         print_title "INSTALL BASE SYSTEM"
         print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
         pacstrap /mnt base base-devel
+        chroot /mnt sed -i 's/interface=.*$/interface=eth0/' /etc/rc.conf
+    }
     #}}}
     #CONFIGURE FSTAB {{{
+    configure_fstab(){
         print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
         print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific device or partition."
-        pause_function
-        #CONFIGURE FSTAB {{{
         if [[ ! -f /mnt/etc/fstab.aui ]]; then
             cp /mnt/etc/fstab /mnt/etc/fstab.aui
         else
@@ -4046,43 +4059,18 @@ if [[ $1 == --ais ]]; then
         echo "Review your fstab"
         pause_function
         nano /mnt/etc/fstab
-        #}}}
-    #}}}
-    #INSTALL BOOTLOADER {{{
-        bootloader=("GRUB2" "Syslinux" "Skip")
-        PS3="$prompt1"
-        echo -e "Install bootloader:\n"
-        select BOOTLOADER in "${bootloader[@]}"; do
-            case "$REPLY" in
-                1)
-                    pacstrap /mnt grub-bios
-                    break
-                    ;;
-                2)
-                    pacstrap /mnt syslinux
-                    break
-                    ;;
-                3)
-                    break
-                    ;;
-                *)
-                    invalid_option
-                    ;;
-            esac
-        done
+    }
     #}}}
     #CONFIGURE HOSTNAME {{{
+    configure_hostname(){
         read -p "Hostname [ex: archlinux]: " HNAME
         echo "$HNAME" > /mnt/etc/hostname
         chroot /mnt sed -i '/127.0.0.1/s/.$/ '$HNAME'/' /etc/hosts
         chroot /mnt sed -i '/::1/s/.$/ '$HNAME'/' /etc/hosts
-    #}}}
-    #CONFIGURE CONSOLE FONTS AND KEYMAP{{{
-        echo "KEYMAP=$KEYMAP" > /mnt/etc/vconsole.conf
-        echo "FONT=\"\"" >> /mnt/etc/vconsole.conf
-        echo "FONT_MAP=\"\"" >> /mnt/etc/vconsole.conf
+    }
     #}}}
     #CONFIGURE TIMEZONE {{{
+    configure_timezone(){
         settimezone(){
             [[ -f /mnt/etc/localtime ]] && rm /mnt/etc/localtime;
             local zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europa" "Indian" "Mexico" "Midest" "Pacific" "US");
@@ -4115,16 +4103,20 @@ if [[ $1 == --ais ]]; then
             read_input_text "Confirm timezone ($ZONE/$SUBZONE)"
         done
         chroot /mnt echo "$ZONE/$SUBZONE" > /etc/timezone
+    }
     #}}}
     #CONFIGURE HARDWARECLOCK {{{
+    configure_hardwareclock(){
         print_title "https://wiki.archlinux.org/index.php/Internationalization"
         echo -e $command_info
         echo -e "      UTC:$(print_warning "hwclock --systohc --utc")"
         echo -e "    ${BYellow}OR${White}"
         echo -e "Localtime:$(print_warning "hwclock --systohc --localtime")\n"
         arch-chroot /mnt
+    }
     #}}}
     #CONFIGURE LOCALE {{{
+    configure_locale(){
         print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
         read -p "Locale [ex: pt_BR]: " LOCALE
         LOCALE_8859="$LOCALE ISO-8859"
@@ -4134,18 +4126,44 @@ if [[ $1 == --ais ]]; then
         echo -e $command_info
         print_warning "locale-gen"
         arch-chroot /mnt
-    #}}}
-    #CONFIGURE NETWORK {{{
-        chroot /mnt sed -i 's/interface=.*$/interface=eth0/' /etc/rc.conf
+    }
     #}}}
     #CONFIGURE MKINITCPIO {{{
+    configure_mkinitcpio(){
         print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
         print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
         echo -e $command_info
         print_warning "mkinitcpio -p linux"
         arch-chroot /mnt
+    }
+    #}}}
+    #INSTALL BOOTLOADER {{{
+    install_bootloader(){
+        bootloader=("GRUB2" "Syslinux" "Skip")
+        PS3="$prompt1"
+        echo -e "Install bootloader:\n"
+        select BOOTLOADER in "${bootloader[@]}"; do
+            case "$REPLY" in
+                1)
+                    pacstrap /mnt grub-bios
+                    break
+                    ;;
+                2)
+                    pacstrap /mnt syslinux
+                    break
+                    ;;
+                3)
+                    break
+                    ;;
+                *)
+                    invalid_option
+                    ;;
+            esac
+        done
+    }
     #}}}
     #CONFIGURE BOOTLOADER {{{
+    configure_bootloader(){
         BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
         if [[ $BOOTLOADER == GRUB2 ]]; then
             chroot /mnt mkdir -p /boot/grub/locale
@@ -4162,14 +4180,18 @@ if [[ $1 == --ais ]]; then
             print_warning "nano /boot/syslinux/syslinux.cfg\nsyslinux-install_update -iam"
             arch-chroot /mnt
         fi
+    }
     #}}}
     #CONFIGURE MIRRORLIST {{{
+    configure_mirrorlist(){
         print_title "MIRRORS - https://wiki.archlinux.org/index.php/Mirrors"
         echo "Edit your mirrorlist"
         pause_function
         nano /mnt/etc/pacman.d/mirrorlist
+    }
     #}}}
     #FINISH {{{
+    finish_ais(){
         print_title "INSTALL COMPLETED"
         print_warning "Enter your new root password"
         chroot /mnt passwd
@@ -4181,13 +4203,29 @@ if [[ $1 == --ais ]]; then
             reboot
             exit 0
         fi
+    }
     #}}}
+    configure_keymap
+    configure_network
+    create_partition
+    format_device
+    install_base_system
+    configure_fstab
+    configure_hostname
+    configure_timezone
+    configure_hardwareclock
+    configure_locale
+    configure_mkinitcpio
+    install_bootloader
+    configure_bootloader
+    configure_mirrorlist
+    finish_ais
 #}}}
 elif [[ $1 == --help || $1 == -h ]]; then
 #HELP {{{
     echo "Usage: "  1>&2
     echo " aui               - install programs and other stuffs"  1>&2
-    echo " aui --ais         - install archlinux with aui + aif (archlinux install scripts)"  1>&2
+    echo " aui --ais         - archlinux install scripts mode"  1>&2
     echo "Options: "  1>&2
     echo " --help            - print this help text"  1>&2
     echo ""
