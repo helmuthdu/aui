@@ -1330,7 +1330,7 @@ install_desktop_environment(){
             package_install "pulseaudio"
             package_install "deja-dup"
             package_install "system-config-printer-gnome"
-            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
             aur_package_install "empathy-theme-ubuntu-adium-bzr"
             aur_package_install "automounter gnome-defaults-list"
             create_xinitrc "gnome-session-cinnamon"
@@ -1401,7 +1401,7 @@ install_desktop_environment(){
             package_install "gvfs-smb gvfs-afc"
             package_install "leafpad epdfview"
             package_install "lxappearance consolekit"
-            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
             aur_package_install "file-roller2-nn"
             aur_package_install "gnome-defaults-list"
             chown -R $USERNAME:users /home/$USERNAME/.config
@@ -1494,7 +1494,7 @@ install_desktop_environment(){
             package_install "deja-dup"
             package_install "pulseaudio"
             package_install "system-config-printer-gnome"
-            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
             aur_package_install "empathy-theme-ubuntu-adium-bzr"
             aur_package_install "automounter gnome-defaults-list"
             create_xinitrc "gnome-session"
@@ -1753,7 +1753,7 @@ install_desktop_environment(){
             package_install "polkit-gnome xdg-user-dirs"
             package_install "gvfs-smb gvfs-afc"
             package_install "leafpad epdfview"
-            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
             aur_package_install "file-roller2-nn"
             aur_package_install "gnome-defaults-list"
             create_xinitrc "startlxde"
@@ -1815,7 +1815,7 @@ install_desktop_environment(){
             package_install "xdg-user-dirs"
             package_install "leafpad epdfview nitrogen"
             package_install "gvfs-smb gvfs-afc"
-            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
             aur_package_install "file-roller2-nn"
             aur_package_install "gnome-defaults-list"
             mkdir -p /home/$USERNAME/.config/openbox/
@@ -1912,7 +1912,7 @@ install_desktop_environment(){
             package_install "xfce4 xfce4-goodies"
             package_install "gvfs-smb gvfs-afc"
             package_install "polkit-gnome xdg-user-dirs"
-            package_install "ttf-bitstream-vera ttf-dejavu ttf-droid ttf-freefont"
+            package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
             aur_package_install "file-roller2-nn"
             aur_package_install "automounter"
             aur_package_install "gnome-defaults-list"
@@ -4070,8 +4070,8 @@ if [[ $1 == --ais ]]; then
         print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
         read -p "Hostname [ex: archlinux]: " HN
         echo "$HN" > /mnt/etc/hostname
-        chroot /mnt sed -i '/127.0.0.1/s/.$/ '$HN'/' /etc/hosts
-        chroot /mnt sed -i '/::1/s/.$/ '$HN'/' /etc/hosts
+        chroot /mnt sed -i '/127.0.0.1/s/.$/t '$HN'/' /etc/hosts
+        chroot /mnt sed -i '/::1/s/.$/t '$HN'/' /etc/hosts
     }
     #}}}
     #CONFIGURE TIMEZONE {{{
