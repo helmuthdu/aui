@@ -187,14 +187,15 @@
     #GTK THEMES {{{
         # 1) Adwaita Cupertino
         # 2) Boomerang
-        # 3) Bluebird
-        # 4) eGTK
-        # 5) Greybird
-        # 6) Light (Aka Ambiance/Radiance)
-        # 7) Orion
-        # 8) Zukini
-        # 9) Zukitwo
-        GTK_THEMES="2-9"
+        # 3) Blackbird
+        # 4) Bluebird
+        # 5) eGTK
+        # 6) Greybird
+        # 7) Light (Aka Ambiance/Radiance)
+        # 8) Orion
+        # 9) Zukini
+        #10) Zukitwo
+        GTK_THEMES="2-10"
     #}}}
     #DISPLAY MANAGER {{{
         # 1) Elsa

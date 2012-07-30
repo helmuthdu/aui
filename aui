@@ -1191,13 +1191,14 @@ install_desktop_environment(){
             print_title "GTK2/GTK3 THEMES"
             echo " 1) $(menu_item "gtk-theme-adwaita-cupertino" "Adwaita Cupertino")"
             echo " 2) $(menu_item "gtk-theme-boomerang" "Boomerang")"
-            echo " 3) $(menu_item "xfce-theme-bluebird" "Bluebird")"
-            echo " 4) $(menu_item "egtk-bzr" "eGTK")"
-            echo " 5) $(menu_item "xfce-theme-greybird" "Greybird")"
-            echo " 6) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
-            echo " 7) $(menu_item "orion-gtk-theme" "Orion")"
-            echo " 8) $(menu_item "zukini-theme" "Zukini")"
-            echo " 9) $(menu_item "zukitwo-themes" "Zukitwo")"
+            echo " 3) $(menu_item "xfce-theme-blackbird" "Blackbird")"
+            echo " 4) $(menu_item "xfce-theme-bluebird" "Bluebird")"
+            echo " 5) $(menu_item "egtk-bzr" "eGTK")"
+            echo " 6) $(menu_item "xfce-theme-greybird" "Greybird")"
+            echo " 7) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
+            echo " 8) $(menu_item "orion-gtk-theme" "Orion")"
+            echo " 9) $(menu_item "zukini-theme" "Zukini")"
+            echo "10) $(menu_item "zukitwo-themes" "Zukitwo")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -1212,24 +1213,27 @@ install_desktop_environment(){
                         aur_package_install "gtk-theme-boomerang"
                         ;;
                     3)
-                        aur_package_install "xfce-theme-bluebird"
+                        aur_package_install "xfce-theme-blackbird"
                         ;;
                     4)
-                        aur_package_install "egtk-bzr"
+                        aur_package_install "xfce-theme-bluebird"
                         ;;
                     5)
-                        aur_package_install "xfce-theme-greybird"
+                        aur_package_install "egtk-bzr"
                         ;;
                     6)
-                        aur_package_install "light-themes"
+                        aur_package_install "xfce-theme-greybird"
                         ;;
                     7)
-                        aur_package_install "orion-gtk-theme"
+                        aur_package_install "light-themes"
                         ;;
                     8)
-                        aur_package_install "zukini-theme"
+                        aur_package_install "orion-gtk-theme"
                         ;;
                     9)
+                        aur_package_install "zukini-theme"
+                        ;;
+                    10)
                         aur_package_install "zukitwo-themes"
                         ;;
                     "b")
@@ -1383,8 +1387,6 @@ install_desktop_environment(){
             elihw
             done
             #}}}
-            su -l $USERNAME -c 'gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"'
-            su -l $USERNAME -c 'gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"'
             config_dm "gdm"
             CURRENT_STATUS=1
             GNOME=1
@@ -1650,8 +1652,6 @@ install_desktop_environment(){
             elihw
             done
             #}}}
-            su -l $USERNAME -c 'gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "antialiasing" "rgba"'
-            su -l $USERNAME -c 'gsettings "set" "org.gnome.settings-daemon.plugins.xsettings" "hinting" "none"'
             config_dm "gdm"
             CURRENT_STATUS=1
             GNOME=1
