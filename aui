@@ -625,7 +625,7 @@ if [[ $1 == --ais ]]; then
         print_title "MIRRORS - https://wiki.archlinux.org/index.php/Mirrors"
         echo "Edit your mirrorlist"
         pause_function
-        nano /mnt/etc/pacman.d/mirrorlist
+        $EDITOR /mnt/etc/pacman.d/mirrorlist
     }
     #}}}
     #FINISH_AIS {{{
