@@ -4028,7 +4028,7 @@ if [[ $1 == --ais ]]; then
                 fi
             done
             #check if there is no partitions left
-            if [[ ${#partitions[*]} == 0 ]]; then
+            if [[ ${#partitions[@]} == 0 ]]; then
                 OPTION=n
             elif [[ ${device_name[i]} == other ]]; then
                 read_input_text "Add other partitions"
