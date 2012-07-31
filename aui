@@ -324,12 +324,13 @@ if [[ $1 == --ais ]]; then
     #DEFAULT EDITOR {{{
     select_editor(){
         print_title "DEFAULT EDITOR"
-        EDITOR=("Emacs" "Nano" "vi" "Vim");
+        EDITORS=("emacs" "nano" "vi" "vim");
         PS3="$prompt1"
         echo -e "Select default editor\n"
-        select OPT in "${EDITOR[@]}"; do
+        select OPT in "${EDITORS[@]}"; do
             case "$REPLY" in
                 1)
+                    pacman -Sy
                     package_install "emacs"
                     EDITOR=emacs
                     break
@@ -343,6 +344,7 @@ if [[ $1 == --ais ]]; then
                     break
                     ;;
                 4)
+                    pacman -Sy
                     package_install "vim"
                     EDITOR=vim
                     break
@@ -486,7 +488,7 @@ if [[ $1 == --ais ]]; then
         genfstab -p /mnt >> /mnt/etc/fstab
         echo "Review your fstab"
         pause_function
-        $EDITOR/mnt/etc/fstab
+        $EDITOR /mnt/etc/fstab
     }
     #}}}
     #CONFIGURE HOSTNAME {{{
@@ -925,10 +927,10 @@ else
             cp dotfiles/.* /home/$USERNAME/
             rm -fr dotfiles
             print_title "DEFAULT EDITOR"
-            EDITOR=("Emacs" "Joe" "Nano" "Vim");
+            EDITORS=("Emacs" "Joe" "Nano" "Vim");
             PS3="$prompt1"
             echo -e "Choose default editor\n"
-            select OPT in "${EDITOR[@]}"; do
+            select OPT in "${EDITORS[@]}"; do
                 case "$REPLY" in
                     1)
                         package_install "emacs"
