@@ -35,7 +35,7 @@ ARCHI=`uname -m`
 # PROMPT {{{
 prompt1="Enter your option: "
 prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
-prompt3=`echo -e "You have to manual enter the following commands, then press ${BYellow}ctrl+d${White} or type ${BYellow}exit${White}:"`
+prompt3="You have to manual enter the following commands, then press ${BYellow}ctrl+d${White} or type ${BYellow}exit${White}:"
 #}}}
 # COLORS {{{
 # Regular Colors
