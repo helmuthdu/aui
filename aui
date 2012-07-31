@@ -3980,6 +3980,8 @@ if [[ $1 == --ais ]]; then
                 mkdir -p $3
                 mount.$1 $2 $3
                 remove_partition "$2"
+            else
+                OPTION=y
             fi
         }
         format_swap_partition(){
@@ -3988,6 +3990,8 @@ if [[ $1 == --ais ]]; then
                 mkswap $1
                 swapon $1
                 remove_partition "$1"
+            else
+                OPTION=y
             fi
         }
         remove_partition(){
