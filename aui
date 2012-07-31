@@ -4016,7 +4016,7 @@ if [[ $1 == --ais ]]; then
                             if [[ $OPTION == y ]]; then
                                 format_partition "$TYPE" "$DEVICE" "/mnt$DIR"
                             else
-                                read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="/mnt$DIR""
+                                read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="$DIR""
                                 if [[ $OPTION == y ]]; then
                                     mount -t $TYPE $DEVICE /mnt$DIR
                                     remove_partition "$DEVICE"
