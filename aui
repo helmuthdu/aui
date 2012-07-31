@@ -3980,8 +3980,6 @@ if [[ $1 == --ais ]]; then
                 mkdir -p $3
                 mount -t $1 $2 $3
                 remove_partition "$2"
-            else
-                OPTION=y
             fi
         }
         format_swap_partition(){
@@ -3990,8 +3988,6 @@ if [[ $1 == --ais ]]; then
                 mkswap $1
                 swapon $1
                 remove_partition "$1"
-            else
-                OPTION=y
             fi
         }
         remove_partition(){
@@ -4000,8 +3996,7 @@ if [[ $1 == --ais ]]; then
             #increase i
             [[ ${device_name[i]} != other ]] && i=$(( i + 1 ))
         }
-        OPTION=y
-        while [[ $OPTION == y ]]; do
+        while [[ 1 ]]; do
             PS3="$prompt1"
             echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
             select DEVICE in "${partitions[@]}"; do
@@ -4033,9 +4028,10 @@ if [[ $1 == --ais ]]; then
             done
             #check if there is no partitions left
             if [[ ${#partitions[@]} == 0 ]]; then
-                OPTION=n
+                break
             elif [[ ${device_name[i]} == other ]]; then
-                read_input_text "Add other partitions"
+                read_input_text "Configure more partitions"
+                [[ $OPTION == y ]] && break
             fi
         done
     }
