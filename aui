@@ -160,7 +160,7 @@ start_module(){ #{{{
 } #}}}
 add_module(){ #{{{
     for MODULE in $1; do
-        echo "/etc/modules-load.d/${MODULE}.conf" > /etc/modules-load.d/$MODULE.conf
+        echo "#/etc/modules-load.d/${MODULE}.conf" > /etc/modules-load.d/$MODULE.conf
         echo "$MODULE" >> /etc/modules-load.d/$MODULE.conf
         start_module "$MODULE"
     done
