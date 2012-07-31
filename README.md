@@ -6,27 +6,43 @@ You can try it first with a `virtualbox`
 
 ## Prerequisites
 
-- You need to have Archlinux (`base` + `base_devel`) already installed and rebooted
 - Git
 - A working internet connection
 - Logged in as 'root'
 
-## How to use
-
+## How to get it
 ### With git
 - Upgrade your system: `pacman -Syu`
 - Install git: `pacman -S git`
 - get the script: `git clone git://github.com/helmuthdu/aui`
-- run the script: `cd aui && ./aui`
 
 ### Without git
 - Upgrade your system: `pacman -Syu`
 - get the script: ` wget --no-check-certificate https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
-- run the script: `./aui`
 
-## What does the script do?
+## How to use
+- default mode: `cd <dir> && ./aui`
+- ais mode: `cd <dir> && ./aui --ais`
 
-- Backup all config files
+## Archlinux Install Script Mode
+- Configure keymap
+- Select editor
+- Create partition
+- Format device
+- Install system base
+- Configure fstab
+- Configure hostname
+- Configure timezone
+- Configure hardware clock
+- Configure locale
+- Configure mkinitcpio
+- Install/Configure bootloader
+- Configure mirrorlist
+- Configure root password
+
+## Default mode
+
+- Backup all modified files
 - Automatic configure rc.conf
 - Install additional repositories
 - Configure rankmirror
