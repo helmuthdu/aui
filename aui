@@ -155,21 +155,15 @@ add_daemon(){ #{{{
     sed -i '/DAEMONS[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
     start_daemon "$1"
 } #}}}
-remove_module(){ #{{{
-    #remove a module from MODULES line in rc.conf
-    sed -i '/MODULES[=]/s/ '"$1"'//' /etc/rc.conf
-} #}}}
 start_module(){ #{{{
-    #modprobe module
-    for MODULE in $1; do
-        modprobe $MODULE;
-    done
+    modprobe $1
 } #}}}
 add_module(){ #{{{
-    remove_module "$1"
-    #add a module into MODULES line in rc.conf
-    sed -i '/MODULES[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
-    start_module "$1"
+    for MODULE in $1; do
+        echo "/etc/modules-load.d/${MODULE}.conf" > /etc/modules-load.d/$MODULE.conf
+        echo "$MODULE" >> /etc/modules-load.d/$MODULE.conf
+        start_module "$MODULE"
+    done
 } #}}}
 config_dm(){ #{{{
     #configure display manager
@@ -771,8 +765,7 @@ install_basic_setup(){
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
     print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
     package_install "alsa-utils alsa-plugins"
-    sed -i '/MODULES[=]/s/snd-usb-audio//' /etc/rc.conf
-    sed -i '/MODULES[=]/s/MODULES[=](/&snd-usb-audio/' /etc/rc.conf
+    add_module "snd-usb-audio"
     add_daemon "@alsa"
     print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/Windows"
     print_info "NTFS-3G is an open source implementation of Microsoft's NTFS file system that includes read and write support."
@@ -3975,12 +3968,18 @@ if [[ $1 == --ais ]]; then
         print_title "https://wiki.archlinux.org/index.php/Format_a_device"
         print_info "This step will select and format the selected partiton where the archlinux will be installed"
         print_warning "\tAll data on the specified partition will be LOST."
+        i=0
+        partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
+        device_name=("root" "swap" "other")
         format_partition(){
             read_input_text "Confirm format $2 partition"
             if [[ $OPTION == y ]]; then
+                umount $2
                 mkfs.$1 $2
                 fsck $2
-                mount -t $1 $2 $3
+                mkdir -p $3
+                mount.$1 $2 $3
+                remove_partition
             fi
         }
         format_swap_partition(){
@@ -3988,11 +3987,15 @@ if [[ $1 == --ais ]]; then
             if [[ $OPTION == y ]]; then
                 mkswap $1
                 swapon $1
+                remove_partition
             fi
         }
-        i=0
-        partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
-        device_name=("root" "swap" "other")
+        remove_partition(){
+            #remove the selected partition from list
+            partitions=(${partitions[@]#$DEVICE})
+            #increase i
+            [[ ${device_name[i]} != other ]] && i=$(( i + 1 ))
+        }
         OPTION=y
         while [[ $OPTION == y ]]; do
             PS3="$prompt1"
@@ -4012,18 +4015,13 @@ if [[ $1 == --ais ]]; then
                             read -p "Type [ex: ext4]:" TYPE
                             read_input_text "Format $DEVICE partition"
                             if [[ $OPTION == y ]]; then
-                                mkdir -p /mnt$DIR
                                 format_partition "$TYPE" "$DEVICE" "/mnt$DIR"
                             else
-                                mkdir -p /mnt$DIR
-                                mount -t $TYPE $DEVICE /mnt$DIR
+                                mount.$TYPE $DEVICE /mnt$DIR
+                                remove_partition
                             fi
                             ;;
                     esac
-                    #remove the selected partition from list
-                    partitions=(${partitions[@]#$DEVICE})
-                    #increase i
-                    [[ ${device_name[i]} != other ]] && i=$(( i + 1 ))
                     break
                 else
                     invalid_option
