@@ -4166,7 +4166,7 @@ else
     }
     #}}}
     #CLEAN ORPHAN PACKAGES {{{
-        clean_orphan_packages(){
+    clean_orphan_packages(){
         print_title "CLEAN ORPHAN PACKAGES"
         pacman -Rsc --noconfirm $(pacman -Qqdt)
         #pacman -Sc --noconfirm
