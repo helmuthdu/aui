@@ -4031,7 +4031,7 @@ if [[ $1 == --ais ]]; then
                 break
             elif [[ ${device_name[i]} == other ]]; then
                 read_input_text "Configure more partitions"
-                [[ $OPTION == y ]] && break
+                [[ $OPTION != y ]] && break
             fi
         done
     }
