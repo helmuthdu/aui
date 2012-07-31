@@ -58,6 +58,7 @@ BWhite='\e[1;37m'       # White
 BYellow='\e[1;33m'      # Yellow
 #}}}
 AUTOMATIC_MODE=0
+[[ -z $EDITOR ]] && EDITOR=nano
 AUR=`echo -e "(${BPurple}aur${White})"`
 #}}}
 #MISC FUNCTIONS {{{
@@ -1176,11 +1177,7 @@ else
         read_input_text "Enable Automatic Mode"
         if [[ $OPTION == y ]]; then
             [[ -f packages_not_installed.txt ]] && rm packages_not_installed.txt;
-            if $EDITOR &> /dev/null; then
-                nano auiscript
-            else
-                $EDITOR auiscript
-            fi
+            $EDITOR auiscript
             source auiscript
             echo -e "The installation will start now."
             pause_function
