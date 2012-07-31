@@ -3978,7 +3978,7 @@ if [[ $1 == --ais ]]; then
                 mkfs.$1 $2
                 fsck $2
                 mkdir -p $3
-                mount.$1 $2 $3
+                mount -t $1 $2 $3
                 remove_partition "$2"
             else
                 OPTION=y
@@ -4021,7 +4021,7 @@ if [[ $1 == --ais ]]; then
                             if [[ $OPTION == y ]]; then
                                 format_partition "$TYPE" "$DEVICE" "/mnt$DIR"
                             else
-                                mount.$TYPE $DEVICE /mnt$DIR
+                                mount -t $TYPE $DEVICE /mnt$DIR
                                 remove_partition "$DEVICE"
                             fi
                             ;;
