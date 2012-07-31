@@ -3979,7 +3979,6 @@ if [[ $1 == --ais ]]; then
                 fsck $2
                 mkdir -p $3
                 mount.$1 $2 $3
-                remove_partition
             fi
         }
         format_swap_partition(){
@@ -3987,7 +3986,6 @@ if [[ $1 == --ais ]]; then
             if [[ $OPTION == y ]]; then
                 mkswap $1
                 swapon $1
-                remove_partition
             fi
         }
         remove_partition(){
@@ -4018,7 +4016,6 @@ if [[ $1 == --ais ]]; then
                                 format_partition "$TYPE" "$DEVICE" "/mnt$DIR"
                             else
                                 mount.$TYPE $DEVICE /mnt$DIR
-                                remove_partition
                             fi
                             ;;
                     esac
@@ -4026,6 +4023,7 @@ if [[ $1 == --ais ]]; then
                 else
                     invalid_option
                 fi
+                remove_partition
             done
             #check if there is no partitions left
             if [[ ${#partitions[*]} == 0 ]]; then
