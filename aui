@@ -121,6 +121,12 @@ print_warning(){ #{{{
 remove_daemon(){ #{{{
     #remove a daemon from DAEMONS line in rc.conf
     sed -i '/DAEMONS[=]/s/ '"$1"'//' /etc/rc.conf
+    #remove the @ from the dameon
+    DAEMON_LIST=`echo "$1" | sed 's/@//g'`
+    #stop daemon
+    for DAEMON in $DAEMON_LIST; do
+        ls -1 /var/run/daemons/$DAEMON &> /dev/null && rc.d stop $DAEMON;
+    done
 } #}}}
 insert_daemon_after(){ #{{{
     remove_daemon "$2"
@@ -291,9 +297,8 @@ elihw() { #{{{
 #}}}
 
 if [[ $1 == --ais ]]; then
-#AIS MODE {{{
                         #ARCHLINUX INSTALL SCRIPTS MODE
-
+#AIS MODE {{{
     #CONFIGURE KEYMAP {{{
     configure_keymap(){
         setkeymap(){
@@ -750,8 +755,8 @@ elif [[ $1 == --help || $1 == -h ]]; then
     exit 1
 #}}}
 else
-#AUI {{{
                           #ARCHLINUX ULTIMATE INSTALL
+#AUI {{{
     #WELCOME {{{
     welcome(){
         clear
