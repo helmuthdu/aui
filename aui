@@ -121,6 +121,10 @@ print_warning(){ #{{{
 remove_daemon(){ #{{{
     #remove a daemon from DAEMONS line in rc.conf
     sed -i '/DAEMONS[=]/s/ '"$1"'//' /etc/rc.conf
+    #stop daemon
+    for DAEMON in $DAEMON_LIST; do
+        ls -1 /var/run/daemons/$DAEMON &> /dev/null && rc.d stop $DAEMON;
+    done
 } #}}}
 insert_daemon_after(){ #{{{
     remove_daemon "$2"
@@ -140,7 +144,7 @@ add_daemon(){ #{{{
     remove_daemon "$1"
     #add a daemon into DAEMONS line in rc.conf
     sed -i '/DAEMONS[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
-    [[ $1 != networkmanager || $1 != wicd ]] && start_daemon "$1"
+    start_daemon "$1"
 } #}}}
 start_module(){ #{{{
     modprobe $1
