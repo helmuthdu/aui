@@ -442,7 +442,7 @@ if [[ $1 == --ais ]]; then
                             else
                                 read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="$DIR""
                                 if [[ $OPTION == y ]]; then
-                                    mkdir -p $/mnt$DIR
+                                    mkdir -p /mnt$DIR
                                     mount -t $TYPE $DEVICE /mnt$DIR
                                     remove_partition "$DEVICE"
                                 fi
