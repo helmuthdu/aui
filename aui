@@ -2624,7 +2624,7 @@ else
                         echo " b) BACK"
                         echo ""
                         ECLIPSE_OPTIONS+=" b"
-                        read_input_options "$ECLIPSE"
+                        read_input_options "$ECLIPSE_OPTIONS"
                         for OPT in ${OPTIONS[@]}; do
                             case "$OPT" in
                                 1)
