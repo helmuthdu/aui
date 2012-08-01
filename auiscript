@@ -43,6 +43,7 @@
     LANGSELECT="y"
     NFS="n"
     PRELOAD="y"
+    ZRAM="n"
     REFLECTOR="n"
     SAMBA="y"
     SSH="y"

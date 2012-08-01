@@ -748,7 +748,7 @@ elif [[ $1 == --help || $1 == -h ]]; then
     exit 1
 #}}}
 else
-# ARCHLINUX ULTIMATE INSTALL {{{
+#ARCHLINUX ULTIMATE INSTALL {{{
     #WELCOME {{{
     welcome(){
         clear
@@ -1309,6 +1309,25 @@ else
                 ;;
         esac
         sumary "Preload installation"
+        pause_function
+    }
+    #}}}
+    #ZRAM {{{
+    install_zram (){
+        print_title "ZRAM - https://wiki.archlinux.org/index.php/Maximizing_Performance"
+        print_info "Zram creates a device in RAM and compresses it. If you use for swap means that part of the RAM can hold much more information but uses more CPU. Still, it is much quicker than swapping to a hard drive. If a system often falls back to swap, this could improve responsiveness. Zram is in mainline staging (therefore its not stable yet, use with caution)."
+        read_input_text "Install Zram" $ZRAM
+        case "$OPTION" in
+            "y")
+                aur_package_install "zramswap"
+                add_daemon "@zramswap"
+                CURRENT_STATUS=1
+                ;;
+            *)
+                CURRENT_STATUS=0
+                ;;
+        esac
+        sumary "Zram installation"
         pause_function
     }
     #}}}
@@ -4385,6 +4404,7 @@ else
                     install_samba
                     install_lmt
                     install_preload
+                    install_zram
                     install_xorg
                     install_video_cards
                     install_cups
