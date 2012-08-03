@@ -2175,7 +2175,7 @@ else
                                 package_install "digikam"
                                 ;;
                             5)
-                                package_install "k3b dvd+rw-tools"
+                                package_install "k3b cdrdao dvd+rw-tools"
                                 ;;
                             6)
                                 aur_package_install "rosa-icons"
@@ -3399,7 +3399,7 @@ else
                     echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                     ;;
                 17)
-                    package_install "gstreamer0.10-plugins"
+                    package_install "gstreamer0.10-plugins mpg123 flac"
                     ;;
                 "b")
                     break
