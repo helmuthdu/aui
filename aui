@@ -57,8 +57,14 @@ prompt1="Enter your option: "
 prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
 prompt3="You have to manual enter the following commands, then press ${BYellow}ctrl+d${White} or type ${BYellow}exit${White}:"
 #}}}
+# EDITOR {{{
 AUTOMATIC_MODE=0
-[[ -z $EDITOR ]] && EDITOR=nano
+if [[ -f /usr/bin/vim ]]; then
+    EDITOR=vim
+elif [[ -z $EDITOR ]]; then
+    EDITOR=nano
+fi
+#}}}
 AUR=`echo -e "(${BPurple}aur${White})"`
 #}}}
 #MISC FUNCTIONS {{{
@@ -620,13 +626,13 @@ if [[ $1 == --ais ]]; then
             print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
             print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
             echo -e $prompt3
-            print_warning "grub-install $BOOTLOADER_PARTITION\ngrub-mkconfig -o /boot/grub/grub.cfg"
+            print_warning "modprobe dm-mod\ngrub-install $BOOTLOADER_PARTITION\ngrub-mkconfig -o /boot/grub/grub.cfg"
             arch-chroot /mnt
         elif [[ $BOOTLOADER == Syslinux ]]; then
             print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
             print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
             echo -e $prompt3
-            print_warning "nano /boot/syslinux/syslinux.cfg\nsyslinux-install_update -iam"
+            print_warning "syslinux-install_update -iam\n$EDITOR /boot/syslinux/syslinux.cfg (and replace sdX)"
             arch-chroot /mnt
         fi
     }
