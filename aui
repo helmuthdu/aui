@@ -405,6 +405,12 @@ if [[ $1 == --ais ]]; then
         i=0
         partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
         device_name=("root" "swap" "another")
+        remove_partition() {
+            #remove the selected partition from list
+            partitions=(${partitions[@]#$1})
+            #increase i
+            [[ ${device_name[i]} != another ]] && i=$(( i + 1 ))
+        }
         format_partition() {
             read_input_text "Confirm format $2 partition"
             if [[ $OPTION == y ]]; then
@@ -426,18 +432,12 @@ if [[ $1 == --ais ]]; then
             fi
         }
         function check_mountpoint() {
-            if mount|grep $1; then
+            if mount|grep $2; then
                 echo "Successfully mounted"
                 remove_partition "$1"
             else
                 echo "WARNING: Not Successfully mounted"
             fi
-        }
-        remove_partition() {
-            #remove the selected partition from list
-            partitions=(${partitions[@]#$1})
-            #increase i
-            [[ ${device_name[i]} != another ]] && i=$(( i + 1 ))
         }
         while [[ 1 ]]; do
             PS3="$prompt1"
@@ -463,7 +463,7 @@ if [[ $1 == --ais ]]; then
                                 if [[ $OPTION == y ]]; then
                                     mkdir -p /mnt$DIR
                                     mount -t $TYPE $DEVICE /mnt$DIR
-                                    check_mountpoint "/mnt$DIR"
+                                    check_mountpoint "$DEVICE" "/mnt$DIR"
                                 fi
                             fi
                             ;;
