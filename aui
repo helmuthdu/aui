@@ -626,13 +626,13 @@ if [[ $1 == --ais ]]; then
             print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
             print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
             echo -e $prompt3
-            print_warning "modprobe dm-mod\ngrub-install $BOOTLOADER_PARTITION\ngrub-mkconfig -o /boot/grub/grub.cfg"
+            print_warning "modprobe dm-mod\ngrub-install $BOOTLOADER_PARTITION\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
             arch-chroot /mnt
         elif [[ $BOOTLOADER == Syslinux ]]; then
             print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
             print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
             echo -e $prompt3
-            print_warning "syslinux-install_update -iam\n$EDITOR /boot/syslinux/syslinux.cfg (and replace sdX)"
+            print_warning "syslinux-install_update -iam\n$EDITOR /boot/syslinux/syslinux.cfg"
             arch-chroot /mnt
         fi
     }
