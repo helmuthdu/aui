@@ -395,11 +395,11 @@ if [[ $1 == --ais ]]; then
     format_device(){
         print_title "https://wiki.archlinux.org/index.php/Format_a_device"
         print_info "This step will select and format the selected partiton where the archlinux will be installed"
-        print_warning "\tAll data on the specified partition will be LOST."
+        print_warning "\tAll data on the ROOT and SWAP partition will be LOST."
         i=0
         partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
-        device_name=("root" "swap" "other")
-        format_partition(){
+        device_name=("root" "swap" "another")
+        format_partition() {
             read_input_text "Confirm format $2 partition"
             if [[ $OPTION == y ]]; then
                 umount $2
@@ -410,19 +410,28 @@ if [[ $1 == --ais ]]; then
                 remove_partition "$2"
             fi
         }
-        format_swap_partition(){
+        format_swap_partition() {
             read_input_text "Confirm format $1 partition"
             if [[ $OPTION == y ]]; then
+                swapoff $1
                 mkswap $1
                 swapon $1
                 remove_partition "$1"
             fi
         }
-        remove_partition(){
+        function check_mountpoint() {
+            if mount|grep $1; then
+                echo "Successfully mounted"
+                remove_partition "$1"
+            else
+                echo "WARNING: Not Successfully mounted"
+            fi
+        }
+        remove_partition() {
             #remove the selected partition from list
             partitions=(${partitions[@]#$1})
             #increase i
-            [[ ${device_name[i]} != other ]] && i=$(( i + 1 ))
+            [[ ${device_name[i]} != another ]] && i=$(( i + 1 ))
         }
         while [[ 1 ]]; do
             PS3="$prompt1"
@@ -437,7 +446,7 @@ if [[ $1 == --ais ]]; then
                         swap)
                             format_swap_partition "$DEVICE"
                             ;;
-                        other)
+                        another)
                             read -p "Mountpoint [ex: /home]:" DIR
                             read -p "Type [ex: ext4]:" TYPE
                             read_input_text "Format $DEVICE partition"
@@ -448,7 +457,7 @@ if [[ $1 == --ais ]]; then
                                 if [[ $OPTION == y ]]; then
                                     mkdir -p /mnt$DIR
                                     mount -t $TYPE $DEVICE /mnt$DIR
-                                    remove_partition "$DEVICE"
+                                    check_mountpoint "/mnt$DIR"
                                 fi
                             fi
                             ;;
@@ -461,7 +470,7 @@ if [[ $1 == --ais ]]; then
             #check if there is no partitions left
             if [[ ${#partitions[@]} == 0 ]]; then
                 break
-            elif [[ ${device_name[i]} == other ]]; then
+            elif [[ ${device_name[i]} == another ]]; then
                 read_input_text "Configure more partitions"
                 [[ $OPTION != y ]] && break
             fi
@@ -654,19 +663,18 @@ if [[ $1 == --ais ]]; then
     do
         print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
         echo " 1) $(mainmenu_item "${checklist[1]}" "Configure Keymap")"
-        echo " 2) $(mainmenu_item "${checklist[2]}" "Configure Network")"
-        echo " 3) $(mainmenu_item "${checklist[3]}" "Select Editor")"
-        echo " 4) $(mainmenu_item "${checklist[4]}" "Create Partition")"
-        echo " 5) $(mainmenu_item "${checklist[5]}" "Format Device")"
-        echo " 6) $(mainmenu_item "${checklist[6]}" "Install Base System")"
-        echo " 7) $(mainmenu_item "${checklist[7]}" "Configure Fstab")"
-        echo " 8) $(mainmenu_item "${checklist[8]}" "Configure Hostname")"
-        echo " 9) $(mainmenu_item "${checklist[9]}" "Configure Timezone")"
-        echo "10) $(mainmenu_item "${checklist[10]}" "Configure Hardware Clock")"
-        echo "11) $(mainmenu_item "${checklist[11]}" "Configure Locale")"
-        echo "12) $(mainmenu_item "${checklist[12]}" "Configure Mkinitcpio")"
-        echo "13) $(mainmenu_item "${checklist[13]}" "Install Bootloader")"
-        echo "14) $(mainmenu_item "${checklist[14]}" "Configure Mirrorlist")"
+        echo " 2) $(mainmenu_item "${checklist[3]}" "Select Editor")"
+        echo " 3) $(mainmenu_item "${checklist[4]}" "Create Partition")"
+        echo " 4) $(mainmenu_item "${checklist[5]}" "Format Device")"
+        echo " 5) $(mainmenu_item "${checklist[6]}" "Install Base System")"
+        echo " 6) $(mainmenu_item "${checklist[7]}" "Configure Fstab")"
+        echo " 7) $(mainmenu_item "${checklist[8]}" "Configure Hostname")"
+        echo " 8) $(mainmenu_item "${checklist[9]}" "Configure Timezone")"
+        echo " 9) $(mainmenu_item "${checklist[10]}" "Configure Hardware Clock")"
+        echo "10) $(mainmenu_item "${checklist[11]}" "Configure Locale")"
+        echo "11) $(mainmenu_item "${checklist[12]}" "Configure Mkinitcpio")"
+        echo "12) $(mainmenu_item "${checklist[13]}" "Install Bootloader")"
+        echo "13) $(mainmenu_item "${checklist[14]}" "Configure Mirrorlist")"
         echo ""
         echo " d) Done"
         echo ""
@@ -679,55 +687,51 @@ if [[ $1 == --ais ]]; then
                     checklist[1]=1
                     ;;
                 2)
-                    configure_network
-                    checklist[2]=1
-                    ;;
-                3)
                     select_editor
                     checklist[3]=1
                     ;;
-                4)
+                3)
                     create_partition
                     checklist[4]=1
                     ;;
-                5)
+                4)
                     format_device
                     checklist[5]=1
                     ;;
-                6)
+                5)
                     install_base_system
                     checklist[6]=1
                     ;;
-                7)
+                6)
                     configure_fstab
                     checklist[7]=1
                     ;;
-                8)
+                7)
                     configure_hostname
                     checklist[8]=1
                     ;;
-                9)
+                8)
                     configure_timezone
                     checklist[9]=1
                     ;;
-                10)
+                9)
                     configure_hardwareclock
                     checklist[10]=1
                     ;;
-                11)
+                10)
                     configure_locale
                     checklist[11]=1
                     ;;
-                12)
+                11)
                     configure_mkinitcpio
                     checklist[12]=1
                     ;;
-                13)
+                12)
                     install_bootloader
                     configure_bootloader
                     checklist[13]=1
                     ;;
-                14)
+                13)
                     configure_mirrorlist
                     checklist[14]=1
                     ;;
@@ -771,6 +775,7 @@ else
         print_line
         echo -e "\nSystem config backups:"
         print_line
+        # backup old configs
         [[ ! -f /etc/rc.conf.aui ]] && cp -v /etc/rc.conf /etc/rc.conf.aui || echo "/etc/rc.conf.aui";
         [[ ! -f /etc/pacman.conf.aui ]] && cp -v /etc/pacman.conf /etc/pacman.conf.aui || echo "/etc/pacman.conf.aui";
         [[ ! -f /etc/inittab.aui ]] && cp -v /etc/inittab /etc/inittab.aui || echo "/etc/inittab.aui";
@@ -1037,7 +1042,7 @@ else
             case "$REPLY" in
                 1)
                     if ! check_package "yaourt" ; then
-                        package_install "base-devel yajl namcap"
+                        package_install "base-devel wget yajl namcap"
                         download_package_aur "http://aur.archlinux.org/packages/pa/package-query/package-query.tar.gz"
                         download_package_aur "http://aur.archlinux.org/packages/ya/yaourt/yaourt.tar.gz"
                         if ! check_package "yaourt" ; then
@@ -1052,7 +1057,7 @@ else
                     ;;
                 2)
                     if ! check_package "pacaur" ; then
-                        package_install "base-devel expac"
+                        package_install "base-devel wget expac"
                         download_package_aur "http://aur.archlinux.org/packages/co/cower/cower.tar.gz"
                         download_package_aur "http://aur.archlinux.org/packages/pa/pacaur/pacaur.tar.gz"
                         if ! check_package "pacaur" ; then
@@ -1067,7 +1072,7 @@ else
                     ;;
                 3)
                     if ! check_package "packer" ; then
-                        package_install "base-devel git jshon"
+                        package_install "base-devel wget git jshon"
                         download_package_aur "http://aur.archlinux.org/packages/pa/packer/packer.tar.gz"
                         if ! check_package "packer" ; then
                             echo "Packer not installed. EXIT now"
@@ -1189,7 +1194,7 @@ else
     #BASIC SETUP {{{
     install_basic_setup(){
         print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-        package_install "bc rsync mlocate bash-completion npd"
+        package_install "bc rsync mlocate bash-completion ntp pkgstats"
         insert_daemon_after "crond" "@ntpd"
         print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
         print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
@@ -1220,7 +1225,8 @@ else
         add_module "fuse"
         print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
         print_info "Secure Shell (SSH) is a network protocol that allows data to be exchanged over a secure channel between two computers."
-        package_install "rssh openssh"
+        package_install "openssh"
+        aur_package_install "rssh"
         add_daemon "@sshd"
         [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
         #CONFIGURE SSHD_CONF #{{{
@@ -1475,7 +1481,7 @@ else
         read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
         case "$OPTION" in
             "y")
-                package_install "cups ghostscript gsfonts"
+                package_install "cups cups-filters ghostscript gsfonts"
                 package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
                 add_daemon "@cupsd"
                 CURRENT_STATUS=1
