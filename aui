@@ -528,7 +528,7 @@ if [[ $1 == --ais ]]; then
     configure_timezone(){
         settimezone(){
             [[ -f /mnt/etc/localtime ]] && rm /mnt/etc/localtime;
-            local zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europa" "Indian" "Mexico" "Midest" "Pacific" "US");
+            local zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europe" "Indian" "Mexico" "Midest" "Pacific" "US");
             PS3="$prompt1"
             echo "Select zone:"
             select ZONE in "${zone[@]}"; do
@@ -1361,7 +1361,7 @@ else
         print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
         print_info "Xorg is the public, open-source implementation of the X window system version 11."
         echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
-        package_install "xorg-server xorg-xinit xorg-xkill"
+        package_install "xorg-server xorg-xinit xorg-xkill xorg-setxkbmap"
         package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard"
         package_install "mesa"
         package_install "gamin"
@@ -4339,8 +4339,8 @@ else
         less aur_pkglist.txt
         print_title "INSTALL COMPLETED"
         echo -e "Thanks for using the Archlinux Ultimate Install script by helmuthdu\n"
-        read_input_text "Reboot yourt system"
         #REBOOT
+        read_input_text "Reboot yourt system"
         if [[ $OPTION == y ]]; then
             reboot
             exit 0
