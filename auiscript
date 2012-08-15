@@ -33,9 +33,10 @@
     #14) Fonts Configuration
     #15) Extra
     #16) Clean Orphan Packages
-    MAINMENU="1-10 13"
+    MAINMENU="1-14 16"
 #}}}
 #BASIC SETUP{{{
+    SYSTEMD="y"
     FIRMWARE="n"
     CUPS="y"
     CUSTOMREPO="n"
@@ -43,7 +44,7 @@
     LANGSELECT="y"
     NFS="n"
     PRELOAD="y"
-    ZRAM="n"
+    ZRAM="y"
     REFLECTOR="n"
     SAMBA="y"
     SSH="y"
@@ -115,7 +116,7 @@
         # 6) Activity Journal
         # 7) Activity Log Manager
         # 8) Gloobus Preview
-        GNOME_OPTIONS="1-5 7"
+        GNOME_OPTIONS="1-5"
         #GNOME EXTENSIONS {{{
             # 1) gpaste
             # 2) gtile
@@ -183,7 +184,7 @@
         # 3) Faenza-Cupertino
         # 4) Faience
         # 5) Elementary
-        GNOME_ICONS="2-5"
+        GNOME_ICONS="2-4"
     #}}}
     #GTK THEMES {{{
         # 1) Adwaita Cupertino
@@ -206,11 +207,11 @@
         # 5) Slim
         DISPLAY_MANAGER="4"
     #}}}
-    #NETWORKMANAGER #{{{
-        # 1) Networkmanager
+    #NETWORK MANAGER {{{
+        # 1) NetworkManager
         # 2) Wicd
-        # 3) None
-        NETWORKMANAGER=1
+        # n) None
+        NETWORKMANAGER="1"
     #}}}
 #}}}
 #ACCESSORIES {{{
@@ -346,7 +347,7 @@
     #MAPPING {{{
         # 1) Google Earth
         # 2) NASA World Wind
-        MAPPING_OPTIONS=""
+        MAPPING_OPTIONS="1"
     #}}}
     #VNC|Desktop Share {{{
         # 1) Remmina
@@ -354,8 +355,10 @@
         VNC_OPTIONS=""
     #}}}
 #}}}
-#LAMP {{{
-    LAMP="y"
+#WEBSERVER {{{
+    # 1) LAMP - APACHE, MYSQL & PHP + ADMINER
+    # 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER
+    LAMP="2"
 #}}}
 #AUDIO {{{
     # 1) Amarok
@@ -523,7 +526,7 @@
     # 2) Cleartype patched packages
     # 3) Infinality patched packages
     # 4) Reverting to unpatched packages
-    FONTSCONFIG_OPTION="3"
+    FONTSCONFIG_OPTION="1"
 #}}}
 #EXTRA {{{
     # 1) Elementary Project

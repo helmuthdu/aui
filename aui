@@ -601,6 +601,8 @@ if [[ $1 == --ais ]]; then
             case "$REPLY" in
                 1)
                     pacstrap /mnt grub-bios
+                    #make grub automatically detect others OS
+                    pacstrap /mnt os-prober
                     break
                     ;;
                 2)
@@ -961,14 +963,7 @@ else
                         ;;
                     2)
                         if ! check_package "joe" ; then
-                            su -l $USERNAME --command="
-                                wget http://aur.archlinux.org/packages/jo/joe/joe.tar.gz;
-                                tar zxvf joe.tar.gz;
-                                cd joe;
-                                makepkg -si --noconfirm;
-                                cd ..;
-                                rm -fr joe*
-                            "
+                            download_package_aur "http://aur.archlinux.org/packages/jo/joe/joe.tar.gz"
                         fi
                         sed -i '/EDITOR/s/vim/joe/' /home/$USERNAME/.bashrc
                         sed -i '/VISUAL/s/vim/joe/' /home/$USERNAME/.bashrc
@@ -1194,27 +1189,59 @@ else
         insert_daemon_after "crond" "@ntpd"
         print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
         print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
-        package_install "systemd "
+        package_install "systemd systemd-arch-units"
+        read_input_text "Enable systemd" $SYSTEMD
+        if [[ $OPTION == y ]]; then
+            sed -i '/GRUB_CMDLINE_LINUX_DEFAULT[=]/s/"quiet"/"init=/bin/systemd"/' /etc/default/grub
+            SYSTEMD=1
+            remove_daemon "syslog-ng"
+            systemctl enable syslog-ng.service
+            remove_daemon "crond"
+            systemctl enable crond.service
+            remove_daemon "@ntpd"
+            systemctl enable ntpd.service
+        fi
         print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
         package_install "zip unzip unrar p7zip atool"
         aur_package_install "rar"
         print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
         print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
         package_install "dbus"
-        insert_daemon_after "syslog-ng" "dbus"
+        if [[ $SYSTEMD == 1 ]]; then
+            remove_daemon "dbus"
+        else
+            insert_daemon_after "syslog-ng" "dbus"
+        fi
         print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
         print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD service discovery. It allows programs to publish and discover services and hosts running on a local network with no specific configuration."
         package_install "avahi nss-mdns"
-        add_daemon "avahi-daemon avahi-dnsconfd"
+        if [[ $SYSTEMD == 1 ]]; then
+            remove_daemon "avahi-daemon avahi-dnsconfd"
+            systemctl enable avahi-daemon.service
+            systemctl enable avahi-dnsconfd.service
+        else
+            add_daemon "avahi-daemon avahi-dnsconfd"
+        fi
         print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
         print_info "acpid is a flexible and extensible daemon for delivering ACPI events."
         package_install "acpi acpid"
-        add_daemon "acpid"
+        if [[ $SYSTEMD == 1 ]]; then
+            remove_daemon "acpid"
+            systemctl enable acpid.service
+        else
+            add_daemon "acpid"
+        fi
         print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
         print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
         package_install "alsa-utils alsa-plugins"
         add_module "snd-usb-audio"
-        add_daemon "@alsa"
+        if [[ $SYSTEMD == 1 ]]; then
+            remove_daemon "@alsa"
+            systemctl enable alsa-store.service
+            systemctl enable alsa-restore.service
+        else
+            add_daemon "@alsa"
+        fi
         print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/Windows"
         print_info "NTFS-3G is an open source implementation of Microsoft's NTFS file system that includes read and write support."
         package_install "ntfs-3g ntfsprogs dosfstools exfat-utils fuse fuse-exfat"
@@ -1223,7 +1250,12 @@ else
         print_info "Secure Shell (SSH) is a network protocol that allows data to be exchanged over a secure channel between two computers."
         package_install "openssh"
         aur_package_install "rssh"
-        add_daemon "@sshd"
+        if [[ $SYSTEMD == 1 ]]; then
+            remove_daemon "@sshd"
+            systemctl enable sshd.service
+        else
+            add_daemon "@sshd"
+        fi
         [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
         #CONFIGURE SSHD_CONF #{{{
             sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
@@ -1268,7 +1300,12 @@ else
         case "$OPTION" in
             "y")
                 package_install "nfs-utils"
-                add_daemon "rpcbind nfs-common @netfs nfs-server"
+                if [[ $SYSTEMD == 1 ]]; then
+                    remove_daemon "rpcbind nfs-common @netfs nfs-server"
+                    systemctl enable rpc-statd.service
+                else
+                    add_daemon "rpcbind nfs-common @netfs nfs-server"
+                fi
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1288,7 +1325,14 @@ else
             "y")
                 package_install "samba"
                 cp /etc/samba/smb.conf.default /etc/samba/smb.conf
-                add_daemon "@samba"
+                if [[ $SYSTEMD == 1 ]]; then
+                    remove_daemon "@samba"
+                    systemctl enable smbd.service
+                    systemctl enable nmbd.service
+                    systemctl enable winbindd.service
+                else
+                    add_daemon "@samba"
+                fi
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1307,7 +1351,12 @@ else
         case "$OPTION" in
             "y")
                 package_install "preload"
-                add_daemon "@preload"
+                if [[ $SYSTEMD == 1 ]]; then
+                    remove_daemon "@preload"
+                    systemctl enable preload.service
+                else
+                    add_daemon "@preload"
+                fi
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1325,8 +1374,14 @@ else
         read_input_text "Install Zram" $ZRAM
         case "$OPTION" in
             "y")
-                aur_package_install "zramswap"
-                add_daemon "@zramswap"
+                if [[ $SYSTEMD == 1 ]]; then
+                    package_remove "zramswap"
+                    remove_daemon "@zramswap"
+                    systemctl enable zram.service
+                else
+                    aur_package_install "zramswap"
+                    add_daemon "@zramswap"
+                fi
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1345,7 +1400,12 @@ else
         case "$OPTION" in
             "y")
                 package_install "laptop-mode-tools"
-                add_daemon "@laptop-mode"
+                if [[ $SYSTEMD == 1 ]]; then
+                    remove_daemon "@laptop-mode"
+                    systemctl enable laptop-mode-tools.service
+                else
+                    add_daemon "@laptop-mode"
+                fi
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1479,7 +1539,12 @@ else
             "y")
                 package_install "cups cups-filters ghostscript gsfonts"
                 package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
-                add_daemon "@cupsd"
+                if [[ $SYSTEMD == 1 ]]; then
+                    remove_daemon "@cupsd"
+                    systemctl enable cups.service
+                else
+                    add_daemon "@cupsd"
+                fi
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1591,7 +1656,15 @@ else
                 groupadd -g 42 privoxy
                 useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
                 pacman -S --noconfirm tor privoxy
-                add_daemon "@tor @privoxy"
+
+                if [[ $SYSTEMD == 1 ]]; then
+                    remove_daemon "@tor @privoxy"
+                    aur_package_install "privoxy-systemd"
+                    systemctl enable tor.service
+                    systemctl enable privoxy.service
+                else
+                    add_daemon "@tor @privoxy"
+                fi
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1735,12 +1808,20 @@ else
                             ;;
                         2)
                             package_install "gdm"
-                            config_dm "gdm"
+                            if [[ $SYSTEMD == 1 ]]; then
+                                systemctl enable gdm.service
+                            else
+                                config_dm "gdm"
+                            fi
                             ;;
                         3)
                             aur_package_install "lightdm lightdm-gtk-greeter"
-                            config_dm "lightdm"
                             sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
+                            if [[ $SYSTEMD == 1 ]]; then
+                                systemctl enable lightdm.service
+                            else
+                                config_dm "lightdm"
+                            fi
                             ;;
                         4)
                             package_install "lxdm"
@@ -1748,11 +1829,19 @@ else
                             if [[ -z "$lxdm" ]]; then
                                 echo -e "x:5:respawn:/usr/sbin/lxdm >& /dev/null" >> /etc/inittab
                             fi
-                            config_dm "lxdm"
+                            if [[ $SYSTEMD == 1 ]]; then
+                                systemctl enable lxdm.service
+                            else
+                                config_dm "lxdm"
+                            fi
                             ;;
                         5)
                             package_install "slim"
-                            config_dm "slim"
+                            if [[ $SYSTEMD == 1 ]]; then
+                                systemctl enable slim.service
+                            else
+                                config_dm "slim"
+                            fi
                             ;;
                         "b")
                             break
@@ -1848,7 +1937,13 @@ else
                 elihw
                 done
                 #}}}
-                config_dm "gdm"
+                if [[ $SYSTEMD == 1 ]]; then
+                    systemctl enable gdm.service
+                    systemctl enable udisks.service
+                    systemctl enable upower.service
+                else
+                    config_dm "gdm"
+                fi
                 CURRENT_STATUS=1
                 GNOME=1
                 ;;
@@ -2113,7 +2208,13 @@ else
                 elihw
                 done
                 #}}}
-                config_dm "gdm"
+                if [[ $SYSTEMD == 1 ]]; then
+                    systemctl enable gdm.service
+                    systemctl enable udisks.service
+                    systemctl enable upower.service
+                else
+                    config_dm "gdm"
+                fi
                 CURRENT_STATUS=1
                 GNOME=1
                 ;;
@@ -2200,7 +2301,13 @@ else
                 elihw
                 done
                 #}}}
-                config_dm "kdm"
+                if [[ $SYSTEMD == 1 ]]; then
+                    systemctl enable kdm.service
+                    systemctl enable udisks.service
+                    systemctl enable upower.service
+                else
+                    config_dm "kdm"
+                fi
                 CURRENT_STATUS=1
                 KDE=1
                 ;;
@@ -2419,6 +2526,10 @@ else
                 elihw
                 done
                 #}}}
+                if [[ $SYSTEMD == 1 ]]; then
+                    systemctl enable udisks.service
+                    systemctl enable upower.service
+                fi
                 CURRENT_STATUS=1
                 XFCE=1
                 ;;
@@ -2433,7 +2544,7 @@ else
     #}}}
     #NETWORKMANAGER/WICD {{{
     install_nm_wicd(){
-        print_title "NETWORK CONNECTION MANAGER"
+        print_title "NETWORK MANAGER"
         echo " 1) Networkmanager"
         echo " 2) Wicd"
         echo ""
@@ -2444,12 +2555,10 @@ else
             1)
                 print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
                 print_info "NetworkManager is a program for providing detection and configuration for systems to automatically connect to network. NetworkManager's functionality can be useful for both wireless and wired networks."
-                if [[ $GNOME -eq 1 || $XFCE -eq 1 || $LXDE -eq 1 || $OPENBOX -eq 1 || $E17 -eq 1 ]]; then
-                    package_install "networkmanager network-manager-applet"
-                elif [[ $KDE -eq 1 ]]; then
+                if [[ $KDE -eq 1 ]]; then
                     package_install "networkmanager kdeplasma-applets-networkmanagement"
                 else
-                    package_install "networkmanager"
+                    package_install "networkmanager network-manager-applet"
                 fi
                 check_package "ntp" && package_install "networkmanager-dispatcher-ntpd"
                 groupadd networkmanager
@@ -2457,32 +2566,31 @@ else
                 remove_daemon "networkmanager"
                 remove_daemon "network"
                 remove_daemon "wicd"
-                insert_daemon_after "dbus" "networkmanager"
+                if [[ $SYSTEMD == 1 ]]; then
+                    systemctl enable NetworkManager.service
+                else
+                    insert_daemon_after "dbus" "networkmanager"
+                fi
                 CURRENT_STATUS=1
                 sumary "Networkmanager installation"
                 ;;
             2)
                 print_title "WICD - https://wiki.archlinux.org/index.php/Wicd"
                 print_info "Wicd is a network connection manager that can manage wireless and wired interfaces, similar and an alternative to NetworkManager."
-                if [[ $GNOME -eq 1 || $XFCE -eq 1 || $LXDE -eq 1 || $OPENBOX -eq 1 || $E17 -eq 1 ]]; then
-                    package_install "wicd wicd-gtk"
-                elif [[ $KDE -eq 1 ]]; then
+                if [[ $KDE -eq 1 ]]; then
                     aur_package_install "wicd wicd-kde"
                 else
-                    package_install "wicd"
+                    package_install "wicd wicd-gtk"
                 fi
                 remove_daemon "networkmanager"
                 remove_daemon "network"
-                insert_daemon_after "dbus" "wicd"
+                if [[ $SYSTEMD == 1 ]]; then
+                    systemctl enable wicd.service
+                else
+                    insert_daemon_after "dbus" "wicd"
+                fi
                 CURRENT_STATUS=1
                 sumary "Wicd installation"
-                ;;
-            *)
-                remove_daemon "networkmanager"
-                remove_daemon "wicd"
-                insert_daemon_after "dbus" "network"
-                CURRENT_STATUS=0
-                sumary "Network manager installation"
                 ;;
         esac
     }
@@ -2855,11 +2963,19 @@ else
                     package_install "virtualbox virtualbox-additions"
                     aur_package_install "virtualbox-ext-oracle"
                     add_module "vboxdrv"
+                    if [[ $SYSTEMD == 1 ]]; then
+                        systemctl enable vboxservice.service
+                    fi
                     gpasswd -a $USERNAME vboxusers
                     ;;
                 5)
                     package_install "webmin perl-net-ssleay"
-                    add_daemon "@webmin"
+                    if [[ $SYSTEMD == 1 ]]; then
+                        remove_daemon "@webmin"
+                        systemctl enable webmin.service
+                    else
+                        add_daemon "@webmin"
+                    fi
                     ;;
                 6)
                     package_install "wine wine_gecko winetricks"
@@ -3042,7 +3158,13 @@ else
                                     else
                                         aur_package_install "dropbox-cli"
                                     fi
-                                    add_daemon "@dropboxd"
+                                    if [[ $SYSTEMD == 1 ]]; then
+                                        remove_daemon "@dropboxd"
+                                        aur_package_install "systemd-dropbox-daemon"
+                                        systemctl enable dropboxd.service
+                                    else
+                                        add_daemon "@dropboxd"
+                                    fi
                                     ;;
                                 3)
                                     aur_package_install "jdownloader"
@@ -3273,49 +3395,95 @@ else
     done
     }
     #}}}
-    #LAMP {{{
-    install_lamp(){
-    print_title "LAMP SERVER - APACHE, MYSQL & PHP + ADMINER\n# https://wiki.archlinux.org/index.php/LAMP"
-    read_input_text "Install LAMP" $LAMP
-    case "$OPTION" in
-        "y")
-            package_install "apache mysql php php-apache php-mcrypt php-gd"
-            aur_package_install "adminer"
-            if [[ ! -f /etc/php/php.ini.aui ]]; then
-                cp -v /etc/php/php.ini /etc/php/php.ini.aui
-                cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
-                cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-                add_daemon "httpd @mysqld"
-                #CONFIGURE LAMP SERVER {{{
-                /usr/bin/mysql_secure_installation
-                echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
-                echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
-                sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
-                echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
-                sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
-                sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
-                sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
-                sed -i '/mysql.so/s/^;//' /etc/php/php.ini
-                sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
-                sed -i '/gd.so/s/^;//' /etc/php/php.ini
-                sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
-                sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
-                #}}}
-            fi
+    #WEBSERVER {{{
+    install_web_server(){
+        create_sites_folder(){
             su -l $USERNAME -c "mkdir -p ~/Sites"
             su -l $USERNAME -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
-            rc.d restart httpd mysqld
-            CURRENT_STATUS=1
             print_line
             echo "The folder \"Sites\" has been created in your home"
             echo "You can access your projects at \"http://localhost/~username\""
-            ;;
-        *)
-            CURRENT_STATUS=0
-            ;;
-    esac
-    sumary "LAMP installation"
-    pause_function
+            pause_function
+        }
+        print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP"
+        echo " 1) LAMP - APACHE, MYSQL & PHP + ADMINER"
+        echo " 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER"
+        echo ""
+        echo " b) BACK"
+        echo ""
+        read_input $WEBSERVER
+        case "$OPTION" in
+            1)
+                package_install "apache mysql php php-apache php-mcrypt php-gd"
+                aur_package_install "adminer"
+                if [[ ! -f /etc/php/php.ini.aui ]]; then
+                    cp -v /etc/php/php.ini /etc/php/php.ini.aui
+                    cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
+                    cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
+                    if [[ $SYSTEMD == 1 ]]; then
+                        remove_daemon "httpd @mysqld"
+                        aur_package_install "systemd-httpd-units"
+                        systemctl enable httpd.service
+                        aur_package_install "systemd-mysqld-units"
+                        systemctl enable mysqld.service
+                    else
+                        add_daemon "httpd @mysqld"
+                    fi
+                    #CONFIGURE LAMP SERVER {{{
+                    /usr/bin/mysql_secure_installation
+                    echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
+                    echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
+                    sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
+                    echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
+                    sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
+                    sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
+                    sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
+                    sed -i '/mysql.so/s/^;//' /etc/php/php.ini
+                    sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
+                    sed -i '/gd.so/s/^;//' /etc/php/php.ini
+                    sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
+                    sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
+                    #}}}
+                    CURRENT_STATUS=1
+                    sumary "LAMP installation"
+                fi
+                rc.d restart httpd mysqld
+                create_sites_folder
+                ;;
+            2)
+                package_install "apache mysql php php-apache php-pgsql php-gd"
+                aur_package_install "adminer"
+                if [[ ! -f /etc/php/php.ini.aui ]]; then
+                    cp -v /etc/php/php.ini /etc/php/php.ini.aui
+                    cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
+                    cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
+                    if [[ $SYSTEMD == 1 ]]; then
+                        remove_daemon "httpd @postgresql"
+                        aur_package_install "systemd-httpd-units"
+                        systemctl enable httpd.service
+                        systemctl enable postgresql.service
+                    else
+                        add_daemon "httpd @postgresql"
+                    fi
+                    #CONFIGURE LAPP SERVER {{{
+                    echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
+                    echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
+                    sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
+                    echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
+                    sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
+                    sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
+                    sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
+                    sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
+                    sed -i '/gd.so/s/^;//' /etc/php/php.ini
+                    sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
+                    sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
+                    #}}}
+                    CURRENT_STATUS=1
+                    sumary "LAPP installation"
+                fi
+                create_sites_folder
+                ;;
+        esac
     }
     #}}}
     #AUDIO {{{
@@ -4390,7 +4558,7 @@ else
         echo " 9) $(mainmenu_item "${checklist[9]}" "Audio Apps")"
         echo "10) $(mainmenu_item "${checklist[10]}" "Video Apps")"
         echo "11) $(mainmenu_item "${checklist[11]}" "Games")"
-        echo "12) $(mainmenu_item "${checklist[12]}" "LAMP")"
+        echo "12) $(mainmenu_item "${checklist[12]}" "Web server")"
         echo "13) $(mainmenu_item "${checklist[13]}" "Fonts")"
         echo "14) $(mainmenu_item "${checklist[14]}" "Fonts Configuration")"
         echo "15) $(mainmenu_item "${checklist[15]}" "Extra")"
@@ -4468,7 +4636,7 @@ else
                     checklist[11]=1
                     ;;
                 12)
-                    install_lamp
+                    install_web_server
                     checklist[12]=1
                     ;;
                 13)
