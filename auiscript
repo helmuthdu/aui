@@ -36,7 +36,6 @@
     MAINMENU="1-14 16"
 #}}}
 #BASIC SETUP{{{
-    SYSTEMD="y"
     FIRMWARE="n"
     CUPS="y"
     CUSTOMREPO="n"
@@ -323,7 +322,7 @@
         # 5) Sparkleshare
         # 6) Steadyflow
         # 7) Trasmission
-        DOWNLOAD_OPTIONS="3"
+        DOWNLOAD_OPTIONS="2 3"
     #}}}
     #EMAIL|RSS {{{
         # 1) Mozilla Thunderbird
@@ -358,7 +357,7 @@
 #WEBSERVER {{{
     # 1) LAMP - APACHE, MYSQL & PHP + ADMINER
     # 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER
-    LAMP="2"
+    LAMP="1"
 #}}}
 #AUDIO {{{
     # 1) Amarok

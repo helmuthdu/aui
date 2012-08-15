@@ -124,34 +124,6 @@ print_warning(){ #{{{
     T_COLS=`tput cols`
     echo -e "${BRed}$1${White}\n" | fold -sw $(( $T_COLS - 1 ))
 } #}}}
-remove_daemon(){ #{{{
-    #remove a daemon from DAEMONS line in rc.conf
-    sed -i '/DAEMONS[=]/s/ '"$1"'//' /etc/rc.conf
-    #stop daemon
-    for DAEMON in $DAEMON_LIST; do
-        ls -1 /var/run/daemons/$DAEMON &> /dev/null && rc.d stop $DAEMON;
-    done
-} #}}}
-insert_daemon_after(){ #{{{
-    remove_daemon "$2"
-    #Insert into DAEMONS line after a daemon
-    sed -i '/DAEMONS[=]/s/'"$1"'/& '"$2"'/' /etc/rc.conf
-    start_daemon "$2"
-} #}}}
-start_daemon(){ #{{{
-    #remove the @ from the dameon
-    DAEMON_LIST=`echo "$1" | sed 's/@//g'`
-    #start daemon
-    for DAEMON in $DAEMON_LIST; do
-        ! ls -1 /var/run/daemons/$DAEMON &> /dev/null && rc.d start $DAEMON;
-    done
-} #}}}
-add_daemon(){ #{{{
-    remove_daemon "$1"
-    #add a daemon into DAEMONS line in rc.conf
-    sed -i '/DAEMONS[=]/s/\(.*\)\>/& '"$1"'/' /etc/rc.conf
-    start_daemon "$1"
-} #}}}
 start_module(){ #{{{
     modprobe $1
 } #}}}
@@ -161,15 +133,6 @@ add_module(){ #{{{
         echo "$MODULE" >> /etc/modules-load.d/$MODULE.conf
         start_module "$MODULE"
     done
-} #}}}
-config_dm(){ #{{{
-    #configure display manager
-    sed -i '/'"$1"'/s/^#//' /etc/inittab
-    sed -i '/xdm/s/^#//' /etc/inittab
-    sed -i '/xdm/s/^/#/' /etc/inittab
-    sed -i '/id:3:initdefault/s/^#//' /etc/inittab
-    sed -i '/id:3:initdefault/s/^/#/' /etc/inittab
-    sed -i '/id:5:initdefault/s/^#//' /etc/inittab
 } #}}}
 check_package(){ #{{{
     #check if a package is already installed
@@ -356,30 +319,6 @@ if [[ $1 == --ais ]]; then
                     pacman -Sy
                     package_install "vim"
                     EDITOR=vim
-                    break
-                    ;;
-                *)
-                    invalid_option
-                    ;;
-            esac
-        done
-    }
-    #}}}
-    #CONFIGURE NETWORK {{{
-    configure_network(){
-        print_title "CONFIGURING NETWORK - https://wiki.archlinux.org/index.php/Configuring_network"
-        connection_type=("Wired Connection (eth0)" "Wireless Connection (wlan0)")
-        PS3="$prompt1"
-        echo -e "Select your connection type:\n"
-        select OPT in "${connection_type[@]}"; do
-            case "$REPLY" in
-                1)
-                    ip link set eth0 up
-                    dhclient eth0
-                    break
-                    ;;
-                2)
-                    wifi-menu
                     break
                     ;;
                 *)
@@ -1186,62 +1125,33 @@ else
     install_basic_setup(){
         print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
         package_install "bc rsync mlocate bash-completion ntp pkgstats"
-        insert_daemon_after "crond" "@ntpd"
-        print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
-        print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
-        package_install "systemd systemd-arch-units"
-        read_input_text "Enable systemd" $SYSTEMD
-        if [[ $OPTION == y ]]; then
-            sed -i '/GRUB_CMDLINE_LINUX_DEFAULT[=]/s/"quiet"/"init=/bin/systemd"/' /etc/default/grub
-            SYSTEMD=1
-            remove_daemon "syslog-ng"
-            systemctl enable syslog-ng.service
-            remove_daemon "crond"
-            systemctl enable crond.service
-            remove_daemon "@ntpd"
-            systemctl enable ntpd.service
-        fi
-        print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
-        package_install "zip unzip unrar p7zip atool"
-        aur_package_install "rar"
         print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
         print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
         package_install "dbus"
-        if [[ $SYSTEMD == 1 ]]; then
-            remove_daemon "dbus"
-        else
-            insert_daemon_after "syslog-ng" "dbus"
-        fi
+        print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
+        print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
+        package_install "systemd systemd-sysvcompat systemd-arch-units"
+        systemctl enable syslog-ng.service
+        systemctl enable crond.service
+        systemctl enable ntpd.service
+        print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
+        package_install "zip unzip unrar p7zip atool"
+        aur_package_install "rar"
         print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
         print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD service discovery. It allows programs to publish and discover services and hosts running on a local network with no specific configuration."
         package_install "avahi nss-mdns"
-        if [[ $SYSTEMD == 1 ]]; then
-            remove_daemon "avahi-daemon avahi-dnsconfd"
-            systemctl enable avahi-daemon.service
-            systemctl enable avahi-dnsconfd.service
-        else
-            add_daemon "avahi-daemon avahi-dnsconfd"
-        fi
+        systemctl enable avahi-daemon.service
+        systemctl enable avahi-dnsconfd.service
         print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
         print_info "acpid is a flexible and extensible daemon for delivering ACPI events."
         package_install "acpi acpid"
-        if [[ $SYSTEMD == 1 ]]; then
-            remove_daemon "acpid"
-            systemctl enable acpid.service
-        else
-            add_daemon "acpid"
-        fi
+        systemctl enable acpid.service
         print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
         print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
         package_install "alsa-utils alsa-plugins"
         add_module "snd-usb-audio"
-        if [[ $SYSTEMD == 1 ]]; then
-            remove_daemon "@alsa"
-            systemctl enable alsa-store.service
-            systemctl enable alsa-restore.service
-        else
-            add_daemon "@alsa"
-        fi
+        systemctl enable alsa-store.service
+        systemctl enable alsa-restore.service
         print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/Windows"
         print_info "NTFS-3G is an open source implementation of Microsoft's NTFS file system that includes read and write support."
         package_install "ntfs-3g ntfsprogs dosfstools exfat-utils fuse fuse-exfat"
@@ -1250,12 +1160,7 @@ else
         print_info "Secure Shell (SSH) is a network protocol that allows data to be exchanged over a secure channel between two computers."
         package_install "openssh"
         aur_package_install "rssh"
-        if [[ $SYSTEMD == 1 ]]; then
-            remove_daemon "@sshd"
-            systemctl enable sshd.service
-        else
-            add_daemon "@sshd"
-        fi
+        systemctl enable sshd.service
         [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
         #CONFIGURE SSHD_CONF #{{{
             sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
@@ -1300,12 +1205,7 @@ else
         case "$OPTION" in
             "y")
                 package_install "nfs-utils"
-                if [[ $SYSTEMD == 1 ]]; then
-                    remove_daemon "rpcbind nfs-common @netfs nfs-server"
-                    systemctl enable rpc-statd.service
-                else
-                    add_daemon "rpcbind nfs-common @netfs nfs-server"
-                fi
+                systemctl enable rpc-statd.service
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1325,14 +1225,9 @@ else
             "y")
                 package_install "samba"
                 cp /etc/samba/smb.conf.default /etc/samba/smb.conf
-                if [[ $SYSTEMD == 1 ]]; then
-                    remove_daemon "@samba"
-                    systemctl enable smbd.service
-                    systemctl enable nmbd.service
-                    systemctl enable winbindd.service
-                else
-                    add_daemon "@samba"
-                fi
+                systemctl enable smbd.service
+                systemctl enable nmbd.service
+                systemctl enable winbindd.service
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1351,12 +1246,7 @@ else
         case "$OPTION" in
             "y")
                 package_install "preload"
-                if [[ $SYSTEMD == 1 ]]; then
-                    remove_daemon "@preload"
-                    systemctl enable preload.service
-                else
-                    add_daemon "@preload"
-                fi
+                systemctl enable preload.service
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1374,14 +1264,7 @@ else
         read_input_text "Install Zram" $ZRAM
         case "$OPTION" in
             "y")
-                if [[ $SYSTEMD == 1 ]]; then
-                    package_remove "zramswap"
-                    remove_daemon "@zramswap"
-                    systemctl enable zram.service
-                else
-                    aur_package_install "zramswap"
-                    add_daemon "@zramswap"
-                fi
+                systemctl enable zram.service
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1400,12 +1283,7 @@ else
         case "$OPTION" in
             "y")
                 package_install "laptop-mode-tools"
-                if [[ $SYSTEMD == 1 ]]; then
-                    remove_daemon "@laptop-mode"
-                    systemctl enable laptop-mode-tools.service
-                else
-                    add_daemon "@laptop-mode"
-                fi
+                systemctl enable laptop-mode-tools.service
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1539,12 +1417,7 @@ else
             "y")
                 package_install "cups cups-filters ghostscript gsfonts"
                 package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
-                if [[ $SYSTEMD == 1 ]]; then
-                    remove_daemon "@cupsd"
-                    systemctl enable cups.service
-                else
-                    add_daemon "@cupsd"
-                fi
+                systemctl enable cups.service
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1656,15 +1529,9 @@ else
                 groupadd -g 42 privoxy
                 useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
                 pacman -S --noconfirm tor privoxy
-
-                if [[ $SYSTEMD == 1 ]]; then
-                    remove_daemon "@tor @privoxy"
-                    aur_package_install "privoxy-systemd"
-                    systemctl enable tor.service
-                    systemctl enable privoxy.service
-                else
-                    add_daemon "@tor @privoxy"
-                fi
+                aur_package_install "privoxy-systemd"
+                systemctl enable tor.service
+                systemctl enable privoxy.service
                 CURRENT_STATUS=1
                 ;;
             *)
@@ -1800,48 +1667,24 @@ else
                     case "$OPT" in
                         1)
                             aur_package_install "elsa-svn-arch"
-                            local elsa=`cat /etc/inittab | sed -n '/elsa/p'`
-                            if [[ -z "$elsa" ]]; then
-                                echo -e "x:5:respawn:/usr/sbin/elsa >& /dev/null" >> /etc/inittab
-                            fi
-                            config_dm "elsa"
+                            systemctl enable elsa.service
                             ;;
                         2)
                             package_install "gdm"
-                            if [[ $SYSTEMD == 1 ]]; then
-                                systemctl enable gdm.service
-                            else
-                                config_dm "gdm"
-                            fi
+                            systemctl enable gdm.service
                             ;;
                         3)
                             aur_package_install "lightdm lightdm-gtk-greeter"
                             sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
-                            if [[ $SYSTEMD == 1 ]]; then
-                                systemctl enable lightdm.service
-                            else
-                                config_dm "lightdm"
-                            fi
+                            systemctl enable lightdm.service
                             ;;
                         4)
                             package_install "lxdm"
-                            local lxdm=`cat /etc/inittab | sed -n '/lxdm/p'`
-                            if [[ -z "$lxdm" ]]; then
-                                echo -e "x:5:respawn:/usr/sbin/lxdm >& /dev/null" >> /etc/inittab
-                            fi
-                            if [[ $SYSTEMD == 1 ]]; then
-                                systemctl enable lxdm.service
-                            else
-                                config_dm "lxdm"
-                            fi
+                            systemctl enable lxdm.service
                             ;;
                         5)
                             package_install "slim"
-                            if [[ $SYSTEMD == 1 ]]; then
-                                systemctl enable slim.service
-                            else
-                                config_dm "slim"
-                            fi
+                            systemctl enable slim.service
                             ;;
                         "b")
                             break
@@ -1937,13 +1780,9 @@ else
                 elihw
                 done
                 #}}}
-                if [[ $SYSTEMD == 1 ]]; then
-                    systemctl enable gdm.service
-                    systemctl enable udisks.service
-                    systemctl enable upower.service
-                else
-                    config_dm "gdm"
-                fi
+                systemctl enable gdm.service
+                systemctl enable udisks.service
+                systemctl enable upower.service
                 CURRENT_STATUS=1
                 GNOME=1
                 ;;
@@ -2051,7 +1890,6 @@ else
                 package_install "pulseaudio"
                 package_install "system-config-printer-gnome"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
-                aur_package_install "empathy-theme-ubuntu-adium-bzr"
                 aur_package_install "automounter gnome-defaults-list"
                 create_xinitrc "gnome-session"
                 #GNOME CUSTOMIZATION {{{
@@ -2208,13 +2046,9 @@ else
                 elihw
                 done
                 #}}}
-                if [[ $SYSTEMD == 1 ]]; then
-                    systemctl enable gdm.service
-                    systemctl enable udisks.service
-                    systemctl enable upower.service
-                else
-                    config_dm "gdm"
-                fi
+                systemctl enable gdm.service
+                systemctl enable udisks.service
+                systemctl enable upower.service
                 CURRENT_STATUS=1
                 GNOME=1
                 ;;
@@ -2301,13 +2135,9 @@ else
                 elihw
                 done
                 #}}}
-                if [[ $SYSTEMD == 1 ]]; then
-                    systemctl enable kdm.service
-                    systemctl enable udisks.service
-                    systemctl enable upower.service
-                else
-                    config_dm "kdm"
-                fi
+                systemctl enable kdm.service
+                systemctl enable udisks.service
+                systemctl enable upower.service
                 CURRENT_STATUS=1
                 KDE=1
                 ;;
@@ -2526,10 +2356,8 @@ else
                 elihw
                 done
                 #}}}
-                if [[ $SYSTEMD == 1 ]]; then
-                    systemctl enable udisks.service
-                    systemctl enable upower.service
-                fi
+                systemctl enable udisks.service
+                systemctl enable upower.service
                 CURRENT_STATUS=1
                 XFCE=1
                 ;;
@@ -2563,14 +2391,7 @@ else
                 check_package "ntp" && package_install "networkmanager-dispatcher-ntpd"
                 groupadd networkmanager
                 gpasswd -a $USERNAME networkmanager
-                remove_daemon "networkmanager"
-                remove_daemon "network"
-                remove_daemon "wicd"
-                if [[ $SYSTEMD == 1 ]]; then
-                    systemctl enable NetworkManager.service
-                else
-                    insert_daemon_after "dbus" "networkmanager"
-                fi
+                systemctl enable NetworkManager.service
                 CURRENT_STATUS=1
                 sumary "Networkmanager installation"
                 ;;
@@ -2582,13 +2403,7 @@ else
                 else
                     package_install "wicd wicd-gtk"
                 fi
-                remove_daemon "networkmanager"
-                remove_daemon "network"
-                if [[ $SYSTEMD == 1 ]]; then
-                    systemctl enable wicd.service
-                else
-                    insert_daemon_after "dbus" "wicd"
-                fi
+                systemctl enable wicd.service
                 CURRENT_STATUS=1
                 sumary "Wicd installation"
                 ;;
@@ -2963,19 +2778,12 @@ else
                     package_install "virtualbox virtualbox-additions"
                     aur_package_install "virtualbox-ext-oracle"
                     add_module "vboxdrv"
-                    if [[ $SYSTEMD == 1 ]]; then
-                        systemctl enable vboxservice.service
-                    fi
+                    systemctl enable vboxservice.service
                     gpasswd -a $USERNAME vboxusers
                     ;;
                 5)
                     package_install "webmin perl-net-ssleay"
-                    if [[ $SYSTEMD == 1 ]]; then
-                        remove_daemon "@webmin"
-                        systemctl enable webmin.service
-                    else
-                        add_daemon "@webmin"
-                    fi
+                    systemctl enable webmin.service
                     ;;
                 6)
                     package_install "wine wine_gecko winetricks"
@@ -3158,13 +2966,8 @@ else
                                     else
                                         aur_package_install "dropbox-cli"
                                     fi
-                                    if [[ $SYSTEMD == 1 ]]; then
-                                        remove_daemon "@dropboxd"
-                                        aur_package_install "systemd-dropbox-daemon"
-                                        systemctl enable dropboxd.service
-                                    else
-                                        add_daemon "@dropboxd"
-                                    fi
+                                    aur_package_install "systemd-dropbox-daemon"
+                                    systemctl enable dropboxd.service
                                     ;;
                                 3)
                                     aur_package_install "jdownloader"
@@ -3416,19 +3219,14 @@ else
             1)
                 package_install "apache mysql php php-apache php-mcrypt php-gd"
                 aur_package_install "adminer"
+                aur_package_install "systemd-httpd-units"
+                systemctl enable httpd.service
+                aur_package_install "systemd-mysqld-units"
+                systemctl enable mysqld.service
                 if [[ ! -f /etc/php/php.ini.aui ]]; then
                     cp -v /etc/php/php.ini /etc/php/php.ini.aui
                     cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
                     cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-                    if [[ $SYSTEMD == 1 ]]; then
-                        remove_daemon "httpd @mysqld"
-                        aur_package_install "systemd-httpd-units"
-                        systemctl enable httpd.service
-                        aur_package_install "systemd-mysqld-units"
-                        systemctl enable mysqld.service
-                    else
-                        add_daemon "httpd @mysqld"
-                    fi
                     #CONFIGURE LAMP SERVER {{{
                     /usr/bin/mysql_secure_installation
                     echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
@@ -3453,18 +3251,12 @@ else
             2)
                 package_install "apache mysql php php-apache php-pgsql php-gd"
                 aur_package_install "adminer"
+                systemctl enable httpd.service
+                systemctl enable postgresql.service
                 if [[ ! -f /etc/php/php.ini.aui ]]; then
                     cp -v /etc/php/php.ini /etc/php/php.ini.aui
                     cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
                     cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-                    if [[ $SYSTEMD == 1 ]]; then
-                        remove_daemon "httpd @postgresql"
-                        aur_package_install "systemd-httpd-units"
-                        systemctl enable httpd.service
-                        systemctl enable postgresql.service
-                    else
-                        add_daemon "httpd @postgresql"
-                    fi
                     #CONFIGURE LAPP SERVER {{{
                     echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
                     echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
