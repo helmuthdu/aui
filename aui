@@ -3251,6 +3251,7 @@ else
             2)
                 package_install "apache mysql php php-apache php-pgsql php-gd"
                 aur_package_install "adminer"
+                aur_package_install "systemd-httpd-units"
                 systemctl enable httpd.service
                 systemctl enable postgresql.service
                 if [[ ! -f /etc/php/php.ini.aui ]]; then
