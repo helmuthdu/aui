@@ -6,7 +6,6 @@ You can try it first with a `virtualbox`
 
 ## Prerequisites
 
-- Git
 - A working internet connection
 - Logged in as 'root'
 
@@ -41,17 +40,18 @@ You can try it first with a `virtualbox`
 - Configure root password
 
 ## Default mode
-
 - Backup all modified files
-- Automatic configure rc.conf
 - Install additional repositories
-- Configure rankmirror
-- System upgrade
+- Install and configure reflector
 - Create and configure new user
 - Install and configure sudo
 - Configure pacman package signing
+- Automatic enable services in systemd
 - Install an AUR Helper [yaourt, packer]
 - Install base system
+- Install systemd
+- Install Preload
+- Install Zram
 - Install Xorg
 - Install GPU Drivers
 - Install CUPS
@@ -66,7 +66,7 @@ You can try it first with a `virtualbox`
 - Install Multimedia apps [Rhythmbox, Clementine, Codecs...]
 - Install Games [HoN, World of Padman, Wesnoth...]
 - Install Fonts [Liberation, MS-Fonts, Google-webfonts...]
-- Install and configure LAMP Server
+- Install and configure Web Servers
 - Many More...
 
 If you like my work, please consider a small Paypal donation at helmuthdu@gmail.com :)
