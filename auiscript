@@ -55,7 +55,7 @@
         # 4) Nouveau
         # 5) Virtualbox
         # 6) Vesa
-        VIDEOCARD=4
+        VIDEOCARD=3
     #}}}
     #ADDITIONAL FIRMWARE {{{
         # 1) alsa-firmware
