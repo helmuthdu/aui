@@ -840,14 +840,7 @@ case "$1" in
         if [[ ! -d /etc/pacman.d/gnupg ]]; then
             print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
             print_info "Pacman-key is a new tool available with pacman 4. It allows the user to manage pacman's list of trusted keys in the new package signing implementation."
-            #install rng-tools {{{
-                wget http://aur.archlinux.org/packages/rng-tools/rng-tools.tar.gz;
-                tar zxvf rng-tools.tar.gz;
-                cd rng-tools;
-                makepkg -si --asroot --noconfirm;
-                cd ..;
-                rm -fr rng-tools*
-            #}}}
+            curl -o PKGBUILD http://aur.archlinux.org/packages/rng-tools/PKGBUILD && makepkg -si --asroot --noconfirm
             sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
             rngd -f -r /dev/urandom &
             pacman-key --init --keyserver pgp.mit.edu
@@ -985,7 +978,7 @@ case "$1" in
                     print_title "YAOURT - https://wiki.archlinux.org/index.php/Yaourt"
                     print_info "Yaourt (Yet AnOther User Repository Tool) is a community-contributed wrapper for pacman which adds seamless access to the AUR, allowing and automating package compilation and installation from your choice of the thousands of PKGBUILDs in the AUR, in addition to the many thousands of available Arch Linux binary packages. Yaourt uses the same exact syntax as pacman, which saves you from relearning an entirely new method of system maintenance but also adds new options. Yaourt expands the power and simplicity of pacman by adding even more useful features and provides pleasing, colorized output, interactive search mode, and much more."
                     if ! check_package "yaourt" ; then
-                        package_install "base-devel curl yajl namcap"
+                        package_install "base-devel wget curl yajl namcap"
                         aur_download_package "http://aur.archlinux.org/packages/package-query/PKGBUILD"
                         aur_download_package "http://aur.archlinux.org/packages/yaourt/PKGBUILD"
                         if ! check_package "yaourt" ; then
@@ -1000,7 +993,7 @@ case "$1" in
                     ;;
                 2)
                     if ! check_package "packer" ; then
-                        package_install "base-devel curl git jshon"
+                        package_install "base-devel wget curl git jshon"
                         aur_download_package "http://aur.archlinux.org/packages/packer/PKGBUILD"
                         if ! check_package "packer" ; then
                             echo "Packer not installed. EXIT now"
@@ -1014,11 +1007,11 @@ case "$1" in
                     ;;
                 3)
                     if ! check_package "pacaur" ; then
-                        package_install "base-devel curl expac"
+                        package_install "base-devel wget curl expac"
                         aur_download_package "http://aur.archlinux.org/packages/cower/PKGBUILD"
                         aur_download_package "http://aur.archlinux.org/packages/pacaur/PKGBUILD"
                         if ! check_package "pacaur" ; then
-                            echo "Packer not installed. EXIT now"
+                            echo "Pacaur not installed. EXIT now"
                             pause_function
                             exit 0
                         fi
