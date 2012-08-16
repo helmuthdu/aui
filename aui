@@ -170,18 +170,10 @@ aur_package_install(){ #{{{
         fi
     done
 } #}}}
-download_package_aur(){ #{{{
-    PACKAGE_NAME=`echo "$1" | sed 's/.*\///'`
-    PACKAGE_DIR=`echo "$PACKAGE_NAME" | sed 's/.tar.gz//'`
+aur_download_package(){ #{{{
+    #exec command as user instead of root
     su -l $USERNAME -c "
-        [[ ! -d downloaded_packages ]] && mkdir downloaded_packages
-        cd downloaded_packages
-        [[ ! -f $PACKAGE_NAME ]] && wget $1
-        tar zxvf $PACKAGE_NAME
-        cd $PACKAGE_DIR
-        makepkg -si --noconfirm
-        cd ..
-        rm -fr $PACKAGE_DIR
+        curl -o PKGBUILD $1 && makepkg -si --noconfirm
     "
 } #}}}
 package_install(){ #{{{
@@ -248,7 +240,7 @@ sumary(){ #{{{
 menu_item(){ #{{{
     #check if the number of arguments is less then 2
     [[ $# -lt 2 ]] && PACKAGE_NAME="$1" || PACKAGE_NAME="$2";
-    #list of chars to remove program a package name
+    #list of chars to remove from the package name
     CHARS_TO_REMOVE=("Ttf-" "-bzr" "-hg" "-svn" "-git" "-stable" "Gnome-shell-theme-" "Gnome-shell-extension-");
     #remove chars from package name
     for CHARS in ${CHARS_TO_REMOVE[@]}; do PACKAGE_NAME=`echo ${PACKAGE_NAME^} | sed 's/'$CHARS'//'`; done
@@ -263,8 +255,9 @@ elihw() { #{{{
 } #}}}
 #}}}
 
-if [[ $1 == --ais ]]; then
-#ARCHLINUX INSTALL SCRIPTS MODE {{{
+case "$1" in
+    --ais)
+    #ARCHLINUX INSTALL SCRIPTS MODE {{{
     #CONFIGURE KEYMAP {{{
     configure_keymap(){
         setkeymap(){
@@ -512,6 +505,7 @@ if [[ $1 == --ais ]]; then
     #CONFIGURE LOCALE {{{
     configure_locale(){
         print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
+        print_info "Locales are used in Linux to define which language the user uses. As the locales define the character sets being used as well, setting up the correct locale is especially important if the language contains non-ASCII characters."
         read -p "Locale [ex: pt_BR]: " LOCALE
         LOCALE_8859="$LOCALE ISO-8859"
         LOCALE_UTF8="$LOCALE.UTF-8"
@@ -696,9 +690,10 @@ if [[ $1 == --ais ]]; then
             esac
         done
     done
-#}}}
-elif [[ $1 == --help || $1 == -h ]]; then
-#HELP {{{
+    ;;
+    #}}}
+    --help  | -h)
+    #HELP {{{
     echo "Usage: "  1>&2
     echo " aui               - install programs and other stuffs"  1>&2
     echo " aui --ais         - archlinux install scripts mode"  1>&2
@@ -706,9 +701,10 @@ elif [[ $1 == --help || $1 == -h ]]; then
     echo " --help            - print this help text"  1>&2
     echo ""
     exit 1
-#}}}
-else
-#ARCHLINUX ULTIMATE INSTALL {{{
+    ;;
+    #}}}
+    *)
+    #ARCHLINUX ULTIMATE INSTALL {{{
     #WELCOME {{{
     welcome(){
         clear
@@ -749,7 +745,7 @@ else
     #}}}
     #LANGUAGE SELECTOR {{{
     language_selector(){
-        #DETECTS THE SYSTEM LANGUAGE {{{
+        #AUTOMATICALLY DETECTS THE SYSTEM LANGUAGE {{{
         #automatically detects the system language based on your locale
         LANGUAGE=`locale | sed '1!d' | sed 's/LANG=//' | cut -c1-5`
         #KDE #{{{
@@ -902,7 +898,7 @@ else
                         ;;
                     2)
                         if ! check_package "joe" ; then
-                            download_package_aur "http://aur.archlinux.org/packages/jo/joe/joe.tar.gz"
+                            aur_download_package "http://aur.archlinux.org/packages/joe/PKGBUILD"
                         fi
                         sed -i '/EDITOR/s/vim/joe/' /home/$USERNAME/.bashrc
                         sed -i '/VISUAL/s/vim/joe/' /home/$USERNAME/.bashrc
@@ -980,16 +976,18 @@ else
         print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
         print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
         print_warning "\tNone of these tools are officially supported by Arch devs."
-        aurhelper=("Yaourt" "Packer")
+        aurhelper=("Yaourt (recommended)" "Packer")
         PS3="$prompt1"
         echo -e "Choose your default AUR helper to install\n"
         select OPT in "${aurhelper[@]}"; do
             case "$REPLY" in
                 1)
+                    print_title "YAOURT - https://wiki.archlinux.org/index.php/Yaourt"
+                    print_info "Yaourt (Yet AnOther User Repository Tool) is a community-contributed wrapper for pacman which adds seamless access to the AUR, allowing and automating package compilation and installation from your choice of the thousands of PKGBUILDs in the AUR, in addition to the many thousands of available Arch Linux binary packages. Yaourt uses the same exact syntax as pacman, which saves you from relearning an entirely new method of system maintenance but also adds new options. Yaourt expands the power and simplicity of pacman by adding even more useful features and provides pleasing, colorized output, interactive search mode, and much more."
                     if ! check_package "yaourt" ; then
-                        package_install "base-devel wget yajl namcap"
-                        download_package_aur "http://aur.archlinux.org/packages/pa/package-query/package-query.tar.gz"
-                        download_package_aur "http://aur.archlinux.org/packages/ya/yaourt/yaourt.tar.gz"
+                        package_install "base-devel curl yajl namcap"
+                        aur_download_package "http://aur.archlinux.org/packages/package-query/PKGBUILD"
+                        aur_download_package "http://aur.archlinux.org/packages/yaourt/PKGBUILD"
                         if ! check_package "yaourt" ; then
                             echo "Yaourt not installed. EXIT now"
                             pause_function
@@ -1002,9 +1000,24 @@ else
                     ;;
                 2)
                     if ! check_package "packer" ; then
-                        package_install "base-devel wget git jshon"
-                        download_package_aur "http://aur.archlinux.org/packages/pa/packer/packer.tar.gz"
+                        package_install "base-devel curl git jshon"
+                        aur_download_package "http://aur.archlinux.org/packages/packer/PKGBUILD"
                         if ! check_package "packer" ; then
+                            echo "Packer not installed. EXIT now"
+                            pause_function
+                            exit 0
+                        fi
+                    fi
+                    CURRENT_STATUS=1
+                    AUR_HELPER="packer"
+                    break
+                    ;;
+                3)
+                    if ! check_package "pacaur" ; then
+                        package_install "base-devel curl expac"
+                        aur_download_package "http://aur.archlinux.org/packages/cower/PKGBUILD"
+                        aur_download_package "http://aur.archlinux.org/packages/pacaur/PKGBUILD"
+                        if ! check_package "pacaur" ; then
                             echo "Packer not installed. EXIT now"
                             pause_function
                             exit 0
@@ -1352,7 +1365,7 @@ else
     #VIDEO CARDS {{{
     install_video_cards(){
         print_title "VIDEO CARD"
-        echo "Select your GPU:"
+        echo "Select your GPU drive:"
         echo " 1) Intel"
         echo " 2) ATI"
         echo " 3) nVidia"
@@ -3208,7 +3221,7 @@ else
             echo "You can access your projects at \"http://localhost/~username\""
             pause_function
         }
-        print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP"
+        print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
         echo " 1) LAMP - APACHE, MYSQL & PHP + ADMINER"
         echo " 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER"
         echo ""
@@ -4330,8 +4343,8 @@ else
     configure_pacman_package_signing
     system_upgrade
     language_selector
-    select_user
     configure_sudo
+    select_user
     choose_aurhelper
     automatic_mode
 
@@ -4457,5 +4470,6 @@ else
             esac
         done
     done
-#}}}
-fi
+    ;;
+    #}}}
+esac
