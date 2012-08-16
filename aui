@@ -173,6 +173,8 @@ aur_package_install(){ #{{{
 aur_download_package(){ #{{{
     #exec command as user instead of root
     su -l $USERNAME -c "
+        [[ ! -d downloaded_packages ]] && mkdir downloaded_packages
+        cd downloaded_packages
         curl -o PKGBUILD $1 && makepkg -si --noconfirm
     "
 } #}}}
