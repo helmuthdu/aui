@@ -1138,7 +1138,7 @@ case "$1" in
         package_install "dbus"
         print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
         print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
-        package_install "systemd systemd-sysvcompat systemd-arch-units"
+        pacman -S systemd systemd-sysvcompat systemd-arch-units
         systemctl enable syslog-ng.service
         systemctl enable crond.service
         systemctl enable ntpd.service
