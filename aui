@@ -1131,17 +1131,17 @@ case "$1" in
     #}}}
     #BASIC SETUP {{{
     install_basic_setup(){
-        print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-        package_install "bc rsync mlocate bash-completion ntp pkgstats"
-        print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
-        print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
-        package_install "dbus"
         print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
         print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
         pacman -S systemd systemd-sysvcompat systemd-arch-units
         systemctl enable syslog-ng.service
         systemctl enable crond.service
+        print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
+        package_install "bc rsync mlocate bash-completion ntp pkgstats"
         systemctl enable ntpd.service
+        print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
+        print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
+        package_install "dbus"
         print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
         package_install "zip unzip unrar p7zip atool"
         aur_package_install "rar"
