@@ -66,6 +66,7 @@ elif [[ -z $EDITOR ]]; then
 fi
 #}}}
 AUR=`echo -e "(${BPurple}aur${White})"`
+AUI_DIR=`pwd`
 #}}}
 #MISC FUNCTIONS {{{
 read_input(){ #{{{
@@ -134,6 +135,21 @@ add_module(){ #{{{
         start_module "$MODULE"
     done
 } #}}}
+pacaui(){ #{{{
+    [[ AUTOMATIC_MODE == 1 ]] && NOCONFIRM="--noconfirm" || NOCONFIRM=""
+    for PACKAGE in $1; do
+        #exec command as user instead of root
+        su -l $USERNAME -c "
+        [[ ! -d pacaui ]] && mkdir pacaui
+        cd pacaui
+        curl -o $PACKAGE.tar.gz http://aur.archlinux.org/packages/$PACKAGE/$PACKAGE.tar.gz
+        tar zxvf $PACKAGE.tar.gz
+        rm $PACKAGE.tar.gz
+        cd $PACKAGE
+        makepkg -si $NOCONFIRM
+        "
+    done
+} #}}}
 check_package(){ #{{{
     #check if a package is already installed
     for PACKAGE in $1; do
@@ -153,7 +169,11 @@ aur_package_install(){ #{{{
     #install package from aur
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
-            su -l $USERNAME -c "$AUR_HELPER -S --noconfirm $PACKAGE"
+            if [[ $AUR_HELPER == pacaui ]]; then
+                pacaui $PACKAGE
+            else
+                su -l $USERNAME -c "$AUR_HELPER --noconfirm -S $PACKAGE"
+            fi
             #RECHECK #{{{
             #check if the package wasnt installed
             if ! check_package "$PACKAGE" ; then
@@ -161,7 +181,14 @@ aur_package_install(){ #{{{
                     echo "$PACKAGE" >> packages_not_installed.txt
                 else
                     read_input_text "Package $PACKAGE not installed, try install again?"
-                    [[ $OPTION == y ]] && su -l $USERNAME -c "$AUR_HELPER -S --noconfirm $PACKAGE"
+                    if [[ $OPTION == y ]]; then
+                        if [[ $AUR_HELPER == pacaui ]]; then
+                            $EDITOR aui_packages/$PACKAGE/PKGBUILD
+                            pacaui $PACKAGE
+                        else
+                            su -l $USERNAME -c "$AUR_HELPER -S $PACKAGE"
+                        fi
+                    fi
                 fi
             fi
             #}}}
@@ -169,14 +196,6 @@ aur_package_install(){ #{{{
             echo -e "Warning: $PACKAGE is up to date --skipping"
         fi
     done
-} #}}}
-aur_download_package(){ #{{{
-    #exec command as user instead of root
-    su -l $USERNAME -c "
-        [[ ! -d downloaded_packages ]] && mkdir downloaded_packages
-        cd downloaded_packages
-        curl -o PKGBUILD $1 && makepkg -si --noconfirm
-    "
 } #}}}
 package_install(){ #{{{
     #install packages using pacman
@@ -902,7 +921,7 @@ case "$1" in
                         ;;
                     2)
                         if ! check_package "joe" ; then
-                            aur_download_package "http://aur.archlinux.org/packages/joe/PKGBUILD"
+                            pacaui joe
                         fi
                         sed -i '/EDITOR/s/vim/joe/' /home/$USERNAME/.bashrc
                         sed -i '/VISUAL/s/vim/joe/' /home/$USERNAME/.bashrc
@@ -980,18 +999,19 @@ case "$1" in
         print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
         print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
         print_warning "\tNone of these tools are officially supported by Arch devs."
-        aurhelper=("Yaourt (recommended)" "Packer")
+        aurhelper=("Yaourt (recommended)" "Packer" "Pacaui (build-in)")
         PS3="$prompt1"
         echo -e "Choose your default AUR helper to install\n"
         select OPT in "${aurhelper[@]}"; do
             case "$REPLY" in
                 1)
                     print_title "YAOURT - https://wiki.archlinux.org/index.php/Yaourt"
-                    print_info "Yaourt (Yet AnOther User Repository Tool) is a community-contributed wrapper for pacman which adds seamless access to the AUR, allowing and automating package compilation and installation from your choice of the thousands of PKGBUILDs in the AUR, in addition to the many thousands of available Arch Linux binary packages. Yaourt uses the same exact syntax as pacman, which saves you from relearning an entirely new method of system maintenance but also adds new options. Yaourt expands the power and simplicity of pacman by adding even more useful features and provides pleasing, colorized output, interactive search mode, and much more."
+                    print_info "Yaourt (Yet AnOther User Repository Tool) is a community-contributed wrapper for pacman which adds seamless access to the AUR, allowing and automating package compilation and installation from your choice of the thousands of PKGBUILDs in the AUR, in addition to the many thousands of available Arch Linux binary packages."
                     if ! check_package "yaourt" ; then
-                        package_install "base-devel wget curl yajl namcap"
-                        aur_download_package "http://aur.archlinux.org/packages/package-query/PKGBUILD"
-                        aur_download_package "http://aur.archlinux.org/packages/yaourt/PKGBUILD"
+                        package_install "base-devel yajl namcap"
+                        pacman -D --asdeps --noconfirm yajl namcap
+                        pacaui package-query
+                        pacaui yaourt
                         if ! check_package "yaourt" ; then
                             echo "Yaourt not installed. EXIT now"
                             pause_function
@@ -1004,8 +1024,9 @@ case "$1" in
                     ;;
                 2)
                     if ! check_package "packer" ; then
-                        package_install "base-devel wget curl git jshon"
-                        aur_download_package "http://aur.archlinux.org/packages/packer/PKGBUILD"
+                        package_install "base-devel git jshon"
+                        pacman -D --asdeps --noconfirm jshon
+                        pacaui packer
                         if ! check_package "packer" ; then
                             echo "Packer not installed. EXIT now"
                             pause_function
@@ -1017,10 +1038,16 @@ case "$1" in
                     break
                     ;;
                 3)
+                    CURRENT_STATUS=1
+                    AUR_HELPER='pacaui'
+                    break
+                    ;;
+                4)
                     if ! check_package "pacaur" ; then
-                        package_install "base-devel wget curl expac"
-                        aur_download_package "http://aur.archlinux.org/packages/cower/PKGBUILD"
-                        aur_download_package "http://aur.archlinux.org/packages/pacaur/PKGBUILD"
+                        package_install "base-devel yajl expac"
+                        pacman -D --asdeps --noconfirm yajl expac
+                        pacaui cower
+                        pacaui pacaur
                         if ! check_package "pacaur" ; then
                             echo "Pacaur not installed. EXIT now"
                             pause_function
@@ -1144,7 +1171,7 @@ case "$1" in
         print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
         pacman -S --needed systemd systemd-sysvcompat systemd-arch-units
         systemctl enable syslog-ng.service
-        systemctl enable crond.service
+        systemctl enable cronie.service
         print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
         package_install "bc rsync mlocate bash-completion ntp pkgstats"
         systemctl enable ntpd.service
@@ -1569,7 +1596,7 @@ case "$1" in
                 echo " 2) $(menu_item "faenza-icon-theme" "Faenza")"
                 echo " 3) $(menu_item "faenza-cupertino-icon-theme" "Faenza-Cupertino")"
                 echo " 4) $(menu_item "faience-icon-theme" "Faience")"
-                echo " 5) $(menu_item "elementary-icons" "Elementary")"
+                echo " 5) $(menu_item "elementary-icons-bzr" "Elementary")"
                 echo ""
                 echo " b) BACK"
                 echo ""
@@ -1797,8 +1824,13 @@ case "$1" in
                 elihw
                 done
                 #}}}
+                #Gnome Display Manager (a reimplementation of xdm)
                 systemctl enable gdm.service
-                systemctl enable udisks.service
+                #D-Bus interface for user account query and manipulation
+                systemctl enable accounts-daemon.service
+                #Application development toolkit for controlling system-wide privileges
+                systemctl enable polkitd.service
+                #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
                 CURRENT_STATUS=1
                 GNOME=1
@@ -1891,6 +1923,8 @@ case "$1" in
                 elihw
                 done
                 #}}}
+                #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+                systemctl enable upower.service
                 CURRENT_STATUS=1
                 E17=1
                 ;;
@@ -2063,8 +2097,13 @@ case "$1" in
                 elihw
                 done
                 #}}}
+                #Gnome Display Manager (a reimplementation of xdm)
                 systemctl enable gdm.service
-                systemctl enable udisks.service
+                #D-Bus interface for user account query and manipulation
+                systemctl enable accounts-daemon.service
+                #Application development toolkit for controlling system-wide privileges
+                systemctl enable polkitd.service
+                #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
                 CURRENT_STATUS=1
                 GNOME=1
@@ -2082,12 +2121,12 @@ case "$1" in
                 aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
                 create_xinitrc "startkde"
                 #QTCURVE THEMES #{{{
-                wget http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
-                wget http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
-                tar zxvf 144205-Sweet.tar.gz
-                tar zxvf 141920-Kawai.tar.gz
-                rm 144205-Sweet.tar.gz
-                rm 141920-Kawai.tar.gz
+                curl -o Sweet.tar.gz http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
+                curl -o Kawai.tar.gz http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
+                tar zxvf Sweet.tar.gz
+                tar zxvf Kawai.tar.gz
+                rm Sweet.tar.gz
+                rm Kawai.tar.gz
                 mkdir -p /home/$USERNAME/.kde4/share/apps/color-schemes
                 mv Sweet/Sweet.colors /home/$USERNAME/.kde4/share/apps/color-schemes
                 mv Kawai/Kawai.colors /home/$USERNAME/.kde4/share/apps/color-schemes
@@ -2153,7 +2192,9 @@ case "$1" in
                 done
                 #}}}
                 systemctl enable kdm.service
-                systemctl enable udisks.service
+                #Application development toolkit for controlling system-wide privileges
+                systemctl enable polkitd.service
+                #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
                 CURRENT_STATUS=1
                 KDE=1
@@ -2217,6 +2258,8 @@ case "$1" in
                 elihw
                 done
                 #}}}
+                #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+                systemctl enable upower.service
                 CURRENT_STATUS=1
                 LXDE=1
                 ;;
@@ -2316,6 +2359,8 @@ case "$1" in
                 elihw
                 done
                 #}}}
+                #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+                systemctl enable upower.service
                 CURRENT_STATUS=1
                 OPENBOX=1
                 ;;
@@ -2373,7 +2418,9 @@ case "$1" in
                 elihw
                 done
                 #}}}
-                systemctl enable udisks.service
+                #Application development toolkit for controlling system-wide privileges
+                systemctl enable polkitd.service
+                #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
                 CURRENT_STATUS=1
                 XFCE=1
@@ -2408,7 +2455,10 @@ case "$1" in
                 check_package "ntp" && package_install "networkmanager-dispatcher-ntpd"
                 groupadd networkmanager
                 gpasswd -a $USERNAME networkmanager
+                #Network Management daemon
                 systemctl enable NetworkManager.service
+                #Application development toolkit for controlling system-wide privileges
+                systemctl enable polkitd.service
                 CURRENT_STATUS=1
                 sumary "Networkmanager installation"
                 ;;
@@ -2420,6 +2470,7 @@ case "$1" in
                 else
                     package_install "wicd wicd-gtk"
                 fi
+                #Network Management daemon
                 systemctl enable wicd.service
                 CURRENT_STATUS=1
                 sumary "Wicd installation"
@@ -2638,7 +2689,7 @@ case "$1" in
                 11)
                     package_install "qtcreator qt-doc"
                     mkdir -p /home/$USERNAME/.config/Nokia/qtcreator/styles
-                    wget http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
+                    curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
                     mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
                     chown -R $USERNAME:users /home/$USERNAME/.config
                     ;;
@@ -3315,7 +3366,7 @@ case "$1" in
         echo "12) $(menu_item "soundconverter soundkonverter" "$([[ $KDE -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
         echo "13) $(menu_item "puddletag") $AUR"
         echo "14) $(menu_item "audacity")"
-        echo "15) $(menu_item "oceanaudio") $AUR"
+        echo "15) $(menu_item "ocenaudio") $AUR"
         echo "16) $(menu_item "timidity++")"
         echo "17) $(menu_item "gstreamer0.10-ugly" "Codecs")"
         echo ""
@@ -4211,8 +4262,8 @@ case "$1" in
                         echo "17) $(menu_item "slingshot-bzr") (app launcher)"
                         echo "18) $(menu_item "switchboard-bzr") (desktop settings hub)"
                         echo "19) $(menu_item "wingpanel-bzr") (indicators topbar)"
-                        echo "20) $(menu_item "elementary-icons-bzr" "eICONS")"
-                        echo "21) $(menu_item "egtk-bzr" "eGTK")"
+                        echo "20) $(menu_item "elementary-icons-bzr" "Elementary Icons")"
+                        echo "21) $(menu_item "egtk-bzr" "Elementary Theme")"
                         echo ""
                         echo " b) BACK"
                         echo ""

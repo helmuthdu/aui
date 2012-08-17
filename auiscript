@@ -273,7 +273,7 @@
     # 9) OCRFeeder
     #10) Xmind
     #11) Zathura
-    OFFICE_OPTIONS="1 3 6-8 10"
+    OFFICE_OPTIONS="1 6-8 10"
 #}}}
 #SYSTEM TOOLS {{{
     # 1) Gparted
@@ -374,7 +374,7 @@
     #12) Soundconverter|Soundkonverter
     #13) Puddletag
     #14) Audacity
-    #15) OceanAudio
+    #15) OcenAudio
     #16) MIDI
     #17) Codecs
     AUDIO_OPTIONS="4 12 17"
