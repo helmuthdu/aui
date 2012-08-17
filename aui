@@ -135,18 +135,17 @@ add_module(){ #{{{
         start_module "$MODULE"
     done
 } #}}}
-pacaui(){ #{{{
-    [[ AUTOMATIC_MODE == 1 ]] && NOCONFIRM="--noconfirm" || NOCONFIRM=""
+aui_download_packages(){ #{{{
     for PACKAGE in $1; do
         #exec command as user instead of root
         su -l $USERNAME -c "
-        [[ ! -d pacaui ]] && mkdir pacaui
-        cd pacaui
+        [[ ! -d aui_packages ]] && mkdir aui_packages
+        cd aui_packages
         curl -o $PACKAGE.tar.gz http://aur.archlinux.org/packages/$PACKAGE/$PACKAGE.tar.gz
         tar zxvf $PACKAGE.tar.gz
         rm $PACKAGE.tar.gz
         cd $PACKAGE
-        makepkg -si $NOCONFIRM
+        makepkg -si --noconfirm
         "
     done
 } #}}}
@@ -910,7 +909,7 @@ case "$1" in
                         ;;
                     2)
                         if ! check_package "joe" ; then
-                            pacaui joe
+                            aui_download_packages "joe"
                         fi
                         sed -i '/EDITOR/s/vim/joe/' /home/$USERNAME/.bashrc
                         sed -i '/VISUAL/s/vim/joe/' /home/$USERNAME/.bashrc
@@ -999,8 +998,7 @@ case "$1" in
                     if ! check_package "yaourt" ; then
                         package_install "base-devel yajl namcap"
                         pacman -D --asdeps --noconfirm yajl namcap
-                        pacaui package-query
-                        pacaui yaourt
+                        aui_download_packages "package-query yaourt"
                         if ! check_package "yaourt" ; then
                             echo "Yaourt not installed. EXIT now"
                             pause_function
@@ -1015,7 +1013,7 @@ case "$1" in
                     if ! check_package "packer" ; then
                         package_install "base-devel git jshon"
                         pacman -D --asdeps --noconfirm jshon
-                        pacaui packer
+                        aui_download_packages "packer"
                         if ! check_package "packer" ; then
                             echo "Packer not installed. EXIT now"
                             pause_function
@@ -1030,8 +1028,7 @@ case "$1" in
                     if ! check_package "pacaur" ; then
                         package_install "base-devel yajl expac"
                         pacman -D --asdeps --noconfirm yajl expac
-                        pacaui cower
-                        pacaui pacaur
+                        aui_download_packages "cower pacaur"
                         if ! check_package "pacaur" ; then
                             echo "Pacaur not installed. EXIT now"
                             pause_function
