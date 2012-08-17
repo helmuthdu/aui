@@ -208,6 +208,7 @@ contains_element(){ #{{{
 create_xinitrc(){ #{{{
     #create a xinitrc file in home user directory
     cp /etc/skel/.xinitrc /home/$USERNAME/
+    chown $USERNAME:users /home/$USERNAME/.xinitrc
 
     if [[ $1 == gnome-session ]]; then
         echo -e "exec ck-launch-session $1" >> /home/$USERNAME/.xinitrc
