@@ -207,18 +207,12 @@ contains_element(){ #{{{
 } #}}}
 create_xinitrc(){ #{{{
     #create a xinitrc file in home user directory
-    echo -e '#!/bin/sh\n
-if [ -d /etc/X11/xinit/xinitrc.d ]; then
-  for f in /etc/X11/xinit/xinitrc.d/*; do
-    [ -x "$f" ] && . "$f"
-  done
-  unset f
-fi\n' > /home/$USERNAME/.xinitrc
+    cp /etc/skel/.xinitrc ~/
 
-    if [[ $1 == startxfce4 ]]; then
-        echo -e "exec $1" >> /home/$USERNAME/.xinitrc
-    else
+    if [[ $1 == gnome-session ]]; then
         echo -e "exec ck-launch-session $1" >> /home/$USERNAME/.xinitrc
+    else
+        echo -e "exec $1" >> /home/$USERNAME/.xinitrc
     fi
 
     chown -R $USERNAME:users /home/$USERNAME/.xinitrc
@@ -2088,6 +2082,8 @@ case "$1" in
                 systemctl enable polkitd.service
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
+                #A framework for defining and tracking users, login sessions, and seats
+                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 GNOME=1
                 ;;
