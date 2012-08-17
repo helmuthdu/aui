@@ -135,20 +135,6 @@ add_module(){ #{{{
         start_module "$MODULE"
     done
 } #}}}
-aui_download_packages(){ #{{{
-    for PACKAGE in $1; do
-        #exec command as user instead of root
-        su -l $USERNAME -c "
-        [[ ! -d aui_packages ]] && mkdir aui_packages
-        cd aui_packages
-        curl -o $PACKAGE.tar.gz http://aur.archlinux.org/packages/$PACKAGE/$PACKAGE.tar.gz
-        tar zxvf $PACKAGE.tar.gz
-        rm $PACKAGE.tar.gz
-        cd $PACKAGE
-        makepkg -si --noconfirm
-        "
-    done
-} #}}}
 check_package(){ #{{{
     #check if a package is already installed
     for PACKAGE in $1; do
@@ -183,6 +169,20 @@ aur_package_install(){ #{{{
         else
             echo -e "Warning: $PACKAGE is up to date --skipping"
         fi
+    done
+} #}}}
+aui_download_packages(){ #{{{
+    for PACKAGE in $1; do
+        #exec command as user instead of root
+        su -l $USERNAME -c "
+        [[ ! -d aui_packages ]] && mkdir aui_packages
+        cd aui_packages
+        curl -o $PACKAGE.tar.gz http://aur.archlinux.org/packages/$PACKAGE/$PACKAGE.tar.gz
+        tar zxvf $PACKAGE.tar.gz
+        rm $PACKAGE.tar.gz
+        cd $PACKAGE
+        makepkg -si --noconfirm
+        "
     done
 } #}}}
 package_install(){ #{{{
