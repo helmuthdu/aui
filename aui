@@ -169,11 +169,7 @@ aur_package_install(){ #{{{
     #install package from aur
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
-            if [[ $AUR_HELPER == pacaui ]]; then
-                pacaui $PACKAGE
-            else
-                su -l $USERNAME -c "$AUR_HELPER --noconfirm -S $PACKAGE"
-            fi
+            su -l $USERNAME -c "$AUR_HELPER --noconfirm -S $PACKAGE"
             #RECHECK #{{{
             #check if the package wasnt installed
             if ! check_package "$PACKAGE" ; then
@@ -181,14 +177,7 @@ aur_package_install(){ #{{{
                     echo "$PACKAGE" >> packages_not_installed.txt
                 else
                     read_input_text "Package $PACKAGE not installed, try install again?"
-                    if [[ $OPTION == y ]]; then
-                        if [[ $AUR_HELPER == pacaui ]]; then
-                            $EDITOR aui_packages/$PACKAGE/PKGBUILD
-                            pacaui $PACKAGE
-                        else
-                            su -l $USERNAME -c "$AUR_HELPER -S $PACKAGE"
-                        fi
-                    fi
+                    [[ $OPTION == y ]] && su -l $USERNAME -c "$AUR_HELPER -S $PACKAGE"
                 fi
             fi
             #}}}
@@ -999,7 +988,7 @@ case "$1" in
         print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
         print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
         print_warning "\tNone of these tools are officially supported by Arch devs."
-        aurhelper=("Yaourt (recommended)" "Packer" "Pacaui (build-in)")
+        aurhelper=("Yaourt (recommended)" "Packer")
         PS3="$prompt1"
         echo -e "Choose your default AUR helper to install\n"
         select OPT in "${aurhelper[@]}"; do
@@ -1038,11 +1027,6 @@ case "$1" in
                     break
                     ;;
                 3)
-                    CURRENT_STATUS=1
-                    AUR_HELPER='pacaui'
-                    break
-                    ;;
-                4)
                     if ! check_package "pacaur" ; then
                         package_install "base-devel yajl expac"
                         pacman -D --asdeps --noconfirm yajl expac
