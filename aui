@@ -1812,6 +1812,8 @@ case "$1" in
                 systemctl enable polkitd.service
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
+                #A framework for defining and tracking users, login sessions, and seats
+                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 GNOME=1
                 ;;
@@ -1905,6 +1907,8 @@ case "$1" in
                 #}}}
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
+                #A framework for defining and tracking users, login sessions, and seats
+                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 E17=1
                 ;;
@@ -2178,6 +2182,8 @@ case "$1" in
                 systemctl enable polkitd.service
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
+                #A framework for defining and tracking users, login sessions, and seats
+                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 KDE=1
                 ;;
@@ -2242,6 +2248,8 @@ case "$1" in
                 #}}}
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
+                #A framework for defining and tracking users, login sessions, and seats
+                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 LXDE=1
                 ;;
@@ -2343,6 +2351,8 @@ case "$1" in
                 #}}}
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
+                #A framework for defining and tracking users, login sessions, and seats
+                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 OPENBOX=1
                 ;;
@@ -2404,6 +2414,8 @@ case "$1" in
                 systemctl enable polkitd.service
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
+                #A framework for defining and tracking users, login sessions, and seats
+                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 XFCE=1
                 ;;
