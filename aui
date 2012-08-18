@@ -1026,8 +1026,8 @@ case "$1" in
                         pacman -D --asdeps --noconfirm yajl expac
                         #fix pod2man path
                         ln -s /usr/bin/core_perl/pod2man /usr/bin/
-                        pacman -D --asdeps --noconfirm cower
                         aui_download_packages "cower pacaur"
+                        pacman -D --asdeps --noconfirm cower
                         if ! check_package "pacaur" ; then
                             echo "Pacaur not installed. EXIT now"
                             pause_function
