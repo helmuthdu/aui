@@ -992,9 +992,9 @@ case "$1" in
                     print_info "Yaourt (Yet AnOther User Repository Tool) is a community-contributed wrapper for pacman which adds seamless access to the AUR, allowing and automating package compilation and installation from your choice of the thousands of PKGBUILDs in the AUR, in addition to the many thousands of available Arch Linux binary packages."
                     if ! check_package "yaourt" ; then
                         package_install "base-devel yajl namcap"
-                        pacman -D --asdeps --noconfirm yajl namcap
+                        pacman -D --asdeps yajl namcap
                         aui_download_packages "package-query yaourt"
-                        pacman -D --asdeps --noconfirm package-query
+                        pacman -D --asdeps package-query
                         if ! check_package "yaourt" ; then
                             echo "Yaourt not installed. EXIT now"
                             pause_function
@@ -1008,7 +1008,7 @@ case "$1" in
                 2)
                     if ! check_package "packer" ; then
                         package_install "base-devel git jshon"
-                        pacman -D --asdeps --noconfirm jshon
+                        pacman -D --asdeps jshon
                         aui_download_packages "packer"
                         if ! check_package "packer" ; then
                             echo "Packer not installed. EXIT now"
@@ -1023,11 +1023,11 @@ case "$1" in
                 3)
                     if ! check_package "pacaur" ; then
                         package_install "base-devel yajl expac"
-                        pacman -D --asdeps --noconfirm yajl expac
+                        pacman -D --asdeps yajl expac
                         #fix pod2man path
                         ln -s /usr/bin/core_perl/pod2man /usr/bin/
                         aui_download_packages "cower pacaur"
-                        pacman -D --asdeps --noconfirm cower
+                        pacman -D --asdeps cower
                         if ! check_package "pacaur" ; then
                             echo "Pacaur not installed. EXIT now"
                             pause_function
