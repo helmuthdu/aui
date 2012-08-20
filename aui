@@ -3284,7 +3284,6 @@ case "$1" in
                 aur_package_install "adminer"
                 aur_package_install "systemd-httpd-units"
                 systemctl enable httpd.service
-                aur_package_install "systemd-mysqld-units"
                 systemctl enable mysqld.service
                 if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
                     cp -v /etc/php/php.ini /etc/php/php.ini.aui
