@@ -1035,7 +1035,7 @@ case "$1" in
                         fi
                     fi
                     CURRENT_STATUS=1
-                    AUR_HELPER="pacaui"
+                    AUR_HELPER="pacaur"
                     break
                     ;;
                 *)
