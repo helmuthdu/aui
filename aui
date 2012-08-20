@@ -205,17 +205,10 @@ contains_element(){ #{{{
     #check if an element exist in a string
     for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
 } #}}}
-create_xinitrc(){ #{{{
+config_xinitrc(){ #{{{
     #create a xinitrc file in home user directory
-    cp /etc/skel/.xinitrc /home/$USERNAME/
-    chown $USERNAME:users /home/$USERNAME/.xinitrc
-
-    if [[ $1 == gnome-session ]]; then
-        echo -e "exec ck-launch-session $1" >> /home/$USERNAME/.xinitrc
-    else
-        echo -e "exec $1" >> /home/$USERNAME/.xinitrc
-    fi
-
+    cp -f /etc/skel/.xinitrc /home/$USERNAME/
+    echo -e "exec $1" >> /home/$USERNAME/.xinitrc
     chown -R $USERNAME:users /home/$USERNAME/.xinitrc
 } #}}}
 invalid_option(){ #{{{
@@ -1750,7 +1743,7 @@ case "$1" in
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
                 aur_package_install "empathy-theme-ubuntu-adium-bzr"
                 aur_package_install "automounter gnome-defaults-list"
-                create_xinitrc "gnome-session-cinnamon"
+                config_xinitrc "gnome-session-cinnamon"
                 #CINNAMON CUSTOMIZATION {{{
                 while [[ 1 ]]
                 do
@@ -1831,7 +1824,7 @@ case "$1" in
                 aur_package_install "file-roller2-nn"
                 aur_package_install "gnome-defaults-list"
                 chown -R $USERNAME:users /home/$USERNAME/.config
-                create_xinitrc "enlightenment_start"
+                config_xinitrc "enlightenment_start"
                 #E17 CUSTOMIZATION {{{
                 while [[ 1 ]]
                 do
@@ -1926,7 +1919,7 @@ case "$1" in
                 package_install "system-config-printer-gnome"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
                 aur_package_install "automounter gnome-defaults-list"
-                create_xinitrc "gnome-session"
+                config_xinitrc "gnome-session"
                 #GNOME CUSTOMIZATION {{{
                 while [[ 1 ]]
                 do
@@ -2105,7 +2098,7 @@ case "$1" in
                 package_remove "kdemultimedia-kscd kdemultimedia-juk"
                 aur_package_install "kde-gtk-config-git"
                 aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
-                create_xinitrc "startkde"
+                config_xinitrc "startkde"
                 #QTCURVE THEMES #{{{
                 curl -o Sweet.tar.gz http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
                 curl -o Kawai.tar.gz http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
@@ -2200,7 +2193,7 @@ case "$1" in
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
                 aur_package_install "file-roller2-nn"
                 aur_package_install "gnome-defaults-list"
-                create_xinitrc "startlxde"
+                config_xinitrc "startlxde"
                 #LXDE CUSTOMIZATION{{{
                 while [[ 1 ]]
                 do
@@ -2271,7 +2264,7 @@ case "$1" in
                 cp /etc/xdg/openbox/menu.xml /home/$USERNAME/.config/openbox/
                 cp /etc/xdg/openbox/autostart /home/$USERNAME/.config/openbox/
                 chown -R $USERNAME:users /home/$USERNAME/.config
-                create_xinitrc "openbox-session"
+                config_xinitrc "openbox-session"
                 #OPENBOX CUSTOMIZATION {{{
                 while [[ 1 ]]
                 do
@@ -2368,7 +2361,7 @@ case "$1" in
                 aur_package_install "file-roller2-nn"
                 aur_package_install "automounter"
                 aur_package_install "gnome-defaults-list"
-                create_xinitrc "startxfce4"
+                config_xinitrc "startxfce4"
                 #XFCE CUSTOMIZATION{{{
                 while [[ 1 ]]
                 do
