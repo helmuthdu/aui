@@ -3256,6 +3256,7 @@ case "$1" in
     #WEBSERVER {{{
     install_web_server(){
         create_sites_folder(){
+            [[ ! -f  /etc/httpd/conf/extra/httpd-userdir.conf.aui ]] && cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
             sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
             su -l $USERNAME -c "mkdir -p ~/Sites"
             su -l $USERNAME -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
@@ -3278,20 +3279,24 @@ case "$1" in
                 aur_package_install "systemd-httpd-units"
                 systemctl enable httpd.service
                 systemctl enable mysqld.service
+                #CONFIGURE HTTPD.CONF {{{
                 if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
-                    cp -v /etc/php/php.ini /etc/php/php.ini.aui
-                    cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
                     cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-                    #CONFIGURE HTTPD.CONF {{{
                     /usr/bin/mysql_secure_installation
                     echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
                     echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
                     sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
                     echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
                     sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
-                    #}}}
                 fi
+                #}}}
                 #CONFIGURE PHP.INI {{{
+                if [[ -f  /etc/php/php.ini.pacnew ]];then
+                    mv -v /etc/php/php.ini /etc/php/php.ini.pacold
+                    mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
+                    rm -v /etc/php/php.ini.aui
+                fi
+                [[ ! -f  /etc/php/php.ini.aui ]] && cp -v /etc/php/php.ini /etc/php/php.ini.aui
                 sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
                 sed -i '/mysql.so/s/^;//' /etc/php/php.ini
                 sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
@@ -3309,19 +3314,23 @@ case "$1" in
                 aur_package_install "systemd-httpd-units"
                 systemctl enable httpd.service
                 systemctl enable postgresql.service
+                #CONFIGURE HTTPD.CONF {{{
                 if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
-                    cp -v /etc/php/php.ini /etc/php/php.ini.aui
-                    cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
                     cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-                    #CONFIGURE HTTPD.CONF {{{
                     echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
                     echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
                     sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
                     echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
                     sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
-                    #}}}
                 fi
+                #}}}
                 #CONFIGURE PHP.INI {{{
+                if [[ -f  /etc/php/php.ini.pacnew ]];then
+                    mv -v /etc/php/php.ini /etc/php/php.ini.pacold
+                    mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
+                    rm -v /etc/php/php.ini.aui
+                fi
+                [[ ! -f  /etc/php/php.ini.aui ]] && cp -v /etc/php/php.ini /etc/php/php.ini.aui
                 sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
                 sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
                 sed -i '/gd.so/s/^;//' /etc/php/php.ini
@@ -4356,26 +4365,8 @@ case "$1" in
         print_title "INSTALL COMPLETED"
         echo -e "Thanks for using the Archlinux Ultimate Install script by helmuthdu\n"
         #REBOOT
-        read_input_text "Reboot yourt system"
-        if [[ $OPTION == y ]]; then
-            reboot
-            exit 0
-        fi
-        #START DM
-        if check_package "gdm" ; then
-            DM="gdm"
-        elif [[ $KDE -eq 1 ]]; then
-            DM="kdm"
-        elif check_package "slim" ; then
-            DM="slim"
-        elif check_package "lightdm" ; then
-            DM="lightdm"
-        elif check_package "lxdm" ; then
-            DM="lxdm"
-        elif check_package "elsa-svn-arch" ; then
-            DM="elsa"
-        fi
-        [[ ! -n $DISPLAY ]] && start_daemon "$DM"
+        read -p "Reboot yourt system" OPTION
+        [[ $OPTION == y ]] && reboot
         exit 0
     }
     #}}}
