@@ -336,9 +336,9 @@ case "$1" in
         partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
         device_name=("root" "swap" "another")
         select_filesystem() {
-            filesystem=("ext4" "ext3" "btrfs" "vfat" "ntfs-3g");
+            filesystem=("ext4" "ext3" "btrfs" "vfat" "ntfs");
             PS3="$prompt1"
-            echo -e "Select filesystem:"
+            echo -e "Select filesystem:\n"
             select OPT in "${filesystem[@]}"; do
                 if contains_element "$OPT" "${filesystem[@]}"; then
                     TYPE=$OPT
