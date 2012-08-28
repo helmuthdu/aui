@@ -4356,7 +4356,7 @@ case "$1" in
         print_title "INSTALL COMPLETED"
         echo -e "Thanks for using the Archlinux Ultimate Install script by helmuthdu\n"
         #REBOOT
-        read -p "Reboot yourt system" OPTION
+        read -p "Reboot yourt system [y/N]" OPTION
         [[ $OPTION == y ]] && reboot
         exit 0
     }
