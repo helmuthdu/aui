@@ -1099,8 +1099,7 @@ case "$1" in
                     echo ""
                     echo " d) DONE"
                     echo ""
-                    CUSTOMREPO+=" d"
-                    read_input_options "$CUSTOMREPO"
+                    read_input_options
                     for OPT in ${OPTIONS[@]}; do
                         case $OPT in
                             1)

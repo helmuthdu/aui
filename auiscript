@@ -30,10 +30,9 @@
     #11) Games
     #12) LAMP
     #13) Fonts
-    #14) Fonts Configuration
-    #15) Extra
-    #16) Clean Orphan Packages
-    MAINMENU="1-14 16"
+    #14) Extra
+    #15) Clean Orphan Packages
+    MAINMENU="1-13 15"
 #}}}
 #BASIC SETUP{{{
     FIRMWARE="n"
@@ -118,14 +117,15 @@
         GNOME_OPTIONS="1-5"
         #GNOME EXTENSIONS {{{
             # 1) gpaste
-            # 2) gtile
-            # 3) media-player
-            # 4) noa11y
-            # 5) pomodoro
-            # 6) system-monitor
-            # 7) user-theme
-            # 8) weather
-            GNOME_EXTENSIONS="1-8"
+            # 2) disper
+            # 3) gtile
+            # 4) media-player
+            # 5) noa11y
+            # 6) pomodoro
+            # 7) system-monitor
+            # 8) user-theme
+            # 9) weather
+            GNOME_EXTENSIONS="1-9"
         #}}}
         #GNOME SHELL THEMES {{{
             # 1) Dark Shine
@@ -273,7 +273,7 @@
     # 9) OCRFeeder
     #10) Xmind
     #11) Zathura
-    OFFICE_OPTIONS="1 6-8 10"
+    OFFICE_OPTIONS="1 6 8 10"
 #}}}
 #SYSTEM TOOLS {{{
     # 1) Gparted
@@ -282,7 +282,7 @@
     # 4) Virtualbox
     # 5) Webmin
     # 6) Wine
-    SYSTEMTOOLS_OPTIONS="1-3 5 6"
+    SYSTEMTOOLS_OPTIONS="1-3 6"
 #}}}
 #GRAPHICS {{{
     # 1) Blender
@@ -357,7 +357,7 @@
 #WEBSERVER {{{
     # 1) LAMP - APACHE, MYSQL & PHP + ADMINER
     # 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER
-    LAMP="1"
+    LAMP="2"
 #}}}
 #AUDIO {{{
     # 1) Amarok
@@ -519,13 +519,6 @@
     # 9) ttf-wgy-microhei
     FONTS_OPTIONS="1 3-9"
     GOOGLE_FONTS="y"
-#}}}
-#FONTS CONFIGURATION {{{
-    # 1) Ubuntu patched packages
-    # 2) Cleartype patched packages
-    # 3) Infinality patched packages
-    # 4) Reverting to unpatched packages
-    FONTSCONFIG_OPTION="1"
 #}}}
 #EXTRA {{{
     # 1) Elementary Project
