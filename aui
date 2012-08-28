@@ -365,7 +365,7 @@ case "$1" in
                     print_info "btrfs provides a number of features (such as checksumming, snapshots, and subvolumes) that make it an excellent candidate for using it as the root partition in an Arch Linux installation."
                     package_install "gdisk"
                     gdisk $ROOT_DEVICE
-                    mkfs.$TYPE -L btrfs-root $1
+                    mkfs.$TYPE $1
                     mount -t $TYPE $1 $2
                 else
                     mkfs.$TYPE $1
