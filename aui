@@ -334,13 +334,14 @@ case "$1" in
         i=0
         partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
         device_name=("root" "swap" "another")
+        MOUNTPOINT="/mnt"
         select_filesystem() {
             filesystem=("btrfs" "ext4" "vfat" "ntfs");
             PS3="$prompt1"
             echo -e "Select filesystem:"
             select OPT in "${filesystem[@]}"; do
                 if contains_element "$OPT" "${filesystem[@]}"; then
-                    FS=$OPT
+                    TYPE=$OPT
                     break
                 else
                     invalid_option
@@ -358,10 +359,10 @@ case "$1" in
             if [[ $OPTION == y ]]; then
                 umount $1
                 select_filesystem
-                mkfs.$FS $1
+                mkfs.$TYPE $1
                 fsck $1
                 mkdir -p $2
-                mount -t $FS $1 $2
+                mount -t $TYPE $1 $2
                 remove_partition "$1"
             fi
         }
@@ -389,8 +390,8 @@ case "$1" in
                 if contains_element "$DEVICE" "${partitions[@]}"; then
                     case ${device_name[i]} in
                         root)
-                            format_partition "$DEVICE" "/mnt"
                             ROOT=$DEVICE
+                            format_partition "$DEVICE" "${MOUNTPOINT}"
                             ;;
                         swap)
                             format_swap_partition "$DEVICE"
@@ -400,13 +401,13 @@ case "$1" in
                             read -p "Type [ex: ext4]:" TYPE
                             read_input_text "Format $DEVICE partition"
                             if [[ $OPTION == y ]]; then
-                                format_partition "$DEVICE" "/mnt$DIR"
+                                format_partition "$DEVICE" "${MOUNTPOINT}${DIR}"
                             else
-                                read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="$DIR""
+                                read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="${DIR}""
                                 if [[ $OPTION == y ]]; then
-                                    mkdir -p /mnt$DIR
-                                    mount -t $TYPE $DEVICE /mnt$DIR
-                                    check_mountpoint "$DEVICE" "/mnt$DIR"
+                                    mkdir -p ${MOUNTPOINT}${DIR}
+                                    mount -t $TYPE $DEVICE ${MOUNTPOINT}${DIR}
+                                    check_mountpoint "$DEVICE" "${MOUNTPOINT}${DIR}"
                                 fi
                             fi
                             ;;
@@ -574,7 +575,7 @@ case "$1" in
             read_input_text "Install Grub2 on the MBR"
             echo -e $prompt3
             if [[ $OPTION == y ]]; then
-                print_warning "modprobe dm-mod\ngrub-install $BOOTLOADER_PARTITION\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
+                print_warning "modprobe dm-mod\ngrub-install --target=i386-pc --recheck $BOOTLOADER_PARTITION\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
             else
                 print_warning "modprobe dm-mod\nchattr -i /boot/grub/i386-pc/core.img\ngrub-install --target=i386-pc --recheck --debug --force /dev/sdaX\nchattr +i /boot/grub/i386-pc/core.img\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
             fi
