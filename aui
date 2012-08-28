@@ -288,7 +288,7 @@ case "$1" in
         print_title "DEFAULT EDITOR"
         EDITORS=("emacs" "nano" "vi" "vim");
         PS3="$prompt1"
-        echo -e "Select default editor\n"
+        echo -e "Select default editor:"
         select OPT in "${EDITORS[@]}"; do
             case "$REPLY" in
                 1)
@@ -334,6 +334,19 @@ case "$1" in
         i=0
         partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
         device_name=("root" "swap" "another")
+        select_filesystem() {
+            filesystem=("btrfs" "ext4" "vfat" "ntfs");
+            PS3="$prompt1"
+            echo -e "Select filesystem:"
+            select OPT in "${filesystem[@]}"; do
+                if contains_element "$OPT" "${filesystem[@]}"; then
+                    FS=$OPT
+                    break
+                else
+                    invalid_option
+                fi
+            done
+        }
         remove_partition() {
             #remove the selected partition from list
             partitions=(${partitions[@]#$1})
@@ -343,12 +356,13 @@ case "$1" in
         format_partition() {
             read_input_text "Confirm format $2 partition"
             if [[ $OPTION == y ]]; then
-                umount $2
-                mkfs.$1 $2
-                fsck $2
-                mkdir -p $3
-                mount -t $1 $2 $3
-                remove_partition "$2"
+                umount $1
+                select_filesystem
+                mkfs.$FS $1
+                fsck $1
+                mkdir -p $2
+                mount -t $FS $1 $2
+                remove_partition "$1"
             fi
         }
         format_swap_partition() {
@@ -375,7 +389,7 @@ case "$1" in
                 if contains_element "$DEVICE" "${partitions[@]}"; then
                     case ${device_name[i]} in
                         root)
-                            format_partition "ext4" "$DEVICE" "/mnt"
+                            format_partition "$DEVICE" "/mnt"
                             ROOT=$DEVICE
                             ;;
                         swap)
@@ -386,7 +400,7 @@ case "$1" in
                             read -p "Type [ex: ext4]:" TYPE
                             read_input_text "Format $DEVICE partition"
                             if [[ $OPTION == y ]]; then
-                                format_partition "$TYPE" "$DEVICE" "/mnt$DIR"
+                                format_partition "$DEVICE" "/mnt$DIR"
                             else
                                 read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="$DIR""
                                 if [[ $OPTION == y ]]; then
@@ -1330,7 +1344,7 @@ case "$1" in
         #variable to check if the file wasnt already patched
         local patch=`cat $file | sed ''$(( $line + 1 ))'!d'`
         #get the keymap from rc.conf
-        local keymap=`cat /etc/rc.conf | sed -n '/KEYMAP[=]/p' | sed 's/.*"\(.*\)".*/\1/g'`
+        local keymap=`cat /etc/vconsole.conf | sed -n '/KEYMAP[=]/p' | sed 's/KEYMAP=//'`
         #check if the file wasnt already patched
         if [[ $patch != *"XkbLayout"* ]]; then
             if [[ $keymap == us-acentos ]]; then
@@ -1546,7 +1560,6 @@ case "$1" in
                 groupadd -g 42 privoxy
                 useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
                 pacman -S --noconfirm tor privoxy
-                aur_package_install "privoxy-systemd"
                 systemctl enable tor.service
                 systemctl enable privoxy.service
                 CURRENT_STATUS=1
@@ -1953,13 +1966,14 @@ case "$1" in
                                 do
                                     print_title "GNOMESHELL EXTENSIONS"
                                     echo " 1) $(menu_item "gpaste")"
-                                    echo " 2) $(menu_item "gnome-shell-extension-mediaplayer-git")"
-                                    echo " 3) $(menu_item "gnome-shell-extension-noa11y-git")"
-                                    echo " 4) $(menu_item "gnome-shell-extension-pomodoro-git")"
-                                    echo " 5) $(menu_item "gnome-shell-system-monitor-applet-git" "System-monitor")"
-                                    echo " 6) $(menu_item "gnome-shell-extension-user-theme-git")"
-                                    echo " 7) $(menu_item "gnome-shell-extension-weather-git")"
-                                    echo " 8) $(menu_item "gnome-shell-extension-gtile-git")"
+                                    echo " 2) $(menu_item "disper")"
+                                    echo " 3) $(menu_item "gnome-shell-extension-mediaplayer-git")"
+                                    echo " 4) $(menu_item "gnome-shell-extension-noa11y-git")"
+                                    echo " 5) $(menu_item "gnome-shell-extension-pomodoro-git")"
+                                    echo " 6) $(menu_item "gnome-shell-system-monitor-applet-git" "System-monitor")"
+                                    echo " 7) $(menu_item "gnome-shell-extension-user-theme-git")"
+                                    echo " 8) $(menu_item "gnome-shell-extension-weather-git")"
+                                    echo " 9) $(menu_item "gnome-shell-extension-gtile-git")"
                                     echo ""
                                     echo " b) BACK"
                                     echo ""
@@ -1971,25 +1985,28 @@ case "$1" in
                                                 aur_package_install "gpaste"
                                                 ;;
                                             2)
-                                                aur_package_install "gnome-shell-extension-mediaplayer-git"
+                                                aur_package_install "disper"
                                                 ;;
                                             3)
-                                                aur_package_install "gnome-shell-extension-noa11y-git"
+                                                aur_package_install "gnome-shell-extension-mediaplayer-git"
                                                 ;;
                                             4)
+                                                aur_package_install "gnome-shell-extension-noa11y-git"
+                                                ;;
+                                            5)
                                                 aur_package_install "libkeybinder3"
                                                 aur_package_install "gnome-shell-extension-pomodoro-git"
                                                 ;;
-                                            5)
+                                            6)
                                                 aur_package_install "gnome-shell-system-monitor-applet-git"
                                                 ;;
-                                            6)
+                                            7)
                                                 aur_package_install "gnome-shell-extension-user-theme-git"
                                                 ;;
-                                            7)
+                                            8)
                                                 aur_package_install "gnome-shell-extension-weather-git"
                                                 ;;
-                                            8)
+                                            9)
                                                 aur_package_install "gnome-shell-extension-gtile-git"
                                                 ;;
                                             "b")
