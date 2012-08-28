@@ -550,6 +550,8 @@ case "$1" in
     #}}}
     #INSTALL BOOTLOADER {{{
     install_bootloader(){
+        print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
+        print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
         bootloader=("Grub2" "Syslinux" "Skip")
         PS3="$prompt1"
         echo -e "Install bootloader:\n"
