@@ -336,7 +336,7 @@ case "$1" in
         partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
         device_name=("root" "swap" "another")
         select_filesystem() {
-            filesystem=("ext4" "btrfs");
+            filesystem=("ext4" "ext3" "btrfs" "vfat" "ntfs-3g");
             PS3="$prompt1"
             echo -e "Select filesystem:"
             select OPT in "${filesystem[@]}"; do
@@ -361,10 +361,10 @@ case "$1" in
                 mount|grep $1 && umount $1
                 [[ -z $3 ]] && select_filesystem
                 if [[ $1 == $ROOT && $TYPE == btrfs ]]; then
-                    print_title "https://wiki.archlinux.org/index.php/Installing_on_Btrfs_root"
+                    print_title "https://wiki.archlinux.org/index.php/Btrfs"
                     print_info "btrfs provides a number of features (such as checksumming, snapshots, and subvolumes) that make it an excellent candidate for using it as the root partition in an Arch Linux installation."
-                    package_install "gdisk"
-                    gdisk $ROOT_DEVICE
+                    print_warning "This filesystem still experimental, use at own risk.\nYou should install the bootloader in a different partition"
+                    pause_function
                     mkfs.$TYPE $1
                     mount -t $TYPE $1 $2
                 else
@@ -409,7 +409,7 @@ case "$1" in
                             ;;
                         another)
                             read -p "Mountpoint [ex: /home]:" DIR
-                            read -p "Type [ex: ext4]:" TYPE
+                            select_filesystem
                             read_input_text "Format $DEVICE partition"
                             if [[ $OPTION == y ]]; then
                                 format_partition "$DEVICE" "${MOUNTPOINT}${DIR}" "$TYPE"
