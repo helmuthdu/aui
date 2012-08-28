@@ -333,7 +333,7 @@ case "$1" in
         print_info "This step will select and format the selected partiton where the archlinux will be installed"
         print_warning "\tAll data on the ROOT and SWAP partition will be LOST."
         i=0
-        partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
+        partitions=(`sfdisk -l | awk '{print $1}' | grep /dev/`)
         device_name=("root" "swap" "another")
         select_filesystem() {
             filesystem=("ext4" "btrfs");
