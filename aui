@@ -366,17 +366,7 @@ case "$1" in
                     package_install "gdisk"
                     gdisk $ROOT_DEVICE
                     mkfs.$TYPE -L btrfs-root $1
-                    mkdir /mnt/btrfs-root
-                    mount -o defaults,noatime $1 /mnt/btrfs-root && cd /mnt/btrfs-root
-                    btrfs subvolume create __active && cd __active
-                    btrfs subvolume create home
-                    btrfs subvolume create var
-                    btrfs subvolume create usr
-                    btrfs subvolume list -p .
-                    chmod 755 ../\__active var usr home
-                    mkdir /mnt/btrfs-active
-                    mount -o defaults,noatime,subvol=__active $1 /mnt/btrfs-active && cd /mnt/btrfs-active
-                    MOUNTPOINT="/mnt/btrfs-active"
+                    mount -t $TYPE $1 $2
                 else
                     mkfs.$TYPE $1
                     fsck $1
