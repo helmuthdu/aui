@@ -357,12 +357,19 @@ case "$1" in
         format_partition() {
             read_input_text "Confirm format $2 partition"
             if [[ $OPTION == y ]]; then
-                umount $1
+                #check if partition is mounted and umount
+                mount|grep $1 && umount $1
                 [[ -z $3 ]] && select_filesystem;
-                mkfs.$TYPE $1
-                fsck $1
-                mkdir -p $2
-                mount -t $TYPE $1 $2
+                if [[ $1 == $ROOT && $TYPE == btrfs ]]; then
+                    package_install "gdisk"
+                    gdisk $ROOT_DEVICE
+                    mkfs.$TYPE $1
+                else
+                    mkfs.$TYPE $1
+                    fsck $1
+                    mkdir -p $2
+                    mount -t $TYPE $1 $2
+                fi
                 remove_partition "$1"
             fi
         }
@@ -391,6 +398,7 @@ case "$1" in
                     case ${device_name[i]} in
                         root)
                             ROOT=$DEVICE
+                            ROOT_DEVICE=`echo $ROOT | sed 's/[0-9]//'`
                             format_partition "$DEVICE" "${MOUNTPOINT}"
                             ;;
                         swap)
@@ -566,7 +574,6 @@ case "$1" in
     #}}}
     #CONFIGURE BOOTLOADER {{{
     configure_bootloader(){
-        BOOTLOADER_PARTITION=`echo $ROOT | sed 's/[0-9]//'`
         if [[ $BOOTLOADER == Grub2 ]]; then
             chroot /mnt mkdir -p /boot/grub/locale
             chroot /mnt cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
@@ -575,7 +582,7 @@ case "$1" in
             read_input_text "Install Grub2 on the MBR"
             echo -e $prompt3
             if [[ $OPTION == y ]]; then
-                print_warning "modprobe dm-mod\ngrub-install --target=i386-pc --recheck $BOOTLOADER_PARTITION\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
+                print_warning "modprobe dm-mod\ngrub-install --target=i386-pc --recheck $ROOT_DEVICE\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
             else
                 print_warning "modprobe dm-mod\nchattr -i /boot/grub/i386-pc/core.img\ngrub-install --target=i386-pc --recheck --debug --force /dev/sdaX\nchattr +i /boot/grub/i386-pc/core.img\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
             fi
