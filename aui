@@ -355,7 +355,7 @@ case "$1" in
             [[ ${device_name[i]} != another ]] && i=$(( i + 1 ))
         }
         format_partition() {
-            read_input_text "Confirm format $2 partition"
+            read_input_text "Confirm format $1 partition"
             if [[ $OPTION == y ]]; then
                 #check if partition is mounted and umount
                 mount|grep $1 && umount $1
