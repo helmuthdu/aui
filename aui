@@ -4449,7 +4449,7 @@ case "$1" in
                     checklist[1]=1
                     ;;
                 2)
-                    if [[ $BASICSETUP -eq 0 ]]; then
+                    if [[ checklist[1] -eq 0 ]]; then
                         echo -e "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
                         read_input_text "Are you sure you want to continue?"
                         if [[ $OPTION == n ]]; then continue; fi
