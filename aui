@@ -1752,6 +1752,7 @@ case "$1" in
         echo " 5) LXDE"
         echo " 6) OpenBox"
         echo " 7) XFCE"
+        echo " 8) Unity (Experimental)"
         echo ""
         echo " b) BACK"
         read_input $DESKTOPENV
@@ -2443,6 +2444,35 @@ case "$1" in
                 systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 XFCE=1
+                ;;
+                #}}}
+            8)
+                #UNITY {{{
+                print_title "UNITY - https://wiki.archlinux.org/index.php/Unity"
+                print_info "Unity is an alternative shell for the GNOME desktop environment, developed by Canonical in its Ayatana project. It consists of several components including the Launcher, Dash, lenses, Panel, indicators, Notify OSD and Overlay Scrollbar."
+                echo -e '\n[unity]\nServer = http://unity.xe-xe.org/$arch' >> /etc/pacman.conf
+                pacman -Suy
+                pacman -S $(pacman -Slq unity | grep -v plasma-widget-menubar | grep -v xfce4-indicator-plugin)
+                package_install "telepathy"
+                package_install "gksu nautilus-open-terminal gnome-search-tool gedit-plugins ubuntu-tweak"
+                package_install "gvfs-smb gvfs-afc"
+                package_install "zeitgeist"
+                package_install "deja-dup"
+                package_install "pulseaudio"
+                package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
+                aur_package_install "automounter gnome-defaults-list"
+                #Gnome Display Manager (a reimplementation of xdm)
+                systemctl enable lightdm.service
+                #D-Bus interface for user account query and manipulation
+                systemctl enable accounts-daemon.service
+                #Application development toolkit for controlling system-wide privileges
+                systemctl enable polkitd.service
+                #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+                systemctl enable upower.service
+                #A framework for defining and tracking users, login sessions, and seats
+                systemctl enable console-kit-daemon.service
+                CURRENT_STATUS=1
+                GNOME=1
                 ;;
                 #}}}
             *)
