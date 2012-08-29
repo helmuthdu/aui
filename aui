@@ -2448,6 +2448,9 @@ case "$1" in
                 #}}}
             8)
                 #UNITY {{{
+                print_warning "\nWARNING: EXPERIMENTAL OPTION, USE AT YOUR OWN RISK"
+                read_input_text "Are you sure you want to continue?"
+                [[ $OPTION == n ]] && continue
                 print_title "UNITY - https://wiki.archlinux.org/index.php/Unity"
                 print_info "Unity is an alternative shell for the GNOME desktop environment, developed by Canonical in its Ayatana project. It consists of several components including the Launcher, Dash, lenses, Panel, indicators, Notify OSD and Overlay Scrollbar."
                 echo -e '\n[unity]\nServer = http://unity.xe-xe.org/$arch' >> /etc/pacman.conf
@@ -2460,7 +2463,6 @@ case "$1" in
                 package_install "deja-dup"
                 package_install "pulseaudio"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
-                aur_package_install "automounter gnome-defaults-list"
                 #Gnome Display Manager (a reimplementation of xdm)
                 systemctl enable lightdm.service
                 #D-Bus interface for user account query and manipulation
@@ -4450,9 +4452,9 @@ case "$1" in
                     ;;
                 2)
                     if [[ checklist[1] -eq 0 ]]; then
-                        echo -e "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
+                        print_warning "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
                         read_input_text "Are you sure you want to continue?"
-                        if [[ $OPTION == n ]]; then continue; fi
+                        [[ $OPTION == n ]] && continue
                     fi
                     install_desktop_environment
                     install_nm_wicd
