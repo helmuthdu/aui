@@ -1099,7 +1099,7 @@ case "$1" in
                     echo ""
                     echo " d) DONE"
                     echo ""
-                    read_input_options
+                    read -p "$prompt2" OPTION
                     for OPT in ${OPTIONS[@]}; do
                         case $OPT in
                             1)
