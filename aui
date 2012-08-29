@@ -67,7 +67,6 @@ fi
 #}}}
 AUR=`echo -e "(${BPurple}aur${White})"`
 AUI_DIR=`pwd`
-MOUNTPOINT="/mnt"
 #}}}
 #MISC FUNCTIONS {{{
 read_input(){ #{{{
@@ -335,6 +334,7 @@ case "$1" in
         i=0
         partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
         device_name=("root" "swap" "another")
+        MOUNTPOINT="/mnt"
         select_filesystem() {
             filesystem=("ext4" "ext3" "btrfs" "vfat" "ntfs");
             PS3="$prompt1"
@@ -4221,7 +4221,7 @@ case "$1" in
         echo " b) BACK"
         echo ""
         EXTRA_OPTIONS+=" b"
-        read_input_options "$GAMES_OPTIONS"
+        read_input_options "$EXTRA_OPTIONS"
         for OPT in ${OPTIONS[@]}; do
             case "$OPT" in
                 1)
@@ -4356,7 +4356,7 @@ case "$1" in
         print_title "INSTALL COMPLETED"
         echo -e "Thanks for using the Archlinux Ultimate Install script by helmuthdu\n"
         #REBOOT
-        read -p "Reboot yourt system [y/N]" OPTION
+        read -p "Reboot yourt system [y/N]: " OPTION
         [[ $OPTION == y ]] && reboot
         exit 0
     }
