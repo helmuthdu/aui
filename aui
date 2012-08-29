@@ -1981,8 +1981,8 @@ case "$1" in
                                 while [[ 1 ]]
                                 do
                                     print_title "GNOMESHELL EXTENSIONS"
-                                    echo " 1) $(menu_item "gpaste")"
-                                    echo " 2) $(menu_item "disper")"
+                                    echo " 1) $(menu_item "disper")"
+                                    echo " 2) $(menu_item "gpaste")"
                                     echo " 3) $(menu_item "gnome-shell-extension-mediaplayer-git")"
                                     echo " 4) $(menu_item "gnome-shell-extension-noa11y-git")"
                                     echo " 5) $(menu_item "gnome-shell-extension-pomodoro-git")"
@@ -1998,10 +1998,10 @@ case "$1" in
                                     for OPT in ${OPTIONS[@]}; do
                                         case "$OPT" in
                                             1)
-                                                aur_package_install "gpaste"
+                                                aur_package_install "disper"
                                                 ;;
                                             2)
-                                                aur_package_install "disper"
+                                                aur_package_install "gpaste"
                                                 ;;
                                             3)
                                                 aur_package_install "gnome-shell-extension-mediaplayer-git"
@@ -2043,11 +2043,12 @@ case "$1" in
                                 while [[ 1 ]]
                                 do
                                     print_title "GNOMESHELL THEMES"
-                                    echo " 1) $(menu_item "gnome-shell-theme-dark-shine")"
-                                    echo " 2) $(menu_item "gnome-shell-theme-elegance")"
-                                    echo " 3) $(menu_item "gnome-shell-theme-eos")"
-                                    echo " 4) $(menu_item "gnome-shell-theme-frieze")"
-                                    echo " 5) $(menu_item "gnome-shell-theme-google+")"
+                                    echo " 1) $(menu_item "gnome-shell-theme-default-mod")"
+                                    echo " 2) $(menu_item "gnome-shell-theme-dark-shine")"
+                                    echo " 3) $(menu_item "gnome-shell-theme-elegance")"
+                                    echo " 4) $(menu_item "gnome-shell-theme-eos")"
+                                    echo " 5) $(menu_item "gnome-shell-theme-frieze")"
+                                    echo " 6) $(menu_item "gnome-shell-theme-google+")"
                                     echo ""
                                     echo " b) BACK"
                                     echo ""
@@ -2056,18 +2057,21 @@ case "$1" in
                                     for OPT in ${OPTIONS[@]}; do
                                         case "$OPT" in
                                             1)
-                                                aur_package_install "gnome-shell-theme-dark-shine"
+                                                aur_package_install "gnome-shell-theme-default-mod"
                                                 ;;
                                             2)
-                                                aur_package_install "gnome-shell-theme-elegance"
+                                                aur_package_install "gnome-shell-theme-dark-shine"
                                                 ;;
                                             3)
-                                                aur_package_install "gnome-shell-theme-eos"
+                                                aur_package_install "gnome-shell-theme-elegance"
                                                 ;;
                                             4)
-                                                aur_package_install "gnome-shell-theme-frieze"
+                                                aur_package_install "gnome-shell-theme-eos"
                                                 ;;
                                             5)
+                                                aur_package_install "gnome-shell-theme-frieze"
+                                                ;;
+                                            6)
                                                 aur_package_install "gnome-shell-theme-google+"
                                                 ;;
                                             "b")
@@ -2457,7 +2461,7 @@ case "$1" in
                 pacman -Suy
                 pacman -S $(pacman -Slq unity | grep -v plasma-widget-menubar | grep -v xfce4-indicator-plugin)
                 package_install "telepathy"
-                package_install "gksu nautilus-open-terminal gnome-search-tool gedit-plugins ubuntu-tweak"
+                package_install "gksu nautilus-open-terminal gnome-search-tool gedit-plugins"
                 package_install "gvfs-smb gvfs-afc"
                 package_install "zeitgeist"
                 package_install "deja-dup"
@@ -2473,6 +2477,8 @@ case "$1" in
                 systemctl enable upower.service
                 #A framework for defining and tracking users, login sessions, and seats
                 systemctl enable console-kit-daemon.service
+                #Network Management daemon
+                systemctl enable NetworkManager.service
                 CURRENT_STATUS=1
                 GNOME=1
                 ;;

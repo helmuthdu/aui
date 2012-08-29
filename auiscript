@@ -116,8 +116,8 @@
         # 8) Gloobus Preview
         GNOME_OPTIONS="1-5"
         #GNOME EXTENSIONS {{{
-            # 1) gpaste
-            # 2) disper
+            # 1) disper
+            # 2) gpaste
             # 3) gtile
             # 4) media-player
             # 5) noa11y
@@ -128,12 +128,13 @@
             GNOME_EXTENSIONS="1-9"
         #}}}
         #GNOME SHELL THEMES {{{
-            # 1) Dark Shine
-            # 2) Elegance
-            # 3) eOS
-            # 4) Frieze
-            # 5) Google+
-            GNOME_SHELL_THEMES="1-5"
+            # 1) Default Mod
+            # 2) Dark Shine
+            # 3) Elegance
+            # 4) eOS
+            # 5) Frieze
+            # 6) Google+
+            GNOME_SHELL_THEMES="1-6"
         #}}}
     #}}}
     #KDE {{{
