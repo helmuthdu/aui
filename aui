@@ -1099,25 +1099,22 @@ case "$1" in
                     echo ""
                     echo " d) DONE"
                     echo ""
-                    read -p "$prompt2" OPTION
-                    for OPT in ${OPTIONS[@]}; do
-                        case $OPT in
-                            1)
-                                read -p "Repository Name [ex: custom]: " REPONAME
-                                read -p "Repository Address [ex: file:///media/backup/Archlinux]: " REPOADDRESS
-                                echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"/'$arch' >> /etc/pacman.conf
-                                echo -e '\nCustom repository added into pacman.conf file'
-                                pause_function
-                                ;;
-                            "d")
-                                break
-                                ;;
-                            *)
-                                invalid_option
-                                ;;
-                        esac
-                    done
-                elihw
+                    read -p "$prompt1" OPTION
+                    case $OPTION in
+                        1)
+                            read -p "Repository Name [ex: custom]: " REPONAME
+                            read -p "Repository Address [ex: file:///media/backup/Archlinux]: " REPOADDRESS
+                            echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"/'$arch' >> /etc/pacman.conf
+                            echo -e '\nCustom repository added into pacman.conf file'
+                            pause_function
+                            ;;
+                        "d")
+                            break
+                            ;;
+                        *)
+                            invalid_option
+                            ;;
+                    esac
                 done
                 pacman -Sy
                 CURRENT_STATUS=1
