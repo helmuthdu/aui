@@ -466,7 +466,7 @@ case "$1" in
     #}}}
     #CONFIGURE HOSTNAME {{{
     configure_hostname(){
-        print_title "HOSTNAME"
+        print_title "HOSTNAME - https://wiki.archlinux.org/index.php/HOSTNAME"
         print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
         read -p "Hostname [ex: archlinux]: " HN
         echo "$HN" > ${MOUNTPOINT}/etc/hostname
@@ -541,7 +541,7 @@ case "$1" in
     #}}}
     #CONFIGURE MKINITCPIO {{{
     configure_mkinitcpio(){
-        print_title "https://wiki.archlinux.org/index.php/Mkinitcpio"
+        print_title "MKINITCPIO - https://wiki.archlinux.org/index.php/Mkinitcpio"
         print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
         echo -e $prompt3
         print_warning "mkinitcpio -p linux"
