@@ -3376,7 +3376,7 @@ case "$1" in
                 create_sites_folder
                 ;;
             2)
-                package_install "apache mysql php php-apache php-pgsql php-gd"
+                package_install "apache postgresql php php-apache php-pgsql php-gd"
                 aur_package_install "adminer"
                 aur_package_install "systemd-httpd-units"
                 systemctl enable httpd.service
