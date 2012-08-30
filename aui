@@ -3382,6 +3382,10 @@ case "$1" in
                 aur_package_install "systemd-httpd-units"
                 systemctl enable httpd.service
                 systemctl enable postgresql.service
+                echo "Enter your new postgres account password:"
+                passwd postgres
+                sed -i '/PGROOT/s/^#//' /etc/conf.d/postgresql
+                su -l postgres -c "initdb -D /var/lib/postgres/data/"
                 #CONFIGURE HTTPD.CONF {{{
                 if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
                     cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
