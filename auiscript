@@ -81,7 +81,7 @@
     # 7) OpenBox
     # 8) XFCE
     # 9) Unity (Experimental)
-    DESKTOPENV=3
+    DESKTOPENV=4
     #AWESOME/OPENBOX {{{
         # 1) Xcompmgr
         # 2) Icons

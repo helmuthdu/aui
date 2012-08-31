@@ -2557,6 +2557,7 @@ case "$1" in
                 echo -e '\n[unity]\nServer = http://unity.xe-xe.org/$arch' >> /etc/pacman.conf
                 pacman -Suy
                 pacman -S $(pacman -Slq unity | grep -v plasma-widget-menubar | grep -v xfce4-indicator-plugin)
+                package_install "gnome-terminal"
                 package_install "telepathy"
                 package_install "gksu nautilus-open-terminal gnome-search-tool gedit-plugins"
                 package_install "gvfs-smb gvfs-afc"
