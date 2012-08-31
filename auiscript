@@ -72,14 +72,32 @@
     #}}}
 #}}}
 #DESKTOP ENVIRONMENT {{{
-    # 1) Cinnamon
-    # 2) E17
-    # 3) GNOME
-    # 4) KDE
-    # 5) LXDE
-    # 6) OpenBox
-    # 7) XFCE
+    # 1) Awesome
+    # 2) Cinnamon
+    # 3) E17
+    # 4) GNOME
+    # 5) KDE
+    # 6) LXDE
+    # 7) OpenBox
+    # 8) XFCE
+    # 9) Unity (Experimental)
     DESKTOPENV=3
+    #AWESOME/OPENBOX {{{
+        # 1) Xcompmgr
+        # 2) Icons
+        # 3) Viewnior
+        # 4) Gmrun
+        # 5) PCManFM
+        # 6) rxvt-unicode
+        # 7) Scrot
+        # 8) Display Manager
+        # 9) GTK Themes
+        #10) Thunar
+        #11) Tint2
+        #12) Volwheel
+        #13) Xfburn
+        AWESOMEOB_OPTIONS=""
+    #}}}
     #CINNAMON {{{
         # 1) Cinnamon Applets
         # 2) Cinnamon Themes
@@ -155,22 +173,6 @@
         # 4) Viewnior
         # 5) Xfburn
         LXDE_OPTIONS=""
-    #}}}
-    #OPENBOX {{{
-        # 1) Xcompmgr
-        # 2) Icons
-        # 3) Viewnior
-        # 4) Gmrun
-        # 5) PCManFM
-        # 6) rxvt-unicode
-        # 7) Scrot
-        # 8) Display Manager
-        # 9) GTK Themes
-        #10) Thunar
-        #11) Tint2
-        #12) Volwheel
-        #13) Xfburn
-        OPENBOX_OPTIONS=""
     #}}}
     #XFCE {{{
         # 1) Icons

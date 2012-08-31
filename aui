@@ -209,7 +209,7 @@ contains_element(){ #{{{
 config_xinitrc(){ #{{{
     #create a xinitrc file in home user directory
     cp -f /etc/skel/.xinitrc /home/$USERNAME/
-    echo -e "exec $1" >> /home/$USERNAME/.xinitrc
+    echo -e "exec ck-launch-session $1" >> /home/$USERNAME/.xinitrc
     chown -R $USERNAME:users /home/$USERNAME/.xinitrc
 } #}}}
 invalid_option(){ #{{{
@@ -1743,19 +1743,118 @@ case "$1" in
         print_title "DESKTOP ENVIRONMENT - https://wiki.archlinux.org/index.php/Desktop_Environment"
         print_info "Desktop environments provide a complete graphical user interface (GUI) for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries."
         echo -e "Choose your desktop-environment:\n"
-        echo " 1) Cinnamon $AUR"
-        echo " 2) E17"
-        echo " 3) GNOME"
-        echo " 4) KDE"
-        echo " 5) LXDE"
-        echo " 6) OpenBox"
-        echo " 7) XFCE"
-        echo " 8) Unity (Experimental)"
+        echo " 1) Awesome"
+        echo " 2) Cinnamon $AUR"
+        echo " 3) E17"
+        echo " 4) GNOME"
+        echo " 5) KDE"
+        echo " 6) LXDE"
+        echo " 7) OpenBox"
+        echo " 8) XFCE"
+        echo " 9) Unity (Experimental)"
         echo ""
         echo " b) BACK"
         read_input $DESKTOPENV
         case "$OPTION" in
             1)
+                #AWESOME {{{
+                print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
+                print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
+                package_install "awesome"
+                package_install "lxappearance consolekit"
+                package_install "leafpad epdfview nitrogen"
+                package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
+                aur_package_install "gnome-defaults-list"
+                mkdir -p /home/$USERNAME/.config/awesome/
+                cp /etc/xdg/awesome/rc.lua /home/$USERNAME/.config/awesome/
+                chown -R $USERNAME:users /home/$USERNAME/.config
+                config_xinitrc "awesome"
+                #AWESOME CUSTOMIZATION {{{
+                while [[ 1 ]]
+                do
+                    print_title "AWESOME CUSTOMIZATION"
+                    echo " 1) $(menu_item "xcompmgr")"
+                    echo " 2) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
+                    echo " 3) $(menu_item "viewnior")"
+                    echo " 4) $(menu_item "gmrun")"
+                    echo " 5) $(menu_item "pcmanfm" "PCManFM")"
+                    echo " 6) $(menu_item "rxvt-unicode")"
+                    echo " 7) $(menu_item "scrot")"
+                    echo " 8) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
+                    echo " 9) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
+                    echo "10) $(menu_item "thunar")"
+                    echo "11) $(menu_item "tint2")"
+                    echo "12) $(menu_item "volwheel")"
+                    echo "13) $(menu_item "xfburn")"
+                    echo ""
+                    echo " d) DONE"
+                    echo ""
+                    AWESOMEOB_OPTIONS+=" d"
+                    read_input_options "$AWESOMEOB_OPTIONS"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                package_install "xcompmgr transset-df"
+                                ;;
+                            2)
+                                install_icons
+                                OPT=2
+                                ;;
+                            3)
+                                package_install "viewnior"
+                                ;;
+                            4)
+                                package_install "gmrun"
+                                ;;
+                            5)
+                                package_install "pcmanfm"
+                                ;;
+                            6)
+                                package_install "rxvt-unicode"
+                                ;;
+                            7)
+                                package_install "scrot"
+                                ;;
+                            8)
+                                install_display_manager
+                                OPT=8
+                                ;;
+                            9)
+                                install_gtk_themes
+                                OPT=9
+                                ;;
+                            10)
+                                package_install "thunar tumbler"
+                                ;;
+                            11)
+                                package_install "tint2"
+                                ;;
+                            12)
+                                package_install "volwheel"
+                                ;;
+                            13)
+                                package_install "xfburn"
+                                ;;
+                            "d")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                elihw
+                done
+                #}}}
+                #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+                systemctl enable upower.service
+                #A framework for defining and tracking users, login sessions, and seats
+                systemctl enable console-kit-daemon.service
+                CURRENT_STATUS=1
+                OPENBOX=1
+                ;;
+                #}}}
+            2)
                 #CINNAMON {{{
                 print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
                 print_info "Cinnamon is a fork of GNOME Shell, initially developed by Linux Mint. It attempts to provide a more traditional user environment based on the desktop metaphor, like GNOME 2. Cinnamon uses Muffin, a fork of the GNOME 3 window manager Mutter, as its window manager."
@@ -1838,7 +1937,7 @@ case "$1" in
                 GNOME=1
                 ;;
                 #}}}
-            2)
+            3)
                 #E17 {{{
                 print_title "E17 - http://wiki.archlinux.org/index.php/E17"
                 print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
@@ -1933,7 +2032,7 @@ case "$1" in
                 E17=1
                 ;;
                 #}}}
-            3)
+            4)
                 #GNOME {{{
                 print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
                 print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
@@ -2123,7 +2222,7 @@ case "$1" in
                 GNOME=1
                 ;;
                 #}}}
-            4)
+            5)
                 #KDE {{{
                 print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
                 print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
@@ -2216,7 +2315,7 @@ case "$1" in
                 KDE=1
                 ;;
                 #}}}
-            5)
+            6)
                 #LXDE {{{
                 print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
                 print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
@@ -2282,7 +2381,7 @@ case "$1" in
                 LXDE=1
                 ;;
                 #}}}
-            6)
+            7)
                 #OPENBOX {{{
                 print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
                 print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -2320,8 +2419,8 @@ case "$1" in
                     echo ""
                     echo " d) DONE"
                     echo ""
-                    OPENBOX_OPTIONS+=" d"
-                    read_input_options "$OPENBOX_OPTIONS"
+                    AWESOMEOB_OPTIONS+=" d"
+                    read_input_options "$AWESOMEOB_OPTIONS"
                     for OPT in ${OPTIONS[@]}; do
                         case "$OPT" in
                             1)
@@ -2385,7 +2484,7 @@ case "$1" in
                 OPENBOX=1
                 ;;
                 #}}}
-            7)
+            8)
                 #XFCE {{{
                 print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
                 print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
@@ -2448,7 +2547,7 @@ case "$1" in
                 XFCE=1
                 ;;
                 #}}}
-            8)
+            9)
                 #UNITY {{{
                 print_warning "\nWARNING: EXPERIMENTAL OPTION, USE AT YOUR OWN RISK"
                 read_input_text "Are you sure you want to continue?"
