@@ -2555,8 +2555,9 @@ case "$1" in
                 print_title "UNITY - https://wiki.archlinux.org/index.php/Unity"
                 print_info "Unity is an alternative shell for the GNOME desktop environment, developed by Canonical in its Ayatana project. It consists of several components including the Launcher, Dash, lenses, Panel, indicators, Notify OSD and Overlay Scrollbar."
                 echo -e '\n[unity]\nServer = http://unity.xe-xe.org/$arch' >> /etc/pacman.conf
+                echo -e '\n[unity-extra]\nServer = http://unity.xe-xe.org/extra/$arch' >> /etc/pacman.conf
                 pacman -Sy
-                pacman -S $(pacman -Slq unity | grep -v plasma-widget-menubar | grep -v xfce4-indicator-plugin)
+                pacman -S $(pacman -Slq unity)
                 package_install "gnome-terminal"
                 package_install "telepathy"
                 package_install "gksu nautilus-open-terminal gnome-search-tool gedit-plugins"
