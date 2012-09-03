@@ -1595,7 +1595,7 @@ case "$1" in
                 echo " 2) $(menu_item "faenza-icon-theme" "Faenza")"
                 echo " 3) $(menu_item "faenza-cupertino-icon-theme" "Faenza-Cupertino")"
                 echo " 4) $(menu_item "faience-icon-theme" "Faience")"
-                echo " 5) $(menu_item "elementary-icons-bzr" "Elementary")"
+                echo " 5) $(menu_item "elementary-xfce-icons elementary-icons-bzr" "Elementary")"
                 echo ""
                 echo " b) BACK"
                 echo ""
@@ -1616,7 +1616,9 @@ case "$1" in
                             aur_package_install "faience-icon-theme"
                             ;;
                         5)
-                            aur_package_install "elementary-icons"
+                            aur_package_install "elementary-icons-bzr"
+                            read_input_text "Install also the elementary XFCE icons"
+                            [[ $OPTION == y ]] && aur_package_install "elementary-xfce-icons"
                             ;;
                         "b")
                             break
