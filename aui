@@ -3448,10 +3448,10 @@ case "$1" in
                 aur_package_install "systemd-httpd-units"
                 systemctl enable httpd.service
                 systemctl enable mysqld.service
+                /usr/bin/mysql_secure_installation
                 #CONFIGURE HTTPD.CONF {{{
                 if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
                     cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-                    /usr/bin/mysql_secure_installation
                     echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
                     echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
                     sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
