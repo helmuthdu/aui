@@ -1741,8 +1741,8 @@ case "$1" in
             done
         } #}}}
         print_title "DESKTOP ENVIRONMENT - https://wiki.archlinux.org/index.php/Desktop_Environment"
-        print_info "Desktop environments provide a complete graphical user interface (GUI) for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries."
-        echo -e "Choose your desktop-environment:\n"
+        print_info "A Desktop environments (DE) provide a complete graphical user interface (GUI) for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries.\nA window manager (WM) is one component of a system's graphical user interface (GUI)."
+        echo -e "Select your DE or WM:\n"
         echo " 1) Awesome"
         echo " 2) Cinnamon $AUR"
         echo " 3) E17"
@@ -1751,7 +1751,7 @@ case "$1" in
         echo " 6) LXDE"
         echo " 7) OpenBox"
         echo " 8) XFCE"
-        echo " 9) Unity (Experimental)"
+        echo " 9) Unity $AUR"
         echo ""
         echo " b) BACK"
         read_input $DESKTOPENV
@@ -1774,14 +1774,14 @@ case "$1" in
                 do
                     print_title "AWESOME CUSTOMIZATION"
                     echo " 1) $(menu_item "xcompmgr")"
-                    echo " 2) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
+                    echo " 2) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
                     echo " 3) $(menu_item "viewnior")"
                     echo " 4) $(menu_item "gmrun")"
                     echo " 5) $(menu_item "pcmanfm" "PCManFM")"
                     echo " 6) $(menu_item "rxvt-unicode")"
                     echo " 7) $(menu_item "scrot")"
                     echo " 8) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
-                    echo " 9) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
+                    echo " 9) $(menu_item "gtk-theme-adwaita-cupertino gtk-theme-boomerang xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes orion-gtk-theme zukini-theme zukitwo-themes" "GTK Themes") $AUR"
                     echo "10) $(menu_item "thunar")"
                     echo "11) $(menu_item "tint2")"
                     echo "12) $(menu_item "volwheel")"
@@ -1876,8 +1876,8 @@ case "$1" in
                     print_title "CINNAMON CUSTOMIZATION"
                     echo " 1) $(menu_item "cinnamon-applets") $AUR"
                     echo " 2) $(menu_item "cinnamon-themes") $AUR"
-                    echo " 3) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "GNOME Icons") $AUR"
-                    echo " 4) $(menu_item "zukini-theme gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes" "GNOME Themes") $AUR"
+                    echo " 3) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
+                    echo " 4) $(menu_item "gtk-theme-adwaita-cupertino gtk-theme-boomerang xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes orion-gtk-theme zukini-theme zukitwo-themes" "GTK Themes") $AUR"
                     echo " 5) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
                     echo " 6) $(menu_item "gnome-activity-journal") $AUR"
                     echo " 7) $(menu_item "gloobus-sushi-bzr") $AUR"
@@ -1958,13 +1958,13 @@ case "$1" in
                     echo " 1) $(menu_item "e17-icons") $AUR"
                     echo " 2) $(menu_item "e17-themes") $AUR"
                     echo " 3) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
-                    echo " 4) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "GNOME Icons") $AUR"
+                    echo " 4) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
                     echo " 5) $(menu_item "viewnior")"
                     echo " 6) $(menu_item "gmrun")"
                     echo " 7) $(menu_item "pcmanfm" "PCManFM")"
                     echo " 8) $(menu_item "rxvt-unicode")"
                     echo " 9) $(menu_item "scrot")"
-                    echo "10) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
+                    echo "10) $(menu_item "gtk-theme-adwaita-cupertino gtk-theme-boomerang xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes orion-gtk-theme zukini-theme zukitwo-themes" "GTK Themes") $AUR"
                     echo "11) $(menu_item "thunar")"
                     echo "12) $(menu_item "xfburn")"
                     echo ""
@@ -2050,10 +2050,10 @@ case "$1" in
                 while [[ 1 ]]
                 do
                     print_title "GNOME CUSTOMIZATION"
-                    echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "GNOME Icons") $AUR"
-                    echo " 2) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GNOME Themes") $AUR"
-                    echo " 3) $(menu_item "gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git" "GNOME Shell Extensions") $AUR"
-                    echo " 4) $(menu_item "gnome-shell-theme-frieze gnome-shell-theme-elegance" "GNOME Shell Themes") $AUR"
+                    echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
+                    echo " 2) $(menu_item "gtk-theme-adwaita-cupertino gtk-theme-boomerang xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes orion-gtk-theme zukini-theme zukitwo-themes" "GNOME Themes") $AUR"
+                    echo " 3) $(menu_item "disper gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git" "GNOME Shell Extensions") $AUR"
+                    echo " 4) $(menu_item "gnome-shell-theme-default-mod gnome-shell-theme-dark-shine gnome-shell-theme-elegance gnome-shell-theme-eos gnome-shell-theme-frieze gnome-shell-theme-google+" "GNOME Shell Themes") $AUR"
                     echo " 5) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
                     echo " 6) $(menu_item "gnome-activity-journal" "activity-journal") $AUR"
                     echo " 7) $(menu_item "activity-log-manager") $AUR"
@@ -2332,9 +2332,9 @@ case "$1" in
                 while [[ 1 ]]
                 do
                     print_title "LXDE CUSTOMIZATION"
-                    echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
+                    echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
                     echo " 2) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
-                    echo " 3) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
+                    echo " 3) $(menu_item "gtk-theme-adwaita-cupertino gtk-theme-boomerang xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes orion-gtk-theme zukini-theme zukitwo-themes" "GTK Themes") $AUR"
                     echo " 4) $(menu_item "viewnior")"
                     echo " 5) $(menu_item "xfburn")"
                     echo ""
@@ -2404,14 +2404,14 @@ case "$1" in
                 do
                     print_title "OPENBOX CUSTOMIZATION"
                     echo " 1) $(menu_item "xcompmgr")"
-                    echo " 2) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
+                    echo " 2) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
                     echo " 3) $(menu_item "viewnior")"
                     echo " 4) $(menu_item "gmrun")"
                     echo " 5) $(menu_item "pcmanfm" "PCManFM")"
                     echo " 6) $(menu_item "rxvt-unicode")"
                     echo " 7) $(menu_item "scrot")"
                     echo " 8) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
-                    echo " 9) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
+                    echo " 9) $(menu_item "gtk-theme-adwaita-cupertino gtk-theme-boomerang xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes orion-gtk-theme zukini-theme zukitwo-themes" "GTK Themes") $AUR"
                     echo "10) $(menu_item "thunar")"
                     echo "11) $(menu_item "tint2")"
                     echo "12) $(menu_item "volwheel")"
@@ -2500,8 +2500,8 @@ case "$1" in
                 while [[ 1 ]]
                 do
                     print_title "XFCE CUSTOMIZATION"
-                    echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons" "Gnome Icons") $AUR"
-                    echo " 2) $(menu_item "gtk-theme-boomerang egtk-bzr light-themes orion-gtk-theme zukitwo-themes zukini-theme" "GTK Themes") $AUR"
+                    echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
+                    echo " 2) $(menu_item "gtk-theme-adwaita-cupertino gtk-theme-boomerang xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes orion-gtk-theme zukini-theme zukitwo-themes" "GTK Themes") $AUR"
                     echo " 3) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
                     echo " 4) $(menu_item "xfce4-volumed") $AUR"
                     echo ""
@@ -2549,13 +2549,13 @@ case "$1" in
                 #}}}
             9)
                 #UNITY {{{
-                print_warning "\nWARNING: EXPERIMENTAL OPTION, USE AT YOUR OWN RISK"
+                print_warning "\nWARNING: EXPERIMENTAL OPTION, USE AT YOUR OWN RISK\nDo not install this if already have a DE or WM installed."
                 read_input_text "Are you sure you want to continue?"
-                [[ $OPTION == n ]] && continue
+                [[ $OPTION != y ]] && continue
                 print_title "UNITY - https://wiki.archlinux.org/index.php/Unity"
                 print_info "Unity is an alternative shell for the GNOME desktop environment, developed by Canonical in its Ayatana project. It consists of several components including the Launcher, Dash, lenses, Panel, indicators, Notify OSD and Overlay Scrollbar."
                 echo -e '\n[unity]\nServer = http://unity.xe-xe.org/$arch' >> /etc/pacman.conf
-                pacman -Suy
+                pacman -Sy
                 pacman -S $(pacman -Slq unity | grep -v plasma-widget-menubar | grep -v xfce4-indicator-plugin)
                 package_install "gnome-terminal"
                 package_install "telepathy"
@@ -4562,7 +4562,7 @@ case "$1" in
                     if [[ checklist[1] -eq 0 ]]; then
                         print_warning "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
                         read_input_text "Are you sure you want to continue?"
-                        [[ $OPTION == n ]] && continue
+                        [[ $OPTION != y ]] && continue
                     fi
                     install_desktop_environment
                     install_nm_wicd
