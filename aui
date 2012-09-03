@@ -2558,9 +2558,9 @@ case "$1" in
                 echo -e '\n[unity-extra]\nServer = http://unity.xe-xe.org/extra/$arch' >> /etc/pacman.conf
                 pacman -Sy
                 pacman -S $(pacman -Slq unity)
-                package_install "gnome-terminal"
+                package_install "gnome-terminal baobab eog eog-plugins evince file-roller gcalctool gedit gedit-plugins gnome-disk-utility gnome-font-viewer gnome-screenshot totem"
                 package_install "telepathy"
-                package_install "gksu nautilus-open-terminal gnome-search-tool gedit-plugins"
+                package_install "gksu nautilus-open-terminal gnome-search-tool"
                 package_install "gvfs-smb gvfs-afc"
                 package_install "zeitgeist"
                 package_install "deja-dup"
