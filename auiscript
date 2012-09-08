@@ -208,14 +208,14 @@
         # 5) Slim
         DISPLAY_MANAGER="4"
     #}}}
-    #NETWORK MANAGER {{{
-        # 1) NetworkManager
-        # 2) Wicd
-        # n) None
-        NETWORKMANAGER="1"
-        #USB 3G MODEM SUPPORT
-        USBMODEM="n"
-    #}}}
+#}}}
+#NETWORK MANAGER {{{
+    # 1) NetworkManager
+    # 2) Wicd
+    # n) None
+    NETWORKMANAGER="1"
+    #USB 3G MODEM SUPPORT
+    USBMODEM="n"
 #}}}
 #ACCESSORIES {{{
     # 1) Cairo Dock

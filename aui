@@ -585,13 +585,8 @@ case "$1" in
             Grub2)
                 print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
                 print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
-                read_input_text "Install Grub2 on the MBR"
                 echo -e $prompt3
-                if [[ $OPTION == y ]]; then
-                    print_warning "modprobe dm-mod\ngrub-install --target=i386-pc --recheck $ROOT_DEVICE\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
-                else
-                    print_warning "modprobe dm-mod\nchattr -i /boot/grub/i386-pc/core.img\ngrub-install --target=i386-pc --recheck --debug --force /dev/sdaX\nchattr +i /boot/grub/i386-pc/core.img\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
-                fi
+                print_warning "modprobe dm-mod\ngrub-install --target=i386-pc --recheck $ROOT_DEVICE\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
                 arch-chroot $MOUNTPOINT
                 chroot $MOUNTPOINT mkdir -p /boot/grub/locale
                 chroot $MOUNTPOINT cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
