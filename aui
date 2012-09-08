@@ -398,6 +398,7 @@ case "$1" in
             PS3="$prompt1"
             echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
             select DEVICE in "${partitions[@]}"; do
+                #get the selected number - 1
                 DEVICE_NUMBER=$(( $REPLY - 1 ))
                 if contains_element "$DEVICE" "${partitions[@]}"; then
                     case ${device_name[i]} in
@@ -456,11 +457,11 @@ case "$1" in
         print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
         print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific device or partition."
         if [[ ! -f $MOUNTPOINT/etc/fstab.aui ]]; then
-            cp $MOUNTPOINT/etc/fstab ${MOUNTPOINT}/etc/fstab.aui
+            cp $MOUNTPOINT/etc/fstab $MOUNTPOINT/etc/fstab.aui
         else
-            cp $MOUNTPOINT/etc/fstab.aui ${MOUNTPOINT}/etc/fstab
+            cp $MOUNTPOINT/etc/fstab.aui $MOUNTPOINT/etc/fstab
         fi
-        genfstab -p $MOUNTPOINT >> ${MOUNTPOINT}/etc/fstab
+        genfstab -p $MOUNTPOINT >> $MOUNTPOINT/etc/fstab
         echo "Review your fstab"
         pause_function
         $EDITOR $MOUNTPOINT/etc/fstab
@@ -473,9 +474,9 @@ case "$1" in
         read -p "Hostname [ex: archlinux]: " HN
         echo "$HN" > $MOUNTPOINT/etc/hostname
         if [[ ! -f $MOUNTPOINT/etc/hosts.aui ]]; then
-            cp $MOUNTPOINT/etc/hosts ${MOUNTPOINT}/etc/hosts.aui
+            cp $MOUNTPOINT/etc/hosts $MOUNTPOINT/etc/hosts.aui
         else
-            cp $MOUNTPOINT/etc/hosts.aui ${MOUNTPOINT}/etc/hosts
+            cp $MOUNTPOINT/etc/hosts.aui $MOUNTPOINT/etc/hosts
         fi
         chroot $MOUNTPOINT sed -i '/127.0.0.1/s/$/ '$HN'/' /etc/hosts
         chroot $MOUNTPOINT sed -i '/::1/s/$/ '$HN'/' /etc/hosts
@@ -484,7 +485,7 @@ case "$1" in
     #CONFIGURE TIMEZONE {{{
     configure_timezone(){
         settimezone(){
-            [[ -f $MOUNTPOINT/etc/localtime ]] && rm ${MOUNTPOINT}/etc/localtime;
+            [[ -f $MOUNTPOINT/etc/localtime ]] && rm $MOUNTPOINT/etc/localtime;
             local zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europe" "Indian" "Mexico" "Midest" "Pacific" "US");
             PS3="$prompt1"
             echo "Select zone:"
