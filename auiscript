@@ -35,18 +35,17 @@
     MAINMENU="1-13 15"
 #}}}
 #BASIC SETUP{{{
-    FIRMWARE="n"
     CUPS="y"
     CUSTOMREPO="n"
+    FIRMWARE="n"
     GITTOR="y"
-    LANGSELECT="y"
     NFS="n"
     PRELOAD="y"
-    ZRAM="y"
     REFLECTOR="n"
     SAMBA="y"
     SSH="y"
     TLP="n"
+    ZRAM="y"
     #VIDEOCARD {{{
         # 1) Intel
         # 2) ATI
@@ -68,7 +67,7 @@
         # 9) libffado [Fireware Audio Devices]
         #10) libraw1394 [IEE1394 Driver]
         #11) sane-gt68xx-firmware
-        FIRMWARE_OPTIONS=""
+        FIRMWARE_OPTIONS="1"
     #}}}
 #}}}
 #DESKTOP ENVIRONMENT {{{
@@ -214,6 +213,8 @@
         # 2) Wicd
         # n) None
         NETWORKMANAGER="1"
+        #USB 3G MODEM SUPPORT
+        USBMODEM="n"
     #}}}
 #}}}
 #ACCESSORIES {{{

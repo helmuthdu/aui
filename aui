@@ -69,7 +69,7 @@ AUR=`echo -e "(${BPurple}aur${White})"`
 AUI_DIR=`pwd`
 MOUNTPOINT="/mnt"
 #}}}
-#MISC FUNCTIONS {{{
+#SUPPORT FUNCTIONS {{{
 read_input(){ #{{{
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
         OPTION=$1
@@ -350,7 +350,8 @@ case "$1" in
         }
         remove_partition() {
             #remove the selected partition from list
-            partitions=(${partitions[@]#$1})
+            unset partitions[$DEVICE_NUMBER]
+            partitions=(${partitions[@]})
             #increase i
             [[ ${device_name[i]} != another ]] && i=$(( i + 1 ))
         }
@@ -397,12 +398,13 @@ case "$1" in
             PS3="$prompt1"
             echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
             select DEVICE in "${partitions[@]}"; do
+                DEVICE_NUMBER=$(( $REPLY - 1 ))
                 if contains_element "$DEVICE" "${partitions[@]}"; then
                     case ${device_name[i]} in
                         root)
                             ROOT=$DEVICE
                             ROOT_DEVICE=`echo $ROOT | sed 's/[0-9]//'`
-                            format_partition "$DEVICE" "${MOUNTPOINT}"
+                            format_partition "$DEVICE" "$MOUNTPOINT"
                             ;;
                         swap)
                             format_swap_partition "$DEVICE"
@@ -412,13 +414,13 @@ case "$1" in
                             select_filesystem
                             read_input_text "Format $DEVICE partition"
                             if [[ $OPTION == y ]]; then
-                                format_partition "$DEVICE" "${MOUNTPOINT}${DIR}" "$TYPE"
+                                format_partition "$DEVICE" "$MOUNTPOINT$DIR" "$TYPE"
                             else
-                                read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="${DIR}""
+                                read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="$DIR""
                                 if [[ $OPTION == y ]]; then
-                                    mkdir -p ${MOUNTPOINT}${DIR}
-                                    mount -t $TYPE $DEVICE ${MOUNTPOINT}${DIR}
-                                    check_mountpoint "$DEVICE" "${MOUNTPOINT}${DIR}"
+                                    mkdir -p $MOUNTPOINT$DIR
+                                    mount -t $TYPE $DEVICE $MOUNTPOINT$DIR
+                                    check_mountpoint "$DEVICE" "$MOUNTPOINT$DIR"
                                 fi
                             fi
                             ;;
@@ -442,26 +444,26 @@ case "$1" in
     install_base_system(){
         print_title "INSTALL BASE SYSTEM"
         print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
-        pacstrap ${MOUNTPOINT} base base-devel btrfs-progs
+        pacstrap $MOUNTPOINT base base-devel btrfs-progs
         #ADD KEYMAP TO THE NEW SETUP
-        echo "KEYMAP=$KEYMAP" > ${MOUNTPOINT}/etc/vconsole.conf
-        echo "FONT=\"\"" >> ${MOUNTPOINT}/etc/vconsole.conf
-        echo "FONT_MAP=\"\"" >> ${MOUNTPOINT}/etc/vconsole.conf
+        echo "KEYMAP=$KEYMAP" > $MOUNTPOINT/etc/vconsole.conf
+        echo "FONT=\"\"" >> $MOUNTPOINT/etc/vconsole.conf
+        echo "FONT_MAP=\"\"" >> $MOUNTPOINT/etc/vconsole.conf
     }
     #}}}
     #CONFIGURE FSTAB {{{
     configure_fstab(){
         print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
         print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific device or partition."
-        if [[ ! -f ${MOUNTPOINT}/etc/fstab.aui ]]; then
-            cp ${MOUNTPOINT}/etc/fstab ${MOUNTPOINT}/etc/fstab.aui
+        if [[ ! -f $MOUNTPOINT/etc/fstab.aui ]]; then
+            cp $MOUNTPOINT/etc/fstab ${MOUNTPOINT}/etc/fstab.aui
         else
-            cp ${MOUNTPOINT}/etc/fstab.aui ${MOUNTPOINT}/etc/fstab
+            cp $MOUNTPOINT/etc/fstab.aui ${MOUNTPOINT}/etc/fstab
         fi
-        genfstab -p ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab
+        genfstab -p $MOUNTPOINT >> ${MOUNTPOINT}/etc/fstab
         echo "Review your fstab"
         pause_function
-        $EDITOR ${MOUNTPOINT}/etc/fstab
+        $EDITOR $MOUNTPOINT/etc/fstab
     }
     #}}}
     #CONFIGURE HOSTNAME {{{
@@ -469,20 +471,20 @@ case "$1" in
         print_title "HOSTNAME - https://wiki.archlinux.org/index.php/HOSTNAME"
         print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
         read -p "Hostname [ex: archlinux]: " HN
-        echo "$HN" > ${MOUNTPOINT}/etc/hostname
-        if [[ ! -f ${MOUNTPOINT}/etc/hosts.aui ]]; then
-            cp ${MOUNTPOINT}/etc/hosts ${MOUNTPOINT}/etc/hosts.aui
+        echo "$HN" > $MOUNTPOINT/etc/hostname
+        if [[ ! -f $MOUNTPOINT/etc/hosts.aui ]]; then
+            cp $MOUNTPOINT/etc/hosts ${MOUNTPOINT}/etc/hosts.aui
         else
-            cp ${MOUNTPOINT}/etc/hosts.aui ${MOUNTPOINT}/etc/hosts
+            cp $MOUNTPOINT/etc/hosts.aui ${MOUNTPOINT}/etc/hosts
         fi
-        chroot ${MOUNTPOINT} sed -i '/127.0.0.1/s/$/ '$HN'/' /etc/hosts
-        chroot ${MOUNTPOINT} sed -i '/::1/s/$/ '$HN'/' /etc/hosts
+        chroot $MOUNTPOINT sed -i '/127.0.0.1/s/$/ '$HN'/' /etc/hosts
+        chroot $MOUNTPOINT sed -i '/::1/s/$/ '$HN'/' /etc/hosts
     }
     #}}}
     #CONFIGURE TIMEZONE {{{
     configure_timezone(){
         settimezone(){
-            [[ -f ${MOUNTPOINT}/etc/localtime ]] && rm ${MOUNTPOINT}/etc/localtime;
+            [[ -f $MOUNTPOINT/etc/localtime ]] && rm ${MOUNTPOINT}/etc/localtime;
             local zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europe" "Indian" "Mexico" "Midest" "Pacific" "US");
             PS3="$prompt1"
             echo "Select zone:"
@@ -493,7 +495,7 @@ case "$1" in
                     echo "Select subzone:"
                     select SUBZONE in "${subzone[@]}"; do
                     if contains_element "$SUBZONE" "${subzone[@]}"; then
-                        chroot ${MOUNTPOINT} ln -s /usr/share/zoneinfo/$ZONE/$SUBZONE /etc/localtime
+                        chroot $MOUNTPOINT ln -s /usr/share/zoneinfo/$ZONE/$SUBZONE /etc/localtime
                         break
                     else
                         invalid_option
@@ -512,7 +514,7 @@ case "$1" in
             settimezone
             read_input_text "Confirm timezone ($ZONE/$SUBZONE)"
         done
-        chroot ${MOUNTPOINT} echo "$ZONE/$SUBZONE" > /etc/timezone
+        chroot $MOUNTPOINT echo "$ZONE/$SUBZONE" > /etc/timezone
     }
     #}}}
     #CONFIGURE HARDWARECLOCK {{{
@@ -522,7 +524,7 @@ case "$1" in
         echo -e $prompt3
         echo -e "You can replace ${BYellow}--utc${White} for ${BYellow}--localtime${White} (discouraged)."
         print_warning "hwclock --systohc --utc"
-        arch-chroot ${MOUNTPOINT}
+        arch-chroot $MOUNTPOINT
     }
     #}}}
     #CONFIGURE LOCALE {{{
@@ -532,11 +534,11 @@ case "$1" in
         read -p "Locale [ex: pt_BR]: " LOCALE
         LOCALE_8859="$LOCALE ISO-8859"
         LOCALE_UTF8="$LOCALE.UTF-8"
-        echo 'LANG="'$LOCALE_UTF8'"' > ${MOUNTPOINT}/etc/locale.conf
-        chroot ${MOUNTPOINT} sed -i '/'$LOCALE'/s/^#//' /etc/locale.gen
+        echo 'LANG="'$LOCALE_UTF8'"' > $MOUNTPOINT/etc/locale.conf
+        chroot $MOUNTPOINT sed -i '/'$LOCALE'/s/^#//' /etc/locale.gen
         echo -e $prompt3
         print_warning "locale-gen"
-        arch-chroot ${MOUNTPOINT}
+        arch-chroot $MOUNTPOINT
     }
     #}}}
     #CONFIGURE MKINITCPIO {{{
@@ -545,7 +547,7 @@ case "$1" in
         print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
         echo -e $prompt3
         print_warning "mkinitcpio -p linux"
-        arch-chroot ${MOUNTPOINT}
+        arch-chroot $MOUNTPOINT
     }
     #}}}
     #INSTALL BOOTLOADER {{{
@@ -558,13 +560,13 @@ case "$1" in
         select BOOTLOADER in "${bootloader[@]}"; do
             case "$REPLY" in
                 1)
-                    pacstrap ${MOUNTPOINT} grub-bios
+                    pacstrap $MOUNTPOINT grub-bios
                     #make grub automatically detect others OS
-                    pacstrap ${MOUNTPOINT} os-prober
+                    pacstrap $MOUNTPOINT os-prober
                     break
                     ;;
                 2)
-                    pacstrap ${MOUNTPOINT} syslinux
+                    pacstrap $MOUNTPOINT syslinux
                     break
                     ;;
                 3)
@@ -590,16 +592,16 @@ case "$1" in
                 else
                     print_warning "modprobe dm-mod\nchattr -i /boot/grub/i386-pc/core.img\ngrub-install --target=i386-pc --recheck --debug --force /dev/sdaX\nchattr +i /boot/grub/i386-pc/core.img\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
                 fi
-                arch-chroot ${MOUNTPOINT}
-                chroot ${MOUNTPOINT} mkdir -p /boot/grub/locale
-                chroot ${MOUNTPOINT} cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
+                arch-chroot $MOUNTPOINT
+                chroot $MOUNTPOINT mkdir -p /boot/grub/locale
+                chroot $MOUNTPOINT cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
                 ;;
             Syslinux)
                 print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
                 print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
                 echo -e $prompt3
                 print_warning "syslinux-install_update -iam\n$EDITOR /boot/syslinux/syslinux.cfg"
-                arch-chroot ${MOUNTPOINT}
+                arch-chroot $MOUNTPOINT
                 ;;
         esac
     }
@@ -609,14 +611,14 @@ case "$1" in
         print_title "MIRRORS - https://wiki.archlinux.org/index.php/Mirrors"
         echo "Edit your mirrorlist"
         pause_function
-        $EDITOR ${MOUNTPOINT}/etc/pacman.d/mirrorlist
+        $EDITOR $MOUNTPOINT/etc/pacman.d/mirrorlist
     }
     #}}}
     #ROOT PASSWORD {{{
     root_password(){
         print_title "ROOT PASSWORD"
         print_warning "Enter your new root password"
-        chroot ${MOUNTPOINT} passwd
+        chroot $MOUNTPOINT passwd
     }
     #}}}
     #FINISH {{{
@@ -624,7 +626,7 @@ case "$1" in
         print_title "INSTALL COMPLETED"
         #COPY AUI TO ROOT FOLDER IN THE NEW SYSTEM
         print_warning "\nA copy of the AUI will be placed in /root directory of your new system"
-        cp -R `pwd` ${MOUNTPOINT}/root
+        cp -R `pwd` $MOUNTPOINT/root
         read_input_text "Reboot system"
         if [[ $OPTION == y ]]; then
             reboot
@@ -823,7 +825,7 @@ case "$1" in
         #}}}
         #}}}
         print_title "LANGUAGE - https://wiki.archlinux.org/index.php/Locale"
-        read_input_text "Default system language: \"$LANGUAGE\"" $LANGSELECT
+        read_input_text "Default system language: \"$LANGUAGE\""
         case "$OPTION" in
             "n")
                 read -p "New system language [ex: en_US]: " LANGUAGE
@@ -2634,6 +2636,24 @@ case "$1" in
                 sumary "Wicd installation"
                 ;;
         esac
+    }
+    #}}}
+    #USB 3G MODEM {{{
+    install_usb_modem(){
+        print_title "USB 3G MODEM - https://wiki.archlinux.org/index.php/USB_3G_Modem"
+        print_info "A number of mobile telephone networks around the world offer mobile internet connections over UMTS (or EDGE or GSM) using a portable USB modem device."
+        read_input_text "Install usb 3G modem support" $USBMODEM
+        case "$OPTION" in
+            "y")
+                package_install "usbutils usb_modeswitch modemmanager"
+                CURRENT_STATUS=1
+                ;;
+            *)
+                CURRENT_STATUS=0
+                ;;
+        esac
+        sumary "USB 3G Modem installation"
+        pause_function
     }
     #}}}
     #ACCESSORIES {{{
@@ -4569,6 +4589,7 @@ case "$1" in
                     fi
                     install_desktop_environment
                     install_nm_wicd
+                    install_usb_modem
                     checklist[2]=1
                     ;;
                 3)
