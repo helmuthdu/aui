@@ -906,7 +906,9 @@ case "$1" in
             package_install "git"
             git clone https://github.com/helmuthdu/dotfiles
             cp dotfiles/.* ~/
-            cp dotfiles/.* /home/$USERNAME/
+            cp -i dotfiles/.* /home/$USERNAME/
+            mkdir -p /home/$USERNAME/.config/fontconfig
+            cp -i dotfiles/fonts.conf /home/$USERNAME/.config/fontconfig
             rm -fr dotfiles
             print_title "DEFAULT EDITOR"
             EDITORS=("Emacs" "Joe" "Nano" "Vim");
@@ -1388,6 +1390,17 @@ case "$1" in
             #patch file
             sed -i "${line}a $kblayout" $file
         fi
+        #}}}
+        #FONT CONFIGURATION PRESETS {{{
+        print_title "FONT CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
+        print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
+        #enable global fonts configs
+        cd /etc/fonts/conf.d
+        ln -sv ../conf.avail/10-sub-pixel-rgb.conf
+        ln -sv ../conf.avail/10-autohint.conf
+        ln -sv ../conf.avail/11-lcdfilter-default.conf
+        cd $AUI_DIR
+        pause_function
         #}}}
     }
     #}}}
