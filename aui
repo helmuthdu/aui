@@ -1397,8 +1397,9 @@ case "$1" in
         #enable global fonts configs
         cd /etc/fonts/conf.d
         ln -sv ../conf.avail/10-sub-pixel-rgb.conf
-        ln -sv ../conf.avail/10-autohint.conf
+        #ln -sv ../conf.avail/10-autohint.conf
         ln -sv ../conf.avail/11-lcdfilter-default.conf
+        ln -s ../conf.avail/70-no-bitmaps.conf
         cd $AUI_DIR
         pause_function
         #}}}
