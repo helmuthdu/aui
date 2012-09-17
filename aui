@@ -333,10 +333,10 @@ case "$1" in
         print_info "This step will select and format the selected partiton where the archlinux will be installed"
         print_warning "\tAll data on the ROOT and SWAP partition will be LOST."
         i=0
-        partitions=(`fdisk -l | awk '{print $1}' | grep /dev/`)
+        partitions=(`cat /proc/partitions | awk '{ print $4}' | sed '1,2d' | awk 'length($0)>3'`)
         device_name=("root" "swap" "another")
-        select_filesystem() {
-            filesystem=("ext4" "ext3" "btrfs" "vfat" "ntfs");
+        select_filesystem(){
+            filesystem=("ext4" "ext3" "ext2" "btrfs" "vfat" "ntfs");
             PS3="$prompt1"
             echo -e "Select filesystem:\n"
             select OPT in "${filesystem[@]}"; do
@@ -348,14 +348,14 @@ case "$1" in
                 fi
             done
         }
-        remove_partition() {
+        remove_partition(){
             #remove the selected partition from list
             unset partitions[$DEVICE_NUMBER]
             partitions=(${partitions[@]})
             #increase i
             [[ ${device_name[i]} != another ]] && i=$(( i + 1 ))
         }
-        format_partition() {
+        format_partition(){
             read_input_text "Confirm format $1 partition"
             if [[ $OPTION == y ]]; then
                 #check if partition is mounted and umount
@@ -364,7 +364,7 @@ case "$1" in
                 if [[ $1 == $ROOT && $TYPE == btrfs ]]; then
                     print_title "https://wiki.archlinux.org/index.php/Btrfs"
                     print_info "btrfs provides a number of features (such as checksumming, snapshots, and subvolumes) that make it an excellent candidate for using it as the root partition in an Arch Linux installation."
-                    print_warning "This filesystem still experimental, use at own risk.\nYou should install the bootloader in a different partition"
+                    print_warning "This filesystem still experimental, use at your own risk.\nYou should install the bootloader in a different partition"
                     pause_function
                     mkfs.$TYPE $1
                     mount -t $TYPE $1 $2
@@ -587,7 +587,7 @@ case "$1" in
                 print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
                 print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
                 echo -e $prompt3
-                print_warning "modprobe dm-mod\ngrub-install --target=i386-pc --recheck $ROOT_DEVICE\ngrub-mkconfig -o /boot/grub/grub.cfg\n$EDITOR /boot/grub/grub.cfg"
+                print_warning "modprobe dm-mod\ngrub-install --target=i386-pc --recheck $ROOT_DEVICE\ngrub-mkconfig -o /boot/grub/grub.cfg"
                 arch-chroot $MOUNTPOINT
                 chroot $MOUNTPOINT mkdir -p /boot/grub/locale
                 chroot $MOUNTPOINT cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
