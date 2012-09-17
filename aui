@@ -333,7 +333,7 @@ case "$1" in
         print_info "This step will select and format the selected partiton where the archlinux will be installed"
         print_warning "\tAll data on the ROOT and SWAP partition will be LOST."
         i=0
-        partitions=(`cat /proc/partitions | awk '{ print $4}' | sed '1,2d' | awk 'length($0)>3'`)
+        partitions=(`cat /proc/partitions | awk '{ print $4}' | sed '1,2d' | awk 'length($0)>3' | grep 'sd\|hd'`)
         device_name=("root" "swap" "another")
         select_filesystem(){
             filesystem=("ext4" "ext3" "ext2" "btrfs" "vfat" "ntfs");
