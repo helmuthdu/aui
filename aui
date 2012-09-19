@@ -348,6 +348,12 @@ case "$1" in
                 fi
             done
         }
+        umount_partition(){
+            #check if swap is on and umount
+            swapon -s|grep $1 && swapoff $1
+            #check if partition is mounted and umount
+            mount|grep $1 && umount $1
+        }
         remove_partition(){
             #remove the selected partition from list
             unset partitions[$DEVICE_NUMBER]
@@ -358,8 +364,7 @@ case "$1" in
         format_partition(){
             read_input_text "Confirm format $1 partition"
             if [[ $OPTION == y ]]; then
-                #check if partition is mounted and umount
-                mount|grep $1 && umount $1
+                umount_partition "$1"
                 [[ -z $3 ]] && select_filesystem
                 if [[ $1 == $ROOT && $TYPE == btrfs ]]; then
                     print_title "https://wiki.archlinux.org/index.php/Btrfs"
@@ -380,7 +385,7 @@ case "$1" in
         format_swap_partition() {
             read_input_text "Confirm format $1 partition"
             if [[ $OPTION == y ]]; then
-                swapoff $1
+                umount_partition "$1"
                 mkswap $1
                 swapon $1
                 remove_partition "$1"
