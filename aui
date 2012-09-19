@@ -3483,6 +3483,7 @@ case "$1" in
             1)
                 package_install "apache mysql php php-apache php-mcrypt php-gd"
                 aur_package_install "adminer"
+                cp /etc/webapps/adminer/apache.example.conf /etc/httpd/conf/extra/httpd-adminer.conf
                 aur_package_install "systemd-httpd-units"
                 systemctl enable httpd.service
                 systemctl enable mysqld.service
@@ -3518,6 +3519,7 @@ case "$1" in
             2)
                 package_install "apache postgresql php php-apache php-pgsql php-gd"
                 aur_package_install "adminer"
+                cp /etc/webapps/adminer/apache.example.conf /etc/httpd/conf/extra/httpd-adminer.conf
                 aur_package_install "systemd-httpd-units"
                 systemctl enable httpd.service
                 systemctl enable postgresql.service
