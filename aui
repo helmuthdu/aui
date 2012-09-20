@@ -3485,6 +3485,7 @@ case "$1" in
                 aur_package_install "adminer"
                 cp /etc/webapps/adminer/apache.example.conf /etc/httpd/conf/extra/httpd-adminer.conf
                 systemctl enable httpd.service
+                systemctl start mysqld.service
                 systemctl enable mysqld.service
                 /usr/bin/mysql_secure_installation
                 #CONFIGURE HTTPD.CONF {{{
@@ -3520,6 +3521,7 @@ case "$1" in
                 aur_package_install "adminer"
                 cp /etc/webapps/adminer/apache.example.conf /etc/httpd/conf/extra/httpd-adminer.conf
                 systemctl enable httpd.service
+                systemctl start postgresql.service
                 systemctl enable postgresql.service
                 echo "Enter your new postgres account password:"
                 passwd postgres
