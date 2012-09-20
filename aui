@@ -3484,7 +3484,6 @@ case "$1" in
                 package_install "apache mysql php php-apache php-mcrypt php-gd"
                 aur_package_install "adminer"
                 cp /etc/webapps/adminer/apache.example.conf /etc/httpd/conf/extra/httpd-adminer.conf
-                aur_package_install "systemd-httpd-units"
                 systemctl enable httpd.service
                 systemctl enable mysqld.service
                 /usr/bin/mysql_secure_installation
@@ -3520,13 +3519,11 @@ case "$1" in
                 package_install "apache postgresql php php-apache php-pgsql php-gd"
                 aur_package_install "adminer"
                 cp /etc/webapps/adminer/apache.example.conf /etc/httpd/conf/extra/httpd-adminer.conf
-                aur_package_install "systemd-httpd-units"
                 systemctl enable httpd.service
                 systemctl enable postgresql.service
                 echo "Enter your new postgres account password:"
                 passwd postgres
                 sed -i '/PGROOT/s/^#//' /etc/conf.d/postgresql
-                su -l postgres -c "initdb -D /var/lib/postgres/data/"
                 #CONFIGURE HTTPD.CONF {{{
                 if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
                     cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
