@@ -1450,7 +1450,7 @@ case "$1" in
                 sumary "Nouveau GPU driver installation"
                 ;;
             5)
-                package_install "virtualbox-archlinux-additions"
+                package_install "virtualbox-guest-additions"
                 add_module "vboxguest vboxsf vboxvideo"
                 groupadd vboxsf
                 gpasswd -a $USERNAME vboxsf
