@@ -620,6 +620,7 @@ case "$1" in
         print_title "ROOT PASSWORD"
         print_warning "Enter your new root password"
         chroot $MOUNTPOINT passwd
+        pause_function
     }
     #}}}
     #FINISH {{{
@@ -903,6 +904,7 @@ case "$1" in
             useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
             chfn $USERNAME
             passwd $USERNAME
+            pause_function
             configure_user_account
         } #}}}
         #CONFIGURE USER ACCOUNT {{{
@@ -3076,7 +3078,8 @@ case "$1" in
         echo " 7) $(menu_item "mypaint")"
         echo " 8) $(menu_item "scribus")"
         echo " 9) $(menu_item "shotwell")"
-        echo "10) $(menu_item "xnviewmp") $AUR"
+        echo "10) $(menu_item "simple-scan")"
+        echo "11) $(menu_item "xnviewmp") $AUR"
         echo ""
         echo " b) BACK"
         echo ""
@@ -3113,6 +3116,9 @@ case "$1" in
                     package_install "shotwell"
                     ;;
                 10)
+                    package_install "simple-scan"
+                    ;;
+                11)
                     aur_package_install "xnviewmp"
                     ;;
                 "b")
