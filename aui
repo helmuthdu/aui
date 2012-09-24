@@ -1620,6 +1620,7 @@ case "$1" in
     #DESKTOP ENVIRONMENT {{{
     install_desktop_environment(){
         install_icons() { #{{{
+            package_install "gtk-update-icon-cache"
             while [[ 1 ]]
             do
                 print_title "GNOME ICONS"
@@ -1628,6 +1629,7 @@ case "$1" in
                 echo " 3) $(menu_item "faenza-cupertino-icon-theme" "Faenza-Cupertino")"
                 echo " 4) $(menu_item "faience-icon-theme" "Faience")"
                 echo " 5) $(menu_item "elementary-xfce-icons elementary-icons-bzr" "Elementary")"
+                echo " 6) $(menu_item "nitrux-icon-theme" "Nitrux")"
                 echo ""
                 echo " b) BACK"
                 echo ""
@@ -1637,20 +1639,49 @@ case "$1" in
                     case "$OPT" in
                         1)
                             aur_package_install "awoken-icons"
+                            gtk-update-icon-cache -f /usr/share/icons/AwOken
+                            gtk-update-icon-cache -f /usr/share/icons/AwOken-Dark
                             ;;
                         2)
                             aur_package_install "faenza-icon-theme"
+                            gtk-update-icon-cache -f /usr/share/icons/Faenza
+                            gtk-update-icon-cache -f /usr/share/icons/Faenza-Dark
+                            gtk-update-icon-cache -f /usr/share/icons/Faenza-Darker
+                            gtk-update-icon-cache -f /usr/share/icons/Faenza-Darkest
                             ;;
                         3)
                             aur_package_install "faenza-cupertino-icon-theme"
+                            gtk-update-icon-cache -f /usr/share/icons/Faenza-Cupertino
+                            gtk-update-icon-cache -f /usr/share/icons/Faenza-Cupertino-Dark
+                            gtk-update-icon-cache -f /usr/share/icons/Faenza-Cupertino-Darker
+                            gtk-update-icon-cache -f /usr/share/icons/Faenza-Cupertino-Darkest
                             ;;
                         4)
                             aur_package_install "faience-icon-theme"
+                            gtk-update-icon-cache -f /usr/share/icons/Faience
+                            gtk-update-icon-cache -f /usr/share/icons/Faience-Azur
+                            gtk-update-icon-cache -f /usr/share/icons/Faience-Claire
+                            gtk-update-icon-cache -f /usr/share/icons/Faience-Ocre
                             ;;
                         5)
                             aur_package_install "elementary-icons-bzr"
+                            gtk-update-icon-cache -f /usr/share/icons/elementary
                             read_input_text "Install also the elementary XFCE icons"
-                            [[ $OPTION == y ]] && aur_package_install "elementary-xfce-icons"
+                            if [[ $OPTION == y ]]; then
+                                aur_package_install "elementary-xfce-icons"
+                                gtk-update-icon-cache -f /usr/share/icons/elementary-xfce
+                                gtk-update-icon-cache -f /usr/share/icons/elementary-xfce-dark
+                            fi
+                            ;;
+                        6)
+                            aur_package_install "nitrux-icon-theme"
+                            gtk-update-icon-cache -f /usr/share/icons/NITRUX
+                            gtk-update-icon-cache -f /usr/share/icons/NITRUX-BTN
+                            gtk-update-icon-cache -f /usr/share/icons/NITRUX-BTN-blufold
+                            gtk-update-icon-cache -f /usr/share/icons/NITRUX-C
+                            gtk-update-icon-cache -f /usr/share/icons/NITRUX-DRK
+                            gtk-update-icon-cache -f /usr/share/icons/NITRUX-G
+                            gtk-update-icon-cache -f /usr/share/icons/NITRUX-G-lightpnl
                             ;;
                         "b")
                             break
@@ -4511,6 +4542,7 @@ case "$1" in
                                     ;;
                                 20)
                                     aur_package_install "elementary-icons-bzr"
+                                    gtk-update-icon-cache -f /usr/share/icons/elementary
                                     ;;
                                 21)
                                     aur_package_install "egtk-bzr"
