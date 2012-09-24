@@ -3490,7 +3490,6 @@ case "$1" in
                 package_install "apache mysql php php-apache php-mcrypt php-gd"
                 aur_package_install "adminer"
                 systemctl enable httpd.service
-                systemctl start mysqld.service
                 systemctl enable mysqld.service
                 /usr/bin/mysql_secure_installation
                 #CONFIGURE HTTPD.CONF {{{
@@ -3525,7 +3524,6 @@ case "$1" in
                 package_install "apache postgresql php php-apache php-pgsql php-gd"
                 aur_package_install "adminer"
                 systemctl enable httpd.service
-                systemctl start postgresql.service
                 systemctl enable postgresql.service
                 echo "Enter your new postgres account password:"
                 passwd postgres
