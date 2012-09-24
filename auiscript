@@ -362,7 +362,7 @@
 #WEBSERVER {{{
     # 1) LAMP - APACHE, MYSQL & PHP + ADMINER
     # 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER
-    LAMP="2"
+    WEBSERVER="2"
 #}}}
 #AUDIO {{{
     # 1) Amarok
