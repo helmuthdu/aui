@@ -898,7 +898,7 @@ case "$1" in
         #CREATE NEW USER {{{
         create_new_user(){
             read -p "Username: " USERNAME
-            useradd -m -g users -G audio,lp,optical,storage,video,sudo,games,power,scanner,network -s /bin/bash $USERNAME
+            useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
             chfn $USERNAME
             passwd $USERNAME
             pause_function
@@ -1000,7 +1000,9 @@ case "$1" in
             package_install "sudo"
         fi
         ## Uncomment to allow members of group wheel to execute any command
-        sed -i '/%sudo ALL=(ALL) ALL/s/^#//' /etc/sudoers
+        sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /etc/sudoers
+        ## Same thing without a password (not secure)
+        #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
     }
     #}}}
     #AUR HELPER {{{
