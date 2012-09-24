@@ -319,6 +319,14 @@ case "$1" in
         done
     }
     #}}}
+    #CONFIGURE MIRRORLIST {{{
+    configure_mirrorlist(){
+        print_title "MIRRORS - https://wiki.archlinux.org/index.php/Mirrors"
+        echo "Edit your mirrorlist"
+        pause_function
+        $EDITOR $MOUNTPOINT/etc/pacman.d/mirrorlist
+    }
+    #}}}
     #CREATE PARTITION {{{
     create_partition(){
         print_title "https://wiki.archlinux.org/index.php/Partitioning"
@@ -607,14 +615,6 @@ case "$1" in
         esac
     }
     #}}}
-    #CONFIGURE MIRRORLIST {{{
-    configure_mirrorlist(){
-        print_title "MIRRORS - https://wiki.archlinux.org/index.php/Mirrors"
-        echo "Edit your mirrorlist"
-        pause_function
-        $EDITOR $MOUNTPOINT/etc/pacman.d/mirrorlist
-    }
-    #}}}
     #ROOT PASSWORD {{{
     root_password(){
         print_title "ROOT PASSWORD"
@@ -646,17 +646,17 @@ case "$1" in
         print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
         echo " 1) $(mainmenu_item "${checklist[1]}" "Configure Keymap")"
         echo " 2) $(mainmenu_item "${checklist[2]}" "Select Editor")"
-        echo " 3) $(mainmenu_item "${checklist[3]}" "Create Partition")"
-        echo " 4) $(mainmenu_item "${checklist[4]}" "Format Device")"
-        echo " 5) $(mainmenu_item "${checklist[5]}" "Install Base System")"
-        echo " 6) $(mainmenu_item "${checklist[6]}" "Configure Fstab")"
-        echo " 7) $(mainmenu_item "${checklist[7]}" "Configure Hostname")"
-        echo " 8) $(mainmenu_item "${checklist[8]}" "Configure Timezone")"
-        echo " 9) $(mainmenu_item "${checklist[9]}" "Configure Hardware Clock")"
-        echo "10) $(mainmenu_item "${checklist[10]}" "Configure Locale")"
-        echo "11) $(mainmenu_item "${checklist[11]}" "Configure Mkinitcpio")"
-        echo "12) $(mainmenu_item "${checklist[12]}" "Install Bootloader")"
-        echo "13) $(mainmenu_item "${checklist[13]}" "Configure Mirrorlist")"
+        echo " 3) $(mainmenu_item "${checklist[3]}" "Configure Mirrorlist")"
+        echo " 4) $(mainmenu_item "${checklist[4]}" "Create Partition")"
+        echo " 5) $(mainmenu_item "${checklist[5]}" "Format Device")"
+        echo " 6) $(mainmenu_item "${checklist[6]}" "Install Base System")"
+        echo " 7) $(mainmenu_item "${checklist[7]}" "Configure Fstab")"
+        echo " 8) $(mainmenu_item "${checklist[8]}" "Configure Hostname")"
+        echo " 9) $(mainmenu_item "${checklist[9]}" "Configure Timezone")"
+        echo "10) $(mainmenu_item "${checklist[10]}" "Configure Hardware Clock")"
+        echo "11) $(mainmenu_item "${checklist[11]}" "Configure Locale")"
+        echo "12) $(mainmenu_item "${checklist[12]}" "Configure Mkinitcpio")"
+        echo "13) $(mainmenu_item "${checklist[13]}" "Install Bootloader")"
         echo "14) $(mainmenu_item "${checklist[14]}" "Root Password")"
         echo ""
         echo " d) Done"
@@ -673,48 +673,48 @@ case "$1" in
                     checklist[2]=1
                     ;;
                 3)
-                    create_partition
+                    configure_mirrorlist
                     checklist[3]=1
                     ;;
                 4)
-                    format_device
+                    create_partition
                     checklist[4]=1
                     ;;
                 5)
-                    install_base_system
+                    format_device
                     checklist[5]=1
                     ;;
                 6)
-                    configure_fstab
+                    install_base_system
                     checklist[6]=1
                     ;;
                 7)
-                    configure_hostname
+                    configure_fstab
                     checklist[7]=1
                     ;;
                 8)
-                    configure_timezone
+                    configure_hostname
                     checklist[8]=1
                     ;;
                 9)
-                    configure_hardwareclock
+                    configure_timezone
                     checklist[9]=1
                     ;;
                 10)
-                    configure_locale
+                    configure_hardwareclock
                     checklist[10]=1
                     ;;
                 11)
-                    configure_mkinitcpio
+                    configure_locale
                     checklist[11]=1
                     ;;
                 12)
-                    install_bootloader
-                    configure_bootloader
+                    configure_mkinitcpio
                     checklist[12]=1
                     ;;
                 13)
-                    configure_mirrorlist
+                    install_bootloader
+                    configure_bootloader
                     checklist[13]=1
                     ;;
                 14)
@@ -764,12 +764,9 @@ case "$1" in
         echo -e "\nSystem config backups:"
         print_line
         # backup old configs
-        [[ ! -f /etc/rc.conf.aui ]] && cp -v /etc/rc.conf /etc/rc.conf.aui || echo "/etc/rc.conf.aui";
         [[ ! -f /etc/pacman.conf.aui ]] && cp -v /etc/pacman.conf /etc/pacman.conf.aui || echo "/etc/pacman.conf.aui";
-        [[ ! -f /etc/inittab.aui ]] && cp -v /etc/inittab /etc/inittab.aui || echo "/etc/inittab.aui";
         [[ -f /etc/ssh/sshd_config.aui ]] && echo "/etc/ssh/sshd_conf.aui";
         [[ -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && echo "/etc/X11/xorg.conf.d/10-evdev.conf.aui";
-        [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui";
         pause_function
     }
     #}}}
@@ -3508,7 +3505,7 @@ case "$1" in
                     mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
                     rm -v /etc/php/php.ini.aui
                 fi
-                [[ ! -f  /etc/php/php.ini.aui ]] && cp -v /etc/php/php.ini /etc/php/php.ini.aui
+                [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui || cp -v /etc/php/php.ini /etc/php/php.ini.aui";
                 sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
                 sed -i '/mysql.so/s/^;//' /etc/php/php.ini
                 sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
@@ -3544,7 +3541,7 @@ case "$1" in
                     mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
                     rm -v /etc/php/php.ini.aui
                 fi
-                [[ ! -f  /etc/php/php.ini.aui ]] && cp -v /etc/php/php.ini /etc/php/php.ini.aui
+                [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui || cp -v /etc/php/php.ini /etc/php/php.ini.aui";
                 sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
                 sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
                 sed -i '/gd.so/s/^;//' /etc/php/php.ini
