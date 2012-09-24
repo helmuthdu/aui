@@ -324,7 +324,7 @@ case "$1" in
         print_title "MIRRORS - https://wiki.archlinux.org/index.php/Mirrors"
         echo "Edit your mirrorlist"
         pause_function
-        $EDITOR $MOUNTPOINT/etc/pacman.d/mirrorlist
+        $EDITOR /etc/pacman.d/mirrorlist
     }
     #}}}
     #CREATE PARTITION {{{
