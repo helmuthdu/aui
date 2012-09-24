@@ -1452,7 +1452,7 @@ case "$1" in
                 sumary "Nouveau GPU driver installation"
                 ;;
             5)
-                package_install "virtualbox-guest-additions"
+                package_install "virtualbox-guest-utils"
                 add_module "vboxguest vboxsf vboxvideo"
                 groupadd vboxsf
                 gpasswd -a $USERNAME vboxsf
@@ -3039,7 +3039,7 @@ case "$1" in
                     package_install "htop"
                     ;;
                 4)
-                    package_install "virtualbox virtualbox-additions"
+                    package_install "virtualbox virtualbox-host-modules virtualbox-guest-iso"
                     aur_package_install "virtualbox-ext-oracle"
                     add_module "vboxdrv"
                     systemctl enable vboxservice.service
@@ -3489,7 +3489,6 @@ case "$1" in
             1)
                 package_install "apache mysql php php-apache php-mcrypt php-gd"
                 aur_package_install "adminer"
-                cp /etc/webapps/adminer/apache.example.conf /etc/httpd/conf/extra/httpd-adminer.conf
                 systemctl enable httpd.service
                 systemctl start mysqld.service
                 systemctl enable mysqld.service
@@ -3525,7 +3524,6 @@ case "$1" in
             2)
                 package_install "apache postgresql php php-apache php-pgsql php-gd"
                 aur_package_install "adminer"
-                cp /etc/webapps/adminer/apache.example.conf /etc/httpd/conf/extra/httpd-adminer.conf
                 systemctl enable httpd.service
                 systemctl start postgresql.service
                 systemctl enable postgresql.service
