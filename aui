@@ -155,7 +155,7 @@ aur_package_install(){ #{{{
     #install package from aur
     for PACKAGE in $1; do
         if ! check_package "$PACKAGE" ; then
-            su -l $USERNAME -c "$AUR_HELPER --noconfirm -S $PACKAGE"
+            su - $USERNAME -c "$AUR_HELPER --noconfirm -S $PACKAGE"
             #RECHECK #{{{
             #check if the package wasnt installed
             if ! check_package "$PACKAGE" ; then
@@ -163,7 +163,7 @@ aur_package_install(){ #{{{
                     echo "$PACKAGE" >> packages_not_installed.txt
                 else
                     read_input_text "Package $PACKAGE not installed, try install again?"
-                    [[ $OPTION == y ]] && su -l $USERNAME -c "$AUR_HELPER -S $PACKAGE"
+                    [[ $OPTION == y ]] && su - $USERNAME -c "$AUR_HELPER -S $PACKAGE"
                 fi
             fi
             #}}}
@@ -175,7 +175,7 @@ aur_package_install(){ #{{{
 aui_download_packages(){ #{{{
     for PACKAGE in $1; do
         #exec command as user instead of root
-        su -l $USERNAME -c "
+        su - $USERNAME -c "
         [[ ! -d aui_packages ]] && mkdir aui_packages
         cd aui_packages
         curl -o $PACKAGE.tar.gz http://aur.archlinux.org/packages/$PACKAGE/$PACKAGE.tar.gz
@@ -1588,7 +1588,7 @@ case "$1" in
                     chmod +x /usr/bin/proxy-wrapper
                     echo -e '\nexport GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"' >> /etc/bash.bashrc
                     export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
-                    su -l $USERNAME -c 'export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"'
+                    su - $USERNAME -c 'export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"'
                 fi
                 groupadd -g 42 privoxy
                 useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
@@ -3471,8 +3471,8 @@ case "$1" in
         create_sites_folder(){
             [[ ! -f  /etc/httpd/conf/extra/httpd-userdir.conf.aui ]] && cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
             sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
-            su -l $USERNAME -c "mkdir -p ~/Sites"
-            su -l $USERNAME -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
+            su - $USERNAME -c "mkdir -p ~/Sites"
+            su - $USERNAME -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
             print_line
             echo "The folder \"Sites\" has been created in your home"
             echo "You can access your projects at \"http://localhost/~username\""
