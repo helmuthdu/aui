@@ -3679,7 +3679,7 @@ case "$1" in
                     package_install "audacity"
                     ;;
                 15)
-                    aur_package_install "oceanaudio"
+                    aur_package_install "ocenaudio"
                     ;;
                 16)
                     aur_package_install "timidity++ fluidr3"
