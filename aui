@@ -3614,7 +3614,7 @@ case "$1" in
         echo " 4) $(menu_item "clementine")"
         echo " 5) $(menu_item "deadbeef")"
         echo " 6) $(menu_item "musique") $AUR"
-        echo " 7) $(menu_item "nuvola-bzr-stable") $AUR"
+        echo " 7) $(menu_item "nuvolaplayer") $AUR"
         echo " 8) $(menu_item "rhythmbox")"
         echo " 9) $(menu_item "radiotray") $AUR"
         echo "10) $(menu_item "spotify") $AUR"
@@ -3651,7 +3651,7 @@ case "$1" in
                     aur_package_install "musique"
                     ;;
                 7)
-                    aur_package_install "nuvola-bzr-stable"
+                    aur_package_install "nuvolaplayer"
                     ;;
                 8)
                     package_install "rhythmbox"
