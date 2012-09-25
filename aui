@@ -3534,7 +3534,9 @@ case "$1" in
                 aur_package_install "adminer"
                 systemctl enable httpd.service
                 systemctl enable mysqld.service
-                /usr/bin/mysql_secure_installation
+                echo "Enter your new mysql root account password"
+                /usr/bin/mysqladmin -u root password
+                #/usr/bin/mysql_secure_installation
                 #CONFIGURE HTTPD.CONF {{{
                 if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
                     cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
@@ -3568,7 +3570,7 @@ case "$1" in
                 aur_package_install "adminer"
                 systemctl enable httpd.service
                 systemctl enable postgresql.service
-                echo "Enter your new postgres account password:"
+                echo "Enter your new postgres account password"
                 passwd postgres
                 sed -i '/PGROOT/s/^#//' /etc/conf.d/postgresql
                 #CONFIGURE HTTPD.CONF {{{
