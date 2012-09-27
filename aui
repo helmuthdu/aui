@@ -65,6 +65,7 @@ elif [[ -z $EDITOR ]]; then
     EDITOR=nano
 fi
 #}}}
+UEFI=0
 AUR=`echo -e "(${BPurple}aur${White})"`
 AUI_DIR=`pwd`
 MOUNTPOINT="/mnt"
@@ -390,7 +391,7 @@ case "$1" in
                 remove_partition "$1"
             fi
         }
-        format_swap_partition() {
+        format_swap_partition(){
             read_input_text "Confirm format $1 partition"
             if [[ $OPTION == y ]]; then
                 umount_partition "$1"
@@ -399,7 +400,7 @@ case "$1" in
                 remove_partition "$1"
             fi
         }
-        function check_mountpoint() {
+        function check_mountpoint(){
             if mount|grep $2; then
                 echo "Successfully mounted"
                 remove_partition "$1"
@@ -574,7 +575,30 @@ case "$1" in
         select BOOTLOADER in "${bootloader[@]}"; do
             case "$REPLY" in
                 1)
-                    pacstrap $MOUNTPOINT grub-bios
+                    EDITORS=("BIOS" "UEFI");
+                    PS3="$prompt1"
+                    echo -e "Select system:\n"
+                    select OPT in "${EDITORS[@]}"; do
+                        case "$REPLY" in
+                            1)
+                                pacstrap $MOUNTPOINT grub-bios
+                                break
+                                ;;
+                            2)
+
+                                if [[ $ARCHI == i686 ]]; then
+                                    pacstrap $MOUNTPOINT grub-efi-i386
+                                else
+                                    pacstrap $MOUNTPOINT grub-efi-x86_64
+                                fi
+                                UEFI=1
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
                     #make grub automatically detect others OS
                     pacstrap $MOUNTPOINT os-prober
                     break
@@ -600,7 +624,11 @@ case "$1" in
                 print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
                 print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
                 echo -e $prompt3
-                print_warning "modprobe dm-mod\ngrub-install --target=i386-pc --recheck $ROOT_DEVICE\ngrub-mkconfig -o /boot/grub/grub.cfg"
+                if [[ $UEFI == 1 ]]; then
+                    print_warning "modprobe dm-mod\ngrub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck\ngrub-mkconfig -o /boot/grub/grub.cfg"
+                else
+                    print_warning "modprobe dm-mod\ngrub-install --target=i386-pc --recheck $ROOT_DEVICE\ngrub-mkconfig -o /boot/grub/grub.cfg"
+                fi
                 arch-chroot $MOUNTPOINT
                 chroot $MOUNTPOINT mkdir -p /boot/grub/locale
                 chroot $MOUNTPOINT cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
