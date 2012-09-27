@@ -575,10 +575,10 @@ case "$1" in
         select BOOTLOADER in "${bootloader[@]}"; do
             case "$REPLY" in
                 1)
-                    EDITORS=("BIOS" "UEFI");
+                    SYSTEM_TYPE=("BIOS" "UEFI");
                     PS3="$prompt1"
                     echo -e "Select system:\n"
-                    select OPT in "${EDITORS[@]}"; do
+                    select OPT in "${SYSTEM_TYPE[@]}"; do
                         case "$REPLY" in
                             1)
                                 pacstrap $MOUNTPOINT grub-bios
