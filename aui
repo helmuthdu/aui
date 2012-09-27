@@ -3567,7 +3567,7 @@ case "$1" in
                         echo " 3) $(menu_item "banshee")"
                         echo " 4) $(menu_item "clementine")"
                         echo " 5) $(menu_item "deadbeef")"
-                        echo " 6) $(menu_item "exaile")"
+                        echo " 6) $(menu_item "exaile") $AUR"
                         echo " 7) $(menu_item "musique") $AUR"
                         echo " 8) $(menu_item "nuvolaplayer") $AUR"
                         echo " 9) $(menu_item "rhythmbox")"
