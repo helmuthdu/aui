@@ -3598,7 +3598,7 @@ case "$1" in
                                     package_install "deadbeef"
                                     ;;
                                 6)
-                                    package_install "exaile"
+                                    aur_package_install "exaile"
                                     ;;
                                 7)
                                     aur_package_install "musique"
