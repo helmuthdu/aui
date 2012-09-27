@@ -3252,11 +3252,12 @@ case "$1" in
                         print_title "DOWNLOAD|FILESHARE"
                         echo " 1) $(menu_item "deluge") $AUR"
                         echo " 2) $(menu_item "dropbox") $AUR"
-                        echo " 3) $(menu_item "jdownloader") $AUR"
-                        echo " 4) $(menu_item "nitroshare") $AUR"
-                        echo " 5) $(menu_item "sparkleshare")"
-                        echo " 6) $(menu_item "steadyflow-bzr") $AUR"
-                        echo " 7) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+                        echo " 3) $(menu_item "insync") $AUR"
+                        echo " 4) $(menu_item "jdownloader") $AUR"
+                        echo " 5) $(menu_item "nitroshare") $AUR"
+                        echo " 6) $(menu_item "sparkleshare")"
+                        echo " 7) $(menu_item "steadyflow-bzr") $AUR"
+                        echo " 8) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
                         echo ""
                         echo " b) BACK"
                         echo ""
@@ -3282,18 +3283,21 @@ case "$1" in
                                     systemctl enable dropboxd.service
                                     ;;
                                 3)
-                                    aur_package_install "jdownloader"
+                                    aur_package_install "insync"
                                     ;;
                                 4)
-                                    aur_package_install "nitroshare"
+                                    aur_package_install "jdownloader"
                                     ;;
                                 5)
-                                    package_install "sparkleshare"
+                                    aur_package_install "nitroshare"
                                     ;;
                                 6)
-                                    aur_package_install "steadyflow-bzr"
+                                    package_install "sparkleshare"
                                     ;;
                                 7)
+                                    aur_package_install "steadyflow-bzr"
+                                    ;;
+                                8)
                                     if [[ $KDE -eq 1 ]]; then
                                         package_install "transmission-qt"
                                     else
@@ -3510,121 +3514,14 @@ case "$1" in
     done
     }
     #}}}
-    #WEBSERVER {{{
-    install_web_server(){
-        create_sites_folder(){
-            [[ ! -f  /etc/httpd/conf/extra/httpd-userdir.conf.aui ]] && cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
-            sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
-            su - $USERNAME -c "mkdir -p ~/Sites"
-            su - $USERNAME -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
-            print_line
-            echo "The folder \"Sites\" has been created in your home"
-            echo "You can access your projects at \"http://localhost/~username\""
-            pause_function
-        }
-        print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
-        echo " 1) LAMP - APACHE, MYSQL & PHP + ADMINER"
-        echo " 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER"
-        echo ""
-        echo " b) BACK"
-        echo ""
-        read_input $WEBSERVER
-        case "$OPTION" in
-            1)
-                package_install "apache mysql php php-apache php-mcrypt php-gd"
-                aur_package_install "adminer"
-                systemctl enable httpd.service
-                systemctl enable mysqld.service
-                echo "Enter your new mysql root account password"
-                /usr/bin/mysqladmin -u root password
-                #/usr/bin/mysql_secure_installation
-                #CONFIGURE HTTPD.CONF {{{
-                if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
-                    cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-                    echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
-                    echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
-                    sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
-                    echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
-                    sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
-                fi
-                #}}}
-                #CONFIGURE PHP.INI {{{
-                if [[ -f  /etc/php/php.ini.pacnew ]]; then
-                    mv -v /etc/php/php.ini /etc/php/php.ini.pacold
-                    mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
-                    rm -v /etc/php/php.ini.aui
-                fi
-                [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui || cp -v /etc/php/php.ini /etc/php/php.ini.aui";
-                sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
-                sed -i '/mysql.so/s/^;//' /etc/php/php.ini
-                sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
-                sed -i '/gd.so/s/^;//' /etc/php/php.ini
-                sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
-                sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
-                #}}}
-                CURRENT_STATUS=1
-                sumary "LAMP installation"
-                create_sites_folder
-                ;;
-            2)
-                package_install "apache postgresql php php-apache php-pgsql php-gd"
-                aur_package_install "adminer"
-                systemctl enable httpd.service
-                systemctl enable postgresql.service
-                echo "Enter your new postgres account password"
-                passwd postgres
-                sed -i '/PGROOT/s/^#//' /etc/conf.d/postgresql
-                #CONFIGURE HTTPD.CONF {{{
-                if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
-                    cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-                    echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
-                    echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
-                    sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
-                    echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
-                    sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
-                fi
-                #}}}
-                #CONFIGURE PHP.INI {{{
-                if [[ -f  /etc/php/php.ini.pacnew ]]; then
-                    mv -v /etc/php/php.ini /etc/php/php.ini.pacold
-                    mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
-                    rm -v /etc/php/php.ini.aui
-                fi
-                [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui || cp -v /etc/php/php.ini /etc/php/php.ini.aui";
-                sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
-                sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
-                sed -i '/gd.so/s/^;//' /etc/php/php.ini
-                sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
-                #}}}
-                CURRENT_STATUS=1
-                sumary "LAPP installation"
-                create_sites_folder
-                ;;
-        esac
-    }
-    #}}}
     #AUDIO {{{
     install_audio_apps(){
     while [[ 1 ]]
     do
-        print_title "AUDIO APPS "
-        echo " 1) $(menu_item "amarok")"
-        echo " 2) $(menu_item "audacious")"
-        echo " 3) $(menu_item "banshee")"
-        echo " 4) $(menu_item "clementine")"
-        echo " 5) $(menu_item "deadbeef")"
-        echo " 6) $(menu_item "musique") $AUR"
-        echo " 7) $(menu_item "nuvolaplayer") $AUR"
-        echo " 8) $(menu_item "rhythmbox")"
-        echo " 9) $(menu_item "radiotray") $AUR"
-        echo "10) $(menu_item "spotify") $AUR"
-        echo "11) $(menu_item "tomahawk") $AUR"
-        echo "12) $(menu_item "soundconverter soundkonverter" "$([[ $KDE -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
-        echo "13) $(menu_item "puddletag") $AUR"
-        echo "14) $(menu_item "audacity")"
-        echo "15) $(menu_item "ocenaudio") $AUR"
-        echo "16) $(menu_item "timidity++")"
-        echo "17) $(menu_item "gstreamer0.10-ugly" "Codecs")"
+        print_title "AUDIO APPS"
+        echo " 1) Players"
+        echo " 2) Editors|Tools"
+        echo " 3) Codecs"
         echo ""
         echo " b) BACK"
         echo ""
@@ -3633,59 +3530,129 @@ case "$1" in
         for OPT in ${OPTIONS[@]}; do
             case "$OPT" in
                 1)
-                    package_install "amarok"
+                    #PLAYERS {{{
+                    while [[ 1 ]]
+                    do
+                        print_title "AUDIO PLAYERS"
+                        echo " 1) $(menu_item "amarok")"
+                        echo " 2) $(menu_item "audacious")"
+                        echo " 3) $(menu_item "banshee")"
+                        echo " 4) $(menu_item "clementine")"
+                        echo " 5) $(menu_item "deadbeef")"
+                        echo " 6) $(menu_item "exaile")"
+                        echo " 7) $(menu_item "musique") $AUR"
+                        echo " 8) $(menu_item "nuvolaplayer") $AUR"
+                        echo " 9) $(menu_item "rhythmbox")"
+                        echo "10) $(menu_item "radiotray") $AUR"
+                        echo "11) $(menu_item "spotify") $AUR"
+                        echo "12) $(menu_item "tomahawk") $AUR"
+                        echo "13) $(menu_item "timidity++")"
+                        echo ""
+                        echo " b) BACK"
+                        echo ""
+                        AUDIO_PLAYER_OPTIONS+=" b"
+                        read_input_options "$AUDIO_PLAYER_OPTIONS"
+                        for OPT in ${OPTIONS[@]}; do
+                            case "$OPT" in
+                                1)
+                                    package_install "amarok"
+                                    ;;
+                                2)
+                                    package_install "audacious audacious-plugins"
+                                    ;;
+                                3)
+                                    package_install "banshee"
+                                    ;;
+                                4)
+                                    package_install "clementine"
+                                    ;;
+                                5)
+                                    package_install "deadbeef"
+                                    ;;
+                                6)
+                                    package_install "exaile"
+                                    ;;
+                                7)
+                                    aur_package_install "musique"
+                                    ;;
+                                8)
+                                    aur_package_install "nuvolaplayer"
+                                    ;;
+                                9)
+                                    package_install "rhythmbox"
+                                    ;;
+                                10)
+                                    aur_package_install "radiotray"
+                                    ;;
+                                11)
+                                    aur_package_install "spotify"
+                                    ;;
+                                12)
+                                    aur_package_install "tomahawk"
+                                    ;;
+                                13)
+                                    aur_package_install "timidity++ fluidr3"
+                                    echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
+                                    ;;
+                                "b")
+                                    break
+                                    ;;
+                                *)
+                                    invalid_option
+                                    ;;
+                            esac
+                        done
+                    elihw
+                    done
+                    #}}}
+                    OPT=1
                     ;;
                 2)
-                    package_install "audacious audacious-plugins"
+                    #EDITORS {{{
+                    while [[ 1 ]]
+                    do
+                        print_title "AUDIO EDITORS|TOOLS"
+                        echo " 1) $(menu_item "soundconverter soundkonverter" "$([[ $KDE -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
+                        echo " 2) $(menu_item "puddletag") $AUR"
+                        echo " 3) $(menu_item "audacity")"
+                        echo " 4) $(menu_item "ocenaudio") $AUR"
+                        echo ""
+                        echo " b) BACK"
+                        echo ""
+                        AUDIO_EDITOR_OPTIONS+=" b"
+                        read_input_options "$AUDIO_EDITOR_OPTIONS"
+                        for OPT in ${OPTIONS[@]}; do
+                            case "$OPT" in
+                                1)
+                                   if [[ $KDE -eq 1 ]]; then
+                                       package_install "soundkonverter"
+                                   else
+                                       package_install "soundconverter"
+                                   fi
+                                   ;;
+                                2)
+                                   aur_package_install "puddletag"
+                                   ;;
+                                3)
+                                   package_install "audacity"
+                                   ;;
+                                4)
+                                   aur_package_install "ocenaudio"
+                                   ;;
+                                "b")
+                                    break
+                                    ;;
+                                *)
+                                    invalid_option
+                                    ;;
+                            esac
+                        done
+                    elihw
+                    done
+                    #}}}
+                    OPT=2
                     ;;
                 3)
-                    package_install "banshee"
-                    ;;
-                4)
-                    package_install "clementine"
-                    ;;
-                5)
-                    package_install "deadbeef"
-                    ;;
-                6)
-                    aur_package_install "musique"
-                    ;;
-                7)
-                    aur_package_install "nuvolaplayer"
-                    ;;
-                8)
-                    package_install "rhythmbox"
-                    ;;
-                9)
-                    aur_package_install "radiotray"
-                    ;;
-                10)
-                    aur_package_install "spotify"
-                    ;;
-                11)
-                    aur_package_install "tomahawk"
-                    ;;
-                12)
-                    if [[ $KDE -eq 1 ]]; then
-                        package_install "soundkonverter"
-                    else
-                        package_install "soundconverter"
-                    fi
-                    ;;
-                13)
-                    aur_package_install "puddletag"
-                    ;;
-                14)
-                    package_install "audacity"
-                    ;;
-                15)
-                    aur_package_install "ocenaudio"
-                    ;;
-                16)
-                    aur_package_install "timidity++ fluidr3"
-                    echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
-                    ;;
-                17)
                     package_install "gstreamer0.10-plugins mpg123 flac"
                     ;;
                 "b")
@@ -3705,21 +3672,9 @@ case "$1" in
     while [[ 1 ]]
     do
         print_title "VIDEO APPS"
-        echo " 1) $(menu_item "audience-bzr") $AUR"
-        echo " 2) $(menu_item "gnome-mplayer")"
-        echo " 3) $(menu_item "parole")"
-        echo " 4) $(menu_item "minitube") $AUR"
-        echo " 5) $(menu_item "miro")"
-        echo " 6) $(menu_item "rosa-media-player") $AUR"
-        echo " 7) $(menu_item "smplayer")"
-        echo " 8) $(menu_item "vlc")"
-        echo " 9) $(menu_item "xbmc")"
-        echo "10) $(menu_item "arista-transcoder" "Arista")"
-        echo "11) $(menu_item "transmageddon")"
-        echo "12) $(menu_item "openshot")"
-        echo "13) $(menu_item "pitivi kdenlive" "$([[ $KDE -eq 1 ]] && echo "Kdenlive" || echo "Pitivi";)")"
-        echo "14) $(menu_item "kazam-bzr") $AUR"
-        echo "15) $(menu_item "codecs codecs64" "Codecs") $AUR"
+        echo " 1) Players"
+        echo " 2) Editors|Tools"
+        echo " 3) Codecs"
         echo ""
         echo " b) BACK"
         echo ""
@@ -3728,56 +3683,120 @@ case "$1" in
         for OPT in ${OPTIONS[@]}; do
             case "$OPT" in
                 1)
-                    aur_package_install "audience-bzr"
+                    #PLAYERS {{{
+                    while [[ 1 ]]
+                    do
+                        print_title "VIDEO PLAYERS"
+                        echo " 1) $(menu_item "audience-bzr") $AUR"
+                        echo " 2) $(menu_item "gnome-mplayer")"
+                        echo " 3) $(menu_item "parole")"
+                        echo " 4) $(menu_item "minitube") $AUR"
+                        echo " 5) $(menu_item "miro")"
+                        echo " 6) $(menu_item "rosa-media-player") $AUR"
+                        echo " 7) $(menu_item "smplayer")"
+                        echo " 8) $(menu_item "vlc")"
+                        echo " 9) $(menu_item "xbmc")"
+                        echo ""
+                        echo " b) BACK"
+                        echo ""
+                        VIDEO_PLAYER_OPTIONS+=" b"
+                        read_input_options "$VIDEO_PLAYER_OPTIONS"
+                        for OPT in ${OPTIONS[@]}; do
+                            case "$OPT" in
+                                1)
+                                    aur_package_install "audience-bzr"
+                                    ;;
+                                2)
+                                    package_install "gnome-mplayer"
+                                    ;;
+                                3)
+                                    package_install "parole"
+                                    ;;
+                                4)
+                                    aur_package_install "minitube"
+                                    ;;
+                                5)
+                                    package_install "miro"
+                                    ;;
+                                6)
+                                    aur_package_install "rosa-media-player"
+                                    ;;
+                                7)
+                                    package_install "smplayer smplayer-themes"
+                                    ;;
+                                8)
+                                    package_install "vlc"
+                                    if [[ $KDE -eq 1 ]]; then
+                                        package_install "phonon-vlc"
+                                    fi
+                                    ;;
+                                9)
+                                    package_install "xbmc"
+                                    ;;
+                                "b")
+                                    break
+                                    ;;
+                                *)
+                                    invalid_option
+                                    ;;
+                            esac
+                        done
+                    elihw
+                    done
+                    #}}}
+                    OPT=1
                     ;;
                 2)
-                    package_install "gnome-mplayer"
+                    #EDITORS {{{
+                    while [[ 1 ]]
+                    do
+                        print_title "VIDEO EDITORS|TOOLS"
+                        echo " 1) $(menu_item "arista-transcoder" "Arista")"
+                        echo " 2) $(menu_item "transmageddon")"
+                        echo " 3) $(menu_item "kdeenlive")"
+                        echo " 4) $(menu_item "openshot")"
+                        echo " 5) $(menu_item "pitivi")"
+                        echo " 6) $(menu_item "kazam-bzr") $AUR"
+                        echo ""
+                        echo " b) BACK"
+                        echo ""
+                        VIDEO_EDITOR_OPTIONS+=" b"
+                        read_input_options "$VIDEO_EDITOR_OPTIONS"
+                        for OPT in ${OPTIONS[@]}; do
+                            case "$OPT" in
+                                1)
+                                   package_install "arista-transcoder"
+                                   ;;
+                                2)
+                                   package_install "transmageddon"
+                                   ;;
+                                3)
+                                    package_install "kdenlive"
+                                    ;;
+                                4)
+                                   package_install "openshot"
+                                   ;;
+                                5)
+                                   package_install "pitivi"
+                                   ;;
+                                6)
+                                   aur_package_install "python-rsvg"
+                                   aur_package_install "kazam-bzr"
+                                   ;;
+                                "b")
+                                    break
+                                    ;;
+                                *)
+                                    invalid_option
+                                    ;;
+                            esac
+                        done
+                    elihw
+                    done
+                    #}}}
+                    OPT=2
                     ;;
                 3)
-                    package_install "parole"
-                    ;;
-                4)
-                    aur_package_install "minitube"
-                    ;;
-                5)
-                    package_install "miro"
-                    ;;
-                6)
-                    aur_package_install "rosa-media-player"
-                    ;;
-                7)
-                    package_install "smplayer smplayer-themes"
-                    ;;
-                8)
-                    package_install "vlc"
-                    if [[ $KDE -eq 1 ]]; then
-                        package_install "phonon-vlc"
-                    fi
-                    ;;
-                9)
-                    package_install "xbmc"
-                    ;;
-                10)
-                    package_install "arista-transcoder"
-                    ;;
-                11)
-                    package_install "transmageddon"
-                    ;;
-                12)
-                    package_install "openshot"
-                    ;;
-                13)
-                    if [[ $KDE -eq 1 ]]; then
-                        package_install "kdenlive"
-                    else
-                        package_install "pitivi"
-                    fi
-                    ;;
-                14)
-                    aur_package_install "python-rsvg"
-                    aur_package_install "kazam-bzr"
-                    ;;
-                15)
                     package_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
                     if [[ $ARCHI == i686 ]]; then
                         aur_package_install "codecs"
@@ -4363,6 +4382,99 @@ case "$1" in
         done
     elihw
     done
+    }
+    #}}}
+    #WEBSERVER {{{
+    install_web_server(){
+        create_sites_folder(){
+            [[ ! -f  /etc/httpd/conf/extra/httpd-userdir.conf.aui ]] && cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
+            sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
+            su - $USERNAME -c "mkdir -p ~/Sites"
+            su - $USERNAME -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
+            print_line
+            echo "The folder \"Sites\" has been created in your home"
+            echo "You can access your projects at \"http://localhost/~username\""
+            pause_function
+        }
+        print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
+        echo " 1) LAMP - APACHE, MYSQL & PHP + ADMINER"
+        echo " 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER"
+        echo ""
+        echo " b) BACK"
+        echo ""
+        read_input $WEBSERVER
+        case "$OPTION" in
+            1)
+                package_install "apache mysql php php-apache php-mcrypt php-gd"
+                aur_package_install "adminer"
+                systemctl enable httpd.service
+                systemctl enable mysqld.service
+                echo "Enter your new mysql root account password"
+                /usr/bin/mysqladmin -u root password
+                #/usr/bin/mysql_secure_installation
+                #CONFIGURE HTTPD.CONF {{{
+                if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
+                    cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
+                    echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
+                    echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
+                    sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
+                    echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
+                    sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
+                fi
+                #}}}
+                #CONFIGURE PHP.INI {{{
+                if [[ -f  /etc/php/php.ini.pacnew ]]; then
+                    mv -v /etc/php/php.ini /etc/php/php.ini.pacold
+                    mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
+                    rm -v /etc/php/php.ini.aui
+                fi
+                [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui || cp -v /etc/php/php.ini /etc/php/php.ini.aui";
+                sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
+                sed -i '/mysql.so/s/^;//' /etc/php/php.ini
+                sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
+                sed -i '/gd.so/s/^;//' /etc/php/php.ini
+                sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
+                sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
+                #}}}
+                CURRENT_STATUS=1
+                sumary "LAMP installation"
+                create_sites_folder
+                ;;
+            2)
+                package_install "apache postgresql php php-apache php-pgsql php-gd"
+                aur_package_install "adminer"
+                systemctl enable httpd.service
+                systemctl enable postgresql.service
+                echo "Enter your new postgres account password"
+                passwd postgres
+                sed -i '/PGROOT/s/^#//' /etc/conf.d/postgresql
+                #CONFIGURE HTTPD.CONF {{{
+                if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
+                    cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
+                    echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
+                    echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
+                    sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
+                    echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
+                    sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
+                fi
+                #}}}
+                #CONFIGURE PHP.INI {{{
+                if [[ -f  /etc/php/php.ini.pacnew ]]; then
+                    mv -v /etc/php/php.ini /etc/php/php.ini.pacold
+                    mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
+                    rm -v /etc/php/php.ini.aui
+                fi
+                [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui || cp -v /etc/php/php.ini /etc/php/php.ini.aui";
+                sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
+                sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
+                sed -i '/gd.so/s/^;//' /etc/php/php.ini
+                sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
+                #}}}
+                CURRENT_STATUS=1
+                sumary "LAPP installation"
+                create_sites_folder
+                ;;
+        esac
     }
     #}}}
     #FONTS {{{
