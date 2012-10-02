@@ -466,6 +466,15 @@ case "$1" in
         echo "FONT_MAP=\"\"" >> $MOUNTPOINT/etc/vconsole.conf
     }
     #}}}
+    #INSTALL SYSTEMD {{{
+    install_systemd(){
+        print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
+        print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
+        echo -e $prompt3
+        print_warning "pacman -S systemd systemd-sysvcompat systemd-arch-units"
+        arch-chroot $MOUNTPOINT
+    }
+    #}}}
     #CONFIGURE FSTAB {{{
     configure_fstab(){
         print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
@@ -714,6 +723,7 @@ case "$1" in
                     ;;
                 6)
                     install_base_system
+                    install_systemd
                     checklist[6]=1
                     ;;
                 7)
@@ -1043,7 +1053,7 @@ case "$1" in
             echo 'Defaults passwd_tries = 8, passwd_timeout = 1' >> /etc/sudoers
             echo 'Defaults env_reset, always_set_home, set_home, set_logname' >> /etc/sudoers
             echo 'Defaults !env_editor, editor="/usr/bin/vim:/usr/bin/vi:/usr/bin/nano"' >> /etc/sudoers
-            echo 'Defaults timestamp_timeout=360' >> /etc/sudoers
+            echo 'Defaults timestamp_timeout=300' >> /etc/sudoers
             echo 'Defaults passprompt="[sudo] password for %u: "' >> /etc/sudoers
         fi
         #}}}
@@ -2785,7 +2795,7 @@ case "$1" in
                     aur_package_install "dockbarx dockbarx-shinybar-theme"
                     ;;
                 5)
-                    aur_package_install "docky"
+                    package_install "docky"
                     ;;
                 6)
                     if [[ $KDE -eq 1 ]]; then
@@ -3307,8 +3317,6 @@ case "$1" in
                                     else
                                         aur_package_install "dropbox-cli"
                                     fi
-                                    aur_package_install "systemd-dropbox-daemon"
-                                    systemctl enable dropboxd.service
                                     ;;
                                 3)
                                     aur_package_install "insync"
@@ -4437,9 +4445,10 @@ case "$1" in
                 aur_package_install "adminer"
                 systemctl enable httpd.service
                 systemctl enable mysqld.service
-                echo "Enter your new mysql root account password"
-                /usr/bin/mysqladmin -u root password
-                #/usr/bin/mysql_secure_installation
+                systemctl start mysqld.service
+                #echo "Enter your new mysql root account password"
+                #/usr/bin/mysqladmin -u root password
+                /usr/bin/mysql_secure_installation
                 #CONFIGURE HTTPD.CONF {{{
                 if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
                     cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
@@ -4473,6 +4482,7 @@ case "$1" in
                 aur_package_install "adminer"
                 systemctl enable httpd.service
                 systemctl enable postgresql.service
+                systemctl start postgresql.service
                 echo "Enter your new postgres account password"
                 passwd postgres
                 sed -i '/PGROOT/s/^#//' /etc/conf.d/postgresql
@@ -4515,10 +4525,9 @@ case "$1" in
         echo " 3) $(menu_item "ttf-funfonts") $AUR"
         echo " 4) $(menu_item "ttf-kochi-substitute") (Japanese Support) $AUR"
         echo " 5) $(menu_item "ttf-liberation")"
-        echo " 6) $(menu_item "ttf-mac-fonts") $AUR"
-        echo " 7) $(menu_item "ttf-ms-fonts") $AUR"
-        echo " 8) $(menu_item "ttf-vista-fonts") $AUR"
-        echo " 9) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support) $AUR"
+        echo " 6) $(menu_item "ttf-ms-fonts") $AUR"
+        echo " 7) $(menu_item "ttf-vista-fonts") $AUR"
+        echo " 8) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support) $AUR"
         echo ""
         echo " b) BACK"
         echo ""
@@ -4548,15 +4557,12 @@ case "$1" in
                     package_install "ttf-liberation"
                     ;;
                 6)
-                    aur_package_install "ttf-mac-fonts"
-                    ;;
-                7)
                     aur_package_install "ttf-ms-fonts"
                     ;;
-                8)
+                7)
                     aur_package_install "ttf-vista-fonts"
                     ;;
-                9)
+                8)
                     aur_package_install "wqy-microhei"
                     ;;
                 "b")

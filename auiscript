@@ -34,7 +34,7 @@
     #15) Clean Orphan Packages
     MAINMENU="1-13 15"
 #}}}
-#BASIC SETUP{{{
+#BASIC SETUP {{{
     CUPS="y"
     CUSTOMREPO="n"
     FIRMWARE="n"
@@ -186,7 +186,7 @@
         # 4) Faience
         # 5) Elementary
         # 6) Nitrux
-        GNOME_ICONS="2-4"
+        GNOME_ICONS="2-4 6"
     #}}}
     #GTK THEMES {{{
         # 1) Adwaita Cupertino
@@ -538,11 +538,10 @@
     # 3) ttf-funfonts
     # 4) ttf-kochi-substitute
     # 5) ttf-liberation
-    # 6) ttf-mac-fonts
-    # 7) ttf-ms-fonts
-    # 8) ttf-vista-fonts
-    # 9) ttf-wgy-microhei
-    FONTS_OPTIONS="1 3-9"
+    # 6) ttf-ms-fonts
+    # 7) ttf-vista-fonts
+    # 8) ttf-wgy-microhei
+    FONTS_OPTIONS="1-8"
     GOOGLE_FONTS="y"
 #}}}
 #EXTRA {{{
