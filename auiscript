@@ -543,7 +543,6 @@
     # 7) ttf-vista-fonts
     # 8) ttf-wgy-microhei
     FONTS_OPTIONS="1-8"
-    GOOGLE_FONTS="y"
 #}}}
 #EXTRA {{{
     # 1) Elementary Project

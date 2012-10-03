@@ -948,8 +948,8 @@ case "$1" in
             print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
             package_install "git"
             git clone https://github.com/helmuthdu/dotfiles
-            cp dotfiles/.* ~/
-            cp -i dotfiles/.* /home/$USERNAME/
+            cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc ~/
+            cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc /home/$USERNAME/
             mkdir -p /home/$USERNAME/.config/fontconfig
             cp -i dotfiles/fonts.conf /home/$USERNAME/.config/fontconfig
             rm -fr dotfiles
@@ -1238,7 +1238,7 @@ case "$1" in
         print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
         package_install "dbus"
         print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
-        package_install "zip unzip unrar p7zip atool"
+        package_install "zip unzip unrar p7zip"
         aur_package_install "rar"
         print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
         print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD service discovery. It allows programs to publish and discover services and hosts running on a local network with no specific configuration."
@@ -4543,9 +4543,6 @@ case "$1" in
                     package_install "ttf-dejavu"
                     ;;
                 2)
-                    echo -e "\nWARNING: Install time can be > 20min"
-                    read_input_text "Are you sure you want to continue?" $GOOGLE_FONTS
-                    if [[ $OPTION == n ]]; then continue; fi
                     pacman -Rdd --noconfirm ttf-droid
                     pacman -Rdd --noconfirm ttf-roboto
                     pacman -Rdd --noconfirm ttf-ubuntu-font-family
