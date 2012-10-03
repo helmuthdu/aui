@@ -4019,6 +4019,7 @@ case "$1" in
                         echo " 2) $(menu_item "tome4" "Tales of MajEyal") $AUR"
                         echo " 3) $(menu_item "lostlabyrinth" "Lost Labyrinth") $AUR"
                         echo " 4) $(menu_item "scourge" "S.C.O.U.R.G.E.") $AUR"
+                        echo " 5) $(menu_item "stone-soupe" "Stone-Soupe")"
                         echo ""
                         echo " b) BACK"
                         echo ""
@@ -4037,6 +4038,9 @@ case "$1" in
                                     ;;
                                 4)
                                     aur_package_install "scourge"
+                                    ;;
+                                5)
+                                    aur_package_install "stone-soup"
                                     ;;
                                 "b")
                                     break
