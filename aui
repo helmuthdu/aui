@@ -4488,6 +4488,7 @@ case "$1" in
             2)
                 package_install "apache postgresql php php-apache php-pgsql php-gd"
                 aur_package_install "adminer"
+                chown -R postgres:postgres /var/lib/postgres/
                 systemctl enable httpd.service
                 systemctl enable postgresql.service
                 systemctl start postgresql.service
