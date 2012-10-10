@@ -4461,7 +4461,7 @@ case "$1" in
                 if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
                     cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
                     echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
-                    echo -e 'application/x-httpd-php        php' >> /etc/httpd/conf/mime.types
+                    echo -e 'application/x-httpd-php5		php php5' >> /etc/httpd/conf/mime.types
                     sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
                     echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
                     sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
