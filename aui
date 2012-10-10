@@ -4489,12 +4489,13 @@ case "$1" in
                 package_install "apache postgresql php php-apache php-pgsql php-gd"
                 aur_package_install "adminer"
                 chown -R postgres:postgres /var/lib/postgres/
+                echo "Enter your new postgres account password"
+                passwd postgres
+                su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'"
+                sed -i '/PGROOT/s/^#//' /etc/conf.d/postgresql
                 systemctl enable httpd.service
                 systemctl enable postgresql.service
                 systemctl start postgresql.service
-                echo "Enter your new postgres account password"
-                passwd postgres
-                sed -i '/PGROOT/s/^#//' /etc/conf.d/postgresql
                 #CONFIGURE HTTPD.CONF {{{
                 if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
                     cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
