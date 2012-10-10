@@ -1243,61 +1243,63 @@ case "$1" in
         print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
         print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD service discovery. It allows programs to publish and discover services and hosts running on a local network with no specific configuration."
         package_install "avahi nss-mdns"
-        systemctl enable avahi-daemon.service
-        systemctl enable avahi-dnsconfd.service
+        check_package "avahi" && systemctl enable avahi-daemon.service
+        check_package "avahi" && systemctl enable avahi-dnsconfd.service
         print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
         print_info "acpid is a flexible and extensible daemon for delivering ACPI events."
         package_install "acpi acpid"
-        systemctl enable acpid.service
+        check_package "fuse" && systemctl enable acpid.service
         print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
         print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
         package_install "alsa-utils alsa-plugins"
         add_module "snd-usb-audio"
         systemctl enable alsa-store.service
         systemctl enable alsa-restore.service
-        print_title "NTFS/FAT/exFAT/BTRFS - https://wiki.archlinux.org/index.php/File_Systems"
+        print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/File_Systems"
         print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
-        package_install "ntfs-3g ntfsprogs btrfs-progs dosfstools exfat-utils fuse fuse-exfat"
-        add_module "fuse"
+        package_install "ntfs-3g ntfsprogs dosfstools exfat-utils fuse fuse-exfat"
+        check_package "fuse" && add_module "fuse"
         print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
         print_info "Secure Shell (SSH) is a network protocol that allows data to be exchanged over a secure channel between two computers."
         package_install "openssh"
-        aur_package_install "rssh"
-        systemctl enable sshd.service
-        [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
-        #CONFIGURE SSHD_CONF #{{{
-            sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
-            sed -i '/Protocol 2/s/^#//' /etc/ssh/sshd_config
-            sed -i '/HostKey \/etc\/ssh\/ssh_host_rsa_key/s/^#//' /etc/ssh/sshd_config
-            sed -i '/HostKey \/etc\/ssh\/ssh_host_dsa_key/s/^#//' /etc/ssh/sshd_config
-            sed -i '/HostKey \/etc\/ssh\/ssh_host_ecdsa_key/s/^#//' /etc/ssh/sshd_config
-            sed -i '/KeyRegenerationInterval/s/^#//' /etc/ssh/sshd_config
-            sed -i '/ServerKeyBits/s/^#//' /etc/ssh/sshd_config
-            sed -i '/SyslogFacility/s/^#//' /etc/ssh/sshd_config
-            sed -i '/LogLevel/s/^#//' /etc/ssh/sshd_config
-            sed -i '/LoginGraceTime/s/^#//' /etc/ssh/sshd_config
-            sed -i '/PermitRootLogin/s/^#//' /etc/ssh/sshd_config
-            sed -i '/HostbasedAuthentication/s/^#//' /etc/ssh/sshd_config
-            sed -i '/StrictModes/s/^#//' /etc/ssh/sshd_config
-            sed -i '/RSAAuthentication/s/^#//' /etc/ssh/sshd_config
-            sed -i '/PubkeyAuthentication/s/^#//' /etc/ssh/sshd_config
-            sed -i '/IgnoreRhosts/s/^#//' /etc/ssh/sshd_config
-            sed -i '/PermitEmptyPasswords/s/^#//' /etc/ssh/sshd_config
-            sed -i '/AllowTcpForwarding/s/^#//' /etc/ssh/sshd_config
-            sed -i '/AllowTcpForwarding no/d' /etc/ssh/sshd_config
-            sed -i '/X11Forwarding/s/^#//' /etc/ssh/sshd_config
-            sed -i '/X11Forwarding/s/no/yes/' /etc/ssh/sshd_config
-            sed -i -e '/\tX11Forwarding yes/d' /etc/ssh/sshd_config
-            sed -i '/X11DisplayOffset/s/^#//' /etc/ssh/sshd_config
-            sed -i '/X11UseLocalhost/s/^#//' /etc/ssh/sshd_config
-            sed -i '/PrintMotd/s/^#//' /etc/ssh/sshd_config
-            sed -i '/PrintMotd/s/yes/no/' /etc/ssh/sshd_config
-            sed -i '/PrintLastLog/s/^#//' /etc/ssh/sshd_config
-            sed -i '/TCPKeepAlive/s/^#//' /etc/ssh/sshd_config
-            sed -i '/the setting of/s/^/#/' /etc/ssh/sshd_config
-            sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
-            ln -sv `dirname $(xauth info | awk '/Authority file/{print $3}')` /home/$USERNAME/.Xauthority
-        #}}}
+        if check_package "openssh"; then
+            aur_package_install "rssh"
+            systemctl enable sshd.service
+            [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
+            #CONFIGURE SSHD_CONF #{{{
+                sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
+                sed -i '/Protocol 2/s/^#//' /etc/ssh/sshd_config
+                sed -i '/HostKey \/etc\/ssh\/ssh_host_rsa_key/s/^#//' /etc/ssh/sshd_config
+                sed -i '/HostKey \/etc\/ssh\/ssh_host_dsa_key/s/^#//' /etc/ssh/sshd_config
+                sed -i '/HostKey \/etc\/ssh\/ssh_host_ecdsa_key/s/^#//' /etc/ssh/sshd_config
+                sed -i '/KeyRegenerationInterval/s/^#//' /etc/ssh/sshd_config
+                sed -i '/ServerKeyBits/s/^#//' /etc/ssh/sshd_config
+                sed -i '/SyslogFacility/s/^#//' /etc/ssh/sshd_config
+                sed -i '/LogLevel/s/^#//' /etc/ssh/sshd_config
+                sed -i '/LoginGraceTime/s/^#//' /etc/ssh/sshd_config
+                sed -i '/PermitRootLogin/s/^#//' /etc/ssh/sshd_config
+                sed -i '/HostbasedAuthentication/s/^#//' /etc/ssh/sshd_config
+                sed -i '/StrictModes/s/^#//' /etc/ssh/sshd_config
+                sed -i '/RSAAuthentication/s/^#//' /etc/ssh/sshd_config
+                sed -i '/PubkeyAuthentication/s/^#//' /etc/ssh/sshd_config
+                sed -i '/IgnoreRhosts/s/^#//' /etc/ssh/sshd_config
+                sed -i '/PermitEmptyPasswords/s/^#//' /etc/ssh/sshd_config
+                sed -i '/AllowTcpForwarding/s/^#//' /etc/ssh/sshd_config
+                sed -i '/AllowTcpForwarding no/d' /etc/ssh/sshd_config
+                sed -i '/X11Forwarding/s/^#//' /etc/ssh/sshd_config
+                sed -i '/X11Forwarding/s/no/yes/' /etc/ssh/sshd_config
+                sed -i -e '/\tX11Forwarding yes/d' /etc/ssh/sshd_config
+                sed -i '/X11DisplayOffset/s/^#//' /etc/ssh/sshd_config
+                sed -i '/X11UseLocalhost/s/^#//' /etc/ssh/sshd_config
+                sed -i '/PrintMotd/s/^#//' /etc/ssh/sshd_config
+                sed -i '/PrintMotd/s/yes/no/' /etc/ssh/sshd_config
+                sed -i '/PrintLastLog/s/^#//' /etc/ssh/sshd_config
+                sed -i '/TCPKeepAlive/s/^#//' /etc/ssh/sshd_config
+                sed -i '/the setting of/s/^/#/' /etc/ssh/sshd_config
+                sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
+                ln -sv `dirname $(xauth info | awk '/Authority file/{print $3}')` /home/$USERNAME/.Xauthority
+            #}}}
+        fi
     }
     #}}}
     #NFS {{{
@@ -3311,6 +3313,7 @@ case "$1" in
                                     aur_package_install "dropbox"
                                     if check_package "nautilus" ; then
                                         aur_package_install "nautilus-dropbox"
+                                        aur_package_install "dropbox-tango-emblems"
                                     elif check_package "thunar" ; then
                                         aur_package_install "thunar-dropbox"
                                     elif check_package "kdebase-dolphin" ; then
