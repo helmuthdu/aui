@@ -1963,7 +1963,7 @@ case "$1" in
                 package_install "system-config-printer-gnome"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
                 aur_package_install "empathy-theme-ubuntu-adium-bzr"
-                aur_package_install "automounter gnome-defaults-list"
+                aur_package_install "gnome-defaults-list"
                 config_xinitrc "gnome-session-cinnamon"
                 #CINNAMON CUSTOMIZATION {{{
                 while [[ 1 ]]
@@ -2140,7 +2140,7 @@ case "$1" in
                 package_install "pulseaudio"
                 package_install "system-config-printer-gnome"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
-                aur_package_install "automounter gnome-defaults-list"
+                aur_package_install "gnome-defaults-list"
                 config_xinitrc "gnome-session"
                 #GNOME CUSTOMIZATION {{{
                 while [[ 1 ]]
@@ -2589,7 +2589,6 @@ case "$1" in
                 package_install "polkit-gnome xdg-user-dirs"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
                 aur_package_install "file-roller2-nn"
-                aur_package_install "automounter"
                 aur_package_install "gnome-defaults-list"
                 config_xinitrc "startxfce4"
                 #XFCE CUSTOMIZATION{{{
