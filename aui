@@ -466,15 +466,6 @@ case "$1" in
         echo "FONT_MAP=\"\"" >> $MOUNTPOINT/etc/vconsole.conf
     }
     #}}}
-    #INSTALL SYSTEMD {{{
-    install_systemd(){
-        print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
-        print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
-        echo -e $prompt3
-        print_warning "pacman -S systemd systemd-sysvcompat systemd-arch-units"
-        arch-chroot $MOUNTPOINT
-    }
-    #}}}
     #CONFIGURE FSTAB {{{
     configure_fstab(){
         print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
@@ -723,7 +714,6 @@ case "$1" in
                     ;;
                 6)
                     install_base_system
-                    install_systemd
                     checklist[6]=1
                     ;;
                 7)
@@ -1227,7 +1217,6 @@ case "$1" in
     install_basic_setup(){
         print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
         print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
-        package_remove "initscripts sysvinit"
         package_install "systemd systemd-sysvcompat systemd-arch-units"
         systemctl enable syslog-ng.service
         systemctl enable cronie.service
