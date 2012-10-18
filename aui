@@ -3760,6 +3760,7 @@ case "$1" in
                                     ;;
                                 9)
                                     package_install "xbmc"
+                                    gpasswd -a $USERNAME xbmc
                                     ;;
                                 "b")
                                     break
