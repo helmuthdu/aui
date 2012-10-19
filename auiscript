@@ -41,7 +41,6 @@
     GITTOR="y"
     NFS="n"
     PRELOAD="y"
-    REFLECTOR="n"
     SAMBA="y"
     SSH="y"
     TLP="n"
@@ -495,7 +494,8 @@
     #}}}
     #PUZZLE {{{
         # 1) Frozen Bubble
-        # 2) Numptyphysics
+        # 2) Puzzle Moppet
+        # 3) Numptyphysics
         PUZZLE=""
     #}}}
     #RPG {{{

@@ -4254,7 +4254,8 @@ case "$1" in
                     do
                         print_title "PUZZLE"
                         echo " 1) $(menu_item "frozen-bubble")"
-                        echo " 2) $(menu_item "numptyphysics-svn") $AUR"
+                        echo " 2) $(menu_item "puzzle-moppet-bin") $AUR"
+                        echo " 3) $(menu_item "numptyphysics-svn") $AUR"
                         echo ""
                         echo " b) BACK"
                         echo ""
@@ -4266,6 +4267,9 @@ case "$1" in
                                     package_install "frozen-bubble"
                                     ;;
                                 2)
+                                    aur_package_install "puzzle-moppet-bin"
+                                    ;;
+                                3)
                                     aur_package_install "numptyphysics-svn"
                                     ;;
                                 "b")
