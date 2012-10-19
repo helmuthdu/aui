@@ -4779,7 +4779,7 @@ case "$1" in
         echo -e "Thanks for using the Archlinux Ultimate Install script by helmuthdu\n"
         #REBOOT
         read -p "Reboot yourt system [y/N]: " OPTION
-        [[ $OPTION == y ]] && reboot --force
+        [[ $OPTION == y ]] && reboot
         exit 0
     }
     #}}}
