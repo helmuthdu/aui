@@ -76,9 +76,9 @@
     # 4) GNOME
     # 5) KDE
     # 6) LXDE
-    # 7) OpenBox
-    # 8) XFCE
-    # 9) Unity (Experimental)
+    # 7) Mate
+    # 8) OpenBox
+    # 9) XFCE
     DESKTOPENV=4
     #AWESOME/OPENBOX {{{
         # 1) Xcompmgr
@@ -171,6 +171,12 @@
         # 4) Viewnior
         # 5) Xfburn
         LXDE_OPTIONS=""
+    #}}}
+    #MATE {{{
+        # 1) Icons
+        # 2) GTK Themes
+        # 3) Display Manager
+        MATE_OPTIONS=""
     #}}}
     #XFCE {{{
         # 1) Icons

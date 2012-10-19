@@ -1892,9 +1892,9 @@ case "$1" in
         echo " 4) GNOME"
         echo " 5) KDE"
         echo " 6) LXDE"
-        echo " 7) OpenBox"
-        echo " 8) XFCE"
-        echo " 9) Unity $AUR"
+        echo " 7) Mate"
+        echo " 8) OpenBox"
+        echo " 9) XFCE"
         echo ""
         echo " b) BACK"
         read_input $DESKTOPENV
@@ -2008,7 +2008,6 @@ case "$1" in
                 package_install "gvfs-smb gvfs-afc"
                 package_install "pulseaudio"
                 package_install "deja-dup"
-                package_install "system-config-printer-gnome"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
                 aur_package_install "empathy-theme-ubuntu-adium-bzr"
                 aur_package_install "gnome-defaults-list"
@@ -2186,7 +2185,6 @@ case "$1" in
                 package_install "zeitgeist"
                 package_install "deja-dup"
                 package_install "pulseaudio"
-                package_install "system-config-printer-gnome"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
                 aur_package_install "gnome-defaults-list"
                 config_xinitrc "gnome-session"
@@ -2472,7 +2470,7 @@ case "$1" in
                 aur_package_install "file-roller2-nn"
                 aur_package_install "gnome-defaults-list"
                 config_xinitrc "startlxde"
-                #LXDE CUSTOMIZATION{{{
+                #LXDE CUSTOMIZATION {{{
                 while [[ 1 ]]
                 do
                     print_title "LXDE CUSTOMIZATION"
@@ -2526,6 +2524,66 @@ case "$1" in
                 ;;
                 #}}}
             7)
+                #MATE {{{
+                print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
+                print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
+                echo -e '\n[mate]\nServer = http://repo.mate-desktop.org/archlinux/$arch' >> /etc/pacman.conf
+                pacman -Sy
+                package_install "mate mate-extras"
+                package_install "gvfs-smb gvfs-afc"
+                package_install "pulseaudio"
+                aur_package_install "gnome-defaults-list"
+                config_xinitrc "mate-session"
+                #MATE CUSTOMIZATION {{{
+                while [[ 1 ]]
+                do
+                    print_title "MATE CUSTOMIZATION"
+                    echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
+                    echo " 2) $(menu_item "gtk-theme-adwaita-cupertino gtk-theme-boomerang xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes orion-gtk-theme zukini-theme zukitwo-themes" "GNOME Themes") $AUR"
+                    echo " 3) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
+                    echo ""
+                    echo " d) DONE"
+                    echo ""
+                    MATE_OPTIONS+=" d"
+                    read_input_options "$MATE_OPTIONS"
+                    for OPT in ${OPTIONS[@]}; do
+                        case "$OPT" in
+                            1)
+                                install_icons
+                                OPT=1
+                                ;;
+                            2)
+                                install_gtk_themes
+                                OPT=2
+                                ;;
+                            3)
+                                install_display_manager
+                                OPT=3
+                                ;;
+                            "d")
+                                break
+                                ;;
+                            *)
+                                invalid_option
+                                ;;
+                        esac
+                    done
+                elihw
+                done
+                #}}}
+                #D-Bus interface for user account query and manipulation
+                systemctl enable accounts-daemon.service
+                #Application development toolkit for controlling system-wide privileges
+                systemctl enable polkitd.service
+                #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+                systemctl enable upower.service
+                #A framework for defining and tracking users, login sessions, and seats
+                systemctl enable console-kit-daemon.service
+                CURRENT_STATUS=1
+                GNOME=1
+                ;;
+                #}}}
+            8)
                 #OPENBOX {{{
                 print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
                 print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -2628,7 +2686,7 @@ case "$1" in
                 OPENBOX=1
                 ;;
                 #}}}
-            8)
+            9)
                 #XFCE {{{
                 print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
                 print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
@@ -2688,41 +2746,6 @@ case "$1" in
                 systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 XFCE=1
-                ;;
-                #}}}
-            9)
-                #UNITY {{{
-                print_warning "\nWARNING: EXPERIMENTAL OPTION, USE AT YOUR OWN RISK\nDo not install this if already have a DE or WM installed."
-                read_input_text "Are you sure you want to continue?"
-                [[ $OPTION != y ]] && continue
-                print_title "UNITY - https://wiki.archlinux.org/index.php/Unity"
-                print_info "Unity is an alternative shell for the GNOME desktop environment, developed by Canonical in its Ayatana project. It consists of several components including the Launcher, Dash, lenses, Panel, indicators, Notify OSD and Overlay Scrollbar."
-                echo -e '\n[unity]\nServer = http://unity.xe-xe.org/$arch' >> /etc/pacman.conf
-                echo -e '\n[unity-extra]\nServer = http://unity.xe-xe.org/extra/$arch' >> /etc/pacman.conf
-                pacman -Sy
-                pacman -S $(pacman -Slq unity)
-                package_install "gnome-terminal baobab eog eog-plugins evince file-roller gcalctool gedit gedit-plugins gnome-disk-utility gnome-font-viewer gnome-screenshot totem"
-                package_install "telepathy"
-                package_install "gksu nautilus-open-terminal gnome-search-tool"
-                package_install "gvfs-smb gvfs-afc"
-                package_install "zeitgeist"
-                package_install "deja-dup"
-                package_install "pulseaudio"
-                package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
-                #Gnome Display Manager (a reimplementation of xdm)
-                systemctl enable lightdm.service
-                #D-Bus interface for user account query and manipulation
-                systemctl enable accounts-daemon.service
-                #Application development toolkit for controlling system-wide privileges
-                systemctl enable polkitd.service
-                #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-                systemctl enable upower.service
-                #A framework for defining and tracking users, login sessions, and seats
-                systemctl enable console-kit-daemon.service
-                #Network Management daemon
-                systemctl enable NetworkManager.service
-                CURRENT_STATUS=1
-                GNOME=1
                 ;;
                 #}}}
             *)
