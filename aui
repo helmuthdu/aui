@@ -352,8 +352,26 @@ case "$1" in
     create_partition(){
         print_title "https://wiki.archlinux.org/index.php/Partitioning"
         print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
+        PARTITION_APP=("cfdisk" "gdisk");
+        PS3="$prompt1"
+        echo -e "Select partition program:"
+        select OPT in "${PARTITION_APP[@]}"; do
+            case "$REPLY" in
+                1)
+                    cfdisk
+                    break
+                    ;;
+                2)
+                    read -p "You must specify drive [ex: sda]: " DEVICE
+                    gdisk /dev/$DEVICE
+                    break
+                    ;;
+                *)
+                    invalid_option
+                    ;;
+            esac
+        done
         pause_function
-        cfdisk
     }
     #}}}
     #FORMAT DEVICE {{{
@@ -362,7 +380,7 @@ case "$1" in
         print_info "This step will select and format the selected partiton where the archlinux will be installed"
         print_warning "\tAll data on the ROOT and SWAP partition will be LOST."
         i=0
-        partitions=(`cat /proc/partitions | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd'`)
+        partitions=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd'`)
         device_name=("root" "swap" "another")
         select_filesystem(){
             filesystem=("ext4" "ext3" "ext2" "btrfs" "vfat" "ntfs");
@@ -597,7 +615,7 @@ case "$1" in
                 1)
                     SYSTEM_TYPE=("BIOS" "UEFI");
                     PS3="$prompt1"
-                    echo -e "Select system:\n"
+                    echo -e "Select system:"
                     select OPT in "${SYSTEM_TYPE[@]}"; do
                         case "$REPLY" in
                             1)
