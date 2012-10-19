@@ -1457,8 +1457,17 @@ case "$1" in
                         kblayout="\\\tOption \"XkbLayout\" \"de\""
                         ;;
                     es_ES)
-                        kblayout="\\\tOption \"XkbLayout\" \"es\""
-                        kblayout+="\n\\tOption \"XkbOptions\" \"terminate:ctrl_alt_bksp\""
+                        KBLAYOUT=("es" "latam");
+                        PS3="$prompt1"
+                        echo -e "Select keyboard layout:"
+                        select KBRD in "${KBLAYOUT[@]}"; do
+                            if contains_element "$KBRD" "${KBLAYOUT[@]}"; then
+                                kblayout="\\\tOption \"XkbLayout\" \"$KBRD\""
+                                break
+                            else
+                                invalid_option
+                            fi
+                        done
                         ;;
                     it_IT)
                         kblayout="\\\tOption \"XkbLayout\" \"it\""
