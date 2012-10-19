@@ -371,7 +371,6 @@ case "$1" in
                     ;;
             esac
         done
-        pause_function
     }
     #}}}
     #FORMAT DEVICE {{{
