@@ -260,28 +260,28 @@ case "$1" in
     #CONFIGURE KEYMAP {{{
     configure_keymap(){
         setkeymap(){
-        local keymaps=(`ls /usr/share/kbd/keymaps/i386/qwerty | sed 's/.map.gz//g'`)
-        PS3="(shift+pgup/pgdown) $prompt1"
-            echo "Select keymap:"
-            select KEYMAP in "${keymaps[@]}" "more"; do
-                if contains_element "$KEYMAP" "${keymaps[@]}"; then
-                    loadkeys $KEYMAP
-                    break
-                elif [[ $KEYMAP == more ]]; then
-                    read -p "Type your Keyboard Layout [ex: us-acentos]: " KEYMAP
-                    loadkeys $KEYMAP
-                    break
-                else
-                    invalid_option
-                fi
-            done
+            local keymaps=(`ls /usr/share/kbd/keymaps/i386/qwerty | sed 's/.map.gz//g'`)
+            PS3="(shift+pgup/pgdown) $prompt1"
+                echo "Select keymap:"
+                select KEYMAP in "${keymaps[@]}" "more"; do
+                    if contains_element "$KEYMAP" "${keymaps[@]}"; then
+                        loadkeys $KEYMAP
+                        break
+                    elif [[ $KEYMAP == more ]]; then
+                        read -p "Type your Keyboard Layout [ex: us-acentos]: " KEYMAP
+                        loadkeys $KEYMAP
+                        break
+                    else
+                        invalid_option
+                    fi
+                done
         }
         print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
         print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
         OPTION=n
         while [[ $OPTION != y ]]; do
             setkeymap
-            read_input_text "Confirm keymap ($KEYMAP)"
+            read_input_text "Confirm keymap: $KEYMAP"
         done
     }
     #}}}
@@ -320,11 +320,31 @@ case "$1" in
         done
     }
     #}}}
-    #CONFIGURE MIRRORLIST {{{
+    #REFLECTOR {{{
     configure_mirrorlist(){
-        print_title "MIRRORS - https://wiki.archlinux.org/index.php/Mirrors"
-        echo "Edit your mirrorlist"
-        pause_function
+        country_list(){
+            #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/^/"/g' | sed 's/,.*//g' | sed 's/ *$//g'  | sed 's/$/"/g' | sed -e :a -e '$!N; s/\n/ /; ta'`
+            local countries=("Australia" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russian Federation" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
+            PS3="$prompt1"
+                echo "Select your country:"
+                select COUNTRY in "${countries[@]}"; do
+                    if contains_element "$COUNTRY" "${countries[@]}"; then
+                        break
+                    else
+                        invalid_option
+                    fi
+                done
+        }
+        print_title "REFLECTOR - https://wiki.archlinux.org/index.php/Reflector"
+        print_info "Reflector is a script which can retrieve the latest mirror list from the MirrorStatus page, filter the most up-to-date mirrors, sort them by speed and overwrite the file /etc/pacman.d/mirrorlist."
+        package_install "reflector"
+        OPTION=n
+        while [[ $OPTION != y ]]; do
+            country_list
+            read_input_text "Confirm country: $COUNTRY"
+        done
+        cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
+        reflector -l 5 --sort rate -c "$COUNTRY" --save /etc/pacman.d/mirrorlist
         $EDITOR /etc/pacman.d/mirrorlist
     }
     #}}}
@@ -1174,26 +1194,6 @@ case "$1" in
                 ;;
         esac
         sumary "Custom repositories configuration"
-        pause_function
-    }
-    #}}}
-    #REFLECTOR {{{
-    install_reflector(){
-        print_title "REFLECTOR - https://wiki.archlinux.org/index.php/Reflector"
-        print_info "Reflector is a script which can retrieve the latest mirror list from the MirrorStatus page, filter the most up-to-date mirrors, sort them by speed and overwrite the file /etc/pacman.d/mirrorlist."
-        read_input_text "Install and configure reflector" $REFLECTOR
-        case "$OPTION" in
-            "y")
-                package_install "reflector"
-                cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
-                reflector -l 5 --sort rate --save /etc/pacman.d/mirrorlist
-                CURRENT_STATUS=1
-                ;;
-            *)
-                CURRENT_STATUS=0
-                ;;
-        esac
-        sumary "New mirrorlist creation"
         pause_function
     }
     #}}}
