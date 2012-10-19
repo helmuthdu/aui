@@ -4775,7 +4775,6 @@ case "$1" in
             case "$OPT" in
                 1)
                     add_custom_repositories
-                    install_reflector
                     install_basic_setup
                     install_nfs
                     install_samba
