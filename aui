@@ -512,7 +512,28 @@ case "$1" in
         else
             cp $MOUNTPOINT/etc/fstab.aui $MOUNTPOINT/etc/fstab
         fi
-        genfstab -p $MOUNTPOINT >> $MOUNTPOINT/etc/fstab
+        FSTAB=("DEV" "UUID" "LABEL");
+        PS3="$prompt1"
+        echo -e "Configure fstab based on:"
+        select OPT in "${EDITORS[@]}"; do
+            case "$REPLY" in
+                1)
+                    genfstab -p $MOUNTPOINT >> $MOUNTPOINT/etc/fstab
+                    break
+                    ;;
+                2)
+                    genfstab -U $MOUNTPOINT >> $MOUNTPOINT/etc/fstab
+                    break
+                    ;;
+                3)
+                    genfstab -L $MOUNTPOINT >> $MOUNTPOINT/etc/fstab
+                    break
+                    ;;
+                *)
+                    invalid_option
+                    ;;
+            esac
+        done
         echo "Review your fstab"
         pause_function
         $EDITOR $MOUNTPOINT/etc/fstab
