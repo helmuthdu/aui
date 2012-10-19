@@ -515,7 +515,7 @@ case "$1" in
         FSTAB=("DEV" "UUID" "LABEL");
         PS3="$prompt1"
         echo -e "Configure fstab based on:"
-        select OPT in "${EDITORS[@]}"; do
+        select OPT in "${FSTAB[@]}"; do
             case "$REPLY" in
                 1)
                     genfstab -p $MOUNTPOINT >> $MOUNTPOINT/etc/fstab
