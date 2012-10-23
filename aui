@@ -728,6 +728,7 @@ case "$1" in
     print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
     print_warning "\tThis option still in beta* stage"
     pause_function
+    pacman -Sy
     while [[ 1 ]]
     do
         print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
