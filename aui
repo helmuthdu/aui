@@ -1326,7 +1326,6 @@ case "$1" in
                 sed -i '/TCPKeepAlive/s/^#//' /etc/ssh/sshd_config
                 sed -i '/the setting of/s/^/#/' /etc/ssh/sshd_config
                 sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
-                ln -sv `dirname $(xauth info | awk '/Authority file/{print $3}')` /home/$USERNAME/.Xauthority
             #}}}
         fi
     }
