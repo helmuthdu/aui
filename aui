@@ -179,7 +179,7 @@ aui_download_packages(){ #{{{
         su - $USERNAME -c "
         [[ ! -d aui_packages ]] && mkdir aui_packages
         cd aui_packages
-        curl -o $PACKAGE.tar.gz http://aur.archlinux.org/packages/$PACKAGE/$PACKAGE.tar.gz
+        curl -o $PACKAGE.tar.gz https://aur.archlinux.org/packages/${PACKAGE:0:2}/$PACKAGE/$PACKAGE.tar.gz
         tar zxvf $PACKAGE.tar.gz
         rm $PACKAGE.tar.gz
         cd $PACKAGE
