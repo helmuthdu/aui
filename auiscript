@@ -42,7 +42,6 @@
     NFS="n"
     PRELOAD="y"
     SAMBA="y"
-    SSH="y"
     TLP="n"
     ZRAM="y"
     #VIDEOCARD {{{
@@ -52,7 +51,7 @@
         # 4) Nouveau
         # 5) Virtualbox
         # 6) Vesa
-        VIDEOCARD=3
+        VIDEOCARD=2
     #}}}
     #ADDITIONAL FIRMWARE {{{
         # 1) alsa-firmware
@@ -102,8 +101,6 @@
         # 3) GNOME Icons
         # 4) GNOME Themes
         # 5) GNOME Packagekit
-        # 6) Activity Journal
-        # 7) Gloobus Preview
         CINNAMON_OPTIONS="1-5"
     #}}}
     #E17 {{{
@@ -127,30 +124,21 @@
         # 3) GNOME Shell
         # 4) GNOME Shell
         # 5) Packagekit
-        # 6) Activity Journal
-        # 7) Activity Log Manager
-        # 8) Gloobus Preview
         GNOME_OPTIONS="1-5"
         #GNOME EXTENSIONS {{{
             # 1) disper
             # 2) gpaste
             # 3) gtile
             # 4) media-player
-            # 5) noa11y
-            # 6) pomodoro
-            # 7) system-monitor
-            # 8) user-theme
-            # 9) weather
-            GNOME_EXTENSIONS="1-9"
+            # 5) pomodoro
+            # 6) system-monitor
+            # 7) user-theme
+            # 8) weather
+            GNOME_EXTENSIONS="1-8"
         #}}}
         #GNOME SHELL THEMES {{{
-            # 1) Default Mod
-            # 2) Dark Shine
-            # 3) Elegance
-            # 4) eOS
-            # 5) Frieze
-            # 6) Google+
-            GNOME_SHELL_THEMES="1-6"
+            # 1) Elegance
+            GNOME_SHELL_THEMES="1"
         #}}}
     #}}}
     #KDE {{{
@@ -194,17 +182,13 @@
         GNOME_ICONS="2-4 6"
     #}}}
     #GTK THEMES {{{
-        # 1) Adwaita Cupertino
-        # 2) Boomerang
-        # 3) Blackbird
-        # 4) Bluebird
-        # 5) eGTK
-        # 6) Greybird
-        # 7) Light (Aka Ambiance/Radiance)
-        # 8) Orion
-        # 9) Zukini
-        #10) Zukitwo
-        GTK_THEMES="2-10"
+        # 1) Blackbird
+        # 2) Bluebird
+        # 3) eGTK
+        # 4) Faience
+        # 5) Greybird
+        # 6) Light (Aka Ambiance/Radiance)
+        GTK_THEMES="2-6"
     #}}}
     #DISPLAY MANAGER {{{
         # 1) Elsa
@@ -225,19 +209,20 @@
 #}}}
 #ACCESSORIES {{{
     # 1) Cairo Dock
-    # 2) Conky + CONKY-colors
-    # 3) Deepin Scrot
-    # 4) Dockbarx
-    # 5) Docky
-    # 6) Galculator/Speedcrunch
-    # 7) Gnome-Pie
-    # 8) Guake
-    # 9) Kupfer
-    #10) Pyrenamer
-    #11) Shutter
-    #12) Synapse
-    #13) Terminator
-    #14) Zim
+    # 2) Catfish
+    # 3) Conky + CONKY-colors
+    # 4) Deepin Screenshot
+    # 5) Dockbarx
+    # 6) Docky
+    # 7) Galculator/Speedcrunch
+    # 8) Gnome-Pie
+    # 9) Guake
+    #10) Kupfer
+    #11) Pyrenamer
+    #12) Shutter
+    #13) Synapse
+    #14) Terminator
+    #15) Zim
     ACCESSORIES_OPTIONS=""
 #}}}
 #DEVELOPEMENT {{{
@@ -250,14 +235,14 @@
     # 7) IntelliJ IDEA
     # 8) Kdevelop
     # 9) Netbeans
-    #10) Oracle Java
+    #10) Oracle JDK
     #11) QT Creator
     #12) Sublime Text 2
     #13) Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]
     #14) MySQL Workbench
     #15) Meld
     #16) RabbitVCS
-    DEVELOPMENT_OPTIONS="10 5 13"
+    DEVELOPMENT_OPTIONS="5 13"
     #ECLIPSE {{{
         # 1) Eclipse Classic
         # 2) Eclipse IDE for C/C++ Developers

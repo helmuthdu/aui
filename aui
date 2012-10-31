@@ -1776,16 +1776,12 @@ case "$1" in
             while [[ 1 ]]
             do
                 print_title "GTK2/GTK3 THEMES"
-                echo " 1) $(menu_item "gtk-theme-adwaita-cupertino" "Adwaita Cupertino")"
-                echo " 2) $(menu_item "gtk-theme-boomerang" "Boomerang")"
-                echo " 3) $(menu_item "xfce-theme-blackbird" "Blackbird")"
-                echo " 4) $(menu_item "xfce-theme-bluebird" "Bluebird")"
-                echo " 5) $(menu_item "egtk-bzr" "eGTK")"
-                echo " 6) $(menu_item "xfce-theme-greybird" "Greybird")"
-                echo " 7) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
-                echo " 8) $(menu_item "orion-gtk-theme" "Orion")"
-                echo " 9) $(menu_item "zukini-theme" "Zukini")"
-                echo "10) $(menu_item "zukitwo-themes" "Zukitwo")"
+                echo " 1) $(menu_item "xfce-theme-blackbird" "Blackbird")"
+                echo " 2) $(menu_item "xfce-theme-bluebird" "Bluebird")"
+                echo " 3) $(menu_item "egtk-bzr" "eGTK")"
+                echo " 4) $(menu_item "faience-themes" "Faience")"
+                echo " 5) $(menu_item "xfce-theme-greybird" "Greybird")"
+                echo " 6) $(menu_item "light-themes-bzr" "Light") (aka Ambiance/Radiance)"
                 echo ""
                 echo " b) BACK"
                 echo ""
@@ -1794,34 +1790,22 @@ case "$1" in
                 for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                         1)
-                            aur_package_install "gtk-theme-adwaita-cupertino"
-                            ;;
-                        2)
-                            aur_package_install "gtk-theme-boomerang"
-                            ;;
-                        3)
                             aur_package_install "xfce-theme-blackbird"
                             ;;
-                        4)
+                        2)
                             aur_package_install "xfce-theme-bluebird"
                             ;;
-                        5)
+                        3)
                             aur_package_install "egtk-bzr"
                             ;;
-                        6)
+                        4)
+                            aur_package_install "faience-themes"
+                            ;;
+                        5)
                             aur_package_install "xfce-theme-greybird"
                             ;;
-                        7)
-                            aur_package_install "light-themes"
-                            ;;
-                        8)
-                            aur_package_install "orion-gtk-theme"
-                            ;;
-                        9)
-                            aur_package_install "zukini-theme"
-                            ;;
-                        10)
-                            aur_package_install "zukitwo-themes"
+                        6)
+                            aur_package_install "light-themes-bzr"
                             ;;
                         "b")
                             break
@@ -2021,8 +2005,6 @@ case "$1" in
                     echo " 3) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
                     echo " 4) $(menu_item "gtk-theme-adwaita-cupertino gtk-theme-boomerang xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes orion-gtk-theme zukini-theme zukitwo-themes" "GTK Themes") $AUR"
                     echo " 5) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
-                    echo " 6) $(menu_item "gnome-activity-journal") $AUR"
-                    echo " 7) $(menu_item "gloobus-sushi-bzr") $AUR"
                     echo ""
                     echo " d) DONE"
                     echo ""
@@ -2046,13 +2028,6 @@ case "$1" in
                                 ;;
                             5)
                                 package_install "gnome-packagekit gnome-settings-daemon-updates"
-                                ;;
-                            6)
-                                aur_package_install "zeitgeist libzeitgeist python2-rdflib zeitgeist-datahub"
-                                aur_package_install "gnome-activity-journal"
-                                ;;
-                            7)
-                                aur_package_install "gloobus-sushi-bzr"
                                 ;;
                             "d")
                                 break
@@ -2178,9 +2153,9 @@ case "$1" in
                 #GNOME {{{
                 print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
                 print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
-                package_install "gnome gnome-extra gucharmap telepathy"
+                package_install "gnome gnome-extra telepathy"
                 aur_package_install "empathy-theme-candybars empathy-theme-adium-matte"
-                package_install "gksu nautilus-open-terminal gnome-search-tool gedit-plugins gnome-tweak-tool"
+                package_install "gksu nautilus-open-terminal gedit-plugins gnome-tweak-tool"
                 package_install "gvfs-smb gvfs-afc"
                 package_install "zeitgeist"
                 package_install "deja-dup"
@@ -2194,12 +2169,9 @@ case "$1" in
                     print_title "GNOME CUSTOMIZATION"
                     echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
                     echo " 2) $(menu_item "gtk-theme-adwaita-cupertino gtk-theme-boomerang xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes orion-gtk-theme zukini-theme zukitwo-themes" "GNOME Themes") $AUR"
-                    echo " 3) $(menu_item "disper gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-noa11y-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git" "GNOME Shell Extensions") $AUR"
-                    echo " 4) $(menu_item "gnome-shell-theme-default-mod gnome-shell-theme-dark-shine gnome-shell-theme-elegance gnome-shell-theme-eos gnome-shell-theme-frieze gnome-shell-theme-google+" "GNOME Shell Themes") $AUR"
+                    echo " 3) $(menu_item "disper gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git" "GNOME Shell Extensions") $AUR"
+                    echo " 4) $(menu_item "gnome-shell-theme-elegance" "GNOME Shell Themes") $AUR"
                     echo " 5) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
-                    echo " 6) $(menu_item "gnome-activity-journal" "activity-journal") $AUR"
-                    echo " 7) $(menu_item "activity-log-manager") $AUR"
-                    echo " 8) $(menu_item "gloobus-sushi-bzr") $AUR"
                     echo ""
                     echo " d) DONE"
                     echo ""
@@ -2223,12 +2195,11 @@ case "$1" in
                                     echo " 1) $(menu_item "disper")"
                                     echo " 2) $(menu_item "gpaste")"
                                     echo " 3) $(menu_item "gnome-shell-extension-mediaplayer-git")"
-                                    echo " 4) $(menu_item "gnome-shell-extension-noa11y-git")"
-                                    echo " 5) $(menu_item "gnome-shell-extension-pomodoro-git")"
-                                    echo " 6) $(menu_item "gnome-shell-system-monitor-applet-git" "System-monitor")"
-                                    echo " 7) $(menu_item "gnome-shell-extension-user-theme-git")"
-                                    echo " 8) $(menu_item "gnome-shell-extension-weather-git")"
-                                    echo " 9) $(menu_item "gnome-shell-extension-gtile-git")"
+                                    echo " 4) $(menu_item "gnome-shell-extension-pomodoro-git")"
+                                    echo " 5) $(menu_item "gnome-shell-system-monitor-applet-git" "System-monitor")"
+                                    echo " 6) $(menu_item "gnome-shell-extension-user-theme-git")"
+                                    echo " 7) $(menu_item "gnome-shell-extension-weather-git")"
+                                    echo " 8) $(menu_item "gnome-shell-extension-gtile-git")"
                                     echo ""
                                     echo " b) BACK"
                                     echo ""
@@ -2246,22 +2217,18 @@ case "$1" in
                                                 aur_package_install "gnome-shell-extension-mediaplayer-git"
                                                 ;;
                                             4)
-                                                aur_package_install "gnome-shell-extension-noa11y-git"
-                                                ;;
-                                            5)
-                                                aur_package_install "libkeybinder3"
                                                 aur_package_install "gnome-shell-extension-pomodoro-git"
                                                 ;;
-                                            6)
+                                            5)
                                                 aur_package_install "gnome-shell-system-monitor-applet-git"
                                                 ;;
-                                            7)
+                                            6)
                                                 aur_package_install "gnome-shell-extension-user-theme-git"
                                                 ;;
-                                            8)
+                                            7)
                                                 aur_package_install "gnome-shell-extension-weather-git"
                                                 ;;
-                                            9)
+                                            8)
                                                 aur_package_install "gnome-shell-extension-gtile-git"
                                                 ;;
                                             "b")
@@ -2282,12 +2249,7 @@ case "$1" in
                                 while [[ 1 ]]
                                 do
                                     print_title "GNOMESHELL THEMES"
-                                    echo " 1) $(menu_item "gnome-shell-theme-default-mod")"
-                                    echo " 2) $(menu_item "gnome-shell-theme-dark-shine")"
-                                    echo " 3) $(menu_item "gnome-shell-theme-elegance")"
-                                    echo " 4) $(menu_item "gnome-shell-theme-eos")"
-                                    echo " 5) $(menu_item "gnome-shell-theme-frieze")"
-                                    echo " 6) $(menu_item "gnome-shell-theme-google+")"
+                                    echo " 1) $(menu_item "gnome-shell-theme-elegance")"
                                     echo ""
                                     echo " b) BACK"
                                     echo ""
@@ -2296,22 +2258,7 @@ case "$1" in
                                     for OPT in ${OPTIONS[@]}; do
                                         case "$OPT" in
                                             1)
-                                                aur_package_install "gnome-shell-theme-default-mod"
-                                                ;;
-                                            2)
-                                                aur_package_install "gnome-shell-theme-dark-shine"
-                                                ;;
-                                            3)
                                                 aur_package_install "gnome-shell-theme-elegance"
-                                                ;;
-                                            4)
-                                                aur_package_install "gnome-shell-theme-eos"
-                                                ;;
-                                            5)
-                                                aur_package_install "gnome-shell-theme-frieze"
-                                                ;;
-                                            6)
-                                                aur_package_install "gnome-shell-theme-google+"
                                                 ;;
                                             "b")
                                                 break
@@ -2328,16 +2275,6 @@ case "$1" in
                                 ;;
                             5)
                                 package_install "gnome-packagekit gnome-settings-daemon-updates"
-                                ;;
-                            6)
-                                aur_package_install "libzeitgeist python2-rdflib zeitgeist-datahub"
-                                aur_package_install "gnome-activity-journal"
-                                ;;
-                            7)
-                                aur_package_install "activity-log-manager"
-                                ;;
-                            8)
-                                aur_package_install "gloobus-sushi-bzr"
                                 ;;
                             "d")
                                 break
@@ -2824,19 +2761,20 @@ case "$1" in
     do
         print_title "ACCESSORIES APPS"
         echo " 1) $(menu_item "cairo-dock-bzr") $AUR"
-        echo " 2) $(menu_item "conky-lua" "Conky + CONKY-colors") $AUR"
-        echo " 3) $(menu_item "deepin-scrot-git") $AUR"
-        echo " 4) $(menu_item "dockbarx") $AUR"
-        echo " 5) $(menu_item "docky") $AUR"
-        echo " 6) $(menu_item "speedcrunch galculator" "$([[ $KDE -eq 1 ]] && echo "Speedcrunch" || echo "Galculator";)") $AUR"
-        echo " 7) $(menu_item "gnome-pie") $AUR"
-        echo " 8) $(menu_item "guake")"
-        echo " 9) $(menu_item "kupfer") $AUR"
-        echo "10) $(menu_item "pyrenamer") $AUR"
-        echo "11) $(menu_item "shutter") $AUR"
-        echo "12) $(menu_item "synapse") $AUR"
-        echo "13) $(menu_item "terminator")"
-        echo "14) $(menu_item "zim")"
+        echo " 2) $(menu_item "catfish")"
+        echo " 3) $(menu_item "conky-lua") $AUR"
+        echo " 4) $(menu_item "deepin-screenshot-git") $AUR"
+        echo " 5) $(menu_item "dockbarx") $AUR"
+        echo " 6) $(menu_item "docky") $AUR"
+        echo " 7) $(menu_item "speedcrunch galculator" "$([[ $KDE -eq 1 ]] && echo "Speedcrunch" || echo "Galculator";)") $AUR"
+        echo " 8) $(menu_item "gnome-pie") $AUR"
+        echo " 9) $(menu_item "guake")"
+        echo "10) $(menu_item "kupfer") $AUR"
+        echo "11) $(menu_item "pyrenamer") $AUR"
+        echo "12) $(menu_item "shutter") $AUR"
+        echo "13) $(menu_item "synapse") $AUR"
+        echo "14) $(menu_item "terminator")"
+        echo "15) $(menu_item "zim")"
         echo ""
         echo " b) BACK"
         echo ""
@@ -2848,48 +2786,51 @@ case "$1" in
                     aur_package_install "cairo-dock-bzr cairo-dock-plugins-bzr"
                     ;;
                 2)
-                    aur_package_install "conky-lua conky-colors"
+                    package_install "catfish"
                     ;;
                 3)
-                    aur_package_install "deepin-scrot-git"
+                    aur_package_install "conky-lua"
                     ;;
                 4)
-                    aur_package_install "dockbarx dockbarx-shinybar-theme"
+                    aur_package_install "deepin-screenshot-git"
                     ;;
                 5)
-                    package_install "docky"
+                    aur_package_install "dockbarx dockbarx-shinybar-theme"
                     ;;
                 6)
+                    package_install "docky"
+                    ;;
+                7)
                     if [[ $KDE -eq 1 ]]; then
                         aur_package_install "speedcrunch"
                     else
                         aur_package_install "galculator"
                     fi
                     ;;
-                7)
+                8)
                     aur_package_install "gnome-pie"
                     ;;
-                8)
+                9)
                     package_install "guake"
                     ;;
-                9)
+                10)
                     aur_package_install "kupfer"
                     ;;
-                10)
+                11)
                     aur_package_install "pyrenamer"
                     ;;
-                11)
+                12)
                     aur_package_install "shutter"
                     ;;
-                12)
+                13)
                     package_install "zeitgeist"
                     aur_package_install "libzeitgeist zeitgeist-datahub synapse"
                     ;;
-                13)
+                14)
                     package_install "terminator"
                     aur_package_install "python-keybinder"
                     ;;
-                14)
+                15)
                     package_install "zim"
                     ;;
                 "b")
@@ -2918,7 +2859,7 @@ case "$1" in
         echo " 7) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
         echo " 8) $(menu_item "kdevelop")"
         echo " 9) $(menu_item "netbeans")"
-        echo "10) $(menu_item "jdk" "Oracle Java") $AUR"
+        echo "10) $(menu_item "jdk" "Oracle JDK") $AUR"
         echo "11) $(menu_item "qtcreator")"
         echo "12) $(menu_item "sublime-text" "Sublime Text 2") $AUR"
         echo "13) $(menu_item "gdb" "Debugger Tools")"
