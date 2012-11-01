@@ -1114,30 +1114,12 @@ case "$1" in
         print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
         print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
         print_warning "\tNone of these tools are officially supported by Arch devs."
-        aurhelper=("Yaourt (recommended)" "Packer" "Pacaur")
+        aurhelper=("Packer (recommended)" "Pacaur" "Yaourt")
         PS3="$prompt1"
         echo -e "Choose your default AUR helper to install\n"
         select OPT in "${aurhelper[@]}"; do
             case "$REPLY" in
                 1)
-                    print_title "YAOURT - https://wiki.archlinux.org/index.php/Yaourt"
-                    print_info "Yaourt (Yet AnOther User Repository Tool) is a community-contributed wrapper for pacman which adds seamless access to the AUR, allowing and automating package compilation and installation from your choice of the thousands of PKGBUILDs in the AUR, in addition to the many thousands of available Arch Linux binary packages."
-                    if ! check_package "yaourt" ; then
-                        package_install "base-devel yajl namcap"
-                        pacman -D --asdeps yajl namcap
-                        aui_download_packages "package-query yaourt"
-                        pacman -D --asdeps package-query
-                        if ! check_package "yaourt" ; then
-                            echo "Yaourt not installed. EXIT now"
-                            pause_function
-                            exit 0
-                        fi
-                    fi
-                    CURRENT_STATUS=1
-                    AUR_HELPER="yaourt"
-                    break
-                    ;;
-                2)
                     if ! check_package "packer" ; then
                         package_install "base-devel git jshon"
                         pacman -D --asdeps jshon
@@ -1152,7 +1134,7 @@ case "$1" in
                     AUR_HELPER="packer"
                     break
                     ;;
-                3)
+                2)
                     if ! check_package "pacaur" ; then
                         package_install "base-devel yajl expac"
                         pacman -D --asdeps yajl expac
@@ -1168,6 +1150,24 @@ case "$1" in
                     fi
                     CURRENT_STATUS=1
                     AUR_HELPER="pacaur"
+                    break
+                    ;;
+                3)
+                    print_title "YAOURT - https://wiki.archlinux.org/index.php/Yaourt"
+                    print_info "Yaourt (Yet AnOther User Repository Tool) is a community-contributed wrapper for pacman which adds seamless access to the AUR, allowing and automating package compilation and installation from your choice of the thousands of PKGBUILDs in the AUR, in addition to the many thousands of available Arch Linux binary packages."
+                    if ! check_package "yaourt" ; then
+                        package_install "base-devel yajl namcap"
+                        pacman -D --asdeps yajl namcap
+                        aui_download_packages "package-query yaourt"
+                        pacman -D --asdeps package-query
+                        if ! check_package "yaourt" ; then
+                            echo "Yaourt not installed. EXIT now"
+                            pause_function
+                            exit 0
+                        fi
+                    fi
+                    CURRENT_STATUS=1
+                    AUR_HELPER="yaourt"
                     break
                     ;;
                 *)
@@ -1257,7 +1257,7 @@ case "$1" in
     install_basic_setup(){
         print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
         print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
-        package_install "systemd systemd-sysvcompat systemd-arch-units"
+        package_install "systemd systemd-sysvcompat"
         systemctl enable syslog-ng.service
         systemctl enable cronie.service
         print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
@@ -1397,6 +1397,7 @@ case "$1" in
         read_input_text "Install Zram" $ZRAM
         case "$OPTION" in
             "y")
+                aur_package_install "zramswap"
                 systemctl enable zram.service
                 CURRENT_STATUS=1
                 ;;
@@ -1456,7 +1457,7 @@ case "$1" in
                     de_DE)
                         kblayout="\\\tOption \"XkbLayout\" \"de\""
                         ;;
-                    es_ES)
+                    es_ES | es_CL)
                         KBLAYOUT=("es" "latam");
                         PS3="$prompt1"
                         echo -e "Select keyboard layout:"
@@ -1888,7 +1889,7 @@ case "$1" in
                 print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
                 print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
                 package_install "awesome"
-                package_install "lxappearance consolekit"
+                package_install "lxappearance"
                 package_install "leafpad epdfview nitrogen"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
                 aur_package_install "gnome-defaults-list"
@@ -1975,8 +1976,6 @@ case "$1" in
                 #}}}
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
-                #A framework for defining and tracking users, login sessions, and seats
-                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 OPENBOX=1
                 ;;
@@ -2048,8 +2047,6 @@ case "$1" in
                 systemctl enable polkitd.service
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
-                #A framework for defining and tracking users, login sessions, and seats
-                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 GNOME=1
                 ;;
@@ -2058,11 +2055,11 @@ case "$1" in
                 #E17 {{{
                 print_title "E17 - http://wiki.archlinux.org/index.php/E17"
                 print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
-                package_install "e-svn e17-extra-svn consolekit"
+                package_install "e-svn e17-extra-svn"
                 package_install "xdg-user-dirs"
                 package_install "gvfs-smb gvfs-afc"
                 package_install "leafpad epdfview"
-                package_install "lxappearance consolekit"
+                package_install "lxappearance"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
                 aur_package_install "file-roller2-nn"
                 aur_package_install "gnome-defaults-list"
@@ -2143,8 +2140,6 @@ case "$1" in
                 #}}}
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
-                #A framework for defining and tracking users, login sessions, and seats
-                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 E17=1
                 ;;
@@ -2295,8 +2290,6 @@ case "$1" in
                 systemctl enable polkitd.service
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
-                #A framework for defining and tracking users, login sessions, and seats
-                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 GNOME=1
                 ;;
@@ -2388,8 +2381,6 @@ case "$1" in
                 systemctl enable polkitd.service
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
-                #A framework for defining and tracking users, login sessions, and seats
-                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 KDE=1
                 ;;
@@ -2398,7 +2389,7 @@ case "$1" in
                 #LXDE {{{
                 print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
                 print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
-                package_install "lxde obconf consolekit"
+                package_install "lxde obconf"
                 package_install "pm-utils upower"
                 package_install "polkit-gnome xdg-user-dirs"
                 package_install "gvfs-smb gvfs-afc"
@@ -2454,8 +2445,6 @@ case "$1" in
                 #}}}
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
-                #A framework for defining and tracking users, login sessions, and seats
-                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 LXDE=1
                 ;;
@@ -2514,8 +2503,6 @@ case "$1" in
                 systemctl enable polkitd.service
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
-                #A framework for defining and tracking users, login sessions, and seats
-                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 GNOME=1
                 ;;
@@ -2525,7 +2512,7 @@ case "$1" in
                 print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
                 print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
                 package_install "openbox obconf obmenu menumaker"
-                package_install "lxappearance consolekit"
+                package_install "lxappearance"
                 package_install "xdg-user-dirs"
                 package_install "leafpad epdfview nitrogen"
                 package_install "gvfs-smb gvfs-afc"
@@ -2617,8 +2604,6 @@ case "$1" in
                 #}}}
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
-                #A framework for defining and tracking users, login sessions, and seats
-                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 OPENBOX=1
                 ;;
@@ -2679,8 +2664,6 @@ case "$1" in
                 systemctl enable polkitd.service
                 #Abstraction for enumerating power devices, listening to device events and querying history and statistics
                 systemctl enable upower.service
-                #A framework for defining and tracking users, login sessions, and seats
-                systemctl enable console-kit-daemon.service
                 CURRENT_STATUS=1
                 XFCE=1
                 ;;
@@ -3957,7 +3940,7 @@ case "$1" in
                         echo " 8) $(menu_item "neverball")"
                         echo " 9) $(menu_item "opensonic") $AUR"
                         echo "10) $(menu_item "robombs_bin" "Robombs") $AUR"
-                        echo "11) $(menu_item "smc" "Super Mario Chronicles")"
+                        echo "11) $(menu_item "smc" "Super Maryo Chronicles")"
                         echo "12) $(menu_item "xmoto")"
                         echo ""
                         echo " b) BACK"
