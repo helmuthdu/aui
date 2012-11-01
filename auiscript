@@ -49,8 +49,9 @@
         # 2) ATI
         # 3) nVidia
         # 4) Nouveau
-        # 5) Virtualbox
-        # 6) Vesa
+        # 5) Poulsbo
+        # 6) Virtualbox
+        # 7) Vesa
         VIDEOCARD=2
     #}}}
     #ADDITIONAL FIRMWARE {{{

@@ -1512,8 +1512,9 @@ case "$1" in
         echo " 2) ATI"
         echo " 3) nVidia"
         echo " 4) Nouveau"
-        echo " 5) Virtualbox"
-        echo " 6) Vesa"
+        echo " 5) Poulsbo"
+        echo " 6) Virtualbox"
+        echo " 7) Vesa"
         echo ""
         echo " s) SKIP"
         echo ""
@@ -1543,6 +1544,11 @@ case "$1" in
                 sumary "Nouveau GPU driver installation"
                 ;;
             5)
+                package_install "xf86-video-modesetting"
+                CURRENT_STATUS=1
+                sumary "Poulsbo GPU driver installation"
+                ;;
+            6)
                 package_install "virtualbox-guest-utils"
                 add_module "vboxguest vboxsf vboxvideo"
                 groupadd vboxsf
@@ -1550,7 +1556,7 @@ case "$1" in
                 CURRENT_STATUS=1
                 sumary "Virtualbox guest additions (incl. video drivers) installation"
                 ;;
-            6)
+            7)
                 package_install "xf86-video-vesa"
                 CURRENT_STATUS=1
                 sumary "Vesa GPU driver installation"
