@@ -1114,27 +1114,12 @@ case "$1" in
         print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
         print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
         print_warning "\tNone of these tools are officially supported by Arch devs."
-        aurhelper=("Packer (recommended)" "Pacaur" "Yaourt")
+        aurhelper=("Pacaur (recommended)" "Packer" "Yaourt")
         PS3="$prompt1"
         echo -e "Choose your default AUR helper to install\n"
         select OPT in "${aurhelper[@]}"; do
             case "$REPLY" in
                 1)
-                    if ! check_package "packer" ; then
-                        package_install "base-devel git jshon"
-                        pacman -D --asdeps jshon
-                        aui_download_packages "packer"
-                        if ! check_package "packer" ; then
-                            echo "Packer not installed. EXIT now"
-                            pause_function
-                            exit 0
-                        fi
-                    fi
-                    CURRENT_STATUS=1
-                    AUR_HELPER="packer"
-                    break
-                    ;;
-                2)
                     if ! check_package "pacaur" ; then
                         package_install "base-devel yajl expac"
                         pacman -D --asdeps yajl expac
@@ -1150,6 +1135,21 @@ case "$1" in
                     fi
                     CURRENT_STATUS=1
                     AUR_HELPER="pacaur"
+                    break
+                    ;;
+                2)
+                    if ! check_package "packer" ; then
+                        package_install "base-devel git jshon"
+                        pacman -D --asdeps jshon
+                        aui_download_packages "packer"
+                        if ! check_package "packer" ; then
+                            echo "Packer not installed. EXIT now"
+                            pause_function
+                            exit 0
+                        fi
+                    fi
+                    CURRENT_STATUS=1
+                    AUR_HELPER="packer"
                     break
                     ;;
                 3)
