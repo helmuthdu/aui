@@ -1011,10 +1011,6 @@ case "$1" in
                 case "$REPLY" in
                     1)
                         package_install "emacs"
-                        sed -i '/EDITOR/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
-                        sed -i '/VISUAL/s/vim/emacs\ -nw/' /home/$USERNAME/.bashrc
-                        sed -i '/EDITOR/s/vim/emacs\ -nw/' ~/.bashrc
-                        sed -i '/VISUAL/s/vim/emacs\ -nw/' ~/.bashrc
                         EDITOR=emacs
                         break
                         ;;
@@ -1022,18 +1018,10 @@ case "$1" in
                         if ! check_package "joe" ; then
                             aui_download_packages "joe"
                         fi
-                        sed -i '/EDITOR/s/vim/joe/' /home/$USERNAME/.bashrc
-                        sed -i '/VISUAL/s/vim/joe/' /home/$USERNAME/.bashrc
-                        sed -i '/EDITOR/s/vim/joe/' ~/.bashrc
-                        sed -i '/VISUAL/s/vim/joe/' ~/.bashrc
                         EDITOR=joe
                         break
                         ;;
                     3)
-                        sed -i '/EDITOR/s/vim/nano/' /home/$USERNAME/.bashrc
-                        sed -i '/VISUAL/s/vim/nano/' /home/$USERNAME/.bashrc
-                        sed -i '/EDITOR/s/vim/nano/' ~/.bashrc
-                        sed -i '/VISUAL/s/vim/nano/' ~/.bashrc
                         EDITOR=nano
                         break
                         ;;
