@@ -320,6 +320,7 @@
         # 6) Sparkleshare
         # 7) Steadyflow
         # 8) Trasmission
+        # 9) Ubuntu One
         DOWNLOAD_OPTIONS="2 4"
     #}}}
     #EMAIL|RSS {{{

@@ -1997,8 +1997,6 @@ case "$1" in
                 package_install "gvfs-smb gvfs-afc"
                 package_install "pulseaudio"
                 package_install "deja-dup"
-                package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
-                aur_package_install "empathy-theme-ubuntu-adium-bzr"
                 aur_package_install "gnome-defaults-list"
                 config_xinitrc "gnome-session-cinnamon"
                 #CINNAMON CUSTOMIZATION {{{
@@ -2067,7 +2065,6 @@ case "$1" in
                 package_install "leafpad epdfview"
                 package_install "lxappearance"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
-                aur_package_install "file-roller2-nn"
                 aur_package_install "gnome-defaults-list"
                 chown -R $USERNAME:users /home/$USERNAME/.config
                 config_xinitrc "enlightenment_start"
@@ -2161,7 +2158,6 @@ case "$1" in
                 package_install "zeitgeist"
                 package_install "deja-dup"
                 package_install "pulseaudio"
-                package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
                 aur_package_install "gnome-defaults-list"
                 config_xinitrc "gnome-session"
                 #GNOME CUSTOMIZATION {{{
@@ -2395,13 +2391,12 @@ case "$1" in
                 #LXDE {{{
                 print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
                 print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
-                package_install "lxde obconf"
+                package_install "lxde"
                 package_install "pm-utils upower"
                 package_install "polkit-gnome xdg-user-dirs"
                 package_install "gvfs-smb gvfs-afc"
                 package_install "leafpad epdfview"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
-                aur_package_install "file-roller2-nn"
                 aur_package_install "gnome-defaults-list"
                 config_xinitrc "startlxde"
                 #LXDE CUSTOMIZATION {{{
@@ -2523,7 +2518,6 @@ case "$1" in
                 package_install "leafpad epdfview nitrogen"
                 package_install "gvfs-smb gvfs-afc"
                 package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
-                aur_package_install "file-roller2-nn"
                 aur_package_install "gnome-defaults-list"
                 mkdir -p /home/$USERNAME/.config/openbox/
                 cp /etc/xdg/openbox/rc.xml /home/$USERNAME/.config/openbox/
@@ -2621,8 +2615,6 @@ case "$1" in
                 package_install "xfce4 xfce4-goodies"
                 package_install "gvfs-smb gvfs-afc"
                 package_install "polkit-gnome xdg-user-dirs"
-                package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
-                aur_package_install "file-roller2-nn"
                 aur_package_install "gnome-defaults-list"
                 config_xinitrc "startxfce4"
                 #XFCE CUSTOMIZATION{{{
@@ -2678,6 +2670,12 @@ case "$1" in
                 CURRENT_STATUS=0
                 ;;
         esac
+        #Fix p7FM {{{
+        if [[ $KDE -eq 0 ]]; then
+          package_install "wxgtk"
+          pacman -D --asdeps wxgtk
+        fi
+        #}}}
         sumary "Desktop Environment Installation"
         pause_function
     }
@@ -3043,10 +3041,11 @@ case "$1" in
                 3)
                     print_title "LATEX - https://wiki.archlinux.org/index.php/LaTeX"
                     package_install "texlive-most"
-                    aur_package_install "texmaker"
                     if [[ $LANGUAGE == pt_BR ]]; then
                         aur_package_install "abntex"
                     fi
+                    read_input_text "Install texmaker?"
+                    [[ $OPTION == y ]] && aur_package_install "texmaker"
                     ;;
                 4)
                     package_install "calibre"
@@ -3247,7 +3246,7 @@ case "$1" in
                                     package_install "chromium flashplugin"
                                     ;;
                                 2)
-                                    aur_package_install "google-chrome openssl098 flashplugin"
+                                    aur_package_install "google-chrome flashplugin"
                                     ;;
                                 3)
                                     if [[ $KDE -eq 1 ]]; then
@@ -3257,7 +3256,7 @@ case "$1" in
                                     fi
                                     ;;
                                 4)
-                                    package_install "firefox firefox-i18n-$LANGUAGE_FF flashplugin "
+                                    package_install "firefox firefox-i18n-$LANGUAGE_FF firefox-adblock-plus flashplugin "
                                     ;;
                                 5)
                                     package_install "opera flashplugin "
@@ -3288,6 +3287,7 @@ case "$1" in
                         echo " 6) $(menu_item "sparkleshare")"
                         echo " 7) $(menu_item "steadyflow-bzr") $AUR"
                         echo " 8) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+                        echo " 9) $(menu_item "ubuntuone-client" "Ubuntu One") $AUR"
                         echo ""
                         echo " b) BACK"
                         echo ""
@@ -3331,6 +3331,12 @@ case "$1" in
                                         package_install "transmission-qt"
                                     else
                                         package_install "transmission-gtk"
+                                    fi
+                                    ;;
+                                9)
+                                    aur_package_install "ubuntuone-client"
+                                    if check_package "nautilus" ; then
+                                        aur_package_install "ubuntuone-client-gnome"
                                     fi
                                     ;;
                                 "b")
@@ -3682,7 +3688,10 @@ case "$1" in
                     OPT=2
                     ;;
                 3)
-                    package_install "gstreamer0.10-plugins mpg123 flac"
+                    package_install "gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly flac"
+                    if check_package "banshee clementine exaile rhythmbox xfburn" ; then
+                      package_install "gstreamer0.10-plugins"
+                    fi
                     ;;
                 "b")
                     break
