@@ -17,551 +17,560 @@
 #-------------------------------------------------------------------------------
 
 #MAINMENU {{{
-    # 1) Basic Setup
-    # 2) Desktop Environment
-    # 3) Accessories Apps
-    # 4) Development Apps
-    # 5) Office Apps
-    # 6) System Apps
-    # 7) Graphics Apps
-    # 8) Internet Apps
-    # 9) Audio Apps
-    #10) Video Apps
-    #11) Games
-    #12) LAMP
-    #13) Fonts
-    #14) Extra
-    #15) Clean Orphan Packages
-    MAINMENU="1-13 15"
+  # 1) Basic Setup
+  # 2) Desktop Environment
+  # 3) Accessories Apps
+  # 4) Development Apps
+  # 5) Office Apps
+  # 6) System Apps
+  # 7) Graphics Apps
+  # 8) Internet Apps
+  # 9) Audio Apps
+  #10) Video Apps
+  #11) Games
+  #12) LAMP
+  #13) Fonts
+  #14) Extra
+  #15) Clean Orphan Packages
+  MAINMENU="1-13 15"
 #}}}
 #BASIC SETUP {{{
-    CUPS="y"
-    CUSTOMREPO="n"
-    FIRMWARE="n"
-    GITTOR="y"
-    NFS="n"
-    PRELOAD="y"
-    SAMBA="y"
-    TLP="n"
-    ZRAM="y"
-    #VIDEOCARD {{{
-        # 1) Intel
-        # 2) ATI
-        # 3) nVidia
-        # 4) Nouveau
-        # 5) Poulsbo
-        # 6) Virtualbox
-        # 7) Vesa
-        VIDEOCARD=2
-    #}}}
-    #ADDITIONAL FIRMWARE {{{
-        # 1) alsa-firmware
-        # 2) ipw2100
-        # 3) ipw2200
-        # 4) b43
-        # 5) b43legacy
-        # 6) broadcom-wl
-        # 7) zd1211-firmware
-        # 8) bluez-firmware
-        # 9) libffado [Fireware Audio Devices]
-        #10) libraw1394 [IEE1394 Driver]
-        #11) sane-gt68xx-firmware
-        FIRMWARE_OPTIONS="1"
-    #}}}
+  CUPS="y"
+  CUSTOMREPO="n"
+  FIRMWARE="n"
+  GITTOR="y"
+  SSH="y"
+  NFS="n"
+  PRELOAD="y"
+  SAMBA="y"
+  TLP="n"
+  ZRAM="y"
+  #VIDEOCARD {{{
+    # 1) Intel
+    # 2) ATI
+    # 3) nVidia
+    # 4) Nouveau
+    # 5) Poulsbo
+    # 6) Virtualbox
+    # 7) Vesa
+    VIDEOCARD=2
+  #}}}
+  #ADDITIONAL FIRMWARE {{{
+    # 1) alsa-firmware
+    # 2) ipw2100
+    # 3) ipw2200
+    # 4) b43
+    # 5) b43legacy
+    # 6) broadcom-wl
+    # 7) zd1211-firmware
+    # 8) bluez-firmware
+    # 9) libffado [Fireware Audio Devices]
+    #10) libraw1394 [IEE1394 Driver]
+    #11) sane-gt68xx-firmware
+    FIRMWARE_OPTIONS="1"
+  #}}}
 #}}}
 #DESKTOP ENVIRONMENT {{{
-    # 1) Awesome
-    # 2) Cinnamon
-    # 3) E17
-    # 4) GNOME
-    # 5) KDE
-    # 6) LXDE
-    # 7) Mate
-    # 8) OpenBox
-    # 9) XFCE
-    DESKTOPENV=4
-    #AWESOME/OPENBOX {{{
-        # 1) Xcompmgr
-        # 2) Icons
-        # 3) Viewnior
-        # 4) Gmrun
-        # 5) PCManFM
-        # 6) rxvt-unicode
-        # 7) Scrot
-        # 8) Display Manager
-        # 9) GTK Themes
-        #10) Thunar
-        #11) Tint2
-        #12) Volwheel
-        #13) Xfburn
-        AWESOMEOB_OPTIONS=""
+  # 1) Awesome
+  # 2) Cinnamon
+  # 3) E17
+  # 4) GNOME
+  # 5) KDE
+  # 6) LXDE
+  # 7) Mate
+  # 8) OpenBox
+  # 9) XFCE
+  DESKTOPENV=4
+  #AWESOME/OPENBOX {{{
+    # 1) Xcompmgr
+    # 2) Icons
+    # 3) Viewnior
+    # 4) Gmrun
+    # 5) PCManFM
+    # 6) rxvt-unicode
+    # 7) Scrot
+    # 8) Display Manager
+    # 9) GTK Themes
+    #10) Thunar
+    #11) Tint2
+    #12) Volwheel
+    #13) Xfburn
+    AWESOMEOB_OPTIONS=""
+  #}}}
+  #CINNAMON {{{
+    # 1) Cinnamon Applets
+    # 2) Cinnamon Themes
+    # 3) GNOME Icons
+    # 4) GNOME Themes
+    # 5) GNOME Packagekit
+    CINNAMON_OPTIONS="1-5"
+  #}}}
+  #E17 {{{
+    # 1) E17 Icons
+    # 2) E17 Themes
+    # 3) Display Manager
+    # 4) Icons
+    # 5) Viewnior
+    # 6) Gmrun
+    # 7) PCManFM
+    # 8) rxvt-unicode
+    # 9) Scrot
+    #10) GTK Themes
+    #11) Thunar
+    #12) Xfburn
+    E17_OPTIONS=""
+  #}}}
+  #GNOME {{{
+    # 1) GNOME Icons
+    # 2) GNOME Themes
+    # 3) GNOME Shell
+    # 4) GNOME Shell
+    # 5) Packagekit
+    GNOME_OPTIONS="1-5"
+    #GNOME EXTENSIONS {{{
+      # 1) disper
+      # 2) gpaste
+      # 3) gtile
+      # 4) media-player
+      # 5) pomodoro
+      # 6) system-monitor
+      # 7) user-theme
+      # 8) weather
+      GNOME_EXTENSIONS="1-8"
     #}}}
-    #CINNAMON {{{
-        # 1) Cinnamon Applets
-        # 2) Cinnamon Themes
-        # 3) GNOME Icons
-        # 4) GNOME Themes
-        # 5) GNOME Packagekit
-        CINNAMON_OPTIONS="1-5"
+    #GNOME SHELL THEMES {{{
+      # 1) Elegance
+      GNOME_SHELL_THEMES="1"
     #}}}
-    #E17 {{{
-        # 1) E17 Icons
-        # 2) E17 Themes
-        # 3) Display Manager
-        # 4) Icons
-        # 5) Viewnior
-        # 6) Gmrun
-        # 7) PCManFM
-        # 8) rxvt-unicode
-        # 9) Scrot
-        #10) GTK Themes
-        #11) Thunar
-        #12) Xfburn
-        E17_OPTIONS=""
-    #}}}
-    #GNOME {{{
-        # 1) GNOME Icons
-        # 2) GNOME Themes
-        # 3) GNOME Shell
-        # 4) GNOME Shell
-        # 5) Packagekit
-        GNOME_OPTIONS="1-5"
-        #GNOME EXTENSIONS {{{
-            # 1) disper
-            # 2) gpaste
-            # 3) gtile
-            # 4) media-player
-            # 5) pomodoro
-            # 6) system-monitor
-            # 7) user-theme
-            # 8) weather
-            GNOME_EXTENSIONS="1-8"
-        #}}}
-        #GNOME SHELL THEMES {{{
-            # 1) Elegance
-            GNOME_SHELL_THEMES="1"
-        #}}}
-    #}}}
-    #KDE {{{
-        # 1) Apper
-        # 2) Bangarang
-        # 3) Choqok
-        # 4) Digikam
-        # 5) K3b
-        # 6) Rosa Icon
-        # 7) Plasma Themes [Caledonia, Produkt, Ronak]
-        # 8) Yakuake
-        KDE_OPTIONS="1-8"
-    #}}}
-    #LXDE {{{
-        # 1) Icons
-        # 2) Display Manager
-        # 3) GTK Themes
-        # 4) Viewnior
-        # 5) Xfburn
-        LXDE_OPTIONS=""
-    #}}}
-    #MATE {{{
-        # 1) Icons
-        # 2) GTK Themes
-        # 3) Display Manager
-        MATE_OPTIONS=""
-    #}}}
-    #XFCE {{{
-        # 1) Icons
-        # 2) GTK Themes
-        # 3) Display Manager
-        XFCE_OPTIONS="1-3"
-    #}}}
-    #ICONS {{{
-        # 1) Awoken
-        # 2) Faenza
-        # 3) Faenza-Cupertino
-        # 4) Faience
-        # 5) Elementary
-        # 6) Nitrux
-        GNOME_ICONS="2-4 6"
-    #}}}
-    #GTK THEMES {{{
-        # 1) Blackbird
-        # 2) Bluebird
-        # 3) eGTK
-        # 4) Faience
-        # 5) Greybird
-        # 6) Light (Aka Ambiance/Radiance)
-        GTK_THEMES="2-6"
-    #}}}
-    #DISPLAY MANAGER {{{
-        # 1) Elsa
-        # 2) GDM
-        # 3) LightDM
-        # 4) LXDM
-        # 5) Slim
-        DISPLAY_MANAGER="4"
-    #}}}
+  #}}}
+  #KDE {{{
+    # 1) Apper
+    # 2) Bangarang
+    # 3) Choqok
+    # 4) Digikam
+    # 5) K3b
+    # 6) Rosa Icon
+    # 7) Plasma Themes [Caledonia, Produkt, Ronak]
+    # 8) Yakuake
+    KDE_OPTIONS="1-8"
+  #}}}
+  #LXDE {{{
+    # 1) Icons
+    # 2) Display Manager
+    # 3) GTK Themes
+    # 4) Viewnior
+    # 5) Xfburn
+    LXDE_OPTIONS=""
+  #}}}
+  #MATE {{{
+    # 1) Icons
+    # 2) GTK Themes
+    # 3) Display Manager
+    MATE_OPTIONS=""
+  #}}}
+  #XFCE {{{
+    # 1) Icons
+    # 2) GTK Themes
+    # 3) Display Manager
+    XFCE_OPTIONS="1-3"
+  #}}}
+  #ICONS {{{
+    # 1) Awoken
+    # 2) Faenza
+    # 3) Faenza-Cupertino
+    # 4) Faience
+    # 5) Elementary
+    # 6) Nitrux
+    GNOME_ICONS="2-4 6"
+  #}}}
+  #GTK THEMES {{{
+    # 1) Blackbird
+    # 2) Bluebird
+    # 3) eGTK
+    # 4) Faience
+    # 5) Greybird
+    # 6) Light (Aka Ambiance/Radiance)
+    GTK_THEMES="2-6"
+  #}}}
+  #DISPLAY MANAGER {{{
+    # 1) Elsa
+    # 2) GDM
+    # 3) LightDM
+    # 4) LXDM
+    # 5) Slim
+    DISPLAY_MANAGER="4"
+  #}}}
 #}}}
 #NETWORK MANAGER {{{
-    # 1) NetworkManager
-    # 2) Wicd
-    # n) None
-    NETWORKMANAGER="1"
-    #USB 3G MODEM SUPPORT
-    USBMODEM="n"
+  # 1) NetworkManager
+  # 2) Wicd
+  # n) None
+  NETWORKMANAGER="1"
+  #USB 3G MODEM SUPPORT
+  USBMODEM="n"
 #}}}
 #ACCESSORIES {{{
-    # 1) Cairo Dock
-    # 2) Catfish
-    # 3) Conky + CONKY-colors
-    # 4) Deepin Screenshot
-    # 5) Dockbarx
-    # 6) Docky
-    # 7) Galculator/Speedcrunch
-    # 8) Gnome-Pie
-    # 9) Guake
-    #10) Kupfer
-    #11) Pyrenamer
-    #12) Shutter
-    #13) Synapse
-    #14) Terminator
-    #15) Zim
-    ACCESSORIES_OPTIONS=""
+  # 1) Cairo Dock
+  # 2) Catfish
+  # 3) Conky + CONKY-colors
+  # 4) Deepin Screenshot
+  # 5) Dockbarx
+  # 6) Docky
+  # 7) Galculator/Speedcrunch
+  # 8) Gnome-Pie
+  # 9) Guake
+  #10) Kupfer
+  #11) Pyrenamer
+  #12) Shutter
+  #13) Synapse
+  #14) Terminator
+  #15) Zim
+  ACCESSORIES_OPTIONS=""
 #}}}
 #DEVELOPEMENT {{{
-    # 1) Aptana Studio
-    # 2) Bluefish
-    # 3) Eclipse
-    # 4) Emacs
-    # 5) Gvim
-    # 6) Geany
-    # 7) IntelliJ IDEA
-    # 8) Kdevelop
-    # 9) Netbeans
-    #10) Oracle JDK
-    #11) QT Creator
-    #12) Sublime Text 2
-    #13) Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]
-    #14) MySQL Workbench
-    #15) Meld
-    #16) RabbitVCS
-    DEVELOPMENT_OPTIONS="5 13"
-    #ECLIPSE {{{
-        # 1) Eclipse Classic
-        # 2) Eclipse IDE for C/C++ Developers
-        # 3) Android Development Tools for Eclipse
-        # 4) Web Development Tools for Eclipse
-        # 5) PHP Development Tools for Eclipse
-        # 6) Python Development Tools for Eclipse
-        # 7) Aptana Studio plugin for Eclipse
-        # 8) Vim-like editing plugin for Eclipse
-        # 9) Git support plugin for Eclipse
-        ECLIPSE_OPTIONS="1"
-    #}}}
+  # 1) Aptana Studio
+  # 2) Bluefish
+  # 3) Eclipse
+  # 4) Emacs
+  # 5) Gvim
+  # 6) Geany
+  # 7) IntelliJ IDEA
+  # 8) Kdevelop
+  # 9) Netbeans
+  #10) Oracle JDK
+  #11) QT Creator
+  #12) Sublime Text 2
+  #13) Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]
+  #14) MySQL Workbench
+  #15) Meld
+  #16) RabbitVCS
+  DEVELOPMENT_OPTIONS="5 13"
+  #ECLIPSE {{{
+    # 1) Eclipse Classic
+    # 2) Eclipse IDE for C/C++ Developers
+    # 3) Android Development Tools for Eclipse
+    # 4) Web Development Tools for Eclipse
+    # 5) PHP Development Tools for Eclipse
+    # 6) Python Development Tools for Eclipse
+    # 7) Aptana Studio plugin for Eclipse
+    # 8) Vim-like editing plugin for Eclipse
+    # 9) Git support plugin for Eclipse
+    ECLIPSE_OPTIONS="1"
+  #}}}
 #}}}
 #OFFICE {{{
-    # 1) LibreOffice
-    # 2) Abiword+Gnumeric|Calligra
-    # 3) Latex + Texmaker
-    # 4) Calibre
-    # 5) GCStar
-    # 6) Homebank
-    # 7) Impressive
-    # 8) Nitrotask
-    # 9) OCRFeeder
-    #10) Xmind
-    #11) Zathura
-    OFFICE_OPTIONS="1 6 8 10"
+  # 1) LibreOffice
+  # 2) Abiword+Gnumeric|Calligra
+  # 3) Latex + Texmaker
+  # 4) Calibre
+  # 5) GCStar
+  # 6) Homebank
+  # 7) Impressive
+  # 8) Nitrotask
+  # 9) OCRFeeder
+  #10) Xmind
+  #11) Zathura
+  OFFICE_OPTIONS="1 6 8 10"
 #}}}
 #SYSTEM TOOLS {{{
-    # 1) Gparted
-    # 2) Grsync
-    # 3) Htop
-    # 4) Virtualbox
-    # 5) Webmin
-    # 6) Wine
-    SYSTEMTOOLS_OPTIONS="1-4 6"
+  # 1) Gparted
+  # 2) Grsync
+  # 3) Htop
+  # 4) Virtualbox
+  # 5) Webmin
+  # 6) Wine
+  SYSTEMTOOLS_OPTIONS="1-4 6"
 #}}}
 #GRAPHICS {{{
-    # 1) Blender
-    # 2) Gimp
-    # 3) Gimp-plugins
-    # 4) Gthumb
-    # 5) Inkscape
-    # 6) MComix
-    # 7) Mypaint
-    # 8) Scribus
-    # 9) Shotwell
-    #10) Simple Scan
-    #11) XnViewMP
-    GRAPHICS_OPTIONS="2-7 9"
+  # 1) Blender
+  # 2) Gimp
+  # 3) Gimp-plugins
+  # 4) Gthumb
+  # 5) Inkscape
+  # 6) MComix
+  # 7) Mypaint
+  # 8) Scribus
+  # 9) Shotwell
+  #10) Simple Scan
+  #11) XnViewMP
+  GRAPHICS_OPTIONS="2-7 9"
 #}}}
 #INTERNET {{{
-    # 1) Browser
-    # 2) Download|Fileshare
-    # 3) Email|RSS
-    # 4) Instant Messaging
-    # 5) IRC
-    # 6) Mapping Tools
-    # 7) VNC|Desktop Share
-    INTERNET_OPTIONS="1-7"
-    #BROWSER {{{
-        # 1) Chromium
-        # 2) Google Chrome
-        # 3) Midori|Rekonq
-        # 4) Mozilla Firefox
-        # 5) Opera
-        BROWSERS_OPTIONS="2 4"
-    #}}}
-    #DOWNLOAD|FILESHARE {{{
-        # 1) Deluge
-        # 2) Dropbox
-        # 3) Insync
-        # 4) Jdownloader
-        # 5) Nitroshare
-        # 6) Sparkleshare
-        # 7) Steadyflow
-        # 8) Trasmission
-        # 9) Ubuntu One
-        DOWNLOAD_OPTIONS="2 4"
-    #}}}
-    #EMAIL|RSS {{{
-        # 1) Mozilla Thunderbird
-        # 2) Liferea
-        # 3) LightRead
-        EMAIL_OPTIONS="3"
-    #}}}
-    #IM {{{
-        # 1) Emesene
-        # 2) Google Talk-Plugin
-        # 3) Pidgin
-        # 4) Skype
-        # 5) Teamspeak
-        IM_OPTIONS="4"
-    #}}}
-    #IRC {{{
-        # 1) Irssi
-        # 2) X-Chat|Quassel
-        IRC_OPTIONS=""
-    #}}}
-    #MAPPING {{{
-        # 1) Google Earth
-        # 2) NASA World Wind
-        MAPPING_OPTIONS="1"
-    #}}}
-    #VNC|Desktop Share {{{
-        # 1) Remmina
-        # 2) Teamviewer
-        VNC_OPTIONS=""
-    #}}}
+  # 1) Browser
+  # 2) Download|Fileshare
+  # 3) Email|RSS
+  # 4) Instant Messaging
+  # 5) IRC
+  # 6) Mapping Tools
+  # 7) VNC|Desktop Share
+  INTERNET_OPTIONS="1-7"
+  #BROWSER {{{
+    # 1) Chromium
+    # 2) Google Chrome
+    # 3) Midori|Rekonq
+    # 4) Mozilla Firefox
+    # 5) Opera
+    BROWSERS_OPTIONS="2 4"
+  #}}}
+  #DOWNLOAD|FILESHARE {{{
+    # 1) Deluge
+    # 2) Dropbox
+    # 3) Insync
+    # 4) Jdownloader
+    # 5) Nitroshare
+    # 6) Sparkleshare
+    # 7) Steadyflow
+    # 8) Trasmission
+    # 9) Ubuntu One
+    DOWNLOAD_OPTIONS="2 4"
+  #}}}
+  #EMAIL|RSS {{{
+    # 1) Mozilla Thunderbird
+    # 2) Liferea
+    # 3) LightRead
+    EMAIL_OPTIONS="3"
+  #}}}
+  #IM {{{
+    # 1) Emesene
+    # 2) Google Talk-Plugin
+    # 3) Pidgin
+    # 4) Skype
+    # 5) Teamspeak
+    IM_OPTIONS="4"
+  #}}}
+  #IRC {{{
+    # 1) Irssi
+    # 2) X-Chat|Quassel
+    IRC_OPTIONS=""
+  #}}}
+  #MAPPING {{{
+    # 1) Google Earth
+    # 2) NASA World Wind
+    MAPPING_OPTIONS="1"
+  #}}}
+  #VNC|Desktop Share {{{
+    # 1) Remmina
+    # 2) Teamviewer
+    VNC_OPTIONS=""
+  #}}}
 #}}}
 #AUDIO {{{
-    # 1) Players
-    # 2) Editors|Tools
-    # 3) Codecs
-    AUDIO_OPTIONS="1-3"
-    #PLAYERS {{{
-        # 1) Amarok
-        # 2) Audacious
-        # 3) Banshee
-        # 4) Clementine
-        # 5) Deadbeef
-        # 6) Exaile
-        # 7) Musique
-        # 8) Nuvola
-        # 9) Rhythmbox
-        #10) Radiotray
-        #11) Spotify
-        #12) Tomahawk
-        #13) Timidity++
-        AUDIO_PLAYER_OPTIONS="4"
-    #}}}
-    #EDITORS|TOOLS {{{
-        # 1) Soundconverter|Soundkonverter
-        # 2) Puddletag
-        # 3) Audacity
-        # 4) OcenAudio
-        AUDIO_EDITOR_OPTIONS="1"
-    #}}}
+  # 1) Players
+  # 2) Editors|Tools
+  # 3) Codecs
+  AUDIO_OPTIONS="1-3"
+  #PLAYERS {{{
+    # 1) Amarok
+    # 2) Audacious
+    # 3) Banshee
+    # 4) Clementine
+    # 5) Deadbeef
+    # 6) Exaile
+    # 7) Musique
+    # 8) Nuvola
+    # 9) Rhythmbox
+    #10) Radiotray
+    #11) Spotify
+    #12) Tomahawk
+    #13) Timidity++
+    AUDIO_PLAYER_OPTIONS="4"
+  #}}}
+  #EDITORS|TOOLS {{{
+    # 1) Soundconverter|Soundkonverter
+    # 2) Puddletag
+    # 3) Audacity
+    # 4) OcenAudio
+    AUDIO_EDITOR_OPTIONS="1"
+  #}}}
 #}}}
 #VIDEO {{{
-    # 1) Players
-    # 2) Editors|Tools
-    # 3) Codecs
-    VIDEO_OPTIONS="1-3"
-    #PLAYERS {{{
-        # 1) Audience
-        # 2) Gnome Mplayer
-        # 3) Parole
-        # 4) Minitube
-        # 5) Miro
-        # 6) Rosa Media Player
-        # 7) SMplayer
-        # 8) VLC
-        # 9) XBMC
-        VIDEO_PLAYER_OPTIONS="8 9"
-    #}}}
-    #EDITORS|TOOLS {{{
-        # 1) Arista
-        # 2) Transmageddon
-        # 3) Kdenlive
-        # 4) Openshot
-        # 5) Pitivi
-        # 6) Kazam
-        VIDEO_EDITOR_OPTIONS="2"
-    #}}}
+  # 1) Players
+  # 2) Editors|Tools
+  # 3) Codecs
+  VIDEO_OPTIONS="1-3"
+  #PLAYERS {{{
+    # 1) Audience
+    # 2) Gnome Mplayer
+    # 3) Parole
+    # 4) Minitube
+    # 5) Miro
+    # 6) Rosa Media Player
+    # 7) SMplayer
+    # 8) VLC
+    # 9) XBMC
+    VIDEO_PLAYER_OPTIONS="8 9"
+  #}}}
+  #EDITORS|TOOLS {{{
+    # 1) Arista
+    # 2) Transmageddon
+    # 3) Kdenlive
+    # 4) Openshot
+    # 5) Pitivi
+    # 6) Kazam
+    VIDEO_EDITOR_OPTIONS="2"
+  #}}}
 #}}}
 #GAMES {{{
-    # 1) Action|Adventure
-    # 2) Arcade|Platformer
-    # 3) Dungeon
-    # 4) Emulators
-    # 5) FPS
-    # 6) MMO
-    # 7) Puzzle
-    # 8) RPG
-    # 9) Racing
-    #10) Simulation
-    #11) Strategy
-    GAMES_OPTIONS="1-11"
-    #ACTION {{{
-        # 1) Astromenace
-        # 2) Counter-Strike 2D
-        # 3) Dead Cyborg
-        # 4) M.A.R.S.
-        # 5) Nikki
-        # 6) OpenTyrian
-        # 7) Sonic Robot Bast 2
-        # 8) SteelStorm
-        # 9) Yo Frankie!
-        ACTION=""
-    #}}}
-    #ARCADE {{{
-        # 1) Abuse
-        # 2) Battle Tanks
-        # 3) Bomberclone
-        # 4) Those Funny Funguloids
-        # 5) Frogatto
-        # 6) Goonies
-        # 7) Mari0
-        # 8) Neverball
-        # 9) Opensonic
-        #10) Robombs
-        #11) Super Mario Chronicles
-        #12) X-Moto
-        ARCADE=""
-    #}}}
-    #DUNGEON {{{
-        # 1) Adom
-        # 2) Tales of MajEyal
-        # 3) Lost Labyrinth
-        # 4) S.C.O.U.R.G.E.
-        # 5) Stone-Soupe
-        DUNGEON=""
-    #}}}
-    #EMULATORS {{{
-        # 1) BSNES
-        # 2) Desmume
-        # 3) Dolphin
-        # 4) ePSXe
-        # 5) Project64
-        # 6) VisualBoyAdvanced
-        # 7) wxMupen64Plus
-        # 8) ZSNES
-        EMULATORS=""
-    #}}}
-    #FPS {{{
-        # 1) AlienArena
-        # 2) Warsow
-        # 3) Wolfenstein: Enemy Territory
-        # 4) World of Padman
-        # 5) Xonotic
-        FPS=""
-    #}}}
-    #MMO {{{
-        # 1) ManaPlus
-        # 2) Heroes of Newerth
-        # 3) Runescape
-        # 4) Savage II
-        # 5) Spiral Knights
-        # 6) Wakfu
-        MMO=""
-    #}}}
-    #PUZZLE {{{
-        # 1) Frozen Bubble
-        # 2) Puzzle Moppet
-        # 3) Numptyphysics
-        PUZZLE=""
-    #}}}
-    #RPG {{{
-        # 1) Ardentryst
-        # 2) Flare
-        # 3) Freedroid RPG
-        RPG=""
-    #}}}
-    #RACING {{{
-        # 1) Maniadrive
-        # 2) Death Rally
-        # 3) Stuntrally
-        # 4) SupertuxKart
-        # 5) Speed Dreams
-        RACING=""
-    #}}}
-    #SIMULATION {{{
-        # 1) Simultrans
-        # 2) Theme Hospital
-        # 3) OpenTTD
-        SIMULATION=""
-    #}}}
-    #STRATEGY {{{
-        # 1) 0ad
-        # 2) Hedgewars
-        # 3) MegaGlest
-        # 4) Warzone 2100
-        # 5) Wesnoth
-        # 6) Zod
-        STRATEGY=""
-    #}}}
+  # 1) Action|Adventure
+  # 2) Arcade|Platformer
+  # 3) Dungeon
+  # 4) Emulators
+  # 5) FPS
+  # 6) MMO
+  # 7) Puzzle
+  # 8) RPG
+  # 9) Racing
+  #10) Simulation
+  #11) Strategy
+  #12) Steam
+  GAMES_OPTIONS="1-11"
+  #ACTION {{{
+    # 1) Astromenace
+    # 2) Counter-Strike 2D
+    # 3) Dead Cyborg
+    # 4) M.A.R.S.
+    # 5) Nikki
+    # 6) OpenTyrian
+    # 7) Sonic Robot Bast 2
+    # 8) SteelStorm
+    # 9) Yo Frankie!
+    ACTION=""
+  #}}}
+  #ARCADE {{{
+    # 1) Abuse
+    # 2) Battle Tanks
+    # 3) Bomberclone
+    # 4) Those Funny Funguloids
+    # 5) Frogatto
+    # 6) Goonies
+    # 7) Mari0
+    # 8) Neverball
+    # 9) Opensonic
+    #10) Robombs
+    #11) Super Mario Chronicles
+    #12) X-Moto
+    ARCADE=""
+  #}}}
+  #DUNGEON {{{
+    # 1) Adom
+    # 2) Tales of MajEyal
+    # 3) Lost Labyrinth
+    # 4) S.C.O.U.R.G.E.
+    # 5) Stone-Soupe
+    DUNGEON=""
+  #}}}
+  #EMULATORS {{{
+    # 1) BSNES
+    # 2) Desmume
+    # 3) Dolphin
+    # 4) ePSXe
+    # 5) Project64
+    # 6) VisualBoyAdvanced
+    # 7) wxMupen64Plus
+    # 8) ZSNES
+    EMULATORS=""
+  #}}}
+  #FPS {{{
+    # 1) AlienArena
+    # 2) Warsow
+    # 3) Wolfenstein: Enemy Territory
+    # 4) World of Padman
+    # 5) Xonotic
+    FPS=""
+  #}}}
+  #MMO {{{
+    # 1) ManaPlus
+    # 2) Heroes of Newerth
+    # 3) Runescape
+    # 4) Savage II
+    # 5) Spiral Knights
+    # 6) Wakfu
+    MMO=""
+  #}}}
+  #PUZZLE {{{
+    # 1) Frozen Bubble
+    # 2) Puzzle Moppet
+    # 3) Numptyphysics
+    PUZZLE=""
+  #}}}
+  #RPG {{{
+    # 1) Ardentryst
+    # 2) Flare
+    # 3) Freedroid RPG
+    RPG=""
+  #}}}
+  #RACING {{{
+    # 1) Maniadrive
+    # 2) Death Rally
+    # 3) Stuntrally
+    # 4) SupertuxKart
+    # 5) Speed Dreams
+    RACING=""
+  #}}}
+  #SIMULATION {{{
+    # 1) Simultrans
+    # 2) Theme Hospital
+    # 3) OpenTTD
+    SIMULATION=""
+  #}}}
+  #STRATEGY {{{
+    # 1) 0ad
+    # 2) Hedgewars
+    # 3) MegaGlest
+    # 4) Warzone 2100
+    # 5) Wesnoth
+    # 6) Zod
+    STRATEGY=""
+  #}}}
 #}}}
 #WEBSERVER {{{
-    # 1) LAMP - APACHE, MYSQL & PHP + ADMINER
-    # 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER
-    WEBSERVER="2"
+  # 1) LAMP - APACHE, MYSQL & PHP + ADMINER
+  # 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER
+  WEBSERVER="2"
 #}}}
 #FONTS {{{
-    # 1) ttf-dejavu
-    # 2) ttf-google-webfonts
-    # 3) ttf-funfonts
-    # 4) ttf-kochi-substitute
-    # 5) ttf-liberation
-    # 6) ttf-ms-fonts
-    # 7) ttf-vista-fonts
-    # 8) ttf-wgy-microhei
-    FONTS_OPTIONS="1-8"
+  # 1) ttf-dejavu
+  # 2) ttf-google-webfonts
+  # 3) ttf-funfonts
+  # 4) ttf-kochi-substitute
+  # 5) ttf-liberation
+  # 6) ttf-ms-fonts
+  # 7) ttf-vista-fonts
+  # 8) ttf-wgy-microhei
+  FONTS_OPTIONS="1-8"
 #}}}
 #EXTRA {{{
-    # 1) Elementary Project
-    EXTRA_OPTIONS=""
-    #ELEMENTARY PROJECT {{{
-        # 1) Audience
-        # 2) Contractor
-        # 3) Eidete
-        # 4) Dexter
-        # 5) Feedler
-        # 6) Files
-        # 7) Footnote
-        # 8) Gala
-        # 9) Geary
-        #10) Lingo
-        #11) Maya
-        #12) Midori
-        #13) Noise
-        #14) Scratch
-        #15) Plank
-        #16) Pantheon Terminal
-        #17) Slingshot
-        #18) Switchboard
-        #19) Wingpanel
-        #20) eICONS
-        #21) eGTK
-        ELEMENTARY_OPTIONS="1-20"
-    #}}}
+  # 1) Elementary Project
+  # 2) Font Configuration
+  EXTRA_OPTIONS=""
+  #ELEMENTARY PROJECT {{{
+    # 1) Audience
+    # 2) Contractor
+    # 3) Eidete
+    # 4) Dexter
+    # 5) Feedler
+    # 6) Files
+    # 7) Footnote
+    # 8) Gala
+    # 9) Geary
+    #10) Lingo
+    #11) Maya
+    #12) Midori
+    #13) Noise
+    #14) Scratch
+    #15) Plank
+    #16) Pantheon Terminal
+    #17) Slingshot
+    #18) Switchboard
+    #19) Wingpanel
+    #20) eICONS
+    #21) eGTK
+    ELEMENTARY_OPTIONS="1-20"
+  #}}}
+  #FONT CONFIGURATION {{{
+    # 1) Ubuntu patched packages
+    # 2) Infinality patched packages
+    # 3) Reverting to unpatched packages
+    FONTSCONFIG_OPTION=""
+  #}}}
 #}}}
