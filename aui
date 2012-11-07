@@ -991,51 +991,38 @@ case "$1" in
       passwd $USERNAME
       pause_function
       configure_user_account
-    } #}}}
+    }
+    #}}}
     #CONFIGURE USER ACCOUNT {{{
     configure_user_account(){
+      #BASHRC {{{
       print_title "BASHRC - https://wiki.archlinux.org/index.php/Bashrc"
-      package_install "git"
-      git clone https://github.com/helmuthdu/dotfiles
-      cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc ~/
-      cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc /home/$USERNAME/
-      mkdir -p /home/$USERNAME/.config/fontconfig
-      cp -i dotfiles/fonts.conf /home/$USERNAME/.config/fontconfig
-      rm -fr dotfiles
-      print_title "DEFAULT EDITOR"
-      EDITORS=("Emacs" "Joe" "Nano" "Vim");
+      BASHRC=("Default" "Vanilla" "Get from github");
       PS3="$prompt1"
-      echo -e "Choose default editor\n"
-      select OPT in "${EDITORS[@]}"; do
+      echo -e "Choose your .bashrc\n"
+      select OPT in "${BASHRC[@]}"; do
         case "$REPLY" in
           1)
-            package_install "emacs"
-            EDITOR=emacs
+            package_install "git"
+            git clone https://github.com/helmuthdu/dotfiles
+            cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc ~/
+            cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc /home/$USERNAME/
+            mkdir -p /home/$USERNAME/.config/fontconfig
+            cp -i dotfiles/fonts.conf /home/$USERNAME/.config/fontconfig
+            rm -fr dotfiles
             break
             ;;
           2)
-            if ! check_package "joe" ; then
-              aui_download_packages "joe"
-            fi
-            EDITOR=joe
+            cp /etc/skel/.bashrc ~/home/$USERNAME
             break
             ;;
           3)
-            EDITOR=nano
-            break
-            ;;
-          4)
-            # VIM
-            package_install "vim ctags ack"
-            # VIMRC
-            git clone https://github.com/helmuthdu/vim
-            mv vim /home/$USERNAME/.vim
-            ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
-            # PENTADACTYL [FIREFOX]
-            git clone https://github.com/helmuthdu/pentadactyl
-            mv pentadactyl /home/$USERNAME/.pentadactyl
-            ln -sf /home/$USERNAME/.pentadactyl/pentadactylrc /home/$USERNAME/.pentadactylrc
-            EDITOR=vim
+            package_install "git"
+            read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
+            read -p "Enter your github repository [ex: aui]: " GITHUB_REPO
+            git clone https://github.com/$GITHUB_USER/$GITHUB_REPO
+            cp -R $GITHUB_REPO/.* /home/$USERNAME/
+            rm -fr $GITHUB_REPO
             break
             ;;
           *)
@@ -1043,8 +1030,94 @@ case "$1" in
             ;;
         esac
       done
+      #}}}
+      #EDITOR {{{
+      print_title "DEFAULT EDITOR"
+      EDITORS=("Emacs" "Joe" "Nano" "Vim" "Zile");
+      PS3="$prompt1"
+      echo -e "Choose default editor\n"
+      select OPT in "${EDITORS[@]}"; do
+        case "$REPLY" in
+          1)
+            print_title "EMACS - https://wiki.archlinux.org/index.php/Emacs"
+            package_install "emacs"
+            EDITOR=emacs
+            break
+            ;;
+          2)
+            print_title "JOE - https://wiki.archlinux.org/index.php/Joe"
+            if ! check_package "joe" ; then
+              aui_download_packages "joe"
+            fi
+            EDITOR=joe
+            break
+            ;;
+          3)
+            print_title "NANO - https://wiki.archlinux.org/index.php/Nano"
+            EDITOR=nano
+            break
+            ;;
+          4)
+            print_title "VIM - https://wiki.archlinux.org/index.php/Vim"
+            package_install "vim ctags ack"
+            #VIMRC {{{
+            VIMRC=("Default" "Vanilla" "Get from github");
+            PS3="$prompt1"
+            echo -e "Choose your .vimrc\n"
+            select OPT in "${VIMRC[@]}"; do
+              case "$REPLY" in
+                1)
+                  package_install "git"
+                  git clone https://github.com/helmuthdu/vim
+                  mv vim /home/$USERNAME/.vim
+                  ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
+                  # PENTADACTYL [FIREFOX]
+                  git clone https://github.com/helmuthdu/pentadactyl
+                  mv pentadactyl /home/$USERNAME/.pentadactyl
+                  ln -sf /home/$USERNAME/.pentadactyl/pentadactylrc /home/$USERNAME/.pentadactylrc
+                  break
+                  ;;
+                2)
+                  break
+                  ;;
+                3)
+                  package_install "git"
+                  read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
+                  read -p "Enter your github repository [ex: vim]: " GITHUB_REPO
+                  git clone https://github.com/$GITHUB_USER/$GITHUB_REPO
+                  cp -R $GITHUB_REPO/.vim /home/$USERNAME/
+                  if [[ -f $GITHUB_REPO/.vimrc ]]; then
+                    cp $GITHUB_REPO/.vimrc /home/$USERNAME/
+                  else
+                    ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
+                  fi
+                  rm -fr $GITHUB_REPO
+                  break
+                  ;;
+                *)
+                  invalid_option
+                  ;;
+              esac
+            done
+            #}}}
+            EDITOR=vim
+            break
+            ;;
+          5)
+            print_title "ZILE - https://wiki.archlinux.org/index.php/Emacs"
+            package_install "zile"
+            EDITOR=zile
+            break
+            ;;
+          *)
+            invalid_option
+            ;;
+        esac
+      done
+      #}}}
       chown -R $USERNAME:users /home/$USERNAME
-    } #}}}
+    }
+    #}}}
     print_title "SELECT/CREATE USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
     users=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
     PS3="$prompt1"
