@@ -1593,6 +1593,9 @@ case "$1" in
     case "$OPTION" in
       1)
         package_install "libgl xf86-video-intel"
+        if [[ $ARCHI == x86_64 ]]; then
+          package_install "lib32-intel-dri"
+        fi
         CURRENT_STATUS=1
         sumary "Intel GPU driver installation"
         ;;
@@ -3564,6 +3567,7 @@ case "$1" in
                 case "$OPT" in
                   1)
                     aur_package_install "google-earth"
+                    rm -v /etc/fonts/conf.d/65-fonts-persian.conf
                     ;;
                   2)
                     aur_package_install "worldwind"
@@ -4818,7 +4822,7 @@ case "$1" in
             case "$OPTION" in
               1)
                 pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
-                aur_package_install "fontconfig-ubuntu freetype2-ubuntu libxft-ubuntu cairo-ubuntu"
+                aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
                 CURRENT_STATUS=1
                 ;;
               2)
