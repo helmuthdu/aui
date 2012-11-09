@@ -1863,12 +1863,13 @@ case "$1" in
       while [[ 1 ]]
       do
         print_title "GTK2/GTK3 THEMES"
-        echo " 1) $(menu_item "xfce-theme-blackbird" "Blackbird")"
-        echo " 2) $(menu_item "xfce-theme-bluebird" "Bluebird")"
-        echo " 3) $(menu_item "egtk-bzr" "eGTK")"
-        echo " 4) $(menu_item "faience-themes" "Faience")"
-        echo " 5) $(menu_item "xfce-theme-greybird" "Greybird")"
-        echo " 6) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
+        echo " 1) $(menu_item "adwaita-x-dark-and-light-theme" "Adwaita-X")"
+        echo " 2) $(menu_item "xfce-theme-blackbird" "Blackbird")"
+        echo " 3) $(menu_item "xfce-theme-bluebird" "Bluebird")"
+        echo " 4) $(menu_item "egtk-bzr" "eGTK")"
+        echo " 5) $(menu_item "faience-themes" "Faience")"
+        echo " 6) $(menu_item "xfce-theme-greybird" "Greybird")"
+        echo " 7) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
         echo ""
         echo " b) BACK"
         echo ""
@@ -1877,21 +1878,24 @@ case "$1" in
         for OPT in ${OPTIONS[@]}; do
           case "$OPT" in
             1)
-              aur_package_install "xfce-theme-blackbird"
+              aur_package_install "adwaita-x-dark-and-light-theme"
               ;;
             2)
-              aur_package_install "xfce-theme-bluebird"
+              aur_package_install "xfce-theme-blackbird"
               ;;
             3)
-              aur_package_install "egtk-bzr"
+              aur_package_install "xfce-theme-bluebird"
               ;;
             4)
-              aur_package_install "faience-themes"
+              aur_package_install "egtk-bzr"
               ;;
             5)
-              aur_package_install "xfce-theme-greybird"
+              aur_package_install "faience-themes"
               ;;
             6)
+              aur_package_install "xfce-theme-greybird"
+              ;;
+            7)
               aur_package_install "light-themes"
               ;;
             "b")

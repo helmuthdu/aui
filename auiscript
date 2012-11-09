@@ -184,13 +184,14 @@
     GNOME_ICONS="2-4 6"
   #}}}
   #GTK THEMES {{{
-    # 1) Blackbird
-    # 2) Bluebird
-    # 3) eGTK
-    # 4) Faience
-    # 5) Greybird
-    # 6) Light (Aka Ambiance/Radiance)
-    GTK_THEMES="2-6"
+    # 1) Adwaita-X
+    # 2) Blackbird
+    # 3) Bluebird
+    # 4) eGTK
+    # 5) Faience
+    # 6) Greybird
+    # 7) Light (Aka Ambiance/Radiance)
+    GTK_THEMES="1-7"
   #}}}
   #DISPLAY MANAGER {{{
     # 1) Elsa
