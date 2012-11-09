@@ -401,13 +401,14 @@
     VIDEO_PLAYER_OPTIONS="8 9"
   #}}}
   #EDITORS|TOOLS {{{
-    # 1) Arista
-    # 2) Transmageddon
-    # 3) Kdenlive
-    # 4) Openshot
-    # 5) Pitivi
-    # 6) Kazam
-    VIDEO_EDITOR_OPTIONS="2"
+    # 1) Avidemux
+    # 2) Arista
+    # 3) Transmageddon
+    # 4) Kdenlive
+    # 5) Openshot
+    # 6) Pitivi
+    # 7) Kazam
+    VIDEO_EDITOR_OPTIONS="3"
   #}}}
 #}}}
 #GAMES {{{

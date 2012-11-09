@@ -1910,7 +1910,7 @@ case "$1" in
       do
         print_title "DISPLAY MANAGER - https://wiki.archlinux.org/index.php/Display_Manager"
         print_info "A display manager, or login manager, is a graphical interface screen that is displayed at the end of the boot process in place of the default shell."
-        echo " 1) $(menu_item "elsa-svn-arch" "Elsa") $AUR"
+        echo " 1) $(menu_item "entrance-svn" "Elsa") $AUR"
         echo " 2) $(menu_item "gdm" "GDM")"
         echo " 3) $(menu_item "lightdm" "LightDM") $AUR"
         echo " 4) $(menu_item "lxdm" "LXDM")"
@@ -1923,8 +1923,8 @@ case "$1" in
         for OPT in ${OPTIONS[@]}; do
           case "$OPT" in
             1)
-              aur_package_install "elsa-svn-arch"
-              systemctl enable elsa.service
+              aur_package_install "entrance-svn"
+              systemctl enable entrace.service
               ;;
             2)
               package_install "gdm"
@@ -1994,7 +1994,7 @@ case "$1" in
           echo " 5) $(menu_item "pcmanfm" "PCManFM")"
           echo " 6) $(menu_item "rxvt-unicode")"
           echo " 7) $(menu_item "scrot")"
-          echo " 8) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
+          echo " 8) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
           echo " 9) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
           echo "10) $(menu_item "thunar")"
           echo "11) $(menu_item "tint2")"
@@ -2060,6 +2060,8 @@ case "$1" in
           elihw
         done
         #}}}
+        #Application development toolkit for controlling system-wide privileges
+        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
         CURRENT_STATUS=1
@@ -2154,7 +2156,7 @@ case "$1" in
           print_title "E17 CUSTOMIZATION"
           echo " 1) $(menu_item "e17-icons") $AUR"
           echo " 2) $(menu_item "e17-themes") $AUR"
-          echo " 3) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
+          echo " 3) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
           echo " 4) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
           echo " 5) $(menu_item "viewnior")"
           echo " 6) $(menu_item "gmrun")"
@@ -2221,6 +2223,8 @@ case "$1" in
           elihw
         done
         #}}}
+        #Application development toolkit for controlling system-wide privileges
+        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
         CURRENT_STATUS=1
@@ -2381,27 +2385,27 @@ case "$1" in
         print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
         print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
         package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
-        package_install "kdeadmin-system-config-printer-kde xdg-user-dirs"
+        package_install "xdg-user-dirs"
         #package_install "kde-telepathy telepathy"
         package_remove "kdemultimedia-kscd kdemultimedia-juk"
         aur_package_install "kde-gtk-config-git"
-        aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4 bespin-svn"
+        aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
         config_xinitrc "startkde"
         #QTCURVE THEMES #{{{
-        curl -o Sweet.tar.gz http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
-        curl -o Kawai.tar.gz http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
-        tar zxvf Sweet.tar.gz
-        tar zxvf Kawai.tar.gz
-        rm Sweet.tar.gz
-        rm Kawai.tar.gz
-        mkdir -p /home/$USERNAME/.kde4/share/apps/color-schemes
-        mv Sweet/Sweet.colors /home/$USERNAME/.kde4/share/apps/color-schemes
-        mv Kawai/Kawai.colors /home/$USERNAME/.kde4/share/apps/color-schemes
-        mkdir -p /home/$USERNAME/.kde4/share/apps/QtCurve
-        mv Sweet/Sweet.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
-        mv Kawai/Kawai.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
-        chown -R $USERNAME:users /home/$USERNAME/.kde4
-        rm -fr Kawai Sweet
+          curl -o Sweet.tar.gz http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
+          curl -o Kawai.tar.gz http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
+          tar zxvf Sweet.tar.gz
+          tar zxvf Kawai.tar.gz
+          rm Sweet.tar.gz
+          rm Kawai.tar.gz
+          mkdir -p /home/$USERNAME/.kde4/share/apps/color-schemes
+          mv Sweet/Sweet.colors /home/$USERNAME/.kde4/share/apps/color-schemes
+          mv Kawai/Kawai.colors /home/$USERNAME/.kde4/share/apps/color-schemes
+          mkdir -p /home/$USERNAME/.kde4/share/apps/QtCurve
+          mv Sweet/Sweet.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
+          mv Kawai/Kawai.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
+          chown -R $USERNAME:users /home/$USERNAME/.kde4
+          rm -fr Kawai Sweet
         #}}}
         #KDE CUSTOMIZATION {{{
         while [[ 1 ]]
@@ -2473,10 +2477,9 @@ case "$1" in
         print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
         package_install "lxde"
         package_install "pm-utils upower"
-        package_install "polkit-gnome xdg-user-dirs"
+        package_install "xdg-user-dirs"
         package_install "gvfs-smb gvfs-afc"
         package_install "leafpad epdfview"
-        package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
         aur_package_install "gnome-defaults-list"
         config_xinitrc "startlxde"
         #LXDE CUSTOMIZATION {{{
@@ -2484,7 +2487,7 @@ case "$1" in
         do
           print_title "LXDE CUSTOMIZATION"
           echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
-          echo " 2) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
+          echo " 2) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
           echo " 3) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
           echo " 4) $(menu_item "viewnior")"
           echo " 5) $(menu_item "xfburn")"
@@ -2524,6 +2527,8 @@ case "$1" in
           elihw
         done
         #}}}
+        #Application development toolkit for controlling system-wide privileges
+        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
         CURRENT_STATUS=1
@@ -2547,7 +2552,7 @@ case "$1" in
           print_title "MATE CUSTOMIZATION"
           echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
           echo " 2) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
-          echo " 3) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
+          echo " 3) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
           echo ""
           echo " d) DONE"
           echo ""
@@ -2616,7 +2621,7 @@ case "$1" in
           echo " 5) $(menu_item "pcmanfm" "PCManFM")"
           echo " 6) $(menu_item "rxvt-unicode")"
           echo " 7) $(menu_item "scrot")"
-          echo " 8) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
+          echo " 8) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
           echo " 9) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
           echo "10) $(menu_item "thunar")"
           echo "11) $(menu_item "tint2")"
@@ -2682,6 +2687,8 @@ case "$1" in
           elihw
         done
         #}}}
+        #Application development toolkit for controlling system-wide privileges
+        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
         CURRENT_STATUS=1
@@ -2703,8 +2710,7 @@ case "$1" in
           print_title "XFCE CUSTOMIZATION"
           echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
           echo " 2) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
-          echo " 3) $(menu_item "elsa-svn-arch gdm lightdm lxdm slim" "Display Manager") $AUR"
-          echo " 4) $(menu_item "xfce4-volumed") $AUR"
+          echo " 3) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
           echo ""
           echo " d) DONE"
           echo ""
@@ -2723,9 +2729,6 @@ case "$1" in
               3)
                 install_display_manager
                 OPT=3
-                ;;
-              4)
-                aur_package_install "xfce4-volumed"
                 ;;
               "d")
                 break
@@ -2827,7 +2830,7 @@ case "$1" in
     while [[ 1 ]]
     do
       print_title "ACCESSORIES APPS"
-      echo " 1) $(menu_item "cairo-dock-bzr") $AUR"
+      echo " 1) $(menu_item "cairo-dock") $AUR"
       echo " 2) $(menu_item "catfish")"
       echo " 3) $(menu_item "conky-lua") $AUR"
       echo " 4) $(menu_item "deepin-screenshot-git") $AUR"
@@ -2850,7 +2853,7 @@ case "$1" in
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            aur_package_install "cairo-dock-bzr cairo-dock-plugins-bzr"
+            aur_package_install "cairo-dock cairo-dock-plugins"
             ;;
           2)
             package_install "catfish"
@@ -2895,7 +2898,6 @@ case "$1" in
             ;;
           14)
             package_install "terminator"
-            aur_package_install "python-keybinder"
             ;;
           15)
             package_install "zim"
@@ -3045,7 +3047,7 @@ case "$1" in
             aur_package_install "sublime-text"
             ;;
           13)
-            aur_package_install "valgrind gdb splint tidyhtml python2-pyflakes jslint"
+            aur_package_install "valgrind gdb splint tidyhtml python2-pyflakes nodejs-jslint"
             ;;
           14)
             aur_package_install "mysql-workbench"
@@ -3871,12 +3873,13 @@ case "$1" in
             while [[ 1 ]]
             do
               print_title "VIDEO EDITORS|TOOLS"
-              echo " 1) $(menu_item "arista-transcoder" "Arista")"
-              echo " 2) $(menu_item "transmageddon")"
-              echo " 3) $(menu_item "kdeenlive")"
-              echo " 4) $(menu_item "openshot")"
-              echo " 5) $(menu_item "pitivi")"
-              echo " 6) $(menu_item "kazam-bzr") $AUR"
+              echo " 1) $(menu_item "avidemux-gtk avidemux-qt" "Avidemux")"
+              echo " 2) $(menu_item "arista-transcoder" "Arista") $AUR"
+              echo " 3) $(menu_item "transmageddon")"
+              echo " 4) $(menu_item "kdeenlive")"
+              echo " 5) $(menu_item "openshot")"
+              echo " 6) $(menu_item "pitivi")"
+              echo " 7) $(menu_item "kazam-bzr") $AUR"
               echo ""
               echo " b) BACK"
               echo ""
@@ -3885,22 +3888,28 @@ case "$1" in
               for OPT in ${OPTIONS[@]}; do
                 case "$OPT" in
                   1)
-                    package_install "arista-transcoder"
+                    if [[ $KDE -eq 1 ]]; then
+                      package_install "avidemux-qt"
+                    else
+                      package_install "avidemux-gtk"
+                    fi
                     ;;
                   2)
-                    package_install "transmageddon"
+                    aur_package_install "arista-transcoder"
                     ;;
                   3)
-                    package_install "kdenlive"
+                    package_install "transmageddon"
                     ;;
                   4)
-                    package_install "openshot"
+                    package_install "kdenlive"
                     ;;
                   5)
-                    package_install "pitivi"
+                    package_install "openshot"
                     ;;
                   6)
-                    aur_package_install "python-rsvg"
+                    package_install "pitivi"
+                    ;;
+                  7)
                     aur_package_install "kazam-bzr"
                     ;;
                   "b")
