@@ -358,11 +358,12 @@ case "$1" in
     select OPT in "${PARTITION_APP[@]}"; do
       case "$REPLY" in
         1)
-          cfdisk
+          read -p "You must specify a drive [ex: sda]: " DEVICE
+          cfdisk /dev/$DEVICE
           break
           ;;
         2)
-          read -p "You must specify drive [ex: sda]: " DEVICE
+          read -p "You must specify a drive [ex: sda]: " DEVICE
           gdisk /dev/$DEVICE
           break
           ;;
@@ -718,6 +719,11 @@ case "$1" in
     cp -R `pwd` $MOUNTPOINT/root
     read_input_text "Reboot system"
     if [[ $OPTION == y ]]; then
+      #umount mounted partitions
+      mounted_partitions=(`findmnt --fstab -o TARGET -t noswap,notmpfs | grep /mnt`)
+      for i in ${mounted_partitions[@]}; do
+        umount $i
+      done
       reboot
     fi
     exit 0
@@ -726,7 +732,6 @@ case "$1" in
 
   print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
   print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
-  print_warning "\tThis option still in beta* stage"
   pause_function
   pacman -Sy
   while [[ 1 ]]
