@@ -383,7 +383,7 @@ case "$1" in
     partitions=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd'`)
     device_name=("root" "swap" "another")
     select_filesystem(){
-      filesystem=("ext4" "ext3" "ext2" "btrfs" "vfat" "ntfs");
+      filesystem=("ext4" "ext3" "ext2" "btrfs" "vfat" "ntfs" "jfs" "xfs");
       PS3="$prompt1"
       echo -e "Select filesystem:\n"
       select OPT in "${filesystem[@]}"; do
@@ -2396,7 +2396,7 @@ case "$1" in
         package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
         package_install "xdg-user-dirs"
         #package_install "kde-telepathy telepathy"
-        package_remove "kdemultimedia-kscd kdemultimedia-juk"
+        package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite"
         aur_package_install "kde-gtk-config-git"
         aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
         config_xinitrc "startkde"
