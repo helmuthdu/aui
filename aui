@@ -1179,27 +1179,27 @@ case "$1" in
     print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
     print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
     print_warning "\tNone of these tools are officially supported by Arch devs."
-    aurhelper=("Pacaur (recommended)" "Packer" "Yaourt")
+    aurhelper=("Yaourt (recommended)" "Packer" "Pacaur")
     PS3="$prompt1"
     echo -e "Choose your default AUR helper to install\n"
     select OPT in "${aurhelper[@]}"; do
       case "$REPLY" in
         1)
-          if ! check_package "pacaur" ; then
-            package_install "base-devel yajl expac"
-            pacman -D --asdeps yajl expac
-            #fix pod2man path
-            ln -s /usr/bin/core_perl/pod2man /usr/bin/
-            aui_download_packages "cower pacaur"
-            pacman -D --asdeps cower
-            if ! check_package "pacaur" ; then
-              echo "Pacaur not installed. EXIT now"
+          print_title "YAOURT - https://wiki.archlinux.org/index.php/Yaourt"
+          print_info "Yaourt (Yet AnOther User Repository Tool) is a community-contributed wrapper for pacman which adds seamless access to the AUR, allowing and automating package compilation and installation from your choice of the thousands of PKGBUILDs in the AUR, in addition to the many thousands of available Arch Linux binary packages."
+          if ! check_package "yaourt" ; then
+            package_install "base-devel yajl namcap"
+            pacman -D --asdeps yajl namcap
+            aui_download_packages "package-query yaourt"
+            pacman -D --asdeps package-query
+            if ! check_package "yaourt" ; then
+              echo "Yaourt not installed. EXIT now"
               pause_function
               exit 0
             fi
           fi
           CURRENT_STATUS=1
-          AUR_HELPER="pacaur"
+          AUR_HELPER="yaourt"
           break
           ;;
         2)
@@ -1218,21 +1218,21 @@ case "$1" in
           break
           ;;
         3)
-          print_title "YAOURT - https://wiki.archlinux.org/index.php/Yaourt"
-          print_info "Yaourt (Yet AnOther User Repository Tool) is a community-contributed wrapper for pacman which adds seamless access to the AUR, allowing and automating package compilation and installation from your choice of the thousands of PKGBUILDs in the AUR, in addition to the many thousands of available Arch Linux binary packages."
-          if ! check_package "yaourt" ; then
-            package_install "base-devel yajl namcap"
-            pacman -D --asdeps yajl namcap
-            aui_download_packages "package-query yaourt"
-            pacman -D --asdeps package-query
-            if ! check_package "yaourt" ; then
-              echo "Yaourt not installed. EXIT now"
+          if ! check_package "pacaur" ; then
+            package_install "base-devel yajl expac"
+            pacman -D --asdeps yajl expac
+            #fix pod2man path
+            ln -s /usr/bin/core_perl/pod2man /usr/bin/
+            aui_download_packages "cower pacaur"
+            pacman -D --asdeps cower
+            if ! check_package "pacaur" ; then
+              echo "Pacaur not installed. EXIT now"
               pause_function
               exit 0
             fi
           fi
           CURRENT_STATUS=1
-          AUR_HELPER="yaourt"
+          AUR_HELPER="pacaur"
           break
           ;;
         *)
