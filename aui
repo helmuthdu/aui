@@ -1766,7 +1766,7 @@ case "$1" in
         package_install "openbsd-netcat vidalia privoxy git"
         if [[ ! -f /usr/bin/proxy-wrapper ]]; then
           echo 'forward-socks5   /               127.0.0.1:9050 .' >> /etc/privoxy/config
-          echo -e '#!/bin/bash\nnc.openbsd -xlocalhost:9050 -X5 $*' > /usr/bin/proxy-wrapper
+          echo -e '#!/bin/bash\nnc -xlocalhost:9050 -X5 $*' > /usr/bin/proxy-wrapper
           chmod +x /usr/bin/proxy-wrapper
           echo -e '\nexport GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"' >> /etc/bash.bashrc
           export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
