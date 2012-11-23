@@ -4726,7 +4726,7 @@ case "$1" in
               echo " 3) $(menu_item "eidete-bzr") (screencasting)"
               echo " 4) $(menu_item "dexter-contacts-bzr") (contacts manager)"
               echo " 5) $(menu_item "feedler-bzr") (RSS feeds Reader)"
-              echo " 6) $(menu_item "files-bzr") (file manager)"
+              echo " 6) $(menu_item "pantheon-files-bzr") (file manager)"
               echo " 7) $(menu_item "footnote-bzr") (note taking)"
               echo " 8) $(menu_item "gala-bzr") (compositing manager)"
               echo " 9) $(menu_item "geary-git") (email client)"
@@ -4735,13 +4735,15 @@ case "$1" in
               echo "12) $(menu_item "midori") (web browser)"
               echo "13) $(menu_item "noise-bzr") (audio player)"
               echo "14) $(menu_item "scratch-bzr") (text editor)"
-              echo "15) $(menu_item "plank-bzr") (dock)"
+              echo "15) $(menu_item "pantheon-dock-bzr") (dock)"
               echo "16) $(menu_item "pantheon-terminal-bzr") (terminal)"
               echo "17) $(menu_item "slingshot-bzr") (app launcher)"
-              echo "18) $(menu_item "switchboard-bzr") (desktop settings hub)"
-              echo "19) $(menu_item "wingpanel-bzr") (indicators topbar)"
-              echo "20) $(menu_item "elementary-icons-bzr" "Elementary Icons")"
-              echo "21) $(menu_item "egtk-bzr" "Elementary Theme")"
+              echo "18) $(menu_item "snap-elementary-bzr") (photo booth)"
+              echo "19) $(menu_item "switchboard-bzr") (desktop settings hub)"
+              echo "20) $(menu_item "wingpanel-bzr") (indicators topbar)"
+              echo "21) $(menu_item "elementary-icons-bzr" "elementary icons")"
+              echo "22) $(menu_item "egtk-bzr" "elementary theme")"
+              echo "23) $(menu_item "cerbere-bzr" "session manager")"
               echo ""
               echo " b) BACK"
               echo ""
@@ -4765,13 +4767,13 @@ case "$1" in
                     aur_package_install "feedler-bzr"
                     ;;
                   6)
-                    aur_package_install "files-bzr tumbler"
+                    aur_package_install "pantheon-files-bzr tumbler"
                     ;;
                   7)
                     aur_package_install "footnote-bzr"
                     ;;
                   8)
-                    aur_package_install "footnote-bzr"
+                    aur_package_install "gala-bzr"
                     ;;
                   9)
                     aur_package_install "geary-git"
@@ -4792,7 +4794,7 @@ case "$1" in
                     aur_package_install "scratch-bzr"
                     ;;
                   15)
-                    aur_package_install "plank-bzr"
+                    aur_package_install "pantheon-dock-bzr"
                     ;;
                   16)
                     aur_package_install "pantheon-terminal-bzr"
@@ -4801,17 +4803,23 @@ case "$1" in
                     aur_package_install "slingshot-bzr"
                     ;;
                   18)
-                    aur_package_install "switchboard-bzr"
+                    aur_package_install "snap-elementary-bzr"
                     ;;
                   19)
-                    aur_package_install "wingpanel-bzr"
+                    aur_package_install "switchboard-bzr"
                     ;;
                   20)
+                    aur_package_install "wingpanel-bzr"
+                    ;;
+                  21)
                     aur_package_install "elementary-icons-bzr"
                     gtk-update-icon-cache -f /usr/share/icons/elementary
                     ;;
-                  21)
+                  22)
                     aur_package_install "egtk-bzr"
+                    ;;
+                  23)
+                    aur_package_install "cerbere-bzr"
                     ;;
                   "b")
                     break
