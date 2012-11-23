@@ -1124,10 +1124,10 @@ case "$1" in
     }
     #}}}
     print_title "SELECT/CREATE USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
-    users=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
+    users_list=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
     PS3="$prompt1"
     echo "Avaliable Users:"
-    if [[ $(( ${#users[@]} )) -gt 0 ]]; then
+    if [[ $(( ${#users_list[@]} )) -gt 0 ]]; then
       print_warning "WARNING: THE SELECTED USER MUST HAVE SUDO PRIVILEGES"
     else
       echo ""
