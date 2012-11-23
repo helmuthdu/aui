@@ -1699,7 +1699,7 @@ case "$1" in
           echo " d) DONE"
           echo ""
           FIRMWARE_OPTIONS+=" d"
-          read_input_options "FIRMWARE_OPTIONS"
+          read_input_options "$FIRMWARE_OPTIONS"
           for OPT in ${OPTIONS[@]}; do
             case "$OPT" in
               1)
