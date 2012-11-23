@@ -1132,11 +1132,11 @@ case "$1" in
     else
       echo ""
     fi
-    select OPT in "${users[@]}" "Create new user"; do
+    select OPT in "${users_list[@]}" "Create new user"; do
       if [[ $OPT == "Create new user" ]]; then
         create_new_user
         break
-      elif contains_element "$OPT" "${users[@]}"; then
+      elif contains_element "$OPT" "${users_list[@]}"; then
         USERNAME=$OPT
         break
       else
