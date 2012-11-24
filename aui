@@ -635,6 +635,32 @@ case "$1" in
     select BOOTLOADER in "${bootloader[@]}"; do
       case "$REPLY" in
         1)
+          # IS UEFI MODE {{{
+          is_uefi_mode()
+          {
+            if [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Inc.' ]] || [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Computer, Inc.' ]]; then
+              modprobe -r -q efivars || true  # if MAC
+            else
+              modprobe -q efivars             # all others
+            fi
+            if [ -d "/sys/firmware/efi/vars/" ]; then
+              UEFI=1
+              echo "UEFI Mode Test Passed."
+              pause_function
+              if [[ $ARCHI == i686 ]]; then
+                pacstrap $MOUNTPOINT grub-efi-i386
+              else
+                pacstrap $MOUNTPOINT grub-efi-x86_64
+              fi
+            else
+              UEFI=0
+              print_warn "UEFI Mode Test Failed!"
+              print_info "UEFI Installation will not work correctly, switching to BIOS mode."
+              pause_function
+              pacstrap $MOUNTPOINT grub-bios
+            fi
+          }
+          #}}}
           SYSTEM_TYPE=("BIOS" "UEFI");
           PS3="$prompt1"
           echo -e "Select system:"
@@ -645,13 +671,8 @@ case "$1" in
                 break
                 ;;
               2)
-
-                if [[ $ARCHI == i686 ]]; then
-                  pacstrap $MOUNTPOINT grub-efi-i386
-                else
-                  pacstrap $MOUNTPOINT grub-efi-x86_64
-                fi
-                UEFI=1
+                modprobe efivars
+                is_uefi_mode
                 break
                 ;;
               *)
