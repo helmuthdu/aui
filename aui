@@ -351,7 +351,7 @@ case "$1" in
   #CREATE PARTITION {{{
   create_partition(){
     select_device(){
-      devices_list=(`fdisk -l | grep "Disk /dev/" | awk '{print $2}' | sed 's/://'`);
+      devices_list=(`fdisk -l | grep 'Disk /dev/sd\|Disk /dev/hd' | awk '{print $2}' | sed 's/://'`);
       PS3="$prompt1"
       echo -e "Select device:\n"
       select DEVICE in "${devices_list[@]}"; do
@@ -370,7 +370,7 @@ case "$1" in
     select APP in "${partition_app[@]}"; do
       if contains_element "$APP" "${partition_app[@]}"; then
         select_device
-        $APP /dev/$DEVICE
+        $APP $DEVICE
         break
       else
         invalid_option
