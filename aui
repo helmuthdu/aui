@@ -335,9 +335,9 @@ case "$1" in
         fi
       done
     }
-    print_title "REFLECTOR - https://wiki.archlinux.org/index.php/Reflector"
+    print_title "MIRRORLIST|REFLECTOR - https://wiki.archlinux.org/index.php/Reflector"
     print_info "Reflector is a script which can retrieve the latest mirror list from the MirrorStatus page, filter the most up-to-date mirrors, sort them by speed and overwrite the file /etc/pacman.d/mirrorlist."
-    package_install "reflector"
+    pacman -S reflector --noconfirm
     OPTION=n
     while [[ $OPTION != y ]]; do
       country_list
@@ -350,27 +350,31 @@ case "$1" in
   #}}}
   #CREATE PARTITION {{{
   create_partition(){
+    select_device(){
+      devices_list=(`fdisk -l | grep "Disk /dev/" | awk '{print $2}' | sed 's/://'`);
+      PS3="$prompt1"
+      echo -e "Select device:\n"
+      select DEVICE in "${devices_list[@]}"; do
+        if contains_element "$DEVICE" "${devices_list[@]}"; then
+          break
+        else
+          invalid_option
+        fi
+      done
+    }
     print_title "https://wiki.archlinux.org/index.php/Partitioning"
     print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
-    PARTITION_APP=("cfdisk" "gdisk");
+    partition_app=("cfdisk" "cgdisk");
     PS3="$prompt1"
     echo -e "Select partition program:"
-    select OPT in "${PARTITION_APP[@]}"; do
-      case "$REPLY" in
-        1)
-          read -p "You must specify a drive [ex: sda]: " DEVICE
-          cfdisk /dev/$DEVICE
-          break
-          ;;
-        2)
-          read -p "You must specify a drive [ex: sda]: " DEVICE
-          cgdisk /dev/$DEVICE
-          break
-          ;;
-        *)
-          invalid_option
-          ;;
-      esac
+    select APP in "${partition_app[@]}"; do
+      if contains_element "$APP" "${partition_app[@]}"; then
+        select_device
+        $APP /dev/$DEVICE
+        break
+      else
+        invalid_option
+      fi
     done
   }
   #}}}
