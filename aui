@@ -390,9 +390,8 @@ case "$1" in
       filesystem=("ext4" "ext3" "ext2" "btrfs" "vfat" "ntfs" "jfs" "xfs");
       PS3="$prompt1"
       echo -e "Select filesystem:\n"
-      select OPT in "${filesystem[@]}"; do
-        if contains_element "$OPT" "${filesystem[@]}"; then
-          TYPE=$OPT
+      select TYPE in "${filesystem[@]}"; do
+        if contains_element "$TYPE" "${filesystem[@]}"; then
           break
         else
           invalid_option
