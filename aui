@@ -1023,7 +1023,7 @@ case "$1" in
             break
             ;;
           2)
-            cp /etc/skel/.bashrc ~/home/$USERNAME
+            cp /etc/skel/.bashrc /home/$USERNAME
             break
             ;;
           3)
