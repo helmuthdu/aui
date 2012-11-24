@@ -636,7 +636,7 @@ case "$1" in
       case "$REPLY" in
         1)
           # IS UEFI MODE {{{
-          is_uefi_mode()
+          is_uefi_or_bios()
           {
             if [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Inc.' ]] || [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Computer, Inc.' ]]; then
               modprobe -r -q efivars || true  # if MAC
@@ -645,8 +645,7 @@ case "$1" in
             fi
             if [ -d "/sys/firmware/efi/vars/" ]; then
               UEFI=1
-              echo "UEFI Mode Test Passed."
-              pause_function
+              echo "UEFI Mode detected"
               if [[ $ARCHI == i686 ]]; then
                 pacstrap $MOUNTPOINT grub-efi-i386
               else
@@ -654,32 +653,13 @@ case "$1" in
               fi
             else
               UEFI=0
-              print_warn "UEFI Mode Test Failed!"
-              print_info "UEFI Installation will not work correctly, switching to BIOS mode."
+              echo "BIOS Mode detected"
               pause_function
               pacstrap $MOUNTPOINT grub-bios
             fi
           }
           #}}}
-          SYSTEM_TYPE=("BIOS" "UEFI");
-          PS3="$prompt1"
-          echo -e "Select system:"
-          select OPT in "${SYSTEM_TYPE[@]}"; do
-            case "$REPLY" in
-              1)
-                pacstrap $MOUNTPOINT grub-bios
-                break
-                ;;
-              2)
-                modprobe efivars
-                is_uefi_mode
-                break
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-          done
+          is_uefi_or_bios
           #make grub automatically detect others OS
           pacstrap $MOUNTPOINT os-prober
           break
