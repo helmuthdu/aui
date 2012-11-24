@@ -364,7 +364,7 @@ case "$1" in
     }
     print_title "https://wiki.archlinux.org/index.php/Partitioning"
     print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
-    partition_app=("cfdisk" "cgdisk");
+    partition_app=("cfdisk" "cgdisk" "gdisk");
     PS3="$prompt1"
     echo -e "Select partition program:"
     select APP in "${partition_app[@]}"; do
