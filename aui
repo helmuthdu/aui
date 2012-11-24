@@ -337,7 +337,7 @@ case "$1" in
     }
     print_title "MIRRORLIST|REFLECTOR - https://wiki.archlinux.org/index.php/Reflector"
     print_info "Reflector is a script which can retrieve the latest mirror list from the MirrorStatus page, filter the most up-to-date mirrors, sort them by speed and overwrite the file /etc/pacman.d/mirrorlist."
-    pacman -S reflector --noconfirm
+    pacman -S reflector --needed --noconfirm
     OPTION=n
     while [[ $OPTION != y ]]; do
       country_list
