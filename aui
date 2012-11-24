@@ -364,7 +364,7 @@ case "$1" in
           ;;
         2)
           read -p "You must specify a drive [ex: sda]: " DEVICE
-          gdisk /dev/$DEVICE
+          cgdisk /dev/$DEVICE
           break
           ;;
         *)
