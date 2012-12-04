@@ -1450,7 +1450,7 @@ case "$1" in
     case "$OPTION" in
       "y")
         aur_package_install "zramswap"
-        systemctl enable zram.service
+        systemctl enable zramswap.service
         CURRENT_STATUS=1
         ;;
       *)
@@ -1812,7 +1812,7 @@ case "$1" in
             5)
               aur_package_install "elementary-icons-bzr"
               gtk-update-icon-cache -f /usr/share/icons/elementary
-              read_input_text "Install also the elementary XFCE icons"
+              read_input_text "Install the elementary XFCE icons"
               if [[ $OPTION == y ]]; then
                 aur_package_install "elementary-xfce-icons"
                 gtk-update-icon-cache -f /usr/share/icons/elementary-xfce
@@ -1847,10 +1847,12 @@ case "$1" in
         echo " 1) $(menu_item "adwaita-x-dark-and-light-theme" "Adwaita-X")"
         echo " 2) $(menu_item "xfce-theme-blackbird" "Blackbird")"
         echo " 3) $(menu_item "xfce-theme-bluebird" "Bluebird")"
-        echo " 4) $(menu_item "egtk-bzr" "eGTK")"
+        echo " 4) $(menu_item "xfce-theme-greybird" "Greybird")"
         echo " 5) $(menu_item "faience-themes" "Faience")"
-        echo " 6) $(menu_item "xfce-theme-greybird" "Greybird")"
-        echo " 7) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
+        echo " 6) $(menu_item "gtk-theme-gnome-cupertino" "Gnome Cupertino")"
+        echo " 7) $(menu_item "mediterraneannight-theme" "MediterraneanNight")"
+        echo " 8) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
+        echo " 9) $(menu_item "zukitwo-themes" "Zukitwo")"
         echo ""
         echo " b) BACK"
         echo ""
@@ -1868,16 +1870,22 @@ case "$1" in
               aur_package_install "xfce-theme-bluebird"
               ;;
             4)
-              aur_package_install "egtk-bzr"
+              aur_package_install "xfce-theme-greybird"
               ;;
             5)
               aur_package_install "faience-themes"
               ;;
             6)
-              aur_package_install "xfce-theme-greybird"
+              aur_package_install "gtk-theme-gnome-cupertino"
               ;;
             7)
+              aur_package_install "mediterraneannight-theme"
+              ;;
+            8)
               aur_package_install "light-themes"
+              ;;
+            9)
+              aur_package_install "zukitwo-themes"
               ;;
             "b")
               break
@@ -1980,7 +1988,7 @@ case "$1" in
           echo " 6) $(menu_item "rxvt-unicode")"
           echo " 7) $(menu_item "scrot")"
           echo " 8) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
-          echo " 9) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
+          echo " 9) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
           echo "10) $(menu_item "thunar")"
           echo "11) $(menu_item "tint2")"
           echo "12) $(menu_item "volwheel")"
@@ -2073,7 +2081,7 @@ case "$1" in
           echo " 1) $(menu_item "cinnamon-applets") $AUR"
           echo " 2) $(menu_item "cinnamon-themes") $AUR"
           echo " 3) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
-          echo " 4) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
+          echo " 4) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
           echo " 5) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
           echo ""
           echo " d) DONE"
@@ -2148,7 +2156,7 @@ case "$1" in
           echo " 7) $(menu_item "pcmanfm" "PCManFM")"
           echo " 8) $(menu_item "rxvt-unicode")"
           echo " 9) $(menu_item "scrot")"
-          echo "10) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
+          echo "10) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
           echo "11) $(menu_item "thunar")"
           echo "12) $(menu_item "xfburn")"
           echo ""
@@ -2234,7 +2242,7 @@ case "$1" in
         do
           print_title "GNOME CUSTOMIZATION"
           echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
-          echo " 2) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
+          echo " 2) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
           echo " 3) $(menu_item "disper gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git" "GNOME Shell Extensions") $AUR"
           echo " 4) $(menu_item "gnome-shell-theme-elegance" "GNOME Shell Themes") $AUR"
           echo " 5) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
@@ -2316,6 +2324,7 @@ case "$1" in
                 do
                   print_title "GNOMESHELL THEMES"
                   echo " 1) $(menu_item "gnome-shell-theme-elegance")"
+                  echo " 2) $(menu_item "gnome-shell-theme-eos")"
                   echo ""
                   echo " b) BACK"
                   echo ""
@@ -2325,6 +2334,9 @@ case "$1" in
                     case "$OPT" in
                       1)
                         aur_package_install "gnome-shell-theme-elegance"
+                        ;;
+                      2)
+                        aur_package_install "gnome-shell-theme-eos"
                         ;;
                       "b")
                         break
@@ -2473,7 +2485,7 @@ case "$1" in
           print_title "LXDE CUSTOMIZATION"
           echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
           echo " 2) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
-          echo " 3) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
+          echo " 3) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
           echo " 4) $(menu_item "viewnior")"
           echo " 5) $(menu_item "xfburn")"
           echo ""
@@ -2536,7 +2548,7 @@ case "$1" in
         do
           print_title "MATE CUSTOMIZATION"
           echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
-          echo " 2) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
+          echo " 2) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
           echo " 3) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
           echo ""
           echo " d) DONE"
@@ -2607,7 +2619,7 @@ case "$1" in
           echo " 6) $(menu_item "rxvt-unicode")"
           echo " 7) $(menu_item "scrot")"
           echo " 8) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
-          echo " 9) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
+          echo " 9) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
           echo "10) $(menu_item "thunar")"
           echo "11) $(menu_item "tint2")"
           echo "12) $(menu_item "volwheel")"
@@ -2694,7 +2706,7 @@ case "$1" in
         do
           print_title "XFCE CUSTOMIZATION"
           echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
-          echo " 2) $(menu_item "xfce-theme-blackbird xfce-theme-bluebird egtk-bzr xfce-theme-greybird light-themes faience-themes" "GTK Themes") $AUR"
+          echo " 2) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
           echo " 3) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
           echo ""
           echo " d) DONE"

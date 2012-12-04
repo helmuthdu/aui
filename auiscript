@@ -140,7 +140,8 @@
     #}}}
     #GNOME SHELL THEMES {{{
       # 1) Elegance
-      GNOME_SHELL_THEMES="1"
+      # 2) eOS
+      GNOME_SHELL_THEMES="1 2"
     #}}}
   #}}}
   #KDE {{{
@@ -187,11 +188,13 @@
     # 1) Adwaita-X
     # 2) Blackbird
     # 3) Bluebird
-    # 4) eGTK
+    # 4) Greybird
     # 5) Faience
-    # 6) Greybird
-    # 7) Light (Aka Ambiance/Radiance)
-    GTK_THEMES="1-7"
+    # 6) Gnome Cupertino
+    # 7) MediterraneanNight
+    # 8) Light (Aka Ambiance/Radiance)
+    # 9) Zukitwo
+    GTK_THEMES="4-9"
   #}}}
   #DISPLAY MANAGER {{{
     # 1) Elsa
