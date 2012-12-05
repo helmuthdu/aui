@@ -46,14 +46,8 @@
   TLP="n"
   ZRAM="y"
   #VIDEOCARD {{{
-    # 1) Intel
-    # 2) ATI
-    # 3) nVidia
-    # 4) Nouveau
-    # 5) Poulsbo
-    # 6) Virtualbox
-    # 7) Vesa
-    VIDEOCARD=2
+    #enable proprietary drive from nvidia intead of the nouveau
+    NVIDIA=0
   #}}}
   #ADDITIONAL FIRMWARE {{{
     # 1) alsa-firmware
