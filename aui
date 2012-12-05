@@ -60,9 +60,9 @@
   # EDITOR {{{
     AUTOMATIC_MODE=0
     if [[ -f /usr/bin/vim ]]; then
-      EDITOR=vim
+      EDITOR="vim"
     elif [[ -z $EDITOR ]]; then
-      EDITOR=nano
+      EDITOR="nano"
     fi
   #}}}
   UEFI=0
@@ -288,35 +288,16 @@ case "$1" in
   #DEFAULT EDITOR {{{
   select_editor(){
     print_title "DEFAULT EDITOR"
-    EDITORS=("emacs" "nano" "vi" "vim");
+    editors_list=("emacs" "nano" "vi" "vim");
     PS3="$prompt1"
-    echo -e "Select default editor:"
-    select OPT in "${EDITORS[@]}"; do
-      case "$REPLY" in
-        1)
-          pacman -Sy
-          package_install "emacs"
-          EDITOR=emacs
-          break
-          ;;
-        2)
-          EDITOR=nano
-          break
-          ;;
-        3)
-          EDITOR=vi
-          break
-          ;;
-        4)
-          pacman -Sy
-          package_install "vim"
-          EDITOR=vim
-          break
-          ;;
-        *)
-          invalid_option
-          ;;
-      esac
+    echo -e "Select editor\n"
+    select EDITOR in "${editors_list[@]}"; do
+      if contains_element "$EDITOR" "${editors_list[@]}"; then
+        package_install "$EDITOR"
+        break
+      else
+        invalid_option
+      fi
     done
   }
   #}}}
@@ -1094,7 +1075,7 @@ case "$1" in
           invalid_option
         fi
       done
-      echo "EDITOR=$EDITOR" >> /home/$USERNAME/.bashrc
+      echo "EDITOR=\"$EDITOR\"" >> /home/$USERNAME/.bashrc
       #}}}
       chown -R $USERNAME:users /home/$USERNAME
     }
