@@ -1,6 +1,7 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
 #Created by helmuthdu mailto: helmuthdu[at]gmail[dot]com
+#Contribution: flexiondotorg
 #-------------------------------------------------------------------------------
 #This program is free software: you can redistribute it and/or modify
 #it under the terms of the GNU General Public License as published by
@@ -18,19 +19,8 @@
 # Run this script after your first boot with archlinux (as root)
 
 #VARIABLES {{{
-  # DESKTOP ENVIRONMENT {{{
-    E17=0
-    GNOME=0
-    KDE=0
-    LXDE=0
-    OPENBOX=0
-    XFCE=0
-  #}}}
   # MAIN MENU {{{
     checklist=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
-  #}}}
-  # ARCH {{{
-    ARCHI=`uname -m`
   #}}}
   # COLORS {{{
     # Regular Colors
@@ -65,12 +55,154 @@
       EDITOR="nano"
     fi
   #}}}
+  ARCHI=`uname -m`
   UEFI=0
   AUR=`echo -e "(${BPurple}aur${White})"`
   AUI_DIR=`pwd`
   MOUNTPOINT="/mnt"
+  SPIN="/-\|"
+  KDE=0
+  NVIDIA=0
+  #verbose mode
+  if [[ $1 == "-v" || $1 == "--verbose" ]]; then
+    VERBOSE_MODE=1
+  else
+    VERBOSE_MODE=0
+  fi
+  #log file
+  LOG="${PWD}/`basename ${0}`.log"
+  rm $LOG 2>/dev/null
 #}}}
-#SUPPORT FUNCTIONS {{{
+#COMMON FUNCTIONS {{{
+  error_msg() { #{{{
+    local MSG="${1}"
+    echo "${MSG}"
+    exit 1
+  } #}}}
+  cecho() { #{{{
+    echo -e "$1"
+    echo -e "$1" >>"$LOG"
+    tput sgr0;
+  } #}}}
+  ncecho() { #{{{
+    echo -ne "$1"
+    echo -ne "$1" >>"$LOG"
+    tput sgr0
+  } #}}}
+  spinny() { #{{{
+    echo -ne "\b${SPIN:i++%${#SPIN}:1}"
+  } #}}}
+  progress() { #{{{
+    ncecho "  ";
+    while [ /bin/true ]; do
+      kill -0 $pid 2>/dev/null;
+      if [[ $? = "0" ]]; then
+        spinny
+        sleep 0.25
+      else
+        ncecho "\b\b";
+        wait $pid
+        retcode=$?
+        echo "$pid's retcode: $retcode" >> "$LOG"
+        if [[ $retcode = "0" ]] || [[ $retcode = "255" ]]; then
+          cecho success
+        else
+          cecho failed
+          echo -e " [i] Showing the last 10 lines from $LOG";
+          tail -n10 "$LOG"
+          exit 1;
+        fi
+        break 1; #was2
+      fi
+    done
+  } #}}}
+  check_root() { #{{{
+    if [ "$(id -u)" != "0" ]; then
+      error_msg "ERROR! You must execute the script as the 'root' user."
+    fi
+  } #}}}
+  check_user() { #{{{
+    if [ "$(id -u)" == "0" ]; then
+      error_msg "ERROR! You must execute the script as a normal user."
+    fi
+  } #}}}
+  check_archlinux() { #{{{
+    if [ ! -e /etc/arch-release ]; then
+      error_msg "ERROR! You must execute the script on Arch Linux."
+    fi
+  } #}}}
+  check_hostname() { #{{{
+    if [ `echo ${HOSTNAME} | sed 's/ //g'` == "" ]; then
+      error_msg "ERROR! Hostname is not configured."
+    fi
+  } #}}}
+  check_domainname() { #{{{
+    DOMAINNAME=`echo ${HOSTNAME} | cut -d'.' -f2- | sed 's/ //g'`
+
+    # Hmm, still no domain name. Keep looking...
+    if [ "${DOMAINNAME}" == "" ]; then
+      DOMAINNAME=`grep domain /etc/resolv.conf | sed 's/domain //g' | sed 's/ //g'`
+    fi
+
+    # OK, give up.
+    if [ "${DOMAINNAME}" == "" ]; then
+      error_msg "ERROR! Domain name is not configured."
+    fi
+  } #}}}
+  check_ip() { #{{{
+    IP_ADDR=`ip addr 2>/dev/null | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' | egrep -v '255|(127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})' | sed 's/ //g'`
+    if [ $? -ne 0 ]; then
+      error_msg "ERROR! Could not find valid IP address."
+    fi
+  } #}}}
+  check_vga() { #{{{
+    # Determine video chipset - only Intel, ATI and nvidia are supported by this script"
+    ncecho "${BBlue}==>${White} Detecting video chipset "
+    local VGA=`lspci | grep VGA`
+    echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q nvidia
+    if [ $? -eq 0 ]; then
+      cecho Nvidia
+      read_input_text "Install proprietary drive of your NVIDIA card"
+      if [[ $OPTION == y ]]; then
+        NVIDIA=1
+      else
+        VIDEO_DRIVER="nouveau"
+        VIDEO_KERNEL="nouveau"
+        VIDEO_ACCEL="vdpau-video"
+      fi
+    else
+      echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q "intel corporation"
+      if [ $? -eq 0 ]; then
+        cecho Intel
+        VIDEO_DRIVER="intel"
+        VIDEO_KERNEL="i915"
+        VIDEO_ACCEL="libva-intel-driver"
+      else
+        echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q "advanced micro devices"
+        if [ $? -eq 0 ]; then
+          cecho AMD/ATI
+          VIDEO_DRIVER="ati"
+          VIDEO_KERNEL="radeon"
+          VIDEO_ACCEL=""
+        else
+          cecho unknown
+          VIDEO_DRIVER=""
+          VIDEO_KERNEL=""
+          VIDEO_ACCEL=""
+        fi
+      fi
+    fi
+  } #}}}
+  check_wireless() { #{{{
+    lspci | grep -q BCM4312
+    if [ $? -eq 0 ]; then
+      WIRELESS_PKG="dkms-broadcom-wl"
+      WIRELESS_MOD="wl"
+    else
+      WIRELESS_PKG=""
+      WIRELESS_MOD=""
+    fi
+  } #}}}
   read_input(){ #{{{
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
       OPTION=$1
@@ -130,12 +262,49 @@
   start_module(){ #{{{
     modprobe $1
   } #}}}
+  replaceinfile() { #{{{
+    SEARCH=${1}
+    REPLACE=${2}
+    FILEPATH=${3}
+    FILEBASE=`basename ${3}`
+
+    sed -e "s/${SEARCH}/${REPLACE}/" ${FILEPATH} > /tmp/${FILEBASE} 2>"$LOG"
+    if [ ${?} -eq 0 ]; then
+      mv /tmp/${FILEBASE} ${FILEPATH}
+    else
+      cecho "failed: ${SEARCH} - ${FILEPATH}"
+    fi
+  } #}}}
   add_module(){ #{{{
+    #check if the number of arguments is less then 2
+    [[ $# -lt 2 ]] && MODULE_NAME="$1" || MODULE_NAME="$2";
+    echo "# Load $MODULE at boot" > /etc/modules-load.d/$MODULE_NAME.conf
     for MODULE in $1; do
-      echo "# Load $MODULE at boot" > /etc/modules-load.d/$MODULE.conf
-      echo "$MODULE" >> /etc/modules-load.d/$MODULE.conf
+      echo "$MODULE" >> /etc/modules-load.d/$MODULE_NAME.conf
       start_module "$MODULE"
     done
+  } #}}}
+  update_early_modules() { #{{{
+    local NEW_MODULE=${1}
+    local OLD_ARRAY=`egrep ^MODULES= /etc/mkinitcpio.conf`
+
+    if [[ -n ${NEW_MODULE} ]]; then
+      # Determine if the new module is already listed.
+      _EXISTS=`echo ${OLD_ARRAY} | grep ${NEW_MODULE}`
+      if [ $? -eq 1 ]; then
+
+        source /etc/mkinitcpio.conf
+        if [[ -z ${MODULES} ]]; then
+          NEW_MODULES="${NEW_MODULE}"
+        else
+          NEW_MODULES="${MODULES} ${NEW_MODULE}"
+        fi
+        replaceinfile "MODULES=\"${MODULES}\"" "MODULES=\"${NEW_MODULES}\"" /etc/mkinitcpio.conf
+        ncecho "${BBlue}==>${White} Rebuilding init "
+        mkinitcpio -p linux >>"$LOG" 2>&1 &
+        pid=$!;progress $pid
+      fi
+    fi
   } #}}}
   check_package(){ #{{{
     #check if a package is already installed
@@ -145,62 +314,99 @@
     return 1
   } #}}}
   checkbox(){ #{{{
-    #display [X] or [ ]
+    #display${BBlue}==>${White} or [ ]
     [[ "$1" -eq 1 ]] && echo -e "${BBlue}[${BWhite}X${BBlue}]${White}" || echo -e "${BBlue}[${White} ${BBlue}]${White}";
   } #}}}
   checkbox_package(){ #{{{
-    #check if [X] or [ ]
+    #check if${BBlue}==>${White} or [ ]
     check_package "$1" && checkbox 1 || checkbox 0
   } #}}}
-  aur_package_install(){ #{{{
-    #install package from aur
-    for PACKAGE in $1; do
-      if ! check_package "$PACKAGE" ; then
-        su - $USERNAME -c "$AUR_HELPER --noconfirm -S $PACKAGE"
-        #RECHECK #{{{
-        #check if the package wasnt installed
-        if ! check_package "$PACKAGE" ; then
-          if [[ $AUTOMATIC_MODE -eq 1 ]]; then
-            echo "$PACKAGE" >> packages_not_installed.txt
-          else
-            read_input_text "Package $PACKAGE not installed, try install again?"
-            [[ $OPTION == y ]] && su - $USERNAME -c "$AUR_HELPER -S $PACKAGE"
-          fi
-        fi
-        #}}}
-      else
-        echo -e "Warning: $PACKAGE is up to date --skipping"
-      fi
-    done
-  } #}}}
   aui_download_packages(){ #{{{
-    for PACKAGE in $1; do
+    for PKG in $1; do
       #exec command as user instead of root
-      su - $USERNAME -c "
+      su - ${USER_NAME} -c "
         [[ ! -d aui_packages ]] && mkdir aui_packages
         cd aui_packages
-        curl -o $PACKAGE.tar.gz https://aur.archlinux.org/packages/${PACKAGE:0:2}/$PACKAGE/$PACKAGE.tar.gz
-        tar zxvf $PACKAGE.tar.gz
-        rm $PACKAGE.tar.gz
-        cd $PACKAGE
+        curl -o $PKG.tar.gz https://aur.archlinux.org/packages/${PKG:0:2}/$PKG/$PKG.tar.gz
+        tar zxvf $PKG.tar.gz
+        rm $PKG.tar.gz
+        cd $PKG
         makepkg -si --noconfirm
       "
     done
   } #}}}
+  aur_package_install(){ #{{{
+    #install package from aur
+    for PKG in $1; do
+      if ! check_package "${PKG}" ; then
+        if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
+          ncecho "${BBlue}==>${White} Installing ${AUR} ${BWhite}${PKG}${White} "
+          su - ${USER_NAME} -c "${AUR_HELPER} --noconfirm -S ${PKG}" >>"$LOG" 2>&1 &
+          pid=$!;progress $pid
+        else
+          su - ${USER_NAME} -c "${AUR_HELPER} -S ${PKG}"
+        fi
+      else
+        if [[ $VERBOSE_MODE -eq 0 ]]; then
+          cecho "${BBlue}==>${White} Installing ${AUR} ${BWhite}${PKG}${White} success"
+        else
+          echo -e "Warning: ${PKG} is up to date --skipping"
+        fi
+      fi
+    done
+  } #}}}
   package_install(){ #{{{
     #install packages using pacman
-    if [[ $AUTOMATIC_MODE -eq 1 ]]; then
-      pacman -S --noconfirm --needed $1
+    if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
+      for PKG in ${1}; do
+        PKG_REPO=`pacman -Sp --print-format %r ${PKG} | uniq`
+        case $PKG_REPO in
+          "core")
+            PKG_REPO="${BRed}${PKG_REPO}${White}"
+            ;;
+          "extra")
+            PKG_REPO="${BYellow}${PKG_REPO}${White}"
+            ;;
+          "community")
+            PKG_REPO="${BGreen}${PKG_REPO}${White}"
+            ;;
+          "multilib")
+            PKG_REPO="${BCyan}${PKG_REPO}${White}"
+            ;;
+        esac
+        if ! check_package "${PKG}" ; then
+          ncecho "${BBlue}==>${White} Installing (${PKG_REPO}) ${BWhite}${PKG}${White} "
+          pacman -S --noconfirm --needed ${PKG} >>"$LOG" 2>&1 &
+          pid=$!;progress $pid
+        else
+          cecho "${BBlue}==>${White} Installing (${PKG_REPO}) ${BWhite}${PKG}${White} exists "
+        fi
+      done
     else
       pacman -S --needed $1
     fi
   } #}}}
   package_remove(){ #{{{
     #remove package
-    if [[ $AUTOMATIC_MODE -eq 1 ]]; then
-      pacman -Rcsn --noconfirm $1
+    if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
+      for PKG in ${1}; do
+        if ! check_package "${PKG}" ; then
+          ncecho "${BBlue}==>${White} Removing ${BWhite}${PKG}${White} "
+          pacman -Rcsn --noconfirm ${PKG} >>"$LOG" 2>&1 &
+          pid=$!;progress $pid
+        fi
+      done
     else
       pacman -Rcsn $1
+    fi
+  } #}}}
+  system_upgrade(){ #{{{
+    if [[ $VERBOSE_MODE -eq 0 ]]; then
+      ncecho "${BBlue}==>${White} Upgrading packages "
+      pacman -Syu --noconfirm --noprogress >>"$LOG" 2>&1 &
+      pid=$!;progress $pid
+    else
+      pacman -Syu $1
     fi
   } #}}}
   contains_element(){ #{{{
@@ -209,9 +415,9 @@
   } #}}}
   config_xinitrc(){ #{{{
     #create a xinitrc file in home user directory
-    cp -f /etc/skel/.xinitrc /home/$USERNAME/
-    echo -e "exec ck-launch-session $1" >> /home/$USERNAME/.xinitrc
-    chown -R $USERNAME:users /home/$USERNAME/.xinitrc
+    cp -fv /etc/skel/.xinitrc /home/${USER_NAME}/
+    echo -e "exec ck-launch-session $1" >> /home/${USER_NAME}/.xinitrc
+    chown -R ${USER_NAME}:users /home/${USER_NAME}/.xinitrc
   } #}}}
   invalid_option(){ #{{{
     print_line
@@ -223,18 +429,6 @@
     if [[ $AUTOMATIC_MODE -ne 1 ]]; then
       read -e -sn 1 -p "Press any key to continue..."
     fi
-  } #}}}
-  sumary(){ #{{{
-    case $CURRENT_STATUS in
-      1)
-        print_line
-        echo "$1 successful"
-        ;;
-      *)
-        print_line
-        echo "$1 not successful (Canceled)"
-        ;;
-    esac
   } #}}}
   menu_item(){ #{{{
     #check if the number of arguments is less then 2
@@ -251,6 +445,18 @@
   } #}}}
   elihw() { #{{{
     [[ $OPT == b || $OPT == d ]] && break;
+  } #}}}
+  add_user_to_group() { #{{{
+    local _USER=${1}
+    local _GROUP=${2}
+
+    if [[ -z ${_GROUP} ]]; then
+      error_msg "ERROR! 'add_user_to_group' was not given enough parameters."
+    fi
+
+    ncecho "${BBlue}==>${White} Adding ${BWhite}${_USER}${White} to ${BWhite}${_GROUP}${White} "
+    gpasswd -a ${_USER} ${_GROUP} >>"$LOG" 2>&1 &
+    pid=$!;progress $pid
   } #}}}
 #}}}
 
@@ -812,9 +1018,10 @@ case "$1" in
   --help  | -h)
   #HELP {{{
   echo "Usage: "  1>&2
-  echo " aui               - install programs and other stuffs"  1>&2
+  echo " aui               - install programs and other stuffs, aka default mode"  1>&2
   echo " aui --ais         - archlinux install scripts mode"  1>&2
   echo "Options: "  1>&2
+  echo " -v, --verbose     - Enable verbose in default mode"  1>&2
   echo " --help            - print this help text"  1>&2
   echo ""
   exit 1
@@ -834,27 +1041,17 @@ case "$1" in
     print_line
     echo "Script can be cancelled at any time with CTRL+C"
     print_line
-    echo "it's highly recommended that you read this script before using it"
     echo "This version is still in BETA. Send bugreports to: "
     echo "http://www.github.com/helmuthdu/aui"
     print_line
-    echo -e "\nSystem config backups:"
+    echo -e "\nBackups:"
     print_line
     # backup old configs
     [[ ! -f /etc/pacman.conf.aui ]] && cp -v /etc/pacman.conf /etc/pacman.conf.aui || echo "/etc/pacman.conf.aui";
     [[ -f /etc/ssh/sshd_config.aui ]] && echo "/etc/ssh/sshd_conf.aui";
     [[ -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && echo "/etc/X11/xorg.conf.d/10-evdev.conf.aui";
     pause_function
-  }
-  #}}}
-  #CHECK ROOT {{{
-  check_root() {
-    CURRENTUSER="$(whoami)"
-    if [[ $CURRENTUSER != root ]]; then
-      echo "Current user is NOT 'root'. EXIT now"
-      pause_function
-      exit 1
-    fi
+    echo ""
   }
   #}}}
   #LANGUAGE SELECTOR {{{
@@ -964,20 +1161,14 @@ case "$1" in
     fi
   }
   #}}}
-  #SYSTEM UPDATE {{{
-  system_upgrade(){
-    print_title "UPDATING YOUR SYSTEM"
-    pacman -Syu
-  }
-  #}}}
   #SELECT/CREATE USER {{{
   select_user(){
     #CREATE NEW USER {{{
     create_new_user(){
-      read -p "Username: " USERNAME
-      useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash $USERNAME
-      chfn $USERNAME
-      passwd $USERNAME
+      read -p "Username: " USER_NAME
+      useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash ${USER_NAME}
+      chfn ${USER_NAME}
+      passwd ${USER_NAME}
       pause_function
       configure_user_account
     }
@@ -995,14 +1186,14 @@ case "$1" in
             package_install "git"
             git clone https://github.com/helmuthdu/dotfiles
             cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc ~/
-            cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc /home/$USERNAME/
-            mkdir -p /home/$USERNAME/.config/fontconfig
-            cp -i dotfiles/fonts.conf /home/$USERNAME/.config/fontconfig
+            cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc /home/${USER_NAME}/
+            mkdir -p /home/${USER_NAME}/.config/fontconfig
+            cp -i dotfiles/fonts.conf /home/${USER_NAME}/.config/fontconfig
             rm -fr dotfiles
             break
             ;;
           2)
-            cp /etc/skel/.bashrc /home/$USERNAME
+            cp /etc/skel/.bashrc /home/${USER_NAME}
             break
             ;;
           3)
@@ -1010,7 +1201,7 @@ case "$1" in
             read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
             read -p "Enter your github repository [ex: aui]: " GITHUB_REPO
             git clone https://github.com/$GITHUB_USER/$GITHUB_REPO
-            cp -R $GITHUB_REPO/.* /home/$USERNAME/
+            cp -R $GITHUB_REPO/.* /home/${USER_NAME}/
             rm -fr $GITHUB_REPO
             break
             ;;
@@ -1040,8 +1231,8 @@ case "$1" in
                 1)
                   package_install "git"
                   git clone https://github.com/helmuthdu/vim
-                  mv vim /home/$USERNAME/.vim
-                  ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
+                  mv vim /home/${USER_NAME}/.vim
+                  ln -sf /home/${USER_NAME}/.vim/vimrc /home/${USER_NAME}/.vimrc
                   break
                   ;;
                 2)
@@ -1052,11 +1243,11 @@ case "$1" in
                   read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
                   read -p "Enter your github repository [ex: vim]: " GITHUB_REPO
                   git clone https://github.com/$GITHUB_USER/$GITHUB_REPO
-                  cp -R $GITHUB_REPO/.vim /home/$USERNAME/
+                  cp -R $GITHUB_REPO/.vim /home/${USER_NAME}/
                   if [[ -f $GITHUB_REPO/.vimrc ]]; then
-                    cp $GITHUB_REPO/.vimrc /home/$USERNAME/
+                    cp $GITHUB_REPO/.vimrc /home/${USER_NAME}/
                   else
-                    ln -sf /home/$USERNAME/.vim/vimrc /home/$USERNAME/.vimrc
+                    ln -sf /home/${USER_NAME}/.vim/vimrc /home/${USER_NAME}/.vimrc
                   fi
                   rm -fr $GITHUB_REPO
                   break
@@ -1075,9 +1266,9 @@ case "$1" in
           invalid_option
         fi
       done
-      echo "EDITOR=\"$EDITOR\"" >> /home/$USERNAME/.bashrc
+      echo "EDITOR=\"$EDITOR\"" >> /home/${USER_NAME}/.bashrc
       #}}}
-      chown -R $USERNAME:users /home/$USERNAME
+      chown -R ${USER_NAME}:users /home/${USER_NAME}
     }
     #}}}
     print_title "SELECT/CREATE USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
@@ -1094,13 +1285,13 @@ case "$1" in
         create_new_user
         break
       elif contains_element "$OPT" "${users_list[@]}"; then
-        USERNAME=$OPT
+        USER_NAME=$OPT
         break
       else
         invalid_option
       fi
     done
-    [[ ! -f /home/$USERNAME/.bashrc ]] && configure_user_account;
+    [[ ! -f /home/${USER_NAME}/.bashrc ]] && configure_user_account;
   }
   #}}}
   #CONFIGURE SUDO {{{
@@ -1155,7 +1346,6 @@ case "$1" in
               exit 0
             fi
           fi
-          CURRENT_STATUS=1
           AUR_HELPER="yaourt"
           break
           ;;
@@ -1170,7 +1360,6 @@ case "$1" in
               exit 0
             fi
           fi
-          CURRENT_STATUS=1
           AUR_HELPER="packer"
           break
           ;;
@@ -1188,7 +1377,6 @@ case "$1" in
               exit 0
             fi
           fi
-          CURRENT_STATUS=1
           AUR_HELPER="pacaur"
           break
           ;;
@@ -1197,7 +1385,6 @@ case "$1" in
           ;;
       esac
     done
-    sumary "AUR Helper installation"
     pause_function
   }
   #}}}
@@ -1220,43 +1407,36 @@ case "$1" in
     #}}}
     print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
     read_input_text "Add custom repositories" $CUSTOMREPO
-    case "$OPTION" in
-      "y")
-        #CUSTOM REPOSITORIES {{{
-        while [[ 1 ]]
-        do
-          print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
-          echo " 1) \"Add new repository\""
-          echo ""
-          echo " d) DONE"
-          echo ""
-          read -p "$prompt1" OPTION
-          case $OPTION in
-            1)
-              read -p "Repository Name [ex: custom]: " REPONAME
-              read -p "Repository Address [ex: file:///media/backup/Archlinux]: " REPOADDRESS
-              echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"/'$arch' >> /etc/pacman.conf
-              echo -e '\nCustom repository added into pacman.conf file'
-              pause_function
-              ;;
-            "d")
-              break
-              ;;
-            *)
-              invalid_option
-              ;;
-          esac
-        done
-        pacman -Sy
-        CURRENT_STATUS=1
-        ;;
-        #}}}
-        *)
-        CURRENT_STATUS=0
-        ;;
-    esac
-    sumary "Custom repositories configuration"
-    pause_function
+    if [[ $OPTION == y ]]; then
+      while [[ 1 ]]
+      do
+        print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
+        echo " 1) \"Add new repository\""
+        echo ""
+        echo " d) DONE"
+        echo ""
+        read -p "$prompt1" OPTION
+        case $OPTION in
+          1)
+            read -p "Repository Name [ex: custom]: " REPONAME
+            read -p "Repository Address [ex: file:///media/backup/Archlinux]: " REPOADDRESS
+            echo -e '\n['"$REPONAME"']\nServer = '"$REPOADDRESS"/'$arch' >> /etc/pacman.conf
+            echo -e '\nCustom repository added into pacman.conf file'
+            pause_function
+            ;;
+          "d")
+            break
+            ;;
+          *)
+            invalid_option
+            ;;
+        esac
+      done
+      ncecho "${BBlue}==>${White} Syncing repositories "
+      pacman -Syy >>"$LOG" 2>&1 &
+      pid=$!;progress $pid
+      pause_function
+    fi
   }
   #}}}
   #AUTOMATIC MODE {{{
@@ -1284,30 +1464,35 @@ case "$1" in
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
     package_install "bc rsync mlocate bash-completion ntp pkgstats"
     systemctl enable ntpd.service
+    pause_function
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
     print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
     package_install "dbus"
+    pause_function
     print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
     package_install "zip unzip unrar p7zip"
+    pause_function
     print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
     print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD service discovery. It allows programs to publish and discover services and hosts running on a local network with no specific configuration."
     package_install "avahi nss-mdns"
+    pause_function
     check_package "avahi" && systemctl enable avahi-daemon.service
     check_package "avahi" && systemctl enable avahi-dnsconfd.service
     print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
     print_info "acpid is a flexible and extensible daemon for delivering ACPI events."
     package_install "acpi acpid"
     check_package "acpid" && systemctl enable acpid.service
+    pause_function
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
     print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
     package_install "alsa-utils alsa-plugins"
     add_module "snd-usb-audio"
-    systemctl enable alsa-store.service
-    systemctl enable alsa-restore.service
+    pause_function
     print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/File_Systems"
     print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
     package_install "ntfs-3g ntfsprogs dosfstools exfat-utils fuse fuse-exfat"
     check_package "fuse" && add_module "fuse"
+    pause_function
   }
   #}}}
   #SSH {{{
@@ -1315,52 +1500,45 @@ case "$1" in
     print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
     print_info "Secure Shell (SSH) is a network protocol that allows data to be exchanged over a secure channel between two computers."
     read_input_text "Install ssh" $SSH
-    case "$OPTION" in
-      "y")
-        package_install "openssh"
-        aur_package_install "rssh"
-        systemctl enable sshd.service
-        [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
-        #CONFIGURE SSHD_CONF #{{{
-          sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
-          sed -i '/Protocol 2/s/^#//' /etc/ssh/sshd_config
-          sed -i '/HostKey \/etc\/ssh\/ssh_host_rsa_key/s/^#//' /etc/ssh/sshd_config
-          sed -i '/HostKey \/etc\/ssh\/ssh_host_dsa_key/s/^#//' /etc/ssh/sshd_config
-          sed -i '/HostKey \/etc\/ssh\/ssh_host_ecdsa_key/s/^#//' /etc/ssh/sshd_config
-          sed -i '/KeyRegenerationInterval/s/^#//' /etc/ssh/sshd_config
-          sed -i '/ServerKeyBits/s/^#//' /etc/ssh/sshd_config
-          sed -i '/SyslogFacility/s/^#//' /etc/ssh/sshd_config
-          sed -i '/LogLevel/s/^#//' /etc/ssh/sshd_config
-          sed -i '/LoginGraceTime/s/^#//' /etc/ssh/sshd_config
-          sed -i '/PermitRootLogin/s/^#//' /etc/ssh/sshd_config
-          sed -i '/HostbasedAuthentication/s/^#//' /etc/ssh/sshd_config
-          sed -i '/StrictModes/s/^#//' /etc/ssh/sshd_config
-          sed -i '/RSAAuthentication/s/^#//' /etc/ssh/sshd_config
-          sed -i '/PubkeyAuthentication/s/^#//' /etc/ssh/sshd_config
-          sed -i '/IgnoreRhosts/s/^#//' /etc/ssh/sshd_config
-          sed -i '/PermitEmptyPasswords/s/^#//' /etc/ssh/sshd_config
-          sed -i '/AllowTcpForwarding/s/^#//' /etc/ssh/sshd_config
-          sed -i '/AllowTcpForwarding no/d' /etc/ssh/sshd_config
-          sed -i '/X11Forwarding/s/^#//' /etc/ssh/sshd_config
-          sed -i '/X11Forwarding/s/no/yes/' /etc/ssh/sshd_config
-          sed -i -e '/\tX11Forwarding yes/d' /etc/ssh/sshd_config
-          sed -i '/X11DisplayOffset/s/^#//' /etc/ssh/sshd_config
-          sed -i '/X11UseLocalhost/s/^#//' /etc/ssh/sshd_config
-          sed -i '/PrintMotd/s/^#//' /etc/ssh/sshd_config
-          sed -i '/PrintMotd/s/yes/no/' /etc/ssh/sshd_config
-          sed -i '/PrintLastLog/s/^#//' /etc/ssh/sshd_config
-          sed -i '/TCPKeepAlive/s/^#//' /etc/ssh/sshd_config
-          sed -i '/the setting of/s/^/#/' /etc/ssh/sshd_config
-          sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
-        #}}}
-        CURRENT_STATUS=1
-        ;;
-      *)
-        CURRENT_STATUS=0
-        ;;
-    esac
-    sumary "SSH installation"
-    pause_function
+    if [[ $OPTION == y ]]; then
+      package_install "openssh"
+      aur_package_install "rssh"
+      systemctl enable sshd.service
+      [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
+      #CONFIGURE SSHD_CONF #{{{
+        sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
+        sed -i '/Protocol 2/s/^#//' /etc/ssh/sshd_config
+        sed -i '/HostKey \/etc\/ssh\/ssh_host_rsa_key/s/^#//' /etc/ssh/sshd_config
+        sed -i '/HostKey \/etc\/ssh\/ssh_host_dsa_key/s/^#//' /etc/ssh/sshd_config
+        sed -i '/HostKey \/etc\/ssh\/ssh_host_ecdsa_key/s/^#//' /etc/ssh/sshd_config
+        sed -i '/KeyRegenerationInterval/s/^#//' /etc/ssh/sshd_config
+        sed -i '/ServerKeyBits/s/^#//' /etc/ssh/sshd_config
+        sed -i '/SyslogFacility/s/^#//' /etc/ssh/sshd_config
+        sed -i '/LogLevel/s/^#//' /etc/ssh/sshd_config
+        sed -i '/LoginGraceTime/s/^#//' /etc/ssh/sshd_config
+        sed -i '/PermitRootLogin/s/^#//' /etc/ssh/sshd_config
+        sed -i '/HostbasedAuthentication/s/^#//' /etc/ssh/sshd_config
+        sed -i '/StrictModes/s/^#//' /etc/ssh/sshd_config
+        sed -i '/RSAAuthentication/s/^#//' /etc/ssh/sshd_config
+        sed -i '/PubkeyAuthentication/s/^#//' /etc/ssh/sshd_config
+        sed -i '/IgnoreRhosts/s/^#//' /etc/ssh/sshd_config
+        sed -i '/PermitEmptyPasswords/s/^#//' /etc/ssh/sshd_config
+        sed -i '/AllowTcpForwarding/s/^#//' /etc/ssh/sshd_config
+        sed -i '/AllowTcpForwarding no/d' /etc/ssh/sshd_config
+        sed -i '/X11Forwarding/s/^#//' /etc/ssh/sshd_config
+        sed -i '/X11Forwarding/s/no/yes/' /etc/ssh/sshd_config
+        sed -i -e '/\tX11Forwarding yes/d' /etc/ssh/sshd_config
+        sed -i '/X11DisplayOffset/s/^#//' /etc/ssh/sshd_config
+        sed -i '/X11UseLocalhost/s/^#//' /etc/ssh/sshd_config
+        sed -i '/PrintMotd/s/^#//' /etc/ssh/sshd_config
+        sed -i '/PrintMotd/s/yes/no/' /etc/ssh/sshd_config
+        sed -i '/PrintLastLog/s/^#//' /etc/ssh/sshd_config
+        sed -i '/TCPKeepAlive/s/^#//' /etc/ssh/sshd_config
+        sed -i '/the setting of/s/^/#/' /etc/ssh/sshd_config
+        sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
+      #}}}
+      pause_function
+    fi
   }
   #}}}
   #NFS {{{
@@ -1368,18 +1546,11 @@ case "$1" in
     print_title "NFS - https://wiki.archlinux.org/index.php/Nfs"
     print_info "NFS allowing a user on a client computer to access files over a network in a manner similar to how local storage is accessed."
     read_input_text "Install nfs" $NFS
-    case "$OPTION" in
-      "y")
-        package_install "nfs-utils"
-        systemctl enable rpc-statd.service
-        CURRENT_STATUS=1
-        ;;
-      *)
-        CURRENT_STATUS=0
-        ;;
-    esac
-    sumary "Nfs installation"
-    pause_function
+    if [[ $OPTION == y ]]; then
+      package_install "nfs-utils"
+      systemctl enable rpc-statd.service
+      pause_function
+    fi
   }
   #}}}
   #SAMBA {{{
@@ -1387,21 +1558,14 @@ case "$1" in
     print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
     print_info "Samba is a re-implementation of the SMB/CIFS networking protocol, it facilitates file and printer sharing among Linux and Windows systems as an alternative to NFS."
     read_input_text "Install Samba" $SAMBA
-    case "$OPTION" in
-      "y")
-        package_install "samba"
-        cp /etc/samba/smb.conf.default /etc/samba/smb.conf
-        systemctl enable smbd.service
-        systemctl enable nmbd.service
-        systemctl enable winbindd.service
-        CURRENT_STATUS=1
-        ;;
-      *)
-        CURRENT_STATUS=0
-        ;;
-    esac
-    sumary "Samba installation"
-    pause_function
+    if [[ $OPTION == y ]]; then
+      package_install "samba"
+      cp /etc/samba/smb.conf.default /etc/samba/smb.conf
+      systemctl enable smbd.service
+      systemctl enable nmbd.service
+      systemctl enable winbindd.service
+      pause_function
+    fi
   }
   #}}}
   #PRELOAD {{{
@@ -1409,18 +1573,11 @@ case "$1" in
     print_title "PRELOAD - https://wiki.archlinux.org/index.php/Preload"
     print_info "Preload is a program which runs as a daemon and records statistics about usage of programs using Markov chains; files of more frequently-used programs are, during a computer's spare time, loaded into memory. This results in faster startup times as less data needs to be fetched from disk. preload is often paired with prelink."
     read_input_text "Install Preload" $PRELOAD
-    case "$OPTION" in
-      "y")
-        package_install "preload"
-        systemctl enable preload.service
-        CURRENT_STATUS=1
-        ;;
-      *)
-        CURRENT_STATUS=0
-        ;;
-    esac
-    sumary "Preload installation"
-    pause_function
+    if [[ $OPTION == y ]]; then
+      package_install "preload"
+      systemctl enable preload.service
+      pause_function
+    fi
   }
   #}}}
   #ZRAM {{{
@@ -1428,18 +1585,11 @@ case "$1" in
     print_title "ZRAM - https://wiki.archlinux.org/index.php/Maximizing_Performance"
     print_info "Zram creates a device in RAM and compresses it. If you use for swap means that part of the RAM can hold much more information but uses more CPU. Still, it is much quicker than swapping to a hard drive. If a system often falls back to swap, this could improve responsiveness. Zram is in mainline staging (therefore its not stable yet, use with caution)."
     read_input_text "Install Zram" $ZRAM
-    case "$OPTION" in
-      "y")
-        aur_package_install "zramswap"
-        systemctl enable zramswap.service
-        CURRENT_STATUS=1
-        ;;
-      *)
-        CURRENT_STATUS=0
-        ;;
-    esac
-    sumary "Zram installation"
-    pause_function
+    if [[ $OPTION == y ]]; then
+      aur_package_install "zramswap"
+      systemctl enable zramswap.service
+      pause_function
+    fi
   }
   #}}}
   #LAPTOP MODE TOOLS {{{
@@ -1447,18 +1597,11 @@ case "$1" in
     print_title "LAPTOP MODE TOOLS- https://wiki.archlinux.org/index.php/Laptop_Mode_Tools"
     print_info "Laptop Mode Tools is a laptop power saving package for Linux systems. It is the primary way to enable the Laptop Mode feature of the Linux kernel, which lets your hard drive spin down. In addition, it allows you to tweak a number of other power-related settings using a simple configuration file."
     read_input_text "Install Laptop Mode Tools" $LMT
-    case "$OPTION" in
-      "y")
-        package_install "laptop-mode-tools"
-        systemctl enable laptop-mode-tools.service
-        CURRENT_STATUS=1
-        ;;
-      *)
-        CURRENT_STATUS=0
-        ;;
-    esac
-    sumary "Laptop Mode Tools installation"
-    pause_function
+    if [[ $OPTION == y ]]; then
+      package_install "laptop-mode-tools"
+      systemctl enable laptop-mode-tools.service
+      pause_function
+    fi
   }
   #}}}
   #XORG {{{
@@ -1523,6 +1666,7 @@ case "$1" in
       sed -i "${line}a $kblayout" $file
     fi
     #}}}
+    pause_function
     #FONT CONFIGURATION PRESETS {{{
     print_title "FONT CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
     print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
@@ -1533,81 +1677,33 @@ case "$1" in
     ln -sv ../conf.avail/11-lcdfilter-default.conf
     ln -s ../conf.avail/70-no-bitmaps.conf
     cd $AUI_DIR
-    pause_function
     #}}}
+    pause_function
   }
   #}}}
   #VIDEO CARDS {{{
   install_video_cards(){
+    package_install "dmidecode"
+    VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
     print_title "VIDEO CARD"
-    echo "Select your GPU drive:"
-    echo " 1) Intel"
-    echo " 2) ATI"
-    echo " 3) nVidia"
-    echo " 4) Nouveau"
-    echo " 5) Poulsbo"
-    echo " 6) Virtualbox"
-    echo " 7) Vesa"
-    echo ""
-    echo " s) SKIP"
-    echo ""
-    read_input $VIDEOCARD
-    case "$OPTION" in
-      1)
-        package_install "libgl xf86-video-intel"
-        if [[ $ARCHI == x86_64 ]]; then
-          package_install "lib32-intel-dri"
-        fi
-        CURRENT_STATUS=1
-        sumary "Intel GPU driver installation"
-        ;;
-      2)
-        package_install "libgl xf86-video-ati ati-dri"
-        if [[ $ARCHI == x86_64 ]]; then
-          package_install "lib32-ati-dri"
-        fi
-        add_module "radeon"
-        CURRENT_STATUS=1
-        sumary "ATI GPU driver installation"
-        ;;
-      3)
-        package_remove "$(pacman -Qe | grep xf86-video | awk '{print $1}')"
-        pacman -S --needed nvidia nvidia-utils
-        CURRENT_STATUS=1
-        sumary "nVidia GPU driver installation"
-        ;;
-      4)
-        package_install "libgl xf86-video-nouveau nouveau-dri"
-        if [[ $ARCHI == x86_64 ]]; then
-          package_install "lib32-nouveau-dri"
-        fi
-        add_module "nouveau"
-        CURRENT_STATUS=1
-        sumary "Nouveau GPU driver installation"
-        ;;
-      5)
-        package_install "xf86-video-modesetting"
-        CURRENT_STATUS=1
-        sumary "Poulsbo GPU driver installation"
-        ;;
-      6)
-        package_install "virtualbox-guest-utils"
-        add_module "vboxguest vboxsf vboxvideo"
-        groupadd vboxsf
-        gpasswd -a $USERNAME vboxsf
-        CURRENT_STATUS=1
-        sumary "Virtualbox guest additions (incl. video drivers) installation"
-        ;;
-      7)
-        package_install "xf86-video-vesa"
-        CURRENT_STATUS=1
-        sumary "Vesa GPU driver installation"
-        ;;
-      *)
-        CURRENT_STATUS=0
-        sumary "GPU drivers installation"
-        ;;
-    esac
+    if [[ -n ${VIRTUALBOX_GUEST} ]]; then
+      package_install "virtualbox-guest-utils"
+      add_module "vboxguest vboxsf vboxvideo"
+      add_user_to_group ${USER_NAME} vboxsf
+      systemctl disable ntpd.service
+      systemctl enable vboxservice.service
+    elif [[ ${NVIDIA} -eq 1 ]]; then
+      package_remove "$(pacman -Qe | grep xf86-video | awk '{print $1}')"
+      pacman -S --needed nvidia nvidia-utils
+    elif [[ -n ${VIDEO_DRIVER} ]]; then
+      package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri ${VIDEO_ACCEL}"
+      if [[ ${ARCHI} == x86_64 ]]; then
+        package_install "lib32-${VIDEO_DRIVER}-dri"
+      fi
+      [[ ${VIDEO_DRIVER} == nouveau || ${VIDEO_DRIVER} == radeon ]] &&  add_module "${VIDEO_DRIVER}"
+    else
+      package_install "xf86-video-vesa"
+    fi
     pause_function
   }
   #}}}
@@ -1616,101 +1712,84 @@ case "$1" in
     print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
     print_info "CUPS is the standards-based, open source printing system developed by Apple Inc. for Mac OS® X and other UNIX®-like operating systems."
     read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
-    case "$OPTION" in
-      "y")
-        package_install "cups cups-filters ghostscript gsfonts"
-        package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
-        systemctl enable cups.service
-        CURRENT_STATUS=1
-        ;;
-      *)
-        CURRENT_STATUS=0
-        ;;
-    esac
-    sumary "CUPS installation"
-    pause_function
+    if [[ $OPTION == y ]]; then
+      package_install "cups cups-filters ghostscript gsfonts"
+      package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
+      systemctl enable cups.service
+      pause_function
+    fi
   }
   #}}}
   #ADDITIONAL FIRMWARE {{{
   install_additional_firmwares(){
     print_title "INSTALL ADDITIONAL FIRMWARES"
     read_input_text "Install additional firmwares [Audio,Bluetooth,Scanner,Wireless]" $FIRMWARE
-    case "$OPTION" in
-      "y")
-        #ADDITIONAL FIRMWARE {{{
-        while [[ 1 ]]
-        do
-          print_title "INSTALL ADDITIONAL FIRMWARES"
-          echo " 1) $(menu_item "alsa-firmware")"
-          echo " 2) $(menu_item "ipw2100-fw")"
-          echo " 3) $(menu_item "ipw2200-fw")"
-          echo " 4) $(menu_item "b43-firmware") $AUR"
-          echo " 5) $(menu_item "b43-firmware-legacy") $AUR"
-          echo " 6) $(menu_item "broadcom-wl") $AUR"
-          echo " 7) $(menu_item "zd1211-firmware ")"
-          echo " 8) $(menu_item "bluez-firmware") "
-          echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
-          echo "10) $(menu_item "libraw1394") [IEEE1394 Driver]"
-          echo "11) $(menu_item "sane-gt68xx-firmware")"
-          echo ""
-          echo " d) DONE"
-          echo ""
-          FIRMWARE_OPTIONS+=" d"
-          read_input_options "$FIRMWARE_OPTIONS"
-          for OPT in ${OPTIONS[@]}; do
-            case "$OPT" in
-              1)
-                package_install "alsa-firmware"
-                ;;
-              2)
-                package_install "ipw2100-fw"
-                ;;
-              3)
-                package_install "ipw2200-fw"
-                ;;
-              4)
-                aur_package_install "b43-firmware"
-                ;;
-              5)
-                aur_package_install "b43-firmware-legacy"
-                ;;
-              6)
-                aur_package_install "broadcom-wl"
-                ;;
-              7)
-                package_install "zd1211-firmware"
-                ;;
-              8)
-                package_install "bluez-firmware"
-                ;;
-              9)
-                package_install "libffado"
-                ;;
-              10)
-                package_install "libraw1394"
-                ;;
-              11)
-                package_install "sane-gt68xx-firmware"
-                ;;
-              "d")
-                break
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-          done
-          elihw
+    if [[ $OPTION == y ]]; then
+      while [[ 1 ]]
+      do
+        print_title "INSTALL ADDITIONAL FIRMWARES"
+        echo " 1) $(menu_item "alsa-firmware")"
+        echo " 2) $(menu_item "ipw2100-fw")"
+        echo " 3) $(menu_item "ipw2200-fw")"
+        echo " 4) $(menu_item "b43-firmware") $AUR"
+        echo " 5) $(menu_item "b43-firmware-legacy") $AUR"
+        echo " 6) $(menu_item "broadcom-wl") $AUR"
+        echo " 7) $(menu_item "zd1211-firmware ")"
+        echo " 8) $(menu_item "bluez-firmware") "
+        echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
+        echo "10) $(menu_item "libraw1394") [IEEE1394 Driver]"
+        echo "11) $(menu_item "sane-gt68xx-firmware")"
+        echo ""
+        echo " d) DONE"
+        echo ""
+        FIRMWARE_OPTIONS+=" d"
+        read_input_options "$FIRMWARE_OPTIONS"
+        for OPT in ${OPTIONS[@]}; do
+          case "$OPT" in
+            1)
+              package_install "alsa-firmware"
+              ;;
+            2)
+              package_install "ipw2100-fw"
+              ;;
+            3)
+              package_install "ipw2200-fw"
+              ;;
+            4)
+              aur_package_install "b43-firmware"
+              ;;
+            5)
+              aur_package_install "b43-firmware-legacy"
+              ;;
+            6)
+              aur_package_install "broadcom-wl"
+              ;;
+            7)
+              package_install "zd1211-firmware"
+              ;;
+            8)
+              package_install "bluez-firmware"
+              ;;
+            9)
+              package_install "libffado"
+              ;;
+            10)
+              package_install "libraw1394"
+              ;;
+            11)
+              package_install "sane-gt68xx-firmware"
+              ;;
+            "d")
+              break
+              ;;
+            *)
+              invalid_option
+              ;;
+          esac
         done
-        CURRENT_STATUS=1
-        ;;
-        #}}}
-        *)
-        CURRENT_STATUS=0
-        ;;
-    esac
-    sumary "Additional Firmware"
-    pause_function
+        elihw
+      done
+    fi
   }
   #}}}
   #GIT ACCESS THRU A FIREWALL {{{
@@ -1718,30 +1797,24 @@ case "$1" in
     print_title "GIT-TOR - https://wiki.archlinux.org/index.php/Tor"
     print_info "Tor is an open source implementation of 2nd generation onion routing that provides free access to an anonymous proxy network. Its primary goal is to enable online anonymity by protecting against traffic analysis attacks."
     read_input_text "Ensuring access to GIT through a firewall (bypass college/work firewall)" $GITTOR
-    case "$OPTION" in
-      "y")
-        package_install "openbsd-netcat vidalia privoxy git"
-        if [[ ! -f /usr/bin/proxy-wrapper ]]; then
-          echo 'forward-socks5   /               127.0.0.1:9050 .' >> /etc/privoxy/config
-          echo -e '#!/bin/bash\nnc -xlocalhost:9050 -X5 $*' > /usr/bin/proxy-wrapper
-          chmod +x /usr/bin/proxy-wrapper
-          echo -e '\nexport GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"' >> /etc/bash.bashrc
-          export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
-          su - $USERNAME -c 'export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"'
-        fi
-        groupadd -g 42 privoxy
-        useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
-        pacman -S --noconfirm tor privoxy
-        systemctl enable tor.service
-        systemctl enable privoxy.service
-        CURRENT_STATUS=1
-        ;;
-      *)
-        CURRENT_STATUS=0
-        ;;
-    esac
-    sumary "GIT-TOR installation"
-    pause_function
+    if [[ $OPTION == y ]]; then
+      package_install "openbsd-netcat vidalia privoxy git"
+      if [[ ! -f /usr/bin/proxy-wrapper ]]; then
+        echo 'forward-socks5   /               127.0.0.1:9050 .' >> /etc/privoxy/config
+        echo -e '#!/bin/bash\nnc -xlocalhost:9050 -X5 $*' > /usr/bin/proxy-wrapper
+        chmod +x /usr/bin/proxy-wrapper
+        echo -e '\nexport GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"' >> /etc/bash.bashrc
+        export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
+        su - ${USER_NAME} -c 'export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"'
+      fi
+      groupadd -g 42 privoxy
+      useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
+      systemctl start tor.service
+      systemctl start privoxy.service
+      systemctl enable tor.service
+      systemctl enable privoxy.service
+      pause_function
+    fi
   }
   #}}}
   #DESKTOP ENVIRONMENT {{{
@@ -1766,49 +1839,25 @@ case "$1" in
           case "$OPT" in
             1)
               aur_package_install "awoken-icons"
-              gtk-update-icon-cache -f /usr/share/icons/AwOken
-              gtk-update-icon-cache -f /usr/share/icons/AwOken-Dark
               ;;
             2)
               aur_package_install "faenza-icon-theme"
-              gtk-update-icon-cache -f /usr/share/icons/Faenza
-              gtk-update-icon-cache -f /usr/share/icons/Faenza-Dark
-              gtk-update-icon-cache -f /usr/share/icons/Faenza-Darker
-              gtk-update-icon-cache -f /usr/share/icons/Faenza-Darkest
               ;;
             3)
               aur_package_install "faenza-cupertino-icon-theme"
-              gtk-update-icon-cache -f /usr/share/icons/Faenza-Cupertino
-              gtk-update-icon-cache -f /usr/share/icons/Faenza-Cupertino-Dark
-              gtk-update-icon-cache -f /usr/share/icons/Faenza-Cupertino-Darker
-              gtk-update-icon-cache -f /usr/share/icons/Faenza-Cupertino-Darkest
               ;;
             4)
               aur_package_install "faience-icon-theme"
-              gtk-update-icon-cache -f /usr/share/icons/Faience
-              gtk-update-icon-cache -f /usr/share/icons/Faience-Azur
-              gtk-update-icon-cache -f /usr/share/icons/Faience-Claire
-              gtk-update-icon-cache -f /usr/share/icons/Faience-Ocre
               ;;
             5)
               aur_package_install "elementary-icons-bzr"
-              gtk-update-icon-cache -f /usr/share/icons/elementary
               read_input_text "Install the elementary XFCE icons"
               if [[ $OPTION == y ]]; then
                 aur_package_install "elementary-xfce-icons"
-                gtk-update-icon-cache -f /usr/share/icons/elementary-xfce
-                gtk-update-icon-cache -f /usr/share/icons/elementary-xfce-dark
               fi
               ;;
             6)
               aur_package_install "nitrux-icon-theme"
-              gtk-update-icon-cache -f /usr/share/icons/NITRUX
-              gtk-update-icon-cache -f /usr/share/icons/NITRUX-BTN
-              gtk-update-icon-cache -f /usr/share/icons/NITRUX-BTN-blufold
-              gtk-update-icon-cache -f /usr/share/icons/NITRUX-C
-              gtk-update-icon-cache -f /usr/share/icons/NITRUX-DRK
-              gtk-update-icon-cache -f /usr/share/icons/NITRUX-G
-              gtk-update-icon-cache -f /usr/share/icons/NITRUX-G-lightpnl
               ;;
             "b")
               break
@@ -1953,10 +2002,11 @@ case "$1" in
         package_install "leafpad epdfview nitrogen"
         package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
         aur_package_install "gnome-defaults-list"
-        mkdir -p /home/$USERNAME/.config/awesome/
-        cp /etc/xdg/awesome/rc.lua /home/$USERNAME/.config/awesome/
-        chown -R $USERNAME:users /home/$USERNAME/.config
+        mkdir -p /home/${USER_NAME}/.config/awesome/
+        cp /etc/xdg/awesome/rc.lua /home/${USER_NAME}/.config/awesome/
+        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
         config_xinitrc "awesome"
+        pause_function
         #AWESOME CUSTOMIZATION {{{
         while [[ 1 ]]
         do
@@ -2034,12 +2084,8 @@ case "$1" in
           elihw
         done
         #}}}
-        #Application development toolkit for controlling system-wide privileges
-        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
-        CURRENT_STATUS=1
-        OPENBOX=1
         ;;
         #}}}
       2)
@@ -2055,6 +2101,7 @@ case "$1" in
         package_install "deja-dup"
         aur_package_install "gnome-defaults-list"
         config_xinitrc "gnome-session-cinnamon"
+        pause_function
         #CINNAMON CUSTOMIZATION {{{
         while [[ 1 ]]
         do
@@ -2103,12 +2150,8 @@ case "$1" in
         systemctl enable gdm.service
         #D-Bus interface for user account query and manipulation
         systemctl enable accounts-daemon.service
-        #Application development toolkit for controlling system-wide privileges
-        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
-        CURRENT_STATUS=1
-        GNOME=1
         ;;
         #}}}
       3)
@@ -2122,8 +2165,9 @@ case "$1" in
         package_install "lxappearance"
         package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
         aur_package_install "gnome-defaults-list"
-        chown -R $USERNAME:users /home/$USERNAME/.config
+        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
         config_xinitrc "enlightenment_start"
+        pause_function
         #E17 CUSTOMIZATION {{{
         while [[ 1 ]]
         do
@@ -2197,12 +2241,8 @@ case "$1" in
           elihw
         done
         #}}}
-        #Application development toolkit for controlling system-wide privileges
-        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
-        CURRENT_STATUS=1
-        E17=1
         ;;
         #}}}
       4)
@@ -2218,6 +2258,7 @@ case "$1" in
         package_install "pulseaudio"
         aur_package_install "gnome-defaults-list"
         config_xinitrc "gnome-session"
+        pause_function
         #GNOME CUSTOMIZATION {{{
         while [[ 1 ]]
         do
@@ -2350,12 +2391,8 @@ case "$1" in
         systemctl enable gdm.service
         #D-Bus interface for user account query and manipulation
         systemctl enable accounts-daemon.service
-        #Application development toolkit for controlling system-wide privileges
-        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
-        CURRENT_STATUS=1
-        GNOME=1
         ;;
         #}}}
       5)
@@ -2369,6 +2406,7 @@ case "$1" in
         aur_package_install "kde-gtk-config-git"
         aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
         config_xinitrc "startkde"
+        pause_function
         #QTCURVE THEMES #{{{
           curl -o Sweet.tar.gz http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
           curl -o Kawai.tar.gz http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
@@ -2376,13 +2414,13 @@ case "$1" in
           tar zxvf Kawai.tar.gz
           rm Sweet.tar.gz
           rm Kawai.tar.gz
-          mkdir -p /home/$USERNAME/.kde4/share/apps/color-schemes
-          mv Sweet/Sweet.colors /home/$USERNAME/.kde4/share/apps/color-schemes
-          mv Kawai/Kawai.colors /home/$USERNAME/.kde4/share/apps/color-schemes
-          mkdir -p /home/$USERNAME/.kde4/share/apps/QtCurve
-          mv Sweet/Sweet.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
-          mv Kawai/Kawai.qtcurve /home/$USERNAME/.kde4/share/apps/QtCurve
-          chown -R $USERNAME:users /home/$USERNAME/.kde4
+          mkdir -p /home/${USER_NAME}/.kde4/share/apps/color-schemes
+          mv Sweet/Sweet.colors /home/${USER_NAME}/.kde4/share/apps/color-schemes
+          mv Kawai/Kawai.colors /home/${USER_NAME}/.kde4/share/apps/color-schemes
+          mkdir -p /home/${USER_NAME}/.kde4/share/apps/QtCurve
+          mv Sweet/Sweet.qtcurve /home/${USER_NAME}/.kde4/share/apps/QtCurve
+          mv Kawai/Kawai.qtcurve /home/${USER_NAME}/.kde4/share/apps/QtCurve
+          chown -R ${USER_NAME}:users /home/${USER_NAME}/.kde4
           rm -fr Kawai Sweet
         #}}}
         #KDE CUSTOMIZATION {{{
@@ -2401,7 +2439,7 @@ case "$1" in
           echo " d) DONE"
           echo ""
           KDE_OPTIONS+=" d"
-          read_input_options "$KDE_OPTIONS"
+          read_input_options "${KDE}_OPTIONS"
           for OPT in ${OPTIONS[@]}; do
             case "$OPT" in
               1)
@@ -2441,11 +2479,8 @@ case "$1" in
         done
         #}}}
         systemctl enable kdm.service
-        #Application development toolkit for controlling system-wide privileges
-        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
-        CURRENT_STATUS=1
         KDE=1
         ;;
         #}}}
@@ -2460,6 +2495,7 @@ case "$1" in
         package_install "leafpad epdfview"
         aur_package_install "gnome-defaults-list"
         config_xinitrc "startlxde"
+        pause_function
         #LXDE CUSTOMIZATION {{{
         while [[ 1 ]]
         do
@@ -2505,12 +2541,8 @@ case "$1" in
           elihw
         done
         #}}}
-        #Application development toolkit for controlling system-wide privileges
-        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
-        CURRENT_STATUS=1
-        LXDE=1
         ;;
         #}}}
       7)
@@ -2524,6 +2556,7 @@ case "$1" in
         package_install "pulseaudio"
         aur_package_install "gnome-defaults-list"
         config_xinitrc "mate-session"
+        pause_function
         #MATE CUSTOMIZATION {{{
         while [[ 1 ]]
         do
@@ -2563,12 +2596,8 @@ case "$1" in
         #}}}
         #D-Bus interface for user account query and manipulation
         systemctl enable accounts-daemon.service
-        #Application development toolkit for controlling system-wide privileges
-        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
-        CURRENT_STATUS=1
-        GNOME=1
         ;;
         #}}}
       8)
@@ -2582,12 +2611,13 @@ case "$1" in
         package_install "gvfs-smb gvfs-afc"
         package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
         aur_package_install "gnome-defaults-list"
-        mkdir -p /home/$USERNAME/.config/openbox/
-        cp /etc/xdg/openbox/rc.xml /home/$USERNAME/.config/openbox/
-        cp /etc/xdg/openbox/menu.xml /home/$USERNAME/.config/openbox/
-        cp /etc/xdg/openbox/autostart /home/$USERNAME/.config/openbox/
-        chown -R $USERNAME:users /home/$USERNAME/.config
+        mkdir -p /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/rc.xml /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/menu.xml /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/autostart /home/${USER_NAME}/.config/openbox/
+        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
         config_xinitrc "openbox-session"
+        pause_function
         #OPENBOX CUSTOMIZATION {{{
         while [[ 1 ]]
         do
@@ -2665,12 +2695,8 @@ case "$1" in
           elihw
         done
         #}}}
-        #Application development toolkit for controlling system-wide privileges
-        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
-        CURRENT_STATUS=1
-        OPENBOX=1
         ;;
         #}}}
       9)
@@ -2679,9 +2705,10 @@ case "$1" in
         print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
         package_install "xfce4 xfce4-goodies"
         package_install "gvfs-smb gvfs-afc"
-        package_install "polkit-gnome xdg-user-dirs"
+        package_install "xdg-user-dirs"
         aur_package_install "gnome-defaults-list"
         config_xinitrc "startxfce4"
+        pause_function
         #XFCE CUSTOMIZATION{{{
         while [[ 1 ]]
         do
@@ -2719,25 +2746,22 @@ case "$1" in
           elihw
         done
         #}}}
-        #Application development toolkit for controlling system-wide privileges
-        systemctl enable polkitd.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
-        CURRENT_STATUS=1
-        XFCE=1
         ;;
         #}}}
+    "b")
+        break
+        ;;
       *)
-        CURRENT_STATUS=0
-      ;;
+        invalid_option
+        ;;
     esac
     #Fix p7FM {{{
-    if [[ $KDE -eq 0 ]]; then
+    if [[ ${KDE} -eq 0 ]]; then
       package_install "wxgtk"
     fi
     #}}}
-    sumary "Desktop Environment Installation"
-    pause_function
   }
   #}}}
   #NETWORKMANAGER/WICD {{{
@@ -2753,33 +2777,29 @@ case "$1" in
       1)
         print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
         print_info "NetworkManager is a program for providing detection and configuration for systems to automatically connect to network. NetworkManager's functionality can be useful for both wireless and wired networks."
-        if [[ $KDE -eq 1 ]]; then
+        if [[ ${KDE} -eq 1 ]]; then
           package_install "networkmanager kdeplasma-applets-networkmanagement"
         else
           package_install "networkmanager network-manager-applet"
         fi
         check_package "ntp" && package_install "networkmanager-dispatcher-ntpd"
         groupadd networkmanager
-        gpasswd -a $USERNAME networkmanager
+        add_user_to_group ${USER_NAME} networkmanager
         #Network Management daemon
         systemctl enable NetworkManager.service
-        #Application development toolkit for controlling system-wide privileges
-        systemctl enable polkitd.service
-        CURRENT_STATUS=1
-        sumary "Networkmanager installation"
+        pause_function
         ;;
       2)
         print_title "WICD - https://wiki.archlinux.org/index.php/Wicd"
         print_info "Wicd is a network connection manager that can manage wireless and wired interfaces, similar and an alternative to NetworkManager."
-        if [[ $KDE -eq 1 ]]; then
+        if [[ ${KDE} -eq 1 ]]; then
           aur_package_install "wicd wicd-kde"
         else
           package_install "wicd wicd-gtk"
         fi
         #Network Management daemon
         systemctl enable wicd.service
-        CURRENT_STATUS=1
-        sumary "Wicd installation"
+        pause_function
         ;;
     esac
   }
@@ -2789,17 +2809,10 @@ case "$1" in
     print_title "USB 3G MODEM - https://wiki.archlinux.org/index.php/USB_3G_Modem"
     print_info "A number of mobile telephone networks around the world offer mobile internet connections over UMTS (or EDGE or GSM) using a portable USB modem device."
     read_input_text "Install usb 3G modem support" $USBMODEM
-    case "$OPTION" in
-      "y")
-        package_install "usbutils usb_modeswitch modemmanager"
-        CURRENT_STATUS=1
-        ;;
-      *)
-        CURRENT_STATUS=0
-        ;;
-    esac
-    sumary "USB 3G Modem installation"
-    pause_function
+    if [[ $OPTION == y ]]; then
+      package_install "usbutils usb_modeswitch modemmanager"
+      pause_function
+    fi
   }
   #}}}
   #ACCESSORIES {{{
@@ -2813,7 +2826,7 @@ case "$1" in
       echo " 4) $(menu_item "deepin-screenshot-git") $AUR"
       echo " 5) $(menu_item "dockbarx") $AUR"
       echo " 6) $(menu_item "docky") $AUR"
-      echo " 7) $(menu_item "speedcrunch galculator" "$([[ $KDE -eq 1 ]] && echo "Speedcrunch" || echo "Galculator";)") $AUR"
+      echo " 7) $(menu_item "speedcrunch galculator" "$([[ ${KDE} -eq 1 ]] && echo "Speedcrunch" || echo "Galculator";)") $AUR"
       echo " 8) $(menu_item "gnome-pie") $AUR"
       echo " 9) $(menu_item "guake")"
       echo "10) $(menu_item "kupfer") $AUR"
@@ -2848,7 +2861,7 @@ case "$1" in
             package_install "docky"
             ;;
           7)
-            if [[ $KDE -eq 1 ]]; then
+            if [[ ${KDE} -eq 1 ]]; then
               aur_package_install "speedcrunch"
             else
               aur_package_install "galculator"
@@ -3015,10 +3028,10 @@ case "$1" in
             ;;
           11)
             package_install "qtcreator qt-doc"
-            mkdir -p /home/$USERNAME/.config/Nokia/qtcreator/styles
+            mkdir -p /home/${USER_NAME}/.config/Nokia/qtcreator/styles
             curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
-            mv monokai.xml /home/$USERNAME/.config/Nokia/qtcreator/styles/
-            chown -R $USERNAME:users /home/$USERNAME/.config
+            mv monokai.xml /home/${USER_NAME}/.config/Nokia/qtcreator/styles/
+            chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
             ;;
           12)
             aur_package_install "sublime-text"
@@ -3060,7 +3073,7 @@ case "$1" in
     do
       print_title "OFFICE APPS"
       echo " 1) $(menu_item "libreoffice-common" "LibreOffice")"
-      echo " 2) $(menu_item "goffice calligra" "$([[ $KDE -eq 1 ]] && echo "Caligra" || echo "Abiword + Gnumeric";)")"
+      echo " 2) $(menu_item "goffice calligra" "$([[ ${KDE} -eq 1 ]] && echo "Caligra" || echo "Abiword + Gnumeric";)")"
       echo " 3) $(menu_item "texlive-core" "latex")"
       echo " 4) $(menu_item "calibre")"
       echo " 5) $(menu_item "gcstar")"
@@ -3082,14 +3095,14 @@ case "$1" in
             package_install "libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer libreoffice-extension-presenter-screen libreoffice-extension-pdfimport"
             aur_package_install "hunspell-$LANGUAGE_HS"
             aur_package_install "aspell-$LANGUAGE_AS"
-            if [[ $KDE -eq 1 ]]; then
+            if [[ ${KDE} -eq 1 ]]; then
               package_install "libreoffice-kde4"
             else
               package_install "libreoffice-gnome"
             fi
             ;;
           2)
-            if [[ $KDE -eq 1 ]]; then
+            if [[ ${KDE} -eq 1 ]]; then
               package_install "calligra"
             else
               package_install "gnumeric abiword abiword-plugins"
@@ -3171,11 +3184,17 @@ case "$1" in
             package_install "htop"
             ;;
           4)
-            package_install "virtualbox virtualbox-host-modules virtualbox-guest-iso"
-            aur_package_install "virtualbox-ext-oracle"
-            add_module "vboxdrv"
-            systemctl enable vboxservice.service
-            gpasswd -a $USERNAME vboxusers
+            # Make sure we are not a VirtualBox Guest
+            VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
+            if [[ -z ${VIRTUALBOX_GUEST} ]]; then
+              package_install "virtualbox virtualbox-host-modules virtualbox-guest-iso"
+              aur_package_install "virtualbox-ext-oracle"
+              add_module "vboxdrv vboxnetadp vboxnetflt" "virtualbox-host"
+              modprobe -a vboxdrv vboxnetadp vboxnetflt
+              add_user_to_group ${USER_NAME} vboxusers
+            else
+              cecho "VirtualBox was not installed as we are a VirtualBox guest."
+            fi
             ;;
           5)
             package_install "webmin perl-net-ssleay"
@@ -3291,7 +3310,7 @@ case "$1" in
               print_title "BROWSER"
               echo " 1) $(menu_item "chromium")"
               echo " 2) $(menu_item "google-chrome")"
-              echo " 3) $(menu_item "rekonq midori" "$([[ $KDE -eq 1 ]] && echo "Rekonq" || echo "Midori";)")"
+              echo " 3) $(menu_item "rekonq midori" "$([[ ${KDE} -eq 1 ]] && echo "Rekonq" || echo "Midori";)")"
               echo " 4) $(menu_item "firefox")"
               echo " 5) $(menu_item "opera")"
               echo ""
@@ -3308,7 +3327,7 @@ case "$1" in
                     aur_package_install "google-chrome flashplugin"
                     ;;
                   3)
-                    if [[ $KDE -eq 1 ]]; then
+                    if [[ ${KDE} -eq 1 ]]; then
                       package_install "rekonq"
                     else
                       package_install "midori"
@@ -3386,11 +3405,16 @@ case "$1" in
                     aur_package_install "steadyflow-bzr"
                     ;;
                   8)
-                    if [[ $KDE -eq 1 ]]; then
+                    if [[ ${KDE} -eq 1 ]]; then
                       package_install "transmission-qt"
                     else
                       package_install "transmission-gtk"
                     fi
+                    if [ -f /home/${USER_NAME}/.config/transmission/settings.json ]; then
+                      replaceinfile '"blocklist-enabled": false' '"blocklist-enabled": true' /home/${USER_NAME}/.config/transmission/settings.json
+                      replaceinfile "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${USER_NAME}/.config/transmission/settings.json
+                    fi
+
                     ;;
                   9)
                     aur_package_install "ubuntuone-client"
@@ -3499,7 +3523,7 @@ case "$1" in
             do
               print_title "IRC"
               echo " 1) $(menu_item "irssi")"
-              echo " 2) $(menu_item "quassel xchat" "$([[ $KDE -eq 1 ]] && echo "Quassel" || echo "X-Chat";)")"
+              echo " 2) $(menu_item "quassel xchat" "$([[ ${KDE} -eq 1 ]] && echo "Quassel" || echo "X-Chat";)")"
               echo ""
               echo " b) BACK"
               echo ""
@@ -3511,7 +3535,7 @@ case "$1" in
                     package_install "irssi"
                     ;;
                   2)
-                    if [[ $KDE -eq 1 ]]; then
+                    if [[ ${KDE} -eq 1 ]]; then
                       package_install "quassel"
                     else
                       package_install "xchat"
@@ -3546,7 +3570,9 @@ case "$1" in
                 case "$OPT" in
                   1)
                     aur_package_install "google-earth"
-                    rm -v /etc/fonts/conf.d/65-fonts-persian.conf
+                    if [ -f /etc/fonts/conf.d/65-fonts-persian.conf ]; then
+                      mv /etc/fonts/conf.d/65-fonts-persian.conf /etc/fonts/conf.d/65-fonts-persian.conf.breaks-google-earth
+                    fi
                     ;;
                   2)
                     aur_package_install "worldwind"
@@ -3707,7 +3733,7 @@ case "$1" in
             while [[ 1 ]]
             do
               print_title "AUDIO EDITORS|TOOLS"
-              echo " 1) $(menu_item "soundconverter soundkonverter" "$([[ $KDE -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
+              echo " 1) $(menu_item "soundconverter soundkonverter" "$([[ ${KDE} -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
               echo " 2) $(menu_item "puddletag") $AUR"
               echo " 3) $(menu_item "audacity")"
               echo " 4) $(menu_item "ocenaudio") $AUR"
@@ -3719,7 +3745,7 @@ case "$1" in
               for OPT in ${OPTIONS[@]}; do
                 case "$OPT" in
                   1)
-                    if [[ $KDE -eq 1 ]]; then
+                    if [[ ${KDE} -eq 1 ]]; then
                       package_install "soundkonverter"
                     else
                       package_install "soundconverter"
@@ -3748,10 +3774,15 @@ case "$1" in
             OPT=2
             ;;
           3)
-            package_install "gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly flac"
-            if check_package "banshee clementine exaile rhythmbox xfburn" ; then
-              package_install "gstreamer0.10-plugins"
-            fi
+            package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good \
+                             gst-plugins-bad gst-plugins-ugly gst-ffmpeg"
+            # FIXME
+            #  - Do this for all users
+            # Use the 'standard' preset by default. This preset should generally be
+            # transparent to most people on most music and is already quite high in quality.
+            # The resulting bitrate should be in the 170-210kbps range, according to music
+            # complexity.
+            sudo -u ${USER_NAME} gconftool-2 --type string --set /system/gstreamer/0.10/audio/profiles/mp3/pipeline "audio/x-raw-int,rate=44100,channels=2 ! lame name=enc preset=1001 ! id3v2mux"
             ;;
           "b")
             break
@@ -3824,13 +3855,13 @@ case "$1" in
                     ;;
                   8)
                     package_install "vlc"
-                    if [[ $KDE -eq 1 ]]; then
+                    if [[ ${KDE} -eq 1 ]]; then
                       package_install "phonon-vlc"
                     fi
                     ;;
                   9)
                     package_install "xbmc"
-                    gpasswd -a $USERNAME xbmc
+                    add_user_to_group ${USER_NAME} xbmc
                     ;;
                   "b")
                     break
@@ -3865,7 +3896,7 @@ case "$1" in
               for OPT in ${OPTIONS[@]}; do
                 case "$OPT" in
                   1)
-                    if [[ $KDE -eq 1 ]]; then
+                    if [[ ${KDE} -eq 1 ]]; then
                       package_install "avidemux-qt"
                     else
                       package_install "avidemux-gtk"
@@ -3903,7 +3934,7 @@ case "$1" in
             OPT=2
             ;;
           3)
-            package_install "libquicktime libdvdread libdvdnav libdvdcss cdrdao"
+            package_install "libbluray libquicktime libdvdread libdvdnav libdvdcss cdrdao libaacs"
             if [[ $ARCHI == i686 ]]; then
               aur_package_install "codecs"
             else
@@ -4507,8 +4538,8 @@ case "$1" in
     create_sites_folder(){
       [[ ! -f  /etc/httpd/conf/extra/httpd-userdir.conf.aui ]] && cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
       sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
-      su - $USERNAME -c "mkdir -p ~/Sites"
-      su - $USERNAME -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
+      su - ${USER_NAME} -c "mkdir -p ~/Sites"
+      su - ${USER_NAME} -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
       print_line
       echo "The folder \"Sites\" has been created in your home"
       echo "You can access your projects at \"http://localhost/~username\""
@@ -4555,8 +4586,6 @@ case "$1" in
         sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
         sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
         #}}}
-        CURRENT_STATUS=1
-        sumary "LAMP installation"
         create_sites_folder
         ;;
       2)
@@ -4595,8 +4624,6 @@ case "$1" in
         sed -i '/gd.so/s/^;//' /etc/php/php.ini
         sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
         #}}}
-        CURRENT_STATUS=1
-        sumary "LAPP installation"
         create_sites_folder
         ;;
     esac
@@ -4613,8 +4640,9 @@ case "$1" in
       echo " 4) $(menu_item "ttf-kochi-substitute") (Japanese Support) $AUR"
       echo " 5) $(menu_item "ttf-liberation")"
       echo " 6) $(menu_item "ttf-ms-fonts") $AUR"
-      echo " 7) $(menu_item "ttf-vista-fonts") $AUR"
-      echo " 8) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support) $AUR"
+      echo " 7) $(menu_item "ttf-source-code-pro") $AUR"
+      echo " 8) $(menu_item "ttf-vista-fonts") $AUR"
+      echo " 9) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support) $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -4644,9 +4672,12 @@ case "$1" in
             aur_package_install "ttf-ms-fonts"
             ;;
           7)
-            aur_package_install "ttf-vista-fonts"
+            aur_package_install "ttf-source-code-pro"
             ;;
           8)
+            aur_package_install "ttf-vista-fonts"
+            ;;
+          9)
             aur_package_install "wqy-microhei"
             ;;
           "b")
@@ -4817,25 +4848,24 @@ case "$1" in
               1)
                 pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
                 aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
-                CURRENT_STATUS=1
+
                 ;;
               2)
                 pacman -Rdd --noconfirm freetype2
                 aur_package_install "freetype2-infinality fontconfig-infinality-git"
                 /etc/profile.d/infinality-settings.sh
                 infctl setstyle
-                CURRENT_STATUS=1
+
                 ;;
               3)
                 pacman -Rdd freetype2-infinality fontconfig-infinality-git
                 pacman -S --asdeps cairo fontconfig freetype2 libxft
-                CURRENT_STATUS=1
+
                 ;;
               *)
-                CURRENT_STATUS=0
+                invalid_option
                 ;;
             esac
-            sumary "Patched Fonts Configuration installation"
             pause_function
             #}}}
             OPT=2
@@ -4870,6 +4900,11 @@ case "$1" in
 
   welcome
   check_root
+  check_archlinux
+  check_hostname
+  check_domainname
+  check_ip
+  check_vga
   configure_pacman_package_signing
   system_upgrade
   language_selector
@@ -4919,9 +4954,6 @@ case "$1" in
           install_cups
           install_additional_firmwares
           install_git_tor
-          CURRENT_STATUS=1
-          sumary "Basic setup installation"
-          pause_function
           checklist[1]=1
           ;;
         2)
