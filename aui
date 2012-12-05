@@ -314,11 +314,11 @@
     return 1
   } #}}}
   checkbox(){ #{{{
-    #display${BBlue}==>${White} or [ ]
+    #display [X] or [ ]
     [[ "$1" -eq 1 ]] && echo -e "${BBlue}[${BWhite}X${BBlue}]${White}" || echo -e "${BBlue}[${White} ${BBlue}]${White}";
   } #}}}
   checkbox_package(){ #{{{
-    #check if${BBlue}==>${White} or [ ]
+    #check if [X] or [ ]
     check_package "$1" && checkbox 1 || checkbox 0
   } #}}}
   aui_download_packages(){ #{{{
