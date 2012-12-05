@@ -162,7 +162,7 @@
     echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q nvidia
     if [ $? -eq 0 ]; then
       cecho Nvidia
-      read_input_text "Install proprietary drive of your NVIDIA card"
+      read_input_text "Install proprietary drive of your NVIDIA card" $INSTALL_NVIDIA
       if [[ $OPTION == y ]]; then
         NVIDIA=1
       else
