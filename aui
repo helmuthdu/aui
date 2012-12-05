@@ -1686,6 +1686,7 @@ case "$1" in
     package_install "dmidecode"
     VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
     print_title "VIDEO CARD"
+    check_vga
     if [[ -n ${VIRTUALBOX_GUEST} ]]; then
       package_install "virtualbox-guest-utils"
       add_module "vboxguest vboxsf vboxvideo"
@@ -4904,7 +4905,6 @@ case "$1" in
   check_hostname
   check_domainname
   check_ip
-  check_vga
   configure_pacman_package_signing
   system_upgrade
   language_selector
