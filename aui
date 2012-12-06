@@ -168,7 +168,6 @@
       else
         VIDEO_DRIVER="nouveau"
         VIDEO_KERNEL="nouveau"
-        VIDEO_ACCEL=""
       fi
     else
       echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q "intel corporation"
@@ -176,19 +175,16 @@
         cecho Intel
         VIDEO_DRIVER="intel"
         VIDEO_KERNEL="intel"
-        VIDEO_ACCEL="libva-intel-driver"
       else
         echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q "advanced micro devices"
         if [ $? -eq 0 ]; then
           cecho AMD/ATI
           VIDEO_DRIVER="ati"
           VIDEO_KERNEL="ati"
-          VIDEO_ACCEL=""
         else
           cecho unknown
           VIDEO_DRIVER=""
           VIDEO_KERNEL=""
-          VIDEO_ACCEL=""
         fi
       fi
     fi
