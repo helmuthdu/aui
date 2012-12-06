@@ -182,7 +182,7 @@
           VIDEO_DRIVER="ati"
           VIDEO_KERNEL="ati"
         else
-          cecho unknown
+          cecho VESA
           VIDEO_DRIVER=""
           VIDEO_KERNEL=""
         fi
@@ -1217,7 +1217,7 @@ case "$1" in
           if [[ $EDITOR == joe ]]; then
             !check_package "joe" && aui_download_packages "joe"
           elif [[ $EDITOR == vim ]]; then
-            package_install "vim ctags"
+            ! check_package "gvim" && package_install "vim ctags"
             #VIMRC {{{
             vimrc_list=("Default" "Vanilla" "Get from github");
             PS3="$prompt1"
