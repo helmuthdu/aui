@@ -1694,7 +1694,7 @@ case "$1" in
       systemctl disable ntpd.service
       systemctl enable vboxservice.service
     elif [[ ${NVIDIA} -eq 1 ]]; then
-      package_remove "$(pacman -Qe | grep xf86-video | awk '{print $1}')"
+      pacman -Rcsn $(pacman -Qe | grep xf86-video | awk '{print $1}')
       pacman -S --needed nvidia nvidia-utils
     elif [[ -n ${VIDEO_DRIVER} ]]; then
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri ${VIDEO_ACCEL}"
@@ -2947,7 +2947,7 @@ case "$1" in
             package_install "emacs"
             ;;
           5)
-            package_remove "vim"
+            check_package && package_remove "vim"
             package_install "gvim ctags ack"
             package_install "ttf-liberation"
             aur_package_install "discount"
@@ -2965,8 +2965,8 @@ case "$1" in
             package_install "netbeans"
             ;;
           10)
-            package_remove "jre7-openjdk"
-            package_remove "jdk7-openjdk"
+            check_package "jre7-openjdk" && package_remove "jre7-openjdk"
+            check_package "jdk7-openjdk" && package_remove "jdk7-openjdk"
             aur_package_install "jdk"
             ;;
           11)
