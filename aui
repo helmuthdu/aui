@@ -4580,12 +4580,11 @@ case "$1" in
       echo " 1) $(menu_item "ttf-dejavu")"
       echo " 2) $(menu_item "ttf-google-webfonts") $AUR"
       echo " 3) $(menu_item "ttf-funfonts") $AUR"
-      echo " 4) $(menu_item "ttf-kochi-substitute") (Japanese Support) $AUR"
-      echo " 5) $(menu_item "ttf-liberation")"
-      echo " 6) $(menu_item "ttf-ms-fonts") $AUR"
-      echo " 7) $(menu_item "ttf-source-code-pro") $AUR"
-      echo " 8) $(menu_item "ttf-vista-fonts") $AUR"
-      echo " 9) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support) $AUR"
+      echo " 4) $(menu_item "ttf-liberation")"
+      echo " 5) $(menu_item "ttf-ms-fonts") $AUR"
+      echo " 6) $(menu_item "ttf-source-code-pro") $AUR"
+      echo " 7) $(menu_item "ttf-vista-fonts") $AUR"
+      echo " 8) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support) $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -4606,21 +4605,18 @@ case "$1" in
             aur_package_install "ttf-funfonts"
             ;;
           4)
-            aur_package_install "ttf-kochi-substitute"
-            ;;
-          5)
             package_install "ttf-liberation"
             ;;
-          6)
+          5)
             aur_package_install "ttf-ms-fonts"
             ;;
-          7)
+          6)
             aur_package_install "ttf-source-code-pro"
             ;;
-          8)
+          7)
             aur_package_install "ttf-vista-fonts"
             ;;
-          9)
+          8)
             aur_package_install "wqy-microhei"
             ;;
           "b")

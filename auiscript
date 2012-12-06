@@ -519,9 +519,9 @@
   # 1) ttf-dejavu
   # 2) ttf-google-webfonts
   # 3) ttf-funfonts
-  # 4) ttf-kochi-substitute
-  # 5) ttf-liberation
-  # 6) ttf-ms-fonts
+  # 4) ttf-liberation
+  # 5) ttf-ms-fonts
+  # 6) ttf-source-code-pro
   # 7) ttf-vista-fonts
   # 8) ttf-wgy-microhei
   FONTS_OPTIONS="1-8"
