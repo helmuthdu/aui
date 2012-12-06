@@ -3873,7 +3873,7 @@ case "$1" in
             OPT=2
             ;;
           3)
-            package_install "libbluray libquicktime libdvdread libdvdnav libdvdcss cdrdao libaacs"
+            package_install "libbluray libquicktime libdvdread libdvdnav libdvdcss cdrdao"
             if [[ $ARCHI == i686 ]]; then
               aur_package_install "codecs"
             else
