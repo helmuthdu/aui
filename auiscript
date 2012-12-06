@@ -117,21 +117,9 @@
   #GNOME {{{
     # 1) GNOME Icons
     # 2) GNOME Themes
-    # 3) GNOME Shell
-    # 4) GNOME Shell
-    # 5) Packagekit
-    GNOME_OPTIONS="1-5"
-    #GNOME EXTENSIONS {{{
-      # 1) disper
-      # 2) gpaste
-      # 3) gtile
-      # 4) media-player
-      # 5) pomodoro
-      # 6) system-monitor
-      # 7) user-theme
-      # 8) weather
-      GNOME_EXTENSIONS="1-8"
-    #}}}
+    # 3) GNOME Shell Themes
+    # 4) Packagekit
+    GNOME_OPTIONS="1-4"
     #GNOME SHELL THEMES {{{
       # 1) Elegance
       # 2) eOS

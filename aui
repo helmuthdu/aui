@@ -2266,9 +2266,8 @@ case "$1" in
           print_title "GNOME CUSTOMIZATION"
           echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
           echo " 2) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
-          echo " 3) $(menu_item "disper gpaste gnome-shell-extension-gtile-git gnome-shell-extension-mediaplayer-git gnome-shell-extension-pomodoro-git gnome-shell-extension-user-theme-git gnome-shell-extension-weather-git gnome-shell-system-monitor-applet-git" "GNOME Shell Extensions") $AUR"
-          echo " 4) $(menu_item "gnome-shell-theme-elegance" "GNOME Shell Themes") $AUR"
-          echo " 5) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
+          echo " 3) $(menu_item "gnome-shell-theme-elegance" "GNOME Shell Themes") $AUR"
+          echo " 4) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
           echo ""
           echo " d) DONE"
           echo ""
@@ -2285,63 +2284,6 @@ case "$1" in
                 OPT=2
                 ;;
               3)
-                #GNOMESHELL EXTENSIONS {{{
-                while [[ 1 ]]
-                do
-                  print_title "GNOMESHELL EXTENSIONS"
-                  echo " 1) $(menu_item "disper")"
-                  echo " 2) $(menu_item "gpaste")"
-                  echo " 3) $(menu_item "gnome-shell-extension-mediaplayer-git")"
-                  echo " 4) $(menu_item "gnome-shell-extension-pomodoro-git")"
-                  echo " 5) $(menu_item "gnome-shell-system-monitor-applet-git" "System-monitor")"
-                  echo " 6) $(menu_item "gnome-shell-extension-user-theme-git")"
-                  echo " 7) $(menu_item "gnome-shell-extension-weather-git")"
-                  echo " 8) $(menu_item "gnome-shell-extension-gtile-git")"
-                  echo ""
-                  echo " b) BACK"
-                  echo ""
-                  GNOME_EXTENSIONS+=" b"
-                  read_input_options "$GNOME_EXTENSIONS"
-                  for OPT in ${OPTIONS[@]}; do
-                    case "$OPT" in
-                      1)
-                        aur_package_install "disper"
-                        ;;
-                      2)
-                        aur_package_install "gpaste"
-                        ;;
-                      3)
-                        aur_package_install "gnome-shell-extension-mediaplayer-git"
-                        ;;
-                      4)
-                        aur_package_install "gnome-shell-extension-pomodoro-git"
-                        ;;
-                      5)
-                        aur_package_install "gnome-shell-system-monitor-applet-git"
-                        ;;
-                      6)
-                        aur_package_install "gnome-shell-extension-user-theme-git"
-                        ;;
-                      7)
-                        aur_package_install "gnome-shell-extension-weather-git"
-                        ;;
-                      8)
-                        aur_package_install "gnome-shell-extension-gtile-git"
-                        ;;
-                      "b")
-                        break
-                        ;;
-                      *)
-                        invalid_option
-                        ;;
-                    esac
-                  done
-                  elihw
-                done
-                #}}}
-                OPT=3
-                ;;
-              4)
                 #GNOMESHELL THEMES {{{
                 while [[ 1 ]]
                 do
