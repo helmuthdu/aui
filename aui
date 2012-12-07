@@ -108,9 +108,9 @@
           cecho success
         else
           cecho failed
-          echo -e " [i] Showing the last 10 lines from $LOG";
+          echo -e "${BRed}==>${White} Showing the last 10 lines from $LOG";
           tail -n10 "$LOG"
-          sleep 2
+          read -e -sn 1 -p "Press any key to continue..."
         fi
         break 1; #was2
       fi
