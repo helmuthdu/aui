@@ -158,7 +158,7 @@
         error_msg "ERROR! Could not find valid IP address."
         exit 1
       fi
-      [[ $XPINGS -eq 1 ]] && dhcpcd > /dev/null
+      [[ $XPINGS -eq 1 ]] && dhcpcd
       sleep 3
       check_connection
     fi
@@ -1484,9 +1484,9 @@ case "$1" in
     print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
     print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD service discovery. It allows programs to publish and discover services and hosts running on a local network with no specific configuration."
     package_install "avahi nss-mdns"
-    pause_function
     is_package_installed "avahi" && systemctl enable avahi-daemon.service
     is_package_installed "avahi" && systemctl enable avahi-dnsconfd.service
+    pause_function
     print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
     print_info "acpid is a flexible and extensible daemon for delivering ACPI events."
     package_install "acpi acpid"
