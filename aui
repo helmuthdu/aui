@@ -1142,21 +1142,6 @@ case "$1" in
     pause_function
   }
   #}}}
-  #PACKMAN PACKAGE SIGNING {{{
-  configure_pacman_package_signing(){
-    if [[ ! -d /etc/pacman.d/gnupg ]]; then
-      print_title "PACMAN PACKAGE SIGNING - https://wiki.archlinux.org/index.php/Pacman-key"
-      print_info "Pacman-key is a new tool available with pacman 4. It allows the user to manage pacman's list of trusted keys in the new package signing implementation."
-      curl -o PKGBUILD http://aur.archlinux.org/packages/rng-tools/PKGBUILD && makepkg -si --asroot --noconfirm
-      sed -i '/timeout/s/0/10/' /etc/conf.d/rngd
-      rngd -f -r /dev/urandom &
-      pacman-key --init --keyserver pgp.mit.edu
-      pacman-key --populate archlinux
-      killall rngd
-      package_remove "rng-tools"
-    fi
-  }
-  #}}}
   #SELECT/CREATE USER {{{
   select_user(){
     #CREATE NEW USER {{{
@@ -4839,7 +4824,6 @@ case "$1" in
   check_hostname
   check_domainname
   check_ip
-  configure_pacman_package_signing
   system_upgrade
   language_selector
   configure_sudo
