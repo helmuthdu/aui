@@ -304,8 +304,8 @@
   } #}}}
   is_package_installed(){ #{{{
     #check if a package is already installed
-    for PACKAGE in $1; do
-      pacman -Q $PACKAGE &> /dev/null && return 0;
+    for PKG in $1; do
+      pacman -Q $PKG &> /dev/null && return 0;
     done
     return 1
   } #}}}
@@ -1200,7 +1200,7 @@ case "$1" in
       select EDITOR in "${editors_list[@]}"; do
         if contains_element "$EDITOR" "${editors_list[@]}"; then
           if [[ $EDITOR == joe ]]; then
-            !is_package_installed "joe" && aui_download_packages "joe"
+            ! is_package_installed "joe" && aui_download_packages "joe"
           elif [[ $EDITOR == vim ]]; then
             ! is_package_installed "gvim" && package_install "vim ctags"
             #VIMRC {{{
