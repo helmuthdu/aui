@@ -2928,7 +2928,7 @@ case "$1" in
             package_install "emacs"
             ;;
           5)
-            if is_package_installed "vim"; then package_remove "vim" fi
+            is_package_installed "vim" && package_remove "vim"
             package_install "gvim ctags"
             ;;
           6)
