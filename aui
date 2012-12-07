@@ -72,6 +72,7 @@
   #log file
   LOG="${PWD}/`basename ${0}`.log"
   [[ -f $LOG ]] && rm $LOG 2>/dev/null
+  XPINGS=0
 #}}}
 #COMMON FUNCTIONS {{{
   error_msg() { #{{{
@@ -149,10 +150,17 @@
       error_msg "ERROR! Domain name is not configured."
     fi
   } #}}}
-  check_ip() { #{{{
+  check_connection() { #{{{
+    XPINGS=$(( $XPINGS + 1 ))
     IP_ADDR=`ip addr 2>/dev/null | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' | egrep -v '255|(127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})' | sed 's/ //g'`
-    if [[ $? -ne 0 ]]; then
-      error_msg "ERROR! Could not find valid IP address."
+    if [[ -z $IP_ADDR ]]; then
+      if [[ $XPINGS -gt 4 ]]; then
+        error_msg "ERROR! Could not find valid IP address."
+        exit 1
+      fi
+      [[ $XPINGS -eq 1 ]] && dhcpcd > /dev/null
+      sleep 3
+      check_connection
     fi
   } #}}}
   check_vga() { #{{{
@@ -4840,8 +4848,7 @@ case "$1" in
   check_root
   check_archlinux
   check_hostname
-  check_domainname
-  check_ip
+  check_connection
   system_upgrade
   language_selector
   configure_sudo
