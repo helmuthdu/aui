@@ -71,7 +71,7 @@
   fi
   #log file
   LOG="${PWD}/`basename ${0}`.log"
-  rm $LOG 2>/dev/null
+  [[ -f $LOG ]] && rm $LOG 2>/dev/null
 #}}}
 #COMMON FUNCTIONS {{{
   error_msg() { #{{{
@@ -386,7 +386,7 @@
     #remove package
     if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
       for PKG in ${1}; do
-        if ! is_package_installed "${PKG}" ; then
+        if is_package_installed "${PKG}" ; then
           ncecho "${BBlue}==>${White} Removing ${BWhite}${PKG}${White} "
           pacman -Rcsn --noconfirm ${PKG} >>"$LOG" 2>&1 &
           pid=$!;progress $pid
@@ -2928,7 +2928,7 @@ case "$1" in
             package_install "emacs"
             ;;
           5)
-            ! is_package_installed "gvim" && package_remove "vim"
+            if is_package_installed "vim"; then package_remove "vim" fi
             package_install "gvim ctags"
             ;;
           6)
