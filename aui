@@ -505,29 +505,49 @@ case "$1" in
   #}}}
   #REFLECTOR {{{
   configure_mirrorlist(){
+    local countries_code=("AU" "BY" "BE" "BR" "BG" "CA" "CL" "CN" "CO" "CZ" "DK" "EE" "FI" "FR" "DE" "GR" "HU" "IN" "IE" "IL" "IT" "JP" "KZ" "KR" "LV" "LU" "MK" "NL" "NC" "NZ" "NO" "PL" "PT" "RO" "RU" "RS" "SG" "SK" "ZA" "ES" "LK" "SE" "CH" "TW" "TR" "UA" "GB" "US" "UZ" "VN")
+    local countries_name=("Australia" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea, Republic of" "Latvia" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russian" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
     country_list(){
       #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/^/"/g' | sed 's/,.*//g' | sed 's/ *$//g'  | sed 's/$/"/g' | sed -e :a -e '$!N; s/\n/ /; ta'`
-      local countries=("Australia" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russian Federation" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
       PS3="$prompt1"
       echo "Select your country:"
-      select COUNTRY in "${countries[@]}"; do
-        if contains_element "$COUNTRY" "${countries[@]}"; then
+      select OPT in "${countries_name[@]}"; do
+        if contains_element "$OPT" "${countries_name[@]}"; then
+          country=${countries_code[$(( $REPLY - 1 ))]}
           break
         else
           invalid_option
         fi
       done
     }
-    print_title "MIRRORLIST|REFLECTOR - https://wiki.archlinux.org/index.php/Reflector"
-    print_info "Reflector is a script which can retrieve the latest mirror list from the MirrorStatus page, filter the most up-to-date mirrors, sort them by speed and overwrite the file /etc/pacman.d/mirrorlist."
-    pacman -S reflector --needed --noconfirm
+    print_title "MIRRORLIST - https://wiki.archlinux.org/index.php/Mirrors"
+    print_info "This option is a guide to selecting and configuring your mirrors, and a listing of current available mirrors."
     OPTION=n
     while [[ $OPTION != y ]]; do
       country_list
-      read_input_text "Confirm country: $COUNTRY"
+      read_input_text "Confirm country: $OPT"
     done
-    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
-    reflector -l 5 --sort rate -c "$COUNTRY" --save /etc/pacman.d/mirrorlist
+
+    url="https://www.archlinux.org/mirrorlist/?country=$country&protocol=ftp&protocol=http&ip_version=4&use_mirror_status=on"
+
+    tmpfile=$(mktemp --suffix=-mirrorlist)
+
+    # Get latest mirror list and save to tmpfile
+    package_install "wget"
+    wget -qO- "$url" | sed 's/^#Server/Server/g' > "$tmpfile"
+
+    # Backup and replace current mirrorlist file (if new file is non-zero)
+    if [[ -s "$tmpfile" ]]
+    then
+     { echo " Backing up the original mirrorlist..."
+       mv -i /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.orig; } &&
+     { echo " Rotating the new list into place..."
+       mv -i "$tmpfile" /etc/pacman.d/mirrorlist; }
+    else
+      echo " Unable to update, could not download list."
+    fi
+    # allow global read access (required for non-root yaourt execution)
+    chmod +r /etc/pacman.d/mirrorlist
     $EDITOR /etc/pacman.d/mirrorlist
   }
   #}}}
