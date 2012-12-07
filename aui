@@ -1697,7 +1697,7 @@ case "$1" in
     check_vga
     if [[ -n ${VIRTUALBOX_GUEST} ]]; then
       package_install "virtualbox-guest-utils"
-      add_module "vboxguest vboxsf vboxvideo" "virtualbox-host"
+      add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
       add_user_to_group ${USER_NAME} vboxsf
       systemctl disable ntpd.service
       systemctl enable vboxservice.service
