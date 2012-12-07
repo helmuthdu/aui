@@ -281,9 +281,8 @@
   } #}}}
   add_module(){ #{{{
     #check if the number of arguments is less then 2
-    [[ $# -lt 2 ]] && MODULE_NAME="$1" || MODULE_NAME="$2";
-    echo "# Load $MODULE at boot" > /etc/modules-load.d/$MODULE_NAME.conf
     for MODULE in $1; do
+      [[ $# -lt 2 ]] && MODULE_NAME="$MODULE" || MODULE_NAME="$2";
       echo "$MODULE" >> /etc/modules-load.d/$MODULE_NAME.conf
       start_module "$MODULE"
     done
@@ -1698,7 +1697,7 @@ case "$1" in
     check_vga
     if [[ -n ${VIRTUALBOX_GUEST} ]]; then
       package_install "virtualbox-guest-utils"
-      add_module "vboxguest vboxsf vboxvideo"
+      add_module "vboxguest vboxsf vboxvideo" "virtualbox-host"
       add_user_to_group ${USER_NAME} vboxsf
       systemctl disable ntpd.service
       systemctl enable vboxservice.service
