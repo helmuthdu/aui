@@ -384,17 +384,17 @@
   } #}}}
   package_remove(){ #{{{
     #remove package
-    if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
-      for PKG in ${1}; do
-        if is_package_installed "${PKG}" ; then
+    for PKG in ${1}; do
+      if is_package_installed "${PKG}" ; then
+        if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
           ncecho "${BBlue}==>${White} Removing ${BWhite}${PKG}${White} "
           pacman -Rcsn --noconfirm ${PKG} >>"$LOG" 2>&1 &
           pid=$!;progress $pid
+        else
+         pacman -Rcsn ${PKG}
         fi
-      done
-    else
-      pacman -Rcsn $1
-    fi
+      fi
+    done
   } #}}}
   system_upgrade(){ #{{{
     if [[ $VERBOSE_MODE -eq 0 ]]; then
