@@ -110,7 +110,7 @@
           cecho failed
           echo -e " [i] Showing the last 10 lines from $LOG";
           tail -n10 "$LOG"
-          exit 1;
+          pause_function
         fi
         break 1; #was2
       fi
