@@ -2929,9 +2929,7 @@ case "$1" in
             ;;
           5)
             is_package_installed "vim" && package_remove "vim"
-            package_install "gvim ctags ack"
-            package_install "ttf-liberation"
-            aur_package_install "discount"
+            package_install "gvim ctags"
             ;;
           6)
             package_install "geany"
