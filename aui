@@ -140,18 +140,18 @@
     DOMAINNAME=`echo ${HOSTNAME} | cut -d'.' -f2- | sed 's/ //g'`
 
     # Hmm, still no domain name. Keep looking...
-    if [ "${DOMAINNAME}" == "" ]; then
+    if [[ "${DOMAINNAME}" == "" ]]; then
       DOMAINNAME=`grep domain /etc/resolv.conf | sed 's/domain //g' | sed 's/ //g'`
     fi
 
     # OK, give up.
-    if [ "${DOMAINNAME}" == "" ]; then
+    if [[ "${DOMAINNAME}" == "" ]]; then
       error_msg "ERROR! Domain name is not configured."
     fi
   } #}}}
   check_ip() { #{{{
     IP_ADDR=`ip addr 2>/dev/null | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' | egrep -v '255|(127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})' | sed 's/ //g'`
-    if [ $? -ne 0 ]; then
+    if [[ $? -ne 0 ]]; then
       error_msg "ERROR! Could not find valid IP address."
     fi
   } #}}}
@@ -2347,7 +2347,7 @@ case "$1" in
         package_install "xdg-user-dirs"
         #package_install "kde-telepathy telepathy"
         package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite"
-        aur_package_install "kde-gtk-config-git"
+        aur_package_install "kde-gtk-config"
         aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
         config_xinitrc "startkde"
         pause_function
