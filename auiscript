@@ -39,11 +39,12 @@
   CUSTOMREPO="n"
   FIRMWARE="n"
   GITTOR="y"
-  SSH="y"
   NFS="n"
   PRELOAD="y"
   SAMBA="y"
+  SSH="y"
   TLP="n"
+  UFW="n"
   ZRAM="y"
   #VIDEOCARD {{{
   #install proprietary drive (NVIDIA|ATI)
