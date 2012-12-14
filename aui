@@ -19,9 +19,7 @@
 # Run this script after your first boot with archlinux (as root)
 
 #VARIABLES {{{
-  # MAIN MENU {{{
-    checklist=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
-  #}}}
+  checklist=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
   # COLORS {{{
     # Regular Colors
     Black='\e[0;30m'        # Black
@@ -63,13 +61,13 @@
   SPIN="/-\|"
   KDE=0
   NVIDIA=0
-  #verbose mode
+  # VERBOSE MODE
   if [[ $1 == "-v" || $1 == "--verbose" ]]; then
     VERBOSE_MODE=1
   else
     VERBOSE_MODE=0
   fi
-  #log file
+  # LOG FILE
   LOG="${PWD}/`basename ${0}`.log"
   [[ -f $LOG ]] && rm $LOG 2>/dev/null
   XPINGS=0
@@ -1494,7 +1492,19 @@ case "$1" in
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
     print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
     package_install "alsa-utils alsa-plugins"
+    if [[ ${ARCHI} == x86_64 ]]; then
+      package_install "lib32-alsa-plugins"
+    fi
     add_module "snd-usb-audio"
+    pause_function
+    print_title "PULSEAUDIO - https://wiki.archlinux.org/index.php/Pulseaudio"
+    print_info "PulseAudio is the default sound server that serves as a proxy to sound applications using existing kernel sound components like ALSA or OSS"
+    package_install "pulseaudio pulseaudio-alsa"
+    if [[ ${ARCHI} == x86_64 ]]; then
+      package_install "lib32-libpulse"
+    fi
+    local CONFIG_PULSEAUDIO=`cat /etc/pulse/default.pa | grep module-switch-on-connect`
+    [[ -z $CONFIG_PULSEAUDIO ]] && echo -e "# automatically switch to newly-connected devices\nload-module module-switch-on-connect" >> /etc/pulse/default.pa
     pause_function
     print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/File_Systems"
     print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
@@ -2106,7 +2116,6 @@ case "$1" in
         package_install "telepathy"
         package_install "gksu nautilus-open-terminal gnome-tweak-tool xdg-user-dirs-gtk"
         package_install "gvfs-smb gvfs-afc"
-        package_install "pulseaudio"
         package_install "deja-dup"
         aur_package_install "gnome-defaults-list"
         config_xinitrc "gnome-session-cinnamon"
@@ -2264,7 +2273,6 @@ case "$1" in
         package_install "gvfs-smb gvfs-afc"
         package_install "zeitgeist"
         package_install "deja-dup"
-        package_install "pulseaudio"
         aur_package_install "gnome-defaults-list"
         config_xinitrc "gnome-session"
         pause_function
@@ -2356,6 +2364,8 @@ case "$1" in
         package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite"
         aur_package_install "kde-gtk-config"
         aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
+        local CONFIG_PULSEAUDIO=`cat /etc/pulse/default.pa | grep module-device-manager`
+        [[ -z $CONFIG_PULSEAUDIO ]] && echo "load-module module-device-manager" >> /etc/pulse/default.pa
         config_xinitrc "startkde"
         pause_function
         #QTCURVE THEMES #{{{
@@ -2504,7 +2514,6 @@ case "$1" in
         pacman -Sy
         package_install "mate mate-extras"
         package_install "gvfs-smb gvfs-afc"
-        package_install "pulseaudio"
         aur_package_install "gnome-defaults-list"
         config_xinitrc "mate-session"
         pause_function
