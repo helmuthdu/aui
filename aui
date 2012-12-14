@@ -168,7 +168,7 @@
     echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q nvidia
     if [ $? -eq 0 ]; then
       cecho Nvidia
-      read_input_text "Install proprietary drive of your NVIDIA card" $INSTALL_NVIDIA
+      read_input_text "Install NVIDIA proprietary driver" $PROPRIETARY_DRIVER
       if [[ $OPTION == y ]]; then
         NVIDIA=1
       else
@@ -185,8 +185,13 @@
         echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q "advanced micro devices"
         if [ $? -eq 0 ]; then
           cecho AMD/ATI
-          VIDEO_DRIVER="ati"
-          VIDEO_KERNEL="ati"
+          read_input_text "Install ATI proprietary driver" $PROPRIETARY_DRIVER
+          if [[ $OPTION == y ]]; then
+            ATI=1
+          else
+            VIDEO_DRIVER="ati"
+            VIDEO_KERNEL="ati"
+          fi
         else
           cecho VESA
           VIDEO_DRIVER=""
@@ -1713,13 +1718,23 @@ case "$1" in
       systemctl enable vboxservice.service
     elif [[ ${NVIDIA} -eq 1 ]]; then
       pacman -Rcsn $(pacman -Qe | grep xf86-video | awk '{print $1}')
-      pacman -S --needed nvidia nvidia-utils
+      pacman -S --needed nvidia
+      if [[ ${ARCHI} == x86_64 ]]; then
+        package_install "lib32-nvidia-utils"
+      fi
+    elif [[ ${ATI} -eq 1 ]]; then
+      package_install "linux-headers"
+      pacman -Rcsn $(pacman -Qe | grep xf86-video | awk '{print $1}')
+      pacman -S --needed catalyst-dkms
+      if [[ ${ARCHI} == x86_64 ]]; then
+        package_install "lib32-catalyst-utils"
+      fi
     elif [[ -n ${VIDEO_DRIVER} ]]; then
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri ${VIDEO_ACCEL}"
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
-      [[ ${VIDEO_DRIVER} == nouveau || ${VIDEO_DRIVER} == radeon ]] &&  add_module "${VIDEO_DRIVER}"
+      [[ ${VIDEO_DRIVER} == nouveau || ${VIDEO_DRIVER} == radeon ]] && add_module "${VIDEO_DRIVER}"
     else
       package_install "xf86-video-vesa"
     fi

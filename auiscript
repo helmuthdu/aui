@@ -46,8 +46,8 @@
   TLP="n"
   ZRAM="y"
   #VIDEOCARD {{{
-    #install nvidia drive intead of the nouveau
-    INSTALL_NVIDIA="n"
+  #install proprietary drive (NVIDIA|ATI)
+    PROPRIETARY_DRIVER="n"
   #}}}
   #ADDITIONAL FIRMWARE {{{
     # 1) alsa-firmware
