@@ -1627,6 +1627,18 @@ case "$1" in
     fi
   }
   #}}}
+  #UFW {{{
+  install_ufw(){
+    print_title "UFW - https://wiki.archlinux.org/index.php/Uncomplicated_Firewall"
+    print_info "Uncomplicated Firewall (ufw) is a simple frontend for iptables that is designed to be easy to use."
+    read_input_text "Install ufw" $UFW
+    if [[ $OPTION == y ]]; then
+      package_install "ufw"
+      systemctl enable ufw
+      pause_function
+    fi
+  }
+  #}}}
   #XORG {{{
   install_xorg(){
     print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
@@ -4920,6 +4932,7 @@ case "$1" in
           install_cups
           install_additional_firmwares
           install_git_tor
+          install_ufw
           checklist[1]=1
           ;;
         2)
