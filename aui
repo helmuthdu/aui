@@ -2044,9 +2044,10 @@ case "$1" in
         print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
         print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
         package_install "awesome"
+        package_install "gvfs"
         package_install "lxappearance"
         package_install "leafpad epdfview nitrogen"
-        package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
+        package_install "ttf-bitstream-vera ttf-dejavu"
         aur_package_install "gnome-defaults-list"
         mkdir -p /home/${USER_NAME}/.config/awesome/
         cp /etc/xdg/awesome/rc.lua /home/${USER_NAME}/.config/awesome/
@@ -2203,14 +2204,13 @@ case "$1" in
         #E17 {{{
         print_title "E17 - http://wiki.archlinux.org/index.php/E17"
         print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
-        package_install "e-svn e17-extra-svn"
+        package_install "enlightenment17"
+        package_install "gvfs"
         package_install "xdg-user-dirs"
-        package_install "gvfs-smb gvfs-afc"
         package_install "leafpad epdfview"
         package_install "lxappearance"
-        package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
+        package_install "ttf-bitstream-vera ttf-dejavu"
         aur_package_install "gnome-defaults-list"
-        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
         config_xinitrc "enlightenment_start"
         pause_function
         #E17 CUSTOMIZATION {{{
@@ -2257,7 +2257,7 @@ case "$1" in
                 package_install "gmrun"
                 ;;
               7)
-                package_install "pcmanfm"
+                package_install "pcmanfm polkit-gnome gvfs"
                 ;;
               8)
                 package_install "rxvt-unicode"
@@ -2387,8 +2387,8 @@ case "$1" in
         print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
         package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
         package_install "xdg-user-dirs"
-        #package_install "kde-telepathy telepathy"
-        package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite"
+        package_install "kde-telepathy telepathy"
+        package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite kdenetwork-kopete"
         aur_package_install "kde-gtk-config"
         aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
         local CONFIG_PULSEAUDIO=`cat /etc/pulse/default.pa | grep module-device-manager`
@@ -2427,7 +2427,7 @@ case "$1" in
           echo " d) DONE"
           echo ""
           KDE_OPTIONS+=" d"
-          read_input_options "${KDE}_OPTIONS"
+          read_input_options "$KDE_OPTIONS"
           for OPT in ${OPTIONS[@]}; do
             case "$OPT" in
               1)
@@ -2477,11 +2477,16 @@ case "$1" in
         print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
         print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
         package_install "lxde"
-        package_install "pm-utils upower"
+        package_install "upower"
+        package_install "polkit-gnome gvfs"
         package_install "xdg-user-dirs"
-        package_install "gvfs-smb gvfs-afc"
-        package_install "leafpad epdfview"
+        package_install "leafpad obconf epdfview"
         aur_package_install "gnome-defaults-list"
+        mkdir -p /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/rc.xml /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/menu.xml /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/autostart /home/${USER_NAME}/.config/openbox/
+        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
         config_xinitrc "startlxde"
         pause_function
         #LXDE CUSTOMIZATION {{{
@@ -2540,7 +2545,7 @@ case "$1" in
         echo -e '\n[mate]\nServer = http://repo.mate-desktop.org/archlinux/$arch' >> /etc/pacman.conf
         pacman -Sy
         package_install "mate mate-extras"
-        package_install "gvfs-smb gvfs-afc"
+        package_install "gvfs"
         aur_package_install "gnome-defaults-list"
         config_xinitrc "mate-session"
         pause_function
@@ -2595,8 +2600,7 @@ case "$1" in
         package_install "lxappearance"
         package_install "xdg-user-dirs"
         package_install "leafpad epdfview nitrogen"
-        package_install "gvfs-smb gvfs-afc"
-        package_install "ttf-bitstream-vera ttf-dejavu ttf-freefont"
+        package_install "ttf-bitstream-vera ttf-dejavu"
         aur_package_install "gnome-defaults-list"
         mkdir -p /home/${USER_NAME}/.config/openbox/
         cp /etc/xdg/openbox/rc.xml /home/${USER_NAME}/.config/openbox/
@@ -2643,7 +2647,7 @@ case "$1" in
                 package_install "gmrun"
                 ;;
               5)
-                package_install "pcmanfm"
+                package_install "pcmanfm polkit-gnome gvfs"
                 ;;
               6)
                 package_install "rxvt-unicode"
@@ -2691,7 +2695,7 @@ case "$1" in
         print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
         print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
         package_install "xfce4 xfce4-goodies"
-        package_install "gvfs-smb gvfs-afc"
+        package_install "gvfs"
         package_install "xdg-user-dirs"
         aur_package_install "gnome-defaults-list"
         config_xinitrc "startxfce4"
@@ -2745,17 +2749,16 @@ case "$1" in
         ;;
     esac
     #Fix p7FM {{{
-    if [[ ${KDE} -eq 0 ]]; then
-      package_install "wxgtk"
-    fi
+    [[ ${KDE} -eq 0 ]] && package_install "wxgtk"
     #}}}
   }
   #}}}
-  #NETWORKMANAGER/WICD {{{
+  #CONNMAN/NETWORKMANAGER/WICD {{{
   install_nm_wicd(){
     print_title "NETWORK MANAGER"
     echo " 1) Networkmanager"
     echo " 2) Wicd"
+    echo " 3) ConnMan"
     echo ""
     echo " n) NONE"
     echo ""
@@ -2784,8 +2787,16 @@ case "$1" in
         else
           package_install "wicd wicd-gtk"
         fi
-        #Network Management daemon
+        #WICD daemon
         systemctl enable wicd.service
+        pause_function
+        ;;
+      3)
+        print_title "CONNMAN - https://wiki.archlinux.org/index.php/Connman"
+        print_info "ConnMan is an alternative to NetworkManager and Wicd and was created by Intel and the Moblin project for use with embedded devices."
+        package_install "connman "
+        #ConnMan daemon
+        systemctl enable connman.service
         pause_function
         ;;
     esac
@@ -3761,13 +3772,14 @@ case "$1" in
           3)
             package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good \
                              gst-plugins-bad gst-plugins-ugly gst-ffmpeg"
-            # FIXME
-            #  - Do this for all users
-            # Use the 'standard' preset by default. This preset should generally be
-            # transparent to most people on most music and is already quite high in quality.
-            # The resulting bitrate should be in the 170-210kbps range, according to music
-            # complexity.
-            sudo -u ${USER_NAME} gconftool-2 --type string --set /system/gstreamer/0.10/audio/profiles/mp3/pipeline "audio/x-raw-int,rate=44100,channels=2 ! lame name=enc preset=1001 ! id3v2mux"
+            if check_package "banshee clementine exaile rhythmbox xfburn" ; then
+              package_install "gstreamer0.10-plugins"
+              # Use the 'standard' preset by default. This preset should generally be
+              # transparent to most people on most music and is already quite high in quality.
+              # The resulting bitrate should be in the 170-210kbps range, according to music
+              # complexity.
+              sudo -u ${USER_NAME} gconftool-2 --type string --set /system/gstreamer/0.10/audio/profiles/mp3/pipeline "audio/x-raw-int,rate=44100,channels=2 ! lame name=enc preset=1001 ! id3v2mux"
+            fi
             ;;
           "b")
             break
