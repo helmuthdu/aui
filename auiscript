@@ -46,10 +46,8 @@
   TLP="n"
   UFW="n"
   ZRAM="y"
-  #VIDEOCARD {{{
   #install proprietary drive (NVIDIA|ATI)
-    PROPRIETARY_DRIVER="n"
-  #}}}
+  PROPRIETARY_DRIVER="n"
   #ADDITIONAL FIRMWARE {{{
     # 1) alsa-firmware
     # 2) ipw2100
@@ -191,6 +189,7 @@
 #NETWORK MANAGER {{{
   # 1) NetworkManager
   # 2) Wicd
+  # 3) ConnMan
   # n) None
   NETWORKMANAGER="1"
   #USB 3G MODEM SUPPORT
@@ -199,16 +198,16 @@
 #ACCESSORIES {{{
   # 1) Cairo Dock
   # 2) Catfish
-  # 3) Conky + CONKY-colors
+  # 3) Conky
   # 4) Deepin Screenshot
   # 5) Dockbarx
   # 6) Docky
   # 7) Galculator/Speedcrunch
-  # 8) Gnome-Pie
-  # 9) Guake
-  #10) Kupfer
-  #11) Pyrenamer
-  #12) Shutter
+  # 8) Guake
+  # 9) Kupfer
+  #10) Pyrenamer
+  #11) Shutter
+  #11) Stormcloud
   #13) Synapse
   #14) Terminator
   #15) Zim
@@ -231,7 +230,7 @@
   #14) MySQL Workbench
   #15) Meld
   #16) RabbitVCS
-  DEVELOPMENT_OPTIONS="5 13"
+  DEVELOPMENT_OPTIONS="10 5 13"
   #ECLIPSE {{{
     # 1) Eclipse Classic
     # 2) Eclipse IDE for C/C++ Developers
@@ -255,8 +254,9 @@
   # 7) Impressive
   # 8) Nitrotask
   # 9) OCRFeeder
-  #10) Xmind
-  #11) Zathura
+  #10) UberWriter
+  #11) Xmind
+  #12) Zathura
   OFFICE_OPTIONS="1 6 8 10"
 #}}}
 #SYSTEM TOOLS {{{
@@ -271,7 +271,7 @@
 #GRAPHICS {{{
   # 1) Blender
   # 2) Gimp
-  # 3) Gimp-plugins
+  # 3) Gradiator
   # 4) Gthumb
   # 5) Inkscape
   # 6) MComix

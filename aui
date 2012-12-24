@@ -2825,11 +2825,11 @@ case "$1" in
       echo " 5) $(menu_item "dockbarx") $AUR"
       echo " 6) $(menu_item "docky") $AUR"
       echo " 7) $(menu_item "speedcrunch galculator" "$([[ ${KDE} -eq 1 ]] && echo "Speedcrunch" || echo "Galculator";)") $AUR"
-      echo " 8) $(menu_item "gnome-pie") $AUR"
-      echo " 9) $(menu_item "guake")"
-      echo "10) $(menu_item "kupfer") $AUR"
-      echo "11) $(menu_item "pyrenamer") $AUR"
-      echo "12) $(menu_item "shutter") $AUR"
+      echo " 8) $(menu_item "guake")"
+      echo " 9) $(menu_item "kupfer") $AUR"
+      echo "10) $(menu_item "pyrenamer") $AUR"
+      echo "11) $(menu_item "shutter") $AUR"
+      echo "12) $(menu_item "stormcloud") $AUR"
       echo "13) $(menu_item "synapse") $AUR"
       echo "14) $(menu_item "terminator")"
       echo "15) $(menu_item "zim")"
@@ -2866,19 +2866,19 @@ case "$1" in
             fi
             ;;
           8)
-            aur_package_install "gnome-pie"
-            ;;
-          9)
             package_install "guake"
             ;;
-          10)
+          9)
             aur_package_install "kupfer"
             ;;
-          11)
+          10)
             aur_package_install "pyrenamer"
             ;;
-          12)
+          11)
             aur_package_install "shutter"
+            ;;
+          12)
+            aur_package_install "stormcloud"
             ;;
           13)
             package_install "zeitgeist"
@@ -3077,8 +3077,9 @@ case "$1" in
       echo " 7) $(menu_item "impressive")"
       echo " 8) $(menu_item "nitrotasks") $AUR"
       echo " 9) $(menu_item "ocrfeeder")"
-      echo "10) $(menu_item "xmind") $AUR"
-      echo "11) $(menu_item "zathura")"
+      echo "10) $(menu_item "uberwriter") $AUR"
+      echo "11) $(menu_item "xmind") $AUR"
+      echo "12) $(menu_item "zathura")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -3135,9 +3136,12 @@ case "$1" in
             aur_package_install "aspell-$LANGUAGE_AS"
             ;;
           10)
-            aur_package_install "xmind"
+            aur_package_install "uberwriter"
             ;;
           11)
+            aur_package_install "xmind"
+            ;;
+          12)
             package_install "zathura"
             ;;
           "b")
@@ -3218,7 +3222,7 @@ case "$1" in
       print_title "GRAPHICS APPS"
       echo " 1) $(menu_item "blender")"
       echo " 2) $(menu_item "gimp")"
-      echo " 3) $(menu_item "gimp-paint-studio" "Gimp-plugins") $AUR"
+      echo " 3) $(menu_item "gradiator")"
       echo " 4) $(menu_item "gthumb")"
       echo " 5) $(menu_item "inkscape")"
       echo " 6) $(menu_item "mcomix")"
@@ -3239,9 +3243,10 @@ case "$1" in
             ;;
           2)
             package_install "gimp"
+            aur_package_install "gimphelp-scriptfu gimp-resynth gimpfx-foundry"
             ;;
           3)
-            aur_package_install "gimp-paint-studio gimphelp-scriptfu gimp-resynth gimpfx-foundry gimp-plugin-pandora gimp-plugin-saveforweb"
+            aur_package_install "gradiator"
             ;;
           4)
             package_install "gthumb"
