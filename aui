@@ -3669,6 +3669,7 @@ case "$1" in
               echo "11) $(menu_item "spotify") $AUR"
               echo "12) $(menu_item "tomahawk") $AUR"
               echo "13) $(menu_item "timidity++")"
+              echo "14) $(menu_item "xnoise") $AUR"
               echo ""
               echo " b) BACK"
               echo ""
@@ -3715,6 +3716,9 @@ case "$1" in
                   13)
                     aur_package_install "timidity++ fluidr3"
                     echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
+                    ;;
+                  14)
+                    aur_package_install "xnoise"
                     ;;
                   "b")
                     break

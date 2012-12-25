@@ -360,6 +360,7 @@
     #11) Spotify
     #12) Tomahawk
     #13) Timidity++
+    #14) Xnoise
     AUDIO_PLAYER_OPTIONS="4"
   #}}}
   #EDITORS|TOOLS {{{
