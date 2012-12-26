@@ -543,7 +543,6 @@ case "$1" in
     tmpfile=$(mktemp --suffix=-mirrorlist)
 
     # Get latest mirror list and save to tmpfile
-    package_install "wget"
     wget -qO- "$url" | sed 's/^#Server/Server/g' > "$tmpfile"
 
     # Backup and replace current mirrorlist file (if new file is non-zero)
@@ -1622,7 +1621,7 @@ case "$1" in
     read_input_text "Install Laptop Mode Tools" $LMT
     if [[ $OPTION == y ]]; then
       package_install "laptop-mode-tools"
-      systemctl enable laptop-mode-tools.service
+      systemctl enable laptop-mode.service
       pause_function
     fi
   }
