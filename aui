@@ -530,6 +530,7 @@ case "$1" in
         fi
       done
     }
+    package_install "wget"
     print_title "MIRRORLIST - https://wiki.archlinux.org/index.php/Mirrors"
     print_info "This option is a guide to selecting and configuring your mirrors, and a listing of current available mirrors."
     OPTION=n
@@ -3107,7 +3108,6 @@ case "$1" in
             aur_package_install "aspell-$LANGUAGE_AS"
             ;;
           3)
-            print_title "LATEX - https://wiki.archlinux.org/index.php/LaTeX"
             package_install "texlive-most"
             if [[ $LANGUAGE == pt_BR ]]; then
               aur_package_install "abntex"
@@ -3309,7 +3309,7 @@ case "$1" in
             do
               print_title "BROWSER"
               echo " 1) $(menu_item "chromium")"
-              echo " 2) $(menu_item "google-chrome")"
+              echo " 2) $(menu_item "google-chrome") $AUR"
               echo " 3) $(menu_item "rekonq midori" "$([[ ${KDE} -eq 1 ]] && echo "Rekonq" || echo "Midori";)")"
               echo " 4) $(menu_item "firefox")"
               echo " 5) $(menu_item "opera")"
