@@ -173,14 +173,12 @@
         NVIDIA=1
       else
         VIDEO_DRIVER="nouveau"
-        VIDEO_KERNEL="nouveau"
       fi
     else
       echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q "intel corporation"
       if [ $? -eq 0 ]; then
         cecho Intel
         VIDEO_DRIVER="intel"
-        VIDEO_KERNEL="intel"
       else
         echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q "advanced micro devices"
         if [ $? -eq 0 ]; then
@@ -190,12 +188,10 @@
             ATI=1
           else
             VIDEO_DRIVER="ati"
-            VIDEO_KERNEL="ati"
           fi
         else
           cecho VESA
           VIDEO_DRIVER=""
-          VIDEO_KERNEL=""
         fi
       fi
     fi
@@ -1730,11 +1726,14 @@ case "$1" in
       systemctl enable vboxservice.service
     elif [[ ${NVIDIA} -eq 1 ]]; then
       pacman -Rcsn $(pacman -Qe | grep xf86-video | awk '{print $1}')
-      pacman -S --needed nvidia
+      pacman -S --needed nvidia{,-utils}
       package_install "libva-vdpau-driver"
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-nvidia-utils"
       fi
+      sed -i 's/options nouveau modeset=1/#options nouveau modeset=1/' /etc/modprobe.d/modprobe.conf
+      sed -i 's/MODULES="nouveau"/#MODULES="nouveau"/' /etc/mkinitcpio.conf
+      mkinitcpio -p linux
     elif [[ ${ATI} -eq 1 ]]; then
       package_install "linux-headers"
       pacman -Rcsn $(pacman -Qe | grep xf86-video | awk '{print $1}')
@@ -1743,11 +1742,19 @@ case "$1" in
         package_install "lib32-catalyst-utils"
       fi
     elif [[ -n ${VIDEO_DRIVER} ]]; then
-      package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri ${VIDEO_ACCEL}"
+      is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
+      pacman -S --asdeps libgl
+      package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri ${VIDEO_DRIVER}"
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
-      [[ ${VIDEO_DRIVER} == nouveau || ${VIDEO_DRIVER} == radeon ]] && add_module "${VIDEO_DRIVER}"
+      if [[ ${VIDEO_DRIVER} == nouveau ]]; then
+        sed -i 's/#*options nouveau modeset=1/options nouveau modeset=1/' /etc/modprobe.d/modprobe.conf
+        sed -i 's/#*MODULES="nouveau"/MODULES="nouveau"/' /etc/mkinitcpio.conf
+        mkinitcpio -p linux
+      else [[ ${VIDEO_DRIVER} == radeon ]]
+        add_module "${VIDEO_DRIVER}"
+      fi
     else
       package_install "xf86-video-vesa"
     fi
