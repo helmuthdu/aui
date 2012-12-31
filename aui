@@ -2251,8 +2251,8 @@ case "$1" in
         done
     } #}}}
     print_title "DESKTOP ENVIRONMENT|WINDOW MANAGER"
-    print_info "A DE provide a complete GUI for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries."
-    echo -e "Select your DE or WM:\n"
+    echo -e "Select your DE or WM:"
+    print_info "\nA DE provide a complete GUI for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries."
     echo " 1) Cinnamon $AUR"
     echo " 2) E17"
     echo " 3) GNOME"
