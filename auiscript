@@ -46,8 +46,10 @@
   TLP="n"
   UFW="n"
   ZRAM="y"
+
   #install proprietary drive (NVIDIA|ATI)
   PROPRIETARY_DRIVER="n"
+
   #ADDITIONAL FIRMWARE {{{
     # 1) alsa-firmware
     # 2) ipw2100
@@ -156,27 +158,6 @@
     # 3) Display Manager
     XFCE_OPTIONS="1-3"
   #}}}
-  #ICONS {{{
-    # 1) Awoken
-    # 2) Faenza
-    # 3) Faenza-Cupertino
-    # 4) Faience
-    # 5) Elementary
-    # 6) Nitrux
-    GNOME_ICONS="2-4 6"
-  #}}}
-  #GTK THEMES {{{
-    # 1) Adwaita-X
-    # 2) Blackbird
-    # 3) Bluebird
-    # 4) Greybird
-    # 5) Faience
-    # 6) Gnome Cupertino
-    # 7) MediterraneanNight
-    # 8) Light (Aka Ambiance/Radiance)
-    # 9) Zukitwo
-    GTK_THEMES="4-9"
-  #}}}
   #DISPLAY MANAGER {{{
     # 1) Elsa
     # 2) GDM
@@ -184,6 +165,30 @@
     # 4) LXDM
     # 5) Slim
     DISPLAY_MANAGER="4"
+  #}}}
+  #ICONS THEMES {{{
+    # 1) Awoken
+    # 2) Elementary XFCE
+    # 3) Faenza
+    # 4) Faenza-Cupertino
+    # 5) Faience
+    # 6) iNX
+    # 7) Matrilineare
+    # 8) Nitrux
+    GNOME_ICONS="3-5"
+  #}}}
+  #GTK THEMES {{{
+    # 1) Adwaita-X
+    # 2) Boje
+    # 3) Blackbird
+    # 4) Bluebird
+    # 5) Greybird
+    # 6) Faience
+    # 7) Gnome Cupertino
+    # 8) MediterraneanNight
+    # 9) Light (Aka Ambiance/Radiance)
+    #10) Zukitwo
+    GTK_THEMES="2 5-10"
   #}}}
 #}}}
 #NETWORK MANAGER {{{
@@ -361,7 +366,7 @@
     #12) Tomahawk
     #13) Timidity++
     #14) Xnoise
-    AUDIO_PLAYER_OPTIONS="4"
+    AUDIO_PLAYER_OPTIONS="9"
   #}}}
   #EDITORS|TOOLS {{{
     # 1) Soundconverter|Soundkonverter
@@ -396,7 +401,7 @@
     # 5) Openshot
     # 6) Pitivi
     # 7) Kazam
-    VIDEO_EDITOR_OPTIONS="3"
+    VIDEO_EDITOR_OPTIONS="2"
   #}}}
 #}}}
 #GAMES {{{
@@ -518,15 +523,19 @@
   WEBSERVER="2"
 #}}}
 #FONTS {{{
-  # 1) ttf-dejavu
-  # 2) ttf-google-webfonts
-  # 3) ttf-funfonts
-  # 4) ttf-liberation
-  # 5) ttf-ms-fonts
-  # 6) ttf-source-code-pro
-  # 7) ttf-vista-fonts
-  # 8) ttf-wgy-microhei
-  FONTS_OPTIONS="1-8"
+  # 1) ttf-anka-coder
+  # 2) ttf-anonymous-pro
+  # 3) ttf-dejavu
+  # 4) ttf-exljbris
+  # 5) ttf-funfonts
+  # 6) ttf-google-webfonts
+  # 7) ttf-inconsolata
+  # 8) ttf-liberation
+  # 9) ttf-ms-fonts
+  #10) ttf-source-code-pro
+  #11) ttf-vista-fonts
+  #12) wqy-microhei
+  FONTS_OPTIONS="1-12"
 #}}}
 #EXTRA {{{
   # 1) Elementary Project

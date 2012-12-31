@@ -1879,11 +1879,13 @@ case "$1" in
       do
         print_title "GNOME ICONS"
         echo " 1) $(menu_item "awoken-icons" "Awoken")"
-        echo " 2) $(menu_item "faenza-icon-theme" "Faenza")"
-        echo " 3) $(menu_item "faenza-cupertino-icon-theme" "Faenza-Cupertino")"
-        echo " 4) $(menu_item "faience-icon-theme" "Faience")"
-        echo " 5) $(menu_item "elementary-xfce-icons elementary-icons-bzr" "Elementary")"
-        echo " 6) $(menu_item "nitrux-icon-theme" "Nitrux")"
+        echo " 2) $(menu_item "elementary-xfce-icons" "Elementary XFCE")"
+        echo " 3) $(menu_item "faenza-icon-theme")"
+        echo " 4) $(menu_item "faenza-cupertino-icon-theme" "Faenza-Cupertino")"
+        echo " 5) $(menu_item "faience-icon-theme")"
+        echo " 6) $(menu_item "inx-icon-theme" "iNX")"
+        echo " 7) $(menu_item "matrilineare-icon-theme")"
+        echo " 8) $(menu_item "nitrux-icon-theme")"
         echo ""
         echo " b) BACK"
         echo ""
@@ -1895,22 +1897,24 @@ case "$1" in
               aur_package_install "awoken-icons"
               ;;
             2)
-              aur_package_install "faenza-icon-theme"
+              aur_package_install "elementary-xfce-icons"
               ;;
             3)
-              aur_package_install "faenza-cupertino-icon-theme"
+              aur_package_install "faenza-icon-theme"
               ;;
             4)
-              aur_package_install "faience-icon-theme"
+              aur_package_install "faenza-cupertino-icon-theme"
               ;;
             5)
-              aur_package_install "elementary-icons-bzr"
-              read_input_text "Install the elementary XFCE icons"
-              if [[ $OPTION == y ]]; then
-                aur_package_install "elementary-xfce-icons"
-              fi
+              aur_package_install "faience-icon-theme"
               ;;
             6)
+              aur_package_install "inx-icon-theme"
+              ;;
+            7)
+              aur_package_install "matrilineare-icon-theme"
+              ;;
+            8)
               aur_package_install "nitrux-icon-theme"
               ;;
             "b")
@@ -1929,14 +1933,15 @@ case "$1" in
       do
         print_title "GTK2/GTK3 THEMES"
         echo " 1) $(menu_item "adwaita-x-dark-and-light-theme" "Adwaita-X")"
-        echo " 2) $(menu_item "xfce-theme-blackbird" "Blackbird")"
-        echo " 3) $(menu_item "xfce-theme-bluebird" "Bluebird")"
-        echo " 4) $(menu_item "xfce-theme-greybird" "Greybird")"
-        echo " 5) $(menu_item "faience-themes" "Faience")"
-        echo " 6) $(menu_item "gtk-theme-gnome-cupertino" "Gnome Cupertino")"
-        echo " 7) $(menu_item "mediterraneannight-theme" "MediterraneanNight")"
-        echo " 8) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
-        echo " 9) $(menu_item "zukitwo-themes" "Zukitwo")"
+        echo " 2) $(menu_item "gtk-theme-boje" "Boje")"
+        echo " 3) $(menu_item "xfce-theme-blackbird" "Blackbird")"
+        echo " 4) $(menu_item "xfce-theme-bluebird" "Bluebird")"
+        echo " 5) $(menu_item "xfce-theme-greybird" "Greybird")"
+        echo " 6) $(menu_item "faience-themes" "Faience")"
+        echo " 7) $(menu_item "gtk-theme-gnome-cupertino" "Gnome Cupertino")"
+        echo " 8) $(menu_item "mediterraneannight-theme" "MediterraneanNight")"
+        echo " 9) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
+        echo "10) $(menu_item "zukitwo-themes" "Zukitwo")"
         echo ""
         echo " b) BACK"
         echo ""
@@ -1948,27 +1953,30 @@ case "$1" in
               aur_package_install "adwaita-x-dark-and-light-theme"
               ;;
             2)
-              aur_package_install "xfce-theme-blackbird"
+              aur_package_install "gtk-theme-boje"
               ;;
             3)
-              aur_package_install "xfce-theme-bluebird"
+              aur_package_install "xfce-theme-blackbird"
               ;;
             4)
-              aur_package_install "xfce-theme-greybird"
+              aur_package_install "xfce-theme-bluebird"
               ;;
             5)
-              aur_package_install "faience-themes"
+              aur_package_install "xfce-theme-greybird"
               ;;
             6)
-              aur_package_install "gtk-theme-gnome-cupertino"
+              aur_package_install "faience-themes"
               ;;
             7)
-              aur_package_install "mediterraneannight-theme"
+              aur_package_install "gtk-theme-gnome-cupertino"
               ;;
             8)
-              aur_package_install "light-themes"
+              aur_package_install "mediterraneannight-theme"
               ;;
             9)
+              aur_package_install "light-themes"
+              ;;
+            10)
               aur_package_install "zukitwo-themes"
               ;;
             "b")
@@ -2928,7 +2936,7 @@ case "$1" in
       echo "11) $(menu_item "qtcreator")"
       echo "12) $(menu_item "sublime-text" "Sublime Text 2") $AUR"
       echo "13) $(menu_item "gdb" "Debugger Tools")"
-      echo "14) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
+      echo "14) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
       echo "15) $(menu_item "meld")"
       echo "16) $(menu_item "rabbitvcs" "RabbitVCS") $AUR"
       echo ""
@@ -3044,7 +3052,7 @@ case "$1" in
             aur_package_install "valgrind gdb splint tidyhtml python2-pyflakes nodejs-jslint"
             ;;
           14)
-            aur_package_install "mysql-workbench"
+            aur_package_install "mysql-workbench-gpl"
             ;;
           15)
             package_install "meld"
@@ -4647,14 +4655,18 @@ case "$1" in
     while [[ 1 ]]
     do
       print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
-      echo " 1) $(menu_item "ttf-dejavu")"
-      echo " 2) $(menu_item "ttf-google-webfonts") $AUR"
-      echo " 3) $(menu_item "ttf-funfonts") $AUR"
-      echo " 4) $(menu_item "ttf-liberation")"
-      echo " 5) $(menu_item "ttf-ms-fonts") $AUR"
-      echo " 6) $(menu_item "ttf-source-code-pro") $AUR"
-      echo " 7) $(menu_item "ttf-vista-fonts") $AUR"
-      echo " 8) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support) $AUR"
+      echo " 1) $(menu_item "ttf-anka-coder") $AUR"
+      echo " 2) $(menu_item "ttf-anonymous-pro") $AUR"
+      echo " 3) $(menu_item "ttf-dejavu")"
+      echo " 4) $(menu_item "ttf-exljbris") $AUR"
+      echo " 5) $(menu_item "ttf-funfonts") $AUR"
+      echo " 6) $(menu_item "ttf-google-webfonts") $AUR"
+      echo " 7) $(menu_item "ttf-inconsolata")"
+      echo " 8) $(menu_item "ttf-liberation")"
+      echo " 9) $(menu_item "ttf-ms-fonts") $AUR"
+      echo "10) $(menu_item "ttf-source-code-pro") $AUR"
+      echo "11) $(menu_item "ttf-vista-fonts") $AUR"
+      echo "12) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support)"
       echo ""
       echo " b) BACK"
       echo ""
@@ -4663,31 +4675,43 @@ case "$1" in
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            package_install "ttf-dejavu"
+            aur_package_install "ttf-anka-coder"
             ;;
           2)
+            aur_package_install "ttf-anonymous-pro"
+            ;;
+          3)
+            package_install "ttf-dejavu"
+            ;;
+          4)
+            aur_package_install "ttf-exljbris"
+            ;;
+          5)
+            aur_package_install "ttf-funfonts"
+            ;;
+          6)
             package_remove ttf-droid
             package_remove ttf-roboto
             package_remove ttf-ubuntu-font-family
             aur_package_install "ttf-google-webfonts"
             ;;
-          3)
-            aur_package_install "ttf-funfonts"
-            ;;
-          4)
-            package_install "ttf-liberation"
-            ;;
-          5)
-            aur_package_install "ttf-ms-fonts"
-            ;;
-          6)
-            aur_package_install "ttf-source-code-pro"
-            ;;
           7)
-            aur_package_install "ttf-vista-fonts"
+            package_install "ttf-inconsolata"
             ;;
           8)
-            aur_package_install "wqy-microhei"
+            package_install "ttf-liberation"
+            ;;
+          9)
+            aur_package_install "ttf-ms-fonts"
+            ;;
+          10)
+            aur_package_install "ttf-source-code-pro"
+            ;;
+          11)
+            aur_package_install "ttf-vista-fonts"
+            ;;
+          12)
+            package_install "wqy-microhei"
             ;;
           "b")
             break
