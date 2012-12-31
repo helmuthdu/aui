@@ -2285,6 +2285,22 @@ case "$1" in
         aur_package_install "cinnamon-applet-shutdown"
         aur_package_install "cinnamon-extension-coverflow-alt-tab"
         config_xinitrc "gnome-session-cinnamon"
+        #Tweaks
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-effect scale
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-time 250
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-transition easeInExpo
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-effect scale
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-time 350
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-transition easeOutBack
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-effect scale
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-time 150
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-transition easeInOutSine
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-effect scale
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-time 250
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-transition easeInOutSine
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-effect scale
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-time 150
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-transition easeInOutSine
         CINNAMON=1
         pause_function
         install_themes "CINNAMON"
