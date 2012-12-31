@@ -53,14 +53,21 @@
       EDITOR="nano"
     fi
   #}}}
+  # DESKTOP ENVIRONMENT
+  CINNAMON=0
+  GNOME=0
+  KDE=0
+  # ARCHITECTURE
   ARCHI=`uname -m`
   UEFI=0
+  # AUR PACKAGE
   AUR=`echo -e "(${BPurple}aur${White})"`
+  #CURRENT DIRECTORY
   AUI_DIR=`pwd`
   MOUNTPOINT="/mnt"
-  SPIN="/-\|"
-  KDE=0
+  #PROPRIETARY DRIVER
   NVIDIA=0
+  ATI=0
   # VERBOSE MODE
   if [[ $1 == "-v" || $1 == "--verbose" ]]; then
     VERBOSE_MODE=1
@@ -70,7 +77,10 @@
   # LOG FILE
   LOG="${PWD}/`basename ${0}`.log"
   [[ -f $LOG ]] && rm $LOG 2>/dev/null
+  # CONNECTION CHECK
   XPINGS=0
+  #MISC
+  SPIN="/-\|"
 #}}}
 #COMMON FUNCTIONS {{{
   error_msg() { #{{{
@@ -436,7 +446,7 @@
     #check if the number of arguments is less then 2
     [[ $# -lt 2 ]] && PACKAGE_NAME="$1" || PACKAGE_NAME="$2";
     #list of chars to remove from the package name
-    CHARS_TO_REMOVE=("Ttf-" "-bzr" "-hg" "-svn" "-git" "-stable" "Gnome-shell-theme-" "Gnome-shell-extension-");
+    CHARS_TO_REMOVE=("Ttf-" "-bzr" "-hg" "-svn" "-git" "-stable" "-icon-theme" "Gnome-shell-theme-" "Gnome-shell-extension-");
     #remove chars from package name
     for CHARS in ${CHARS_TO_REMOVE[@]}; do PACKAGE_NAME=`echo ${PACKAGE_NAME^} | sed 's/'$CHARS'//'`; done
     #display checkbox and package name
@@ -1873,7 +1883,7 @@ case "$1" in
   #}}}
   #DESKTOP ENVIRONMENT {{{
   install_desktop_environment(){
-    install_icons() { #{{{
+    install_icon_theme() { #{{{
       package_install "gtk-update-icon-cache"
       while [[ 1 ]]
       do
@@ -1889,8 +1899,8 @@ case "$1" in
         echo ""
         echo " b) BACK"
         echo ""
-        GNOME_ICONS+=" b"
-        read_input_options "$GNOME_ICONS"
+        ICONS_THEMES+=" b"
+        read_input_options "$ICONS_THEMES"
         for OPT in ${OPTIONS[@]}; do
           case "$OPT" in
             1)
@@ -1928,7 +1938,7 @@ case "$1" in
         elihw
       done
     } #}}}
-    install_gtk_themes() { #{{{
+    install_gtk_theme() { #{{{
       while [[ 1 ]]
       do
         print_title "GTK2/GTK3 THEMES"
@@ -2001,7 +2011,7 @@ case "$1" in
         echo " 4) $(menu_item "lxdm" "LXDM")"
         echo " 5) $(menu_item "slim")"
         echo ""
-        echo " b) BACK"
+        echo " b) BACK|SKIP"
         echo ""
         DISPLAY_MANAGER+=" b"
         read_input_options "$DISPLAY_MANAGER"
@@ -2039,314 +2049,35 @@ case "$1" in
         elihw
       done
     } #}}}
-    print_title "DESKTOP ENVIRONMENT - https://wiki.archlinux.org/index.php/Desktop_Environment"
-    print_info "A Desktop environments (DE) provide a complete graphical user interface (GUI) for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries.\nA window manager (WM) is one component of a system's graphical user interface (GUI)."
-    echo -e "Select your DE or WM:\n"
-    echo " 1) Awesome"
-    echo " 2) Cinnamon $AUR"
-    echo " 3) E17"
-    echo " 4) GNOME"
-    echo " 5) KDE"
-    echo " 6) LXDE"
-    echo " 7) Mate"
-    echo " 8) OpenBox"
-    echo " 9) XFCE"
-    echo ""
-    echo " b) BACK"
-    read_input $DESKTOPENV
-    case "$OPTION" in
-      1)
-        #AWESOME {{{
-        print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
-        print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
-        package_install "awesome"
-        package_install "gvfs"
-        package_install "lxappearance"
-        package_install "leafpad epdfview nitrogen"
-        package_install "ttf-bitstream-vera ttf-dejavu"
-        aur_package_install "gnome-defaults-list"
-        mkdir -p /home/${USER_NAME}/.config/awesome/
-        cp /etc/xdg/awesome/rc.lua /home/${USER_NAME}/.config/awesome/
-        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
-        config_xinitrc "awesome"
-        pause_function
-        #AWESOME CUSTOMIZATION {{{
-        while [[ 1 ]]
-        do
-          print_title "AWESOME CUSTOMIZATION"
-          echo " 1) $(menu_item "xcompmgr")"
-          echo " 2) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
-          echo " 3) $(menu_item "viewnior")"
-          echo " 4) $(menu_item "gmrun")"
-          echo " 5) $(menu_item "pcmanfm" "PCManFM")"
-          echo " 6) $(menu_item "rxvt-unicode")"
-          echo " 7) $(menu_item "scrot")"
-          echo " 8) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
-          echo " 9) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
-          echo "10) $(menu_item "thunar")"
-          echo "11) $(menu_item "tint2")"
-          echo "12) $(menu_item "volwheel")"
-          echo "13) $(menu_item "xfburn")"
-          echo ""
-          echo " d) DONE"
-          echo ""
-          AWESOMEOB_OPTIONS+=" d"
-          read_input_options "$AWESOMEOB_OPTIONS"
-          for OPT in ${OPTIONS[@]}; do
-            case "$OPT" in
-              1)
-                package_install "xcompmgr transset-df"
-                ;;
-              2)
-                install_icons
-                OPT=2
-                ;;
-              3)
-                package_install "viewnior"
-                ;;
-              4)
-                package_install "gmrun"
-                ;;
-              5)
-                package_install "pcmanfm"
-                ;;
-              6)
-                package_install "rxvt-unicode"
-                ;;
-              7)
-                package_install "scrot"
-                ;;
-              8)
-                install_display_manager
-                OPT=8
-                ;;
-              9)
-                install_gtk_themes
-                OPT=9
-                ;;
-              10)
-                package_install "thunar tumbler"
-                ;;
-              11)
-                package_install "tint2"
-                ;;
-              12)
-                package_install "volwheel"
-                ;;
-              13)
-                package_install "xfburn"
-                ;;
-              "d")
-                break
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-          done
-          elihw
-        done
-        #}}}
-        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
-        ;;
-        #}}}
-      2)
-        #CINNAMON {{{
-        print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
-        print_info "Cinnamon is a fork of GNOME Shell, initially developed by Linux Mint. It attempts to provide a more traditional user environment based on the desktop metaphor, like GNOME 2. Cinnamon uses Muffin, a fork of the GNOME 3 window manager Mutter, as its window manager."
-        aur_package_install "cinnamon"
-        package_install "gnome-extra gedit-plugins"
-        package_install "telepathy"
-        package_install "gksu nautilus-open-terminal gnome-tweak-tool xdg-user-dirs-gtk"
-        package_install "gvfs-smb gvfs-afc"
-        package_install "deja-dup"
-        aur_package_install "gnome-defaults-list"
-        config_xinitrc "gnome-session-cinnamon"
-        pause_function
-        #CINNAMON CUSTOMIZATION {{{
-        while [[ 1 ]]
-        do
-          print_title "CINNAMON CUSTOMIZATION"
-          echo " 1) $(menu_item "cinnamon-applets") $AUR"
-          echo " 2) $(menu_item "cinnamon-themes") $AUR"
-          echo " 3) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
-          echo " 4) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
-          echo " 5) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
-          echo ""
-          echo " d) DONE"
-          echo ""
-          CINNAMON_OPTIONS+=" d"
-          read_input_options "$CINNAMON_OPTIONS"
-          for OPT in ${OPTIONS[@]}; do
-            case "$OPT" in
-              1)
-                aur_package_install "cinnamon-applets"
-                ;;
-              2)
-                aur_package_install "cinnamon-themes"
-                ;;
-              3)
-                install_icons
-                OPT=1
-                ;;
-              4)
-                install_gtk_themes
-                OPT=2
-                ;;
-              5)
-                package_install "gnome-packagekit gnome-settings-daemon-updates"
-                ;;
-              "d")
-                break
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-          done
-          elihw
-        done
-        #}}}
-        #Gnome Display Manager (a reimplementation of xdm)
-        systemctl enable gdm.service
-        #D-Bus interface for user account query and manipulation
-        systemctl enable accounts-daemon.service
-        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
-        ;;
-        #}}}
-      3)
-        #E17 {{{
-        print_title "E17 - http://wiki.archlinux.org/index.php/E17"
-        print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
-        package_install "enlightenment17"
-        package_install "gvfs"
-        package_install "xdg-user-dirs"
-        package_install "leafpad epdfview"
-        package_install "lxappearance"
-        package_install "ttf-bitstream-vera ttf-dejavu"
-        aur_package_install "gnome-defaults-list"
-        config_xinitrc "enlightenment_start"
-        pause_function
-        #E17 CUSTOMIZATION {{{
-        while [[ 1 ]]
-        do
-          print_title "E17 CUSTOMIZATION"
-          echo " 1) $(menu_item "e17-icons") $AUR"
-          echo " 2) $(menu_item "e17-themes") $AUR"
-          echo " 3) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
-          echo " 4) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
-          echo " 5) $(menu_item "viewnior")"
-          echo " 6) $(menu_item "gmrun")"
-          echo " 7) $(menu_item "pcmanfm" "PCManFM")"
-          echo " 8) $(menu_item "rxvt-unicode")"
-          echo " 9) $(menu_item "scrot")"
-          echo "10) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
-          echo "11) $(menu_item "thunar")"
-          echo "12) $(menu_item "xfburn")"
-          echo ""
-          echo " d) DONE"
-          echo ""
-          E17_OPTIONS+=" d"
-          read_input_options "$E17_OPTIONS"
-          for OPT in ${OPTIONS[@]}; do
-            case "$OPT" in
-              1)
-                aur_package_install "e17-icons"
-                ;;
-              2)
-                aur_package_install "e17-themes"
-                ;;
-              3)
-                install_display_manager
-                OPT=3
-                ;;
-              4)
-                install_icons
-                OPT=4
-                ;;
-              5)
-                package_install "viewnior"
-                ;;
-              6)
-                package_install "gmrun"
-                ;;
-              7)
-                package_install "pcmanfm polkit-gnome gvfs"
-                ;;
-              8)
-                package_install "rxvt-unicode"
-                ;;
-              9)
-                package_install "scrot"
-                ;;
-              10)
-                install_gtk_themes
-                OPT=10
-                ;;
-              11)
-                package_install "thunar tumbler"
-                ;;
-              12)
-                package_install "xfburn"
-                ;;
-              "d")
-                break
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-          done
-          elihw
-        done
-        #}}}
-        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
-        ;;
-        #}}}
-      4)
-        #GNOME {{{
-        print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
-        print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
-        package_install "gnome gnome-extra telepathy"
-        aur_package_install "empathy-theme-candybars empathy-theme-adium-matte"
-        package_install "gksu nautilus-open-terminal gedit-plugins gnome-tweak-tool gucharmap"
-        package_install "gvfs-smb gvfs-afc"
-        package_install "zeitgeist"
-        package_install "deja-dup"
-        aur_package_install "gnome-defaults-list"
-        config_xinitrc "gnome-session"
-        pause_function
-        #GNOME CUSTOMIZATION {{{
-        while [[ 1 ]]
-        do
-          print_title "GNOME CUSTOMIZATION"
-          echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
-          echo " 2) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
-          echo " 3) $(menu_item "gnome-shell-theme-elegance" "GNOME Shell Themes") $AUR"
-          echo " 4) $(menu_item "gnome-packagekit" "GNOME Packagekit")"
-          echo ""
-          echo " d) DONE"
-          echo ""
-          GNOME_OPTIONS+=" d"
-          read_input_options "$GNOME_OPTIONS"
-          for OPT in ${OPTIONS[@]}; do
-            case "$OPT" in
-              1)
-                install_icons
-                OPT=1
-                ;;
-              2)
-                install_gtk_themes
-                OPT=2
-                ;;
-              3)
-                #GNOMESHELL THEMES {{{
+    install_themes() { #{{{
+      while [[ 1 ]]
+      do
+        print_title "$1 THEMES"
+        echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-xfce-icons inx-icon-theme matrilineare-icon-theme nitrux-icon-theme" "Icons Themes") $AUR"
+        echo " 2) $(menu_item "adwaita-x-dark-and-light-theme gtk-theme-boje xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
+        [[ $GNOME == 1 ]] && echo " 3) $(menu_item "gnome-shell-theme-elegance gnome-shell-theme-eos" "Gnome Shell Themes") $AUR"
+        [[ $CINNAMON == 1 ]] && echo " 3) $(menu_item "cinnamon-theme-ambience cinnamon-theme-baldr cinnamon-theme-google+ cinnamon-theme-eleganse cinnamon-theme-helios cinnamon-theme-elementary-luna cinnamon-theme-holo cinnamon-theme-gnome cinnamon-theme-loki" "Cinnamon themes") $AUR"
+        echo ""
+        echo " d) DONE"
+        echo ""
+        THEMES_OPTIONS+=" d"
+        read_input_options "$THEME_OPTIONS"
+        for OPT in ${OPTIONS[@]}; do
+          case "$OPT" in
+            1)
+              install_icon_theme
+              OPT=1
+              ;;
+            2)
+              install_gtk_theme
+              OPT=2
+              ;;
+            3)
+              if [[ $GNOME == 1 ]]; then
+                #GNOME SHELL THEMES {{{
                 while [[ 1 ]]
                 do
-                  print_title "GNOMESHELL THEMES"
+                  print_title "GNOME SHELL THEMES"
                   echo " 1) $(menu_item "gnome-shell-theme-elegance")"
                   echo " 2) $(menu_item "gnome-shell-theme-eos")"
                   echo ""
@@ -2373,10 +2104,140 @@ case "$1" in
                   elihw
                 done
                 #}}}
-                OPT=4
+              elif [[ $CINNAMON == 1 ]]; then
+                #CINNAMON THEMES {{{
+                while [[ 1 ]]
+                do
+                  print_title "CINNAMON THEMES"
+                  echo " 1) $(menu_item "cinnamon-theme-ambience")"
+                  echo " 2) $(menu_item "cinnamon-theme-baldr")"
+                  echo " 3) $(menu_item "cinnamon-theme-eleganse")"
+                  echo " 4) $(menu_item "cinnamon-theme-elementary-luna")"
+                  echo " 5) $(menu_item "cinnamon-theme-gnome")"
+                  echo " 6) $(menu_item "cinnamon-theme-google+")"
+                  echo " 7) $(menu_item "cinnamon-theme-helios")"
+                  echo " 8) $(menu_item "cinnamon-theme-holo")"
+                  echo " 9) $(menu_item "cinnamon-theme-loki")"
+                  echo ""
+                  echo " b) BACK"
+                  echo ""
+                  CINNAMON_THEMES+=" b"
+                  read_input_options "$CINNAMON_THEMES"
+                  for OPT in ${OPTIONS[@]}; do
+                    case "$OPT" in
+                      1)
+                        aur_package_install "cinnamon-theme-ambience"
+                        ;;
+                      2)
+                        aur_package_install "cinnamon-theme-baldr"
+                        ;;
+                      3)
+                        aur_package_install "cinnamon-theme-eleganse"
+                        ;;
+                      4)
+                        aur_package_install "cinnamon-theme-elementary-luna"
+                        ;;
+                      5)
+                        aur_package_install "cinnamon-theme-gnome"
+                        ;;
+                      6)
+                        aur_package_install "cinnamon-theme-google+"
+                        ;;
+                      7)
+                        aur_package_install "cinnamon-theme-helios"
+                        ;;
+                      8)
+                        aur_package_install "cinnamon-theme-holo"
+                        ;;
+                      9)
+                        aur_package_install "cinnamon-theme-loki"
+                        ;;
+                      "b")
+                        break
+                        ;;
+                      *)
+                        invalid_option
+                        ;;
+                    esac
+                  done
+                  elihw
+                done
+                #}}}
+              else
+                invalid_option
+              fi
+              OPT=3
+              ;;
+            "d")
+              break
+              ;;
+            *)
+              invalid_option
+              ;;
+          esac
+        done
+        elihw
+      done
+    } #}}}
+    install_misc_apps() { #{{{
+        while [[ 1 ]]
+        do
+          print_title "$1 ESSENTIAL APPS"
+          echo " 1) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
+          echo " 2) $(menu_item "dmenu")"
+          echo " 3) $(menu_item "viewnior")"
+          echo " 4) $(menu_item "gmrun")"
+          echo " 5) $(menu_item "pcmanfm" "PCManFM")"
+          echo " 6) $(menu_item "rxvt-unicode")"
+          echo " 7) $(menu_item "scrot")"
+          echo " 8) $(menu_item "thunar")"
+          echo " 9) $(menu_item "tint2")"
+          echo "10) $(menu_item "volwheel")"
+          echo "11) $(menu_item "xfburn")"
+          echo "12) $(menu_item "xcompmgr")"
+          echo ""
+          echo " d) DONE"
+          echo ""
+          MISCAPPS+=" d"
+          read_input_options "$MISCAPPS"
+          for OPT in ${OPTIONS[@]}; do
+            case "$OPT" in
+              1)
+                install_display_manager
+                OPT=1
+                ;;
+              2)
+                package_install "dmenu"
+                ;;
+              3)
+                package_install "viewnior"
+                ;;
+              4)
+                package_install "gmrun"
                 ;;
               5)
-                package_install "gnome-packagekit gnome-settings-daemon-updates"
+                package_install "pcmanfm polkit-gnome gvfs"
+                ;;
+              6)
+                package_install "rxvt-unicode"
+                ;;
+              7)
+                package_install "scrot"
+                ;;
+              8)
+                package_install "thunar tumbler"
+                ;;
+              9)
+                package_install "tint2"
+                ;;
+              10)
+                package_install "volwheel"
+                ;;
+              11)
+                package_install "xfburn"
+                ;;
+              12)
+                package_install "xcompmgr transset-df"
                 ;;
               "d")
                 break
@@ -2388,7 +2249,45 @@ case "$1" in
           done
           elihw
         done
-        #}}}
+    } #}}}
+    print_title "DESKTOP ENVIRONMENT|WINDOW MANAGER"
+    print_info "A DE provide a complete GUI for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries."
+    echo -e "Select your DE or WM:\n"
+    echo " 1) Cinnamon $AUR"
+    echo " 2) E17"
+    echo " 3) GNOME"
+    echo " 4) KDE"
+    echo " 5) LXDE"
+    echo " 6) Mate"
+    echo " 7) XFCE"
+    print_info "\nA window manager is one component of a system's graphical user interface."
+    echo " 8) Awesome"
+    echo " 9) Fluxbox"
+    echo "10) OpenBox"
+    echo ""
+    echo " b) BACK"
+    read_input $DESKTOPENV
+    case "$OPTION" in
+      1)
+        #CINNAMON {{{
+        print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
+        print_info "Cinnamon is a fork of GNOME Shell, initially developed by Linux Mint. It attempts to provide a more traditional user environment based on the desktop metaphor, like GNOME 2. Cinnamon uses Muffin, a fork of the GNOME 3 window manager Mutter, as its window manager."
+        aur_package_install "cinnamon"
+        package_install "gnome-extra gedit-plugins"
+        package_install "telepathy"
+        package_install "gksu nautilus-open-terminal gnome-tweak-tool xdg-user-dirs-gtk gucharmap"
+        package_install "gvfs-smb gvfs-afc"
+        package_install "deja-dup"
+        package_install "gnome-packagekit gnome-settings-daemon-updates"
+        aur_package_install "gnome-defaults-list"
+        #Essential stuffs
+        aur_package_install "cinnamon-applet-screenshot-record"
+        aur_package_install "cinnamon-applet-shutdown"
+        aur_package_install "cinnamon-extension-coverflow-alt-tab"
+        config_xinitrc "gnome-session-cinnamon"
+        CINNAMON=1
+        pause_function
+        install_themes "CINNAMON"
         #Gnome Display Manager (a reimplementation of xdm)
         systemctl enable gdm.service
         #D-Bus interface for user account query and manipulation
@@ -2397,7 +2296,51 @@ case "$1" in
         systemctl enable upower.service
         ;;
         #}}}
-      5)
+      2)
+        #E17 {{{
+        print_title "E17 - http://wiki.archlinux.org/index.php/E17"
+        print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
+        package_install "enlightenment17"
+        package_install "gvfs"
+        package_install "xdg-user-dirs"
+        package_install "leafpad epdfview"
+        package_install "lxappearance"
+        package_install "ttf-bitstream-vera ttf-dejavu"
+        aur_package_install "gnome-defaults-list"
+        config_xinitrc "enlightenment_start"
+        pause_function
+        install_misc_apps "E17"
+        install_themes "E17"
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
+      3)
+        #GNOME {{{
+        print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
+        print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
+        package_install "gnome gnome-extra telepathy"
+        package_install "gksu nautilus-open-terminal gedit-plugins gnome-tweak-tool gucharmap"
+        package_install "gvfs-smb gvfs-afc"
+        package_install "zeitgeist"
+        package_install "deja-dup"
+        package_install "gnome-packagekit gnome-settings-daemon-updates"
+        aur_package_install "gnome-defaults-list"
+        package_install "python2-distutils-extra"
+        aur_package_install "empathy-theme-ubuntu-adium-bzr"
+        config_xinitrc "gnome-session"
+        GNOME=1
+        pause_function
+        install_themes "GNOME"
+        #Gnome Display Manager (a reimplementation of xdm)
+        systemctl enable gdm.service
+        #D-Bus interface for user account query and manipulation
+        systemctl enable accounts-daemon.service
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
+      4)
         #KDE {{{
         print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
         print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
@@ -2488,7 +2431,7 @@ case "$1" in
         KDE=1
         ;;
         #}}}
-      6)
+      5)
         #LXDE {{{
         print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
         print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
@@ -2505,56 +2448,13 @@ case "$1" in
         chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
         config_xinitrc "startlxde"
         pause_function
-        #LXDE CUSTOMIZATION {{{
-        while [[ 1 ]]
-        do
-          print_title "LXDE CUSTOMIZATION"
-          echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
-          echo " 2) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
-          echo " 3) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
-          echo " 4) $(menu_item "viewnior")"
-          echo " 5) $(menu_item "xfburn")"
-          echo ""
-          echo " d) DONE"
-          echo ""
-          LXDE_OPTIONS+=" d"
-          read_input_options "$LXDE_OPTIONS"
-          for OPT in ${OPTIONS[@]}; do
-            case "$OPT" in
-              1)
-                install_icons
-                OPT=1
-                ;;
-              2)
-                install_display_manager
-                OPT=2
-                ;;
-              3)
-                install_gtk_themes
-                OPT=3
-                ;;
-              4)
-                package_install "viewnior"
-                ;;
-              5)
-                package_install "xfburn"
-                ;;
-              "d")
-                break
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-          done
-          elihw
-        done
-        #}}}
+        install_misc_apps "LXDE"
+        install_themes "LXDE"
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
         ;;
         #}}}
-      7)
+      6)
         #MATE {{{
         print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
         print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
@@ -2565,50 +2465,69 @@ case "$1" in
         aur_package_install "gnome-defaults-list"
         config_xinitrc "mate-session"
         pause_function
-        #MATE CUSTOMIZATION {{{
-        while [[ 1 ]]
-        do
-          print_title "MATE CUSTOMIZATION"
-          echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "GNOME Icons") $AUR"
-          echo " 2) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
-          echo " 3) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
-          echo ""
-          echo " d) DONE"
-          echo ""
-          MATE_OPTIONS+=" d"
-          read_input_options "$MATE_OPTIONS"
-          for OPT in ${OPTIONS[@]}; do
-            case "$OPT" in
-              1)
-                install_icons
-                OPT=1
-                ;;
-              2)
-                install_gtk_themes
-                OPT=2
-                ;;
-              3)
-                install_display_manager
-                OPT=3
-                ;;
-              "d")
-                break
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-          done
-          elihw
-        done
-        #}}}
+        install_themes "MATE"
         #D-Bus interface for user account query and manipulation
         systemctl enable accounts-daemon.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
         ;;
         #}}}
+      7)
+        #XFCE {{{
+        print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
+        print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
+        package_install "xfce4 xfce4-goodies"
+        package_install "gvfs"
+        package_install "xdg-user-dirs"
+        aur_package_install "gnome-defaults-list"
+        config_xinitrc "startxfce4"
+        pause_function
+        install_display_manager
+        install_themes "XFCE"
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
       8)
+        #AWESOME {{{
+        print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
+        print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
+        package_install "awesome"
+        package_install "gvfs"
+        package_install "lxappearance"
+        package_install "leafpad epdfview nitrogen"
+        package_install "ttf-bitstream-vera ttf-dejavu"
+        aur_package_install "gnome-defaults-list"
+        mkdir -p /home/${USER_NAME}/.config/awesome/
+        cp /etc/xdg/awesome/rc.lua /home/${USER_NAME}/.config/awesome/
+        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+        config_xinitrc "awesome"
+        pause_function
+        install_misc_apps "AWESOME"
+        install_themes "AWESOME"
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
+      9)
+        #FLUXBOX {{{
+        print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
+        print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
+        package_install "fluxbox menumaker"
+        package_install "lxappearance"
+        package_install "xdg-user-dirs"
+        package_install "leafpad epdfview"
+        package_install "ttf-bitstream-vera ttf-dejavu"
+        aur_package_install "gnome-defaults-list"
+        config_xinitrc "startfluxbox"
+        install_misc_apps "FLUXBOX"
+        install_themes "FLUXBOX"
+        pause_function
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
+      10)
         #OPENBOX {{{
         print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
         print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -2625,134 +2544,8 @@ case "$1" in
         chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
         config_xinitrc "openbox-session"
         pause_function
-        #OPENBOX CUSTOMIZATION {{{
-        while [[ 1 ]]
-        do
-          print_title "OPENBOX CUSTOMIZATION"
-          echo " 1) $(menu_item "xcompmgr")"
-          echo " 2) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
-          echo " 3) $(menu_item "viewnior")"
-          echo " 4) $(menu_item "gmrun")"
-          echo " 5) $(menu_item "pcmanfm" "PCManFM")"
-          echo " 6) $(menu_item "rxvt-unicode")"
-          echo " 7) $(menu_item "scrot")"
-          echo " 8) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
-          echo " 9) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
-          echo "10) $(menu_item "thunar")"
-          echo "11) $(menu_item "tint2")"
-          echo "12) $(menu_item "volwheel")"
-          echo "13) $(menu_item "xfburn")"
-          echo ""
-          echo " d) DONE"
-          echo ""
-          AWESOMEOB_OPTIONS+=" d"
-          read_input_options "$AWESOMEOB_OPTIONS"
-          for OPT in ${OPTIONS[@]}; do
-            case "$OPT" in
-              1)
-                package_install "xcompmgr transset-df"
-                ;;
-              2)
-                install_icons
-                OPT=2
-                ;;
-              3)
-                package_install "viewnior"
-                ;;
-              4)
-                package_install "gmrun"
-                ;;
-              5)
-                package_install "pcmanfm polkit-gnome gvfs"
-                ;;
-              6)
-                package_install "rxvt-unicode"
-                ;;
-              7)
-                package_install "scrot"
-                ;;
-              8)
-                install_display_manager
-                OPT=8
-                ;;
-              9)
-                install_gtk_themes
-                OPT=9
-                ;;
-              10)
-                package_install "thunar tumbler"
-                ;;
-              11)
-                package_install "tint2"
-                ;;
-              12)
-                package_install "volwheel"
-                ;;
-              13)
-                package_install "xfburn"
-                ;;
-              "d")
-                break
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-          done
-          elihw
-        done
-        #}}}
-        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
-        ;;
-        #}}}
-      9)
-        #XFCE {{{
-        print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
-        print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
-        package_install "xfce4 xfce4-goodies"
-        package_install "gvfs"
-        package_install "xdg-user-dirs"
-        aur_package_install "gnome-defaults-list"
-        config_xinitrc "startxfce4"
-        pause_function
-        #XFCE CUSTOMIZATION{{{
-        while [[ 1 ]]
-        do
-          print_title "XFCE CUSTOMIZATION"
-          echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-icons-bzr" "Gnome Icons") $AUR"
-          echo " 2) $(menu_item "adwaita-x-dark-and-light-theme xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
-          echo " 3) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
-          echo ""
-          echo " d) DONE"
-          echo ""
-          XFCE_OPTIONS+=" d"
-          read_input_options "$XFCE_OPTIONS"
-          for OPT in ${OPTIONS[@]}; do
-            case "$OPT" in
-              1)
-                install_icons
-                OPT=1
-                ;;
-              2)
-                install_gtk_themes
-                OPT=2
-                ;;
-              3)
-                install_display_manager
-                OPT=3
-                ;;
-              "d")
-                break
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-          done
-          elihw
-        done
-        #}}}
+        install_misc_apps "OPENBOX"
+        install_themes "OPENBOX"
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
         systemctl enable upower.service
         ;;
@@ -4949,7 +4742,7 @@ case "$1" in
   do
     print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
     echo " 1) $(mainmenu_item "${checklist[1]}" "Basic Setup")"
-    echo " 2) $(mainmenu_item "${checklist[2]}" "Desktop Environment")"
+    echo " 2) $(mainmenu_item "${checklist[2]}" "Desktop Environment|Window Manager")"
     echo " 3) $(mainmenu_item "${checklist[3]}" "Accessories Apps")"
     echo " 4) $(mainmenu_item "${checklist[4]}" "Development Apps")"
     echo " 5) $(mainmenu_item "${checklist[5]}" "Office Apps")"

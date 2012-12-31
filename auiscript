@@ -65,68 +65,18 @@
     FIRMWARE_OPTIONS="1"
   #}}}
 #}}}
-#DESKTOP ENVIRONMENT {{{
-  # 1) Awesome
-  # 2) Cinnamon
-  # 3) E17
-  # 4) GNOME
-  # 5) KDE
-  # 6) LXDE
-  # 7) Mate
-  # 8) OpenBox
-  # 9) XFCE
-  DESKTOPENV=4
-  #AWESOME/OPENBOX {{{
-    # 1) Xcompmgr
-    # 2) Icons
-    # 3) Viewnior
-    # 4) Gmrun
-    # 5) PCManFM
-    # 6) rxvt-unicode
-    # 7) Scrot
-    # 8) Display Manager
-    # 9) GTK Themes
-    #10) Thunar
-    #11) Tint2
-    #12) Volwheel
-    #13) Xfburn
-    AWESOMEOB_OPTIONS=""
-  #}}}
-  #CINNAMON {{{
-    # 1) Cinnamon Applets
-    # 2) Cinnamon Themes
-    # 3) GNOME Icons
-    # 4) GNOME Themes
-    # 5) GNOME Packagekit
-    CINNAMON_OPTIONS="1-5"
-  #}}}
-  #E17 {{{
-    # 1) E17 Icons
-    # 2) E17 Themes
-    # 3) Display Manager
-    # 4) Icons
-    # 5) Viewnior
-    # 6) Gmrun
-    # 7) PCManFM
-    # 8) rxvt-unicode
-    # 9) Scrot
-    #10) GTK Themes
-    #11) Thunar
-    #12) Xfburn
-    E17_OPTIONS=""
-  #}}}
-  #GNOME {{{
-    # 1) GNOME Icons
-    # 2) GNOME Themes
-    # 3) GNOME Shell Themes
-    # 4) Packagekit
-    GNOME_OPTIONS="1-4"
-    #GNOME SHELL THEMES {{{
-      # 1) Elegance
-      # 2) eOS
-      GNOME_SHELL_THEMES="1 2"
-    #}}}
-  #}}}
+#DESKTOP ENVIRONMENT|WINDOW MANAGER {{{
+  # 1) Cinnamon
+  # 2) E17
+  # 3) GNOME
+  # 4) KDE
+  # 5) LXDE
+  # 6) Mate
+  # 7) XFCE
+  # 8) Awesome
+  # 9) Fluxbox
+  #10) OpenBox
+  DESKTOPENV=3
   #KDE {{{
     # 1) Apper
     # 2) Bangarang
@@ -138,25 +88,20 @@
     # 8) Yakuake
     KDE_OPTIONS="1-8"
   #}}}
-  #LXDE {{{
-    # 1) Icons
-    # 2) Display Manager
-    # 3) GTK Themes
-    # 4) Viewnior
-    # 5) Xfburn
-    LXDE_OPTIONS=""
-  #}}}
-  #MATE {{{
-    # 1) Icons
-    # 2) GTK Themes
-    # 3) Display Manager
-    MATE_OPTIONS=""
-  #}}}
-  #XFCE {{{
-    # 1) Icons
-    # 2) GTK Themes
-    # 3) Display Manager
-    XFCE_OPTIONS="1-3"
+  #ESSENTIAL APPS {{{
+    # 1) Display Manager
+    # 2) Dmenu
+    # 3) Viewnior
+    # 4) Gmrun
+    # 5) PCManFM
+    # 6) rxvt-unicode
+    # 7) Scrot
+    # 8) Thunar
+    # 9) Tint2
+    #10) Volwheel
+    #11) Xfburn
+    #12) Xcompmgr
+    MISCAPPS="1 3"
   #}}}
   #DISPLAY MANAGER {{{
     # 1) Elsa
@@ -164,8 +109,12 @@
     # 3) LightDM
     # 4) LXDM
     # 5) Slim
-    DISPLAY_MANAGER="4"
+    DISPLAY_MANAGER="3"
   #}}}
+  # 1) Icons Themes
+  # 2) GTK2|GTK3 Themes
+  # 3) GNOME|CINNAMON Themes
+  THEMES_OPTIONS="1 2"
   #ICONS THEMES {{{
     # 1) Awoken
     # 2) Elementary XFCE
@@ -175,7 +124,7 @@
     # 6) iNX
     # 7) Matrilineare
     # 8) Nitrux
-    GNOME_ICONS="3-5"
+    ICONS_THEMES="3-5"
   #}}}
   #GTK THEMES {{{
     # 1) Adwaita-X
@@ -188,7 +137,24 @@
     # 8) MediterraneanNight
     # 9) Light (Aka Ambiance/Radiance)
     #10) Zukitwo
-    GTK_THEMES="2 5-10"
+    GTK_THEMES="2 5-7 9 10"
+  #}}}
+  #GNOME SHELL THEMES {{{
+    # 1) Elegance
+    # 2) eOS
+    GNOME_SHELL_THEMES="1 2"
+  #}}}
+  #CINNAMON THEMES {{{
+    # 1) ambience
+    # 2) baldr
+    # 3) eleganse
+    # 4) elementary-luna
+    # 5) gnome
+    # 6) google+
+    # 7) helios
+    # 8) holo
+    # 9) loki
+    CINNAMON_THEMES="5"
   #}}}
 #}}}
 #NETWORK MANAGER {{{
