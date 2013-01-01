@@ -26,6 +26,7 @@ You can try it first with a `virtualbox`
 ## Archlinux Install Script Mode
 - Configure keymap
 - Select editor
+- Automatic configure mirrorlist
 - Create partition
 - Format device
 - Install system base
@@ -42,10 +43,8 @@ You can try it first with a `virtualbox`
 ## Default mode
 - Backup all modified files
 - Install additional repositories
-- Install and configure reflector
 - Create and configure new user
 - Install and configure sudo
-- Configure pacman package signing
 - Automatic enable services in systemd
 - Install an AUR Helper [yaourt, packer]
 - Install base system
@@ -57,7 +56,7 @@ You can try it first with a `virtualbox`
 - Install CUPS
 - Install Additional wireless/bluetooth firmwares
 - Ensuring access to GIT through a firewall
-- Install a Desktop Environment [Cinnamon, E17, FluxBox, GNOME, KDE, LXDE, OpenBox, XFCE]
+- Install DE or WM [Cinnamon, E17, FluxBox, GNOME, KDE, LXDE, OpenBox, XFCE]
 - Install Developement tools [Vim, Emacs, Eclipse...]
 - Install Office apps [LibreOffice, GNOME-Office, Latex...]
 - Install System tools [Wine, Virtualbox, Grsync, Htop]
