@@ -1737,6 +1737,8 @@ case "$1" in
     elif [[ ${NVIDIA} -eq 1 ]]; then
       pacman -Rcsn $(pacman -Qe | grep xf86-video | awk '{print $1}')
       pacman -S --needed nvidia{,-utils}
+      #fix nvidia-settings open
+      package_install "pangox-compat"
       package_install "libva-vdpau-driver"
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-nvidia-utils"
