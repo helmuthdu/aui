@@ -2120,6 +2120,7 @@ case "$1" in
                   echo " 7) $(menu_item "cinnamon-theme-helios")"
                   echo " 8) $(menu_item "cinnamon-theme-holo")"
                   echo " 9) $(menu_item "cinnamon-theme-loki")"
+                  echo "10) $(menu_item "cinnamon-theme-nadia")"
                   echo ""
                   echo " b) BACK"
                   echo ""
@@ -2153,6 +2154,9 @@ case "$1" in
                         ;;
                       9)
                         aur_package_install "cinnamon-theme-loki"
+                        ;;
+                      10)
+                        aur_package_install "cinnamon-theme-nadia"
                         ;;
                       "b")
                         break
