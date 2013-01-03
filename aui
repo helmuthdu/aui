@@ -213,6 +213,7 @@
         fi
       fi
     fi
+    OPTION="n"
     [[ $VIDEO_DRIVER == intel || $VIDEO_DRIVER == vesa ]] && read -p "Confirm video driver: $VIDEO_DRIVER [Y/n]" OPTION
     if [[ $OPTION == n ]]; then
       read -p "Type your video driver [ex: sis, fbdev, modesetting]: " VIDEO_DRIVER
