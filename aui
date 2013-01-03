@@ -1519,7 +1519,6 @@ case "$1" in
     if [[ ${ARCHI} == x86_64 ]]; then
       package_install "lib32-alsa-plugins"
     fi
-    add_module "snd-usb-audio"
     pause_function
     print_title "PULSEAUDIO - https://wiki.archlinux.org/index.php/Pulseaudio"
     print_info "PulseAudio is the default sound server that serves as a proxy to sound applications using existing kernel sound components like ALSA or OSS"
