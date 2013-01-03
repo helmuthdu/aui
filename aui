@@ -3030,8 +3030,8 @@ case "$1" in
             if [[ -z ${VIRTUALBOX_GUEST} ]]; then
               package_install "virtualbox virtualbox-host-modules virtualbox-guest-iso"
               aur_package_install "virtualbox-ext-oracle"
-              add_module "vboxdrv vboxnetadp vboxnetflt" "virtualbox-host"
-              modprobe -a vboxdrv vboxnetadp vboxnetflt
+              add_module "vboxdrv" "virtualbox-host"
+              modprobe -a vboxdrv
               add_user_to_group ${USER_NAME} vboxusers
             else
               cecho "VirtualBox was not installed as we are a VirtualBox guest."
