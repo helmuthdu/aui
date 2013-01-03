@@ -490,18 +490,15 @@
 #}}}
 #FONTS {{{
   # 1) ttf-anka-coder
-  # 2) ttf-anonymous-pro
-  # 3) ttf-dejavu
-  # 4) ttf-exljbris
-  # 5) ttf-funfonts
-  # 6) ttf-google-webfonts
-  # 7) ttf-inconsolata
-  # 8) ttf-liberation
-  # 9) ttf-ms-fonts
-  #10) ttf-source-code-pro
-  #11) ttf-vista-fonts
-  #12) wqy-microhei
-  FONTS_OPTIONS="1-12"
+  # 2) ttf-dejavu
+  # 3) ttf-exljbris
+  # 4) ttf-funfonts
+  # 5) ttf-google-webfonts
+  # 6) ttf-liberation
+  # 7) ttf-ms-fonts
+  # 8) ttf-vista-fonts
+  # 9) wqy-microhei
+  FONTS_OPTIONS="1-9"
 #}}}
 #EXTRA {{{
   # 1) Elementary Project
