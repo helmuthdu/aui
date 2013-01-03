@@ -4483,17 +4483,14 @@ case "$1" in
     do
       print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
       echo " 1) $(menu_item "ttf-anka-coder") $AUR"
-      echo " 2) $(menu_item "ttf-anonymous-pro") $AUR"
-      echo " 3) $(menu_item "ttf-dejavu")"
-      echo " 4) $(menu_item "ttf-exljbris") $AUR"
-      echo " 5) $(menu_item "ttf-funfonts") $AUR"
-      echo " 6) $(menu_item "ttf-google-webfonts") $AUR"
-      echo " 7) $(menu_item "ttf-inconsolata")"
-      echo " 8) $(menu_item "ttf-liberation")"
-      echo " 9) $(menu_item "ttf-ms-fonts") $AUR"
-      echo "10) $(menu_item "ttf-source-code-pro") $AUR"
-      echo "11) $(menu_item "ttf-vista-fonts") $AUR"
-      echo "12) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support)"
+      echo " 2) $(menu_item "ttf-dejavu")"
+      echo " 3) $(menu_item "ttf-exljbris") $AUR"
+      echo " 4) $(menu_item "ttf-funfonts") $AUR"
+      echo " 5) $(menu_item "ttf-google-webfonts") $AUR"
+      echo " 6) $(menu_item "ttf-liberation")"
+      echo " 7) $(menu_item "ttf-ms-fonts") $AUR"
+      echo " 8) $(menu_item "ttf-vista-fonts") $AUR"
+      echo " 9) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support)"
       echo ""
       echo " b) BACK"
       echo ""
@@ -4505,39 +4502,30 @@ case "$1" in
             aur_package_install "ttf-anka-coder"
             ;;
           2)
-            aur_package_install "ttf-anonymous-pro"
-            ;;
-          3)
             package_install "ttf-dejavu"
             ;;
-          4)
+          3)
             aur_package_install "ttf-exljbris"
             ;;
-          5)
+          4)
             aur_package_install "ttf-funfonts"
             ;;
-          6)
+          5)
             package_remove ttf-droid
             package_remove ttf-roboto
             package_remove ttf-ubuntu-font-family
             aur_package_install "ttf-google-webfonts"
             ;;
-          7)
-            package_install "ttf-inconsolata"
-            ;;
-          8)
+          6)
             package_install "ttf-liberation"
             ;;
-          9)
+          7)
             aur_package_install "ttf-ms-fonts"
             ;;
-          10)
-            aur_package_install "ttf-source-code-pro"
-            ;;
-          11)
+          8)
             aur_package_install "ttf-vista-fonts"
             ;;
-          12)
+          9)
             package_install "wqy-microhei"
             ;;
           "b")
