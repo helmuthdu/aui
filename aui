@@ -65,9 +65,10 @@
   #CURRENT DIRECTORY
   AUI_DIR=`pwd`
   MOUNTPOINT="/mnt"
-  #PROPRIETARY DRIVER
+  #VIDEO DRIVER
   NVIDIA=0
   ATI=0
+  VIRTUALBOX_GUEST=0
   # VERBOSE MODE
   if [[ $1 == "-v" || $1 == "--verbose" ]]; then
     VERBOSE_MODE=1
@@ -75,7 +76,7 @@
     VERBOSE_MODE=0
   fi
   # LOG FILE
-  LOG="${PWD}/`basename ${0}`.log"
+  LOG="${AUI_DIR}/`basename ${0}`.log"
   [[ -f $LOG ]] && rm $LOG 2>/dev/null
   # CONNECTION CHECK
   XPINGS=0
@@ -176,7 +177,7 @@
     ncecho "${BBlue}==>${White} Detecting video chipset "
     local VGA=`lspci | grep VGA`
     echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q nvidia
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
       cecho Nvidia
       read_input_text "Install NVIDIA proprietary driver" $PROPRIETARY_DRIVER
       if [[ $OPTION == y ]]; then
@@ -186,12 +187,12 @@
       fi
     else
       echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q "intel corporation"
-      if [ $? -eq 0 ]; then
+      if [[ $? -eq 0 ]]; then
         cecho Intel
         VIDEO_DRIVER="intel"
       else
         echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q "advanced micro devices"
-        if [ $? -eq 0 ]; then
+        if [[ $? -eq 0 ]]; then
           cecho AMD/ATI
           read_input_text "Install ATI proprietary driver" $PROPRIETARY_DRIVER
           if [[ $OPTION == y ]]; then
@@ -200,15 +201,25 @@
             VIDEO_DRIVER="ati"
           fi
         else
-          cecho VESA
-          VIDEO_DRIVER=""
+          echo `dmidecode --type 1 | grep VirtualBox`
+          if [[ $? -eq 0 ]]; then
+            cecho VIRTUALBOX
+            VIRTUALBOX_GUEST=1
+          else
+            cecho VESA
+            VIDEO_DRIVER="vesa"
+          fi
         fi
       fi
+    fi
+    [[ $VIDEO_DRIVER == intel || $VIDEO_DRIVER == vesa ]] && read -p "Confirm video driver: $VIDEO_DRIVER [Y/n]"
+    if [[ $OPTION == n ]]; then
+      read -p "Type your video driver [ex: sis, fbdev, modesetting]: " VIDEO_DRIVER
     fi
   } #}}}
   check_wireless() { #{{{
     lspci | grep -q BCM4312
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
       WIRELESS_PKG="dkms-broadcom-wl"
       WIRELESS_MOD="wl"
     else
@@ -706,7 +717,7 @@ case "$1" in
         fi
       done
       #check if there is no partitions left
-      if [[ ${#partitions[@]} == 0 ]]; then
+      if [[ ${#partitions[@]} -eq 0 ]]; then
         break
       elif [[ ${device_name[i]} == another ]]; then
         read_input_text "Configure more partitions"
@@ -906,7 +917,7 @@ case "$1" in
         print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
         print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
         echo -e $prompt3
-        if [[ $UEFI == 1 ]]; then
+        if [[ $UEFI -eq 1 ]]; then
           print_warning "modprobe dm-mod\ngrub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck\ngrub-mkconfig -o /boot/grub/grub.cfg"
         else
           print_warning "modprobe dm-mod\ngrub-install --target=i386-pc --recheck $ROOT_DEVICE\ngrub-mkconfig -o /boot/grub/grub.cfg"
@@ -1725,10 +1736,9 @@ case "$1" in
   #VIDEO CARDS {{{
   install_video_cards(){
     package_install "dmidecode"
-    VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
     print_title "VIDEO CARD"
     check_vga
-    if [[ -n ${VIRTUALBOX_GUEST} ]]; then
+    if [[ ${VIRTUALBOX_GUEST} -eq 1 ]]; then
       package_install "virtualbox-guest-utils"
       add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
       add_user_to_group ${USER_NAME} vboxsf
@@ -1754,9 +1764,10 @@ case "$1" in
         package_install "lib32-catalyst-utils"
       fi
     elif [[ -n ${VIDEO_DRIVER} ]]; then
-      is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
+      is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils} lib32-nvidia-utils
+      is_package_installed "catalyst-dkms" && pacman -Rdds --noconfirm catalyst{-dkms,-utils} lib32-catalyst-utils
       pacman -S --asdeps libgl
-      package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri ${VIDEO_DRIVER}"
+      package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
@@ -1768,7 +1779,7 @@ case "$1" in
         add_module "${VIDEO_DRIVER}"
       fi
     else
-      package_install "xf86-video-vesa"
+      package_install "xf86-video-${VIDEO_DRIVER}"
     fi
     pause_function
   }
@@ -2057,8 +2068,8 @@ case "$1" in
         print_title "$1 THEMES"
         echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-xfce-icons inx-icon-theme matrilineare-icon-theme nitrux-icon-theme" "Icons Themes") $AUR"
         echo " 2) $(menu_item "adwaita-x-dark-and-light-theme gtk-theme-boje xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
-        [[ $GNOME == 1 ]] && echo " 3) $(menu_item "gnome-shell-theme-elegance gnome-shell-theme-eos" "Gnome Shell Themes") $AUR"
-        [[ $CINNAMON == 1 ]] && echo " 3) $(menu_item "cinnamon-theme-ambience cinnamon-theme-baldr cinnamon-theme-google+ cinnamon-theme-eleganse cinnamon-theme-helios cinnamon-theme-elementary-luna cinnamon-theme-holo cinnamon-theme-gnome cinnamon-theme-loki" "Cinnamon themes") $AUR"
+        [[ $GNOME -eq 1 ]] && echo " 3) $(menu_item "gnome-shell-theme-elegance gnome-shell-theme-eos" "Gnome Shell Themes") $AUR"
+        [[ $CINNAMON -eq 1 ]] && echo " 3) $(menu_item "cinnamon-theme-ambience cinnamon-theme-baldr cinnamon-theme-google+ cinnamon-theme-eleganse cinnamon-theme-helios cinnamon-theme-elementary-luna cinnamon-theme-holo cinnamon-theme-gnome cinnamon-theme-loki" "Cinnamon themes") $AUR"
         echo ""
         echo " d) DONE"
         echo ""
@@ -2075,7 +2086,7 @@ case "$1" in
               OPT=2
               ;;
             3)
-              if [[ $GNOME == 1 ]]; then
+              if [[ $GNOME -eq 1 ]]; then
                 #GNOME SHELL THEMES {{{
                 while [[ 1 ]]
                 do
@@ -2106,7 +2117,7 @@ case "$1" in
                   elihw
                 done
                 #}}}
-              elif [[ $CINNAMON == 1 ]]; then
+              elif [[ $CINNAMON -eq 1 ]]; then
                 #CINNAMON THEMES {{{
                 while [[ 1 ]]
                 do
