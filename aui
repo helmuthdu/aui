@@ -213,7 +213,7 @@
         fi
       fi
     fi
-    OPTION="n"
+    OPTION="y"
     [[ $VIDEO_DRIVER == intel || $VIDEO_DRIVER == vesa ]] && read -p "Confirm video driver: $VIDEO_DRIVER [Y/n]" OPTION
     if [[ $OPTION == n ]]; then
       read -p "Type your video driver [ex: sis, fbdev, modesetting]: " VIDEO_DRIVER
@@ -2076,7 +2076,7 @@ case "$1" in
         echo " d) DONE"
         echo ""
         THEMES_OPTIONS+=" d"
-        read_input_options "$THEME_OPTIONS"
+        read_input_options "$THEMES_OPTIONS"
         for OPT in ${OPTIONS[@]}; do
           case "$OPT" in
             1)
@@ -2199,64 +2199,254 @@ case "$1" in
       done
     } #}}}
     install_misc_apps() { #{{{
+      while [[ 1 ]]
+      do
+        print_title "$1 ESSENTIAL APPS"
+        echo " 1) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
+        echo " 2) $(menu_item "dmenu")"
+        echo " 3) $(menu_item "viewnior")"
+        echo " 4) $(menu_item "gmrun")"
+        echo " 5) $(menu_item "pcmanfm" "PCManFM")"
+        echo " 6) $(menu_item "rxvt-unicode")"
+        echo " 7) $(menu_item "scrot")"
+        echo " 8) $(menu_item "thunar")"
+        echo " 9) $(menu_item "tint2")"
+        echo "10) $(menu_item "volwheel")"
+        echo "11) $(menu_item "xfburn")"
+        echo "12) $(menu_item "xcompmgr")"
+        echo ""
+        echo " d) DONE"
+        echo ""
+        MISCAPPS+=" d"
+        read_input_options "$MISCAPPS"
+        for OPT in ${OPTIONS[@]}; do
+          case "$OPT" in
+            1)
+              install_display_manager
+              OPT=1
+              ;;
+            2)
+              package_install "dmenu"
+              ;;
+            3)
+              package_install "viewnior"
+              ;;
+            4)
+              package_install "gmrun"
+              ;;
+            5)
+              package_install "pcmanfm polkit-gnome gvfs"
+              ;;
+            6)
+              package_install "rxvt-unicode"
+              ;;
+            7)
+              package_install "scrot"
+              ;;
+            8)
+              package_install "thunar tumbler"
+              ;;
+            9)
+              package_install "tint2"
+              ;;
+            10)
+              package_install "volwheel"
+              ;;
+            11)
+              package_install "xfburn"
+              ;;
+            12)
+              package_install "xcompmgr transset-df"
+              ;;
+            "d")
+              break
+              ;;
+            *)
+              invalid_option
+              ;;
+          esac
+        done
+        elihw
+      done
+    } #}}}
+    print_title "DESKTOP ENVIRONMENT|WINDOW MANAGER"
+    print_info "A DE provide a complete GUI for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries.\n\nA window manager is one component of a system's graphical user interface."
+    echo -e "Select your DE or WM:\n"
+    echo " 1) Cinnamon $AUR"
+    echo " 2) E17"
+    echo " 3) GNOME"
+    echo " 4) KDE"
+    echo " 5) LXDE"
+    echo " 6) Mate"
+    echo " 7) XFCE"
+    echo " 8) Awesome"
+    echo " 9) Fluxbox"
+    echo "10) OpenBox"
+    echo ""
+    echo " b) BACK"
+    read_input $DESKTOPENV
+    case "$OPTION" in
+      1)
+        #CINNAMON {{{
+        print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
+        print_info "Cinnamon is a fork of GNOME Shell, initially developed by Linux Mint. It attempts to provide a more traditional user environment based on the desktop metaphor, like GNOME 2. Cinnamon uses Muffin, a fork of the GNOME 3 window manager Mutter, as its window manager."
+        aur_package_install "cinnamon"
+        package_install "gnome-extra gedit-plugins"
+        package_install "telepathy"
+        package_install "gksu nautilus-open-terminal gnome-tweak-tool xdg-user-dirs-gtk gucharmap"
+        package_install "gvfs-smb gvfs-afc"
+        package_install "deja-dup"
+        package_install "gnome-packagekit gnome-settings-daemon-updates"
+        aur_package_install "gnome-defaults-list"
+        #Essential stuffs
+        aur_package_install "cinnamon-applet-screenshot-record"
+        aur_package_install "cinnamon-applet-shutdown"
+        aur_package_install "cinnamon-extension-coverflow-alt-tab"
+        config_xinitrc "gnome-session-cinnamon"
+        #Tweaks
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-effect scale
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-time 250
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-transition easeInExpo
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-effect scale
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-time 350
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-transition easeOutBack
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-effect scale
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-time 150
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-transition easeInOutSine
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-effect scale
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-time 250
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-transition easeInOutSine
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-effect scale
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-time 150
+        sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-transition easeInOutSine
+        CINNAMON=1
+        pause_function
+        install_themes "CINNAMON"
+        #Gnome Display Manager (a reimplementation of xdm)
+        systemctl enable gdm.service
+        #D-Bus interface for user account query and manipulation
+        systemctl enable accounts-daemon.service
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
+        2)
+        #E17 {{{
+        print_title "E17 - http://wiki.archlinux.org/index.php/E17"
+        print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
+        package_install "enlightenment17"
+        package_install "gvfs"
+        package_install "xdg-user-dirs"
+        package_install "leafpad epdfview"
+        package_install "lxappearance"
+        package_install "ttf-bitstream-vera ttf-dejavu"
+        aur_package_install "gnome-defaults-list"
+        config_xinitrc "enlightenment_start"
+        pause_function
+        install_misc_apps "E17"
+        install_themes "E17"
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
+        3)
+        #GNOME {{{
+        print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
+        print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
+        package_install "gnome gnome-extra telepathy"
+        package_install "gksu nautilus-open-terminal gedit-plugins gnome-tweak-tool gucharmap"
+        package_install "gvfs-smb gvfs-afc"
+        package_install "zeitgeist"
+        package_install "deja-dup"
+        package_install "gnome-packagekit gnome-settings-daemon-updates"
+        aur_package_install "gnome-defaults-list"
+        package_install "python2-distutils-extra"
+        aur_package_install "empathy-theme-ubuntu-adium-bzr"
+        config_xinitrc "gnome-session"
+        GNOME=1
+        pause_function
+        install_themes "GNOME"
+        #Gnome Display Manager (a reimplementation of xdm)
+        systemctl enable gdm.service
+        #D-Bus interface for user account query and manipulation
+        systemctl enable accounts-daemon.service
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
+        4)
+        #KDE {{{
+        print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
+        print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
+        package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
+        package_install "xdg-user-dirs"
+        package_install "kde-telepathy telepathy"
+        package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite kdenetwork-kopete"
+        aur_package_install "kde-gtk-config"
+        aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
+        local CONFIG_PULSEAUDIO=`cat /etc/pulse/default.pa | grep module-device-manager`
+        [[ -z $CONFIG_PULSEAUDIO ]] && echo "load-module module-device-manager" >> /etc/pulse/default.pa
+        config_xinitrc "startkde"
+        pause_function
+        #QTCURVE THEMES #{{{
+        curl -o Sweet.tar.gz http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
+        curl -o Kawai.tar.gz http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
+        tar zxvf Sweet.tar.gz
+        tar zxvf Kawai.tar.gz
+        rm Sweet.tar.gz
+        rm Kawai.tar.gz
+        mkdir -p /home/${USER_NAME}/.kde4/share/apps/color-schemes
+        mv Sweet/Sweet.colors /home/${USER_NAME}/.kde4/share/apps/color-schemes
+        mv Kawai/Kawai.colors /home/${USER_NAME}/.kde4/share/apps/color-schemes
+        mkdir -p /home/${USER_NAME}/.kde4/share/apps/QtCurve
+        mv Sweet/Sweet.qtcurve /home/${USER_NAME}/.kde4/share/apps/QtCurve
+        mv Kawai/Kawai.qtcurve /home/${USER_NAME}/.kde4/share/apps/QtCurve
+        chown -R ${USER_NAME}:users /home/${USER_NAME}/.kde4
+        rm -fr Kawai Sweet
+        #}}}
+        #KDE CUSTOMIZATION {{{
         while [[ 1 ]]
         do
-          print_title "$1 ESSENTIAL APPS"
-          echo " 1) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
-          echo " 2) $(menu_item "dmenu")"
-          echo " 3) $(menu_item "viewnior")"
-          echo " 4) $(menu_item "gmrun")"
-          echo " 5) $(menu_item "pcmanfm" "PCManFM")"
-          echo " 6) $(menu_item "rxvt-unicode")"
-          echo " 7) $(menu_item "scrot")"
-          echo " 8) $(menu_item "thunar")"
-          echo " 9) $(menu_item "tint2")"
-          echo "10) $(menu_item "volwheel")"
-          echo "11) $(menu_item "xfburn")"
-          echo "12) $(menu_item "xcompmgr")"
+          print_title "KDE CUSTOMIZATION"
+          echo " 1) $(menu_item "apper")"
+          echo " 2) $(menu_item "bangarang") $AUR"
+          echo " 3) $(menu_item "choqok")"
+          echo " 4) $(menu_item "digikam")"
+          echo " 5) $(menu_item "k3b")"
+          echo " 6) $(menu_item "rosa-icons") $AUR"
+          echo " 7) $(menu_item "caledonia-bundle plasma-theme-produkt" "Plasma Themes") $AUR"
+          echo " 8) $(menu_item "yakuake")"
           echo ""
           echo " d) DONE"
           echo ""
-          MISCAPPS+=" d"
-          read_input_options "$MISCAPPS"
+          KDE_OPTIONS+=" d"
+          read_input_options "$KDE_OPTIONS"
           for OPT in ${OPTIONS[@]}; do
             case "$OPT" in
               1)
-                install_display_manager
-                OPT=1
+                package_install "apper"
                 ;;
               2)
-                package_install "dmenu"
+                aur_package_install "bangarang"
                 ;;
               3)
-                package_install "viewnior"
+                package_install "choqok"
                 ;;
               4)
-                package_install "gmrun"
+                package_install "digikam"
                 ;;
               5)
-                package_install "pcmanfm polkit-gnome gvfs"
+                package_install "k3b cdrdao dvd+rw-tools"
                 ;;
               6)
-                package_install "rxvt-unicode"
+                aur_package_install "rosa-icons"
                 ;;
               7)
-                package_install "scrot"
+                aur_package_install "caledonia-bundle plasma-theme-rosa plasma-theme-produkt ronak-plasmatheme"
                 ;;
               8)
-                package_install "thunar tumbler"
-                ;;
-              9)
-                package_install "tint2"
-                ;;
-              10)
-                package_install "volwheel"
-                ;;
-              11)
-                package_install "xfburn"
-                ;;
-              12)
-                package_install "xcompmgr transset-df"
+                package_install "yakuake"
+                aur_package_install "yakuake-skin-plasma-oxygen-panel"
                 ;;
               "d")
                 break
@@ -2268,328 +2458,139 @@ case "$1" in
           done
           elihw
         done
-    } #}}}
-    print_title "DESKTOP ENVIRONMENT|WINDOW MANAGER"
-    print_info "A DE provide a complete GUI for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries.\n\nA window manager is one component of a system's graphical user interface."
-    de_wm_list=("Cinnamon" "E17" "GNOME" "KDE" "LXDE" "Mate" "XFCE" "Awesome" "Fluxbox" "OpenBox");
-    PS3="$prompt1"
-    echo -e "Select your DE or WM:\n"
-    select OPT in "${de_wm_list[@]}"; do
-      [[ $AUTOMATIC_MODE -eq 1 ]] && REPLY=$DESKTOPENV
-      case "$REPLY" in
-        1)
-          #CINNAMON {{{
-          print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
-          print_info "Cinnamon is a fork of GNOME Shell, initially developed by Linux Mint. It attempts to provide a more traditional user environment based on the desktop metaphor, like GNOME 2. Cinnamon uses Muffin, a fork of the GNOME 3 window manager Mutter, as its window manager."
-          aur_package_install "cinnamon"
-          package_install "gnome-extra gedit-plugins"
-          package_install "telepathy"
-          package_install "gksu nautilus-open-terminal gnome-tweak-tool xdg-user-dirs-gtk gucharmap"
-          package_install "gvfs-smb gvfs-afc"
-          package_install "deja-dup"
-          package_install "gnome-packagekit gnome-settings-daemon-updates"
-          aur_package_install "gnome-defaults-list"
-          #Essential stuffs
-          aur_package_install "cinnamon-applet-screenshot-record"
-          aur_package_install "cinnamon-applet-shutdown"
-          aur_package_install "cinnamon-extension-coverflow-alt-tab"
-          config_xinitrc "gnome-session-cinnamon"
-          #Tweaks
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-effect scale
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-time 250
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-transition easeInExpo
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-effect scale
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-time 350
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-transition easeOutBack
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-effect scale
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-time 150
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-transition easeInOutSine
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-effect scale
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-time 250
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-transition easeInOutSine
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-effect scale
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-time 150
-          sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-transition easeInOutSine
-          CINNAMON=1
-          pause_function
-          install_themes "CINNAMON"
-          #Gnome Display Manager (a reimplementation of xdm)
-          systemctl enable gdm.service
-          #D-Bus interface for user account query and manipulation
-          systemctl enable accounts-daemon.service
-          #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-          systemctl enable upower.service
-          break
-          ;;
-          #}}}
-        2)
-          #E17 {{{
-          print_title "E17 - http://wiki.archlinux.org/index.php/E17"
-          print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
-          package_install "enlightenment17"
-          package_install "gvfs"
-          package_install "xdg-user-dirs"
-          package_install "leafpad epdfview"
-          package_install "lxappearance"
-          package_install "ttf-bitstream-vera ttf-dejavu"
-          aur_package_install "gnome-defaults-list"
-          config_xinitrc "enlightenment_start"
-          pause_function
-          install_misc_apps "E17"
-          install_themes "E17"
-          #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-          systemctl enable upower.service
-          break
-          ;;
-          #}}}
-        3)
-          #GNOME {{{
-          print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
-          print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
-          package_install "gnome gnome-extra telepathy"
-          package_install "gksu nautilus-open-terminal gedit-plugins gnome-tweak-tool gucharmap"
-          package_install "gvfs-smb gvfs-afc"
-          package_install "zeitgeist"
-          package_install "deja-dup"
-          package_install "gnome-packagekit gnome-settings-daemon-updates"
-          aur_package_install "gnome-defaults-list"
-          package_install "python2-distutils-extra"
-          aur_package_install "empathy-theme-ubuntu-adium-bzr"
-          config_xinitrc "gnome-session"
-          GNOME=1
-          pause_function
-          install_themes "GNOME"
-          #Gnome Display Manager (a reimplementation of xdm)
-          systemctl enable gdm.service
-          #D-Bus interface for user account query and manipulation
-          systemctl enable accounts-daemon.service
-          #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-          systemctl enable upower.service
-          break
-          ;;
-          #}}}
-        4)
-          #KDE {{{
-          print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
-          print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
-          package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
-          package_install "xdg-user-dirs"
-          package_install "kde-telepathy telepathy"
-          package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite kdenetwork-kopete"
-          aur_package_install "kde-gtk-config"
-          aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
-          local CONFIG_PULSEAUDIO=`cat /etc/pulse/default.pa | grep module-device-manager`
-          [[ -z $CONFIG_PULSEAUDIO ]] && echo "load-module module-device-manager" >> /etc/pulse/default.pa
-          config_xinitrc "startkde"
-          pause_function
-          #QTCURVE THEMES #{{{
-            curl -o Sweet.tar.gz http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
-            curl -o Kawai.tar.gz http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
-            tar zxvf Sweet.tar.gz
-            tar zxvf Kawai.tar.gz
-            rm Sweet.tar.gz
-            rm Kawai.tar.gz
-            mkdir -p /home/${USER_NAME}/.kde4/share/apps/color-schemes
-            mv Sweet/Sweet.colors /home/${USER_NAME}/.kde4/share/apps/color-schemes
-            mv Kawai/Kawai.colors /home/${USER_NAME}/.kde4/share/apps/color-schemes
-            mkdir -p /home/${USER_NAME}/.kde4/share/apps/QtCurve
-            mv Sweet/Sweet.qtcurve /home/${USER_NAME}/.kde4/share/apps/QtCurve
-            mv Kawai/Kawai.qtcurve /home/${USER_NAME}/.kde4/share/apps/QtCurve
-            chown -R ${USER_NAME}:users /home/${USER_NAME}/.kde4
-            rm -fr Kawai Sweet
-          #}}}
-          #KDE CUSTOMIZATION {{{
-          while [[ 1 ]]
-          do
-            print_title "KDE CUSTOMIZATION"
-            echo " 1) $(menu_item "apper")"
-            echo " 2) $(menu_item "bangarang") $AUR"
-            echo " 3) $(menu_item "choqok")"
-            echo " 4) $(menu_item "digikam")"
-            echo " 5) $(menu_item "k3b")"
-            echo " 6) $(menu_item "rosa-icons") $AUR"
-            echo " 7) $(menu_item "caledonia-bundle plasma-theme-produkt" "Plasma Themes") $AUR"
-            echo " 8) $(menu_item "yakuake")"
-            echo ""
-            echo " d) DONE"
-            echo ""
-            KDE_OPTIONS+=" d"
-            read_input_options "$KDE_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  package_install "apper"
-                  ;;
-                2)
-                  aur_package_install "bangarang"
-                  ;;
-                3)
-                  package_install "choqok"
-                  ;;
-                4)
-                  package_install "digikam"
-                  ;;
-                5)
-                  package_install "k3b cdrdao dvd+rw-tools"
-                  ;;
-                6)
-                  aur_package_install "rosa-icons"
-                  ;;
-                7)
-                  aur_package_install "caledonia-bundle plasma-theme-rosa plasma-theme-produkt ronak-plasmatheme"
-                  ;;
-                8)
-                  package_install "yakuake"
-                  aur_package_install "yakuake-skin-plasma-oxygen-panel"
-                  ;;
-                "d")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          systemctl enable kdm.service
-          #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-          systemctl enable upower.service
-          KDE=1
-          break
-          ;;
-          #}}}
+        #}}}
+        systemctl enable kdm.service
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        KDE=1
+        ;;
+        #}}}
         5)
-          #LXDE {{{
-          print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
-          print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
-          package_install "lxde"
-          package_install "upower"
-          package_install "polkit-gnome gvfs"
-          package_install "xdg-user-dirs"
-          package_install "leafpad obconf epdfview"
-          aur_package_install "gnome-defaults-list"
-          mkdir -p /home/${USER_NAME}/.config/openbox/
-          cp /etc/xdg/openbox/rc.xml /home/${USER_NAME}/.config/openbox/
-          cp /etc/xdg/openbox/menu.xml /home/${USER_NAME}/.config/openbox/
-          cp /etc/xdg/openbox/autostart /home/${USER_NAME}/.config/openbox/
-          chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
-          config_xinitrc "startlxde"
-          pause_function
-          install_misc_apps "LXDE"
-          install_themes "LXDE"
-          #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-          systemctl enable upower.service
-          break
-          ;;
-          #}}}
+        #LXDE {{{
+        print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
+        print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
+        package_install "lxde"
+        package_install "upower"
+        package_install "polkit-gnome gvfs"
+        package_install "xdg-user-dirs"
+        package_install "leafpad obconf epdfview"
+        aur_package_install "gnome-defaults-list"
+        mkdir -p /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/rc.xml /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/menu.xml /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/autostart /home/${USER_NAME}/.config/openbox/
+        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+        config_xinitrc "startlxde"
+        pause_function
+        install_misc_apps "LXDE"
+        install_themes "LXDE"
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
         6)
-          #MATE {{{
-          print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
-          print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
-          echo -e '\n[mate]\nServer = http://repo.mate-desktop.org/archlinux/$arch' >> /etc/pacman.conf
-          pacman -Sy
-          package_install "mate mate-extras"
-          package_install "gvfs"
-          aur_package_install "gnome-defaults-list"
-          config_xinitrc "mate-session"
-          pause_function
-          install_themes "MATE"
-          #D-Bus interface for user account query and manipulation
-          systemctl enable accounts-daemon.service
-          #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-          systemctl enable upower.service
-          break
-          ;;
-          #}}}
+        #MATE {{{
+        print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
+        print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
+        echo -e '\n[mate]\nServer = http://repo.mate-desktop.org/archlinux/$arch' >> /etc/pacman.conf
+        pacman -Sy
+        package_install "mate mate-extras"
+        package_install "gvfs"
+        aur_package_install "gnome-defaults-list"
+        config_xinitrc "mate-session"
+        pause_function
+        install_themes "MATE"
+        #D-Bus interface for user account query and manipulation
+        systemctl enable accounts-daemon.service
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
         7)
-          #XFCE {{{
-          print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
-          print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
-          package_install "xfce4 xfce4-goodies"
-          package_install "gvfs"
-          package_install "xdg-user-dirs"
-          aur_package_install "gnome-defaults-list"
-          config_xinitrc "startxfce4"
-          pause_function
-          install_display_manager
-          install_themes "XFCE"
-          #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-          systemctl enable upower.service
-          break
-          ;;
-          #}}}
+        #XFCE {{{
+        print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
+        print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
+        package_install "xfce4 xfce4-goodies"
+        package_install "gvfs"
+        package_install "xdg-user-dirs"
+        aur_package_install "gnome-defaults-list"
+        config_xinitrc "startxfce4"
+        pause_function
+        install_display_manager
+        install_themes "XFCE"
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
         8)
-          #AWESOME {{{
-          print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
-          print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
-          package_install "awesome"
-          package_install "gvfs"
-          package_install "lxappearance"
-          package_install "leafpad epdfview nitrogen"
-          package_install "ttf-bitstream-vera ttf-dejavu"
-          aur_package_install "gnome-defaults-list"
-          mkdir -p /home/${USER_NAME}/.config/awesome/
-          cp /etc/xdg/awesome/rc.lua /home/${USER_NAME}/.config/awesome/
-          chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
-          config_xinitrc "awesome"
-          pause_function
-          install_misc_apps "AWESOME"
-          install_themes "AWESOME"
-          #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-          systemctl enable upower.service
-          break
-          ;;
-          #}}}
+        #AWESOME {{{
+        print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
+        print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
+        package_install "awesome"
+        package_install "gvfs"
+        package_install "lxappearance"
+        package_install "leafpad epdfview nitrogen"
+        package_install "ttf-bitstream-vera ttf-dejavu"
+        aur_package_install "gnome-defaults-list"
+        mkdir -p /home/${USER_NAME}/.config/awesome/
+        cp /etc/xdg/awesome/rc.lua /home/${USER_NAME}/.config/awesome/
+        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+        config_xinitrc "awesome"
+        pause_function
+        install_misc_apps "AWESOME"
+        install_themes "AWESOME"
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
         9)
-          #FLUXBOX {{{
-          print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
-          print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
-          package_install "fluxbox menumaker"
-          package_install "lxappearance"
-          package_install "xdg-user-dirs"
-          package_install "leafpad epdfview"
-          package_install "ttf-bitstream-vera ttf-dejavu"
-          aur_package_install "gnome-defaults-list"
-          config_xinitrc "startfluxbox"
-          install_misc_apps "FLUXBOX"
-          install_themes "FLUXBOX"
-          pause_function
-          #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-          systemctl enable upower.service
-          break
-          ;;
-          #}}}
+        #FLUXBOX {{{
+        print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
+        print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
+        package_install "fluxbox menumaker"
+        package_install "lxappearance"
+        package_install "xdg-user-dirs"
+        package_install "leafpad epdfview"
+        package_install "ttf-bitstream-vera ttf-dejavu"
+        aur_package_install "gnome-defaults-list"
+        config_xinitrc "startfluxbox"
+        install_misc_apps "FLUXBOX"
+        install_themes "FLUXBOX"
+        pause_function
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
         10)
-          #OPENBOX {{{
-          print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
-          print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
-          package_install "openbox obconf obmenu menumaker"
-          package_install "lxappearance"
-          package_install "xdg-user-dirs"
-          package_install "leafpad epdfview nitrogen"
-          package_install "ttf-bitstream-vera ttf-dejavu"
-          aur_package_install "gnome-defaults-list"
-          mkdir -p /home/${USER_NAME}/.config/openbox/
-          cp /etc/xdg/openbox/rc.xml /home/${USER_NAME}/.config/openbox/
-          cp /etc/xdg/openbox/menu.xml /home/${USER_NAME}/.config/openbox/
-          cp /etc/xdg/openbox/autostart /home/${USER_NAME}/.config/openbox/
-          chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
-          config_xinitrc "openbox-session"
-          pause_function
-          install_misc_apps "OPENBOX"
-          install_themes "OPENBOX"
-          #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-          systemctl enable upower.service
-          break
-          ;;
-          #}}}
-        *)
-          invalid_option
-          ;;
-      esac
-    done
+        #OPENBOX {{{
+        print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
+        print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
+        package_install "openbox obconf obmenu menumaker"
+        package_install "lxappearance"
+        package_install "xdg-user-dirs"
+        package_install "leafpad epdfview nitrogen"
+        package_install "ttf-bitstream-vera ttf-dejavu"
+        aur_package_install "gnome-defaults-list"
+        mkdir -p /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/rc.xml /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/menu.xml /home/${USER_NAME}/.config/openbox/
+        cp /etc/xdg/openbox/autostart /home/${USER_NAME}/.config/openbox/
+        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+        config_xinitrc "openbox-session"
+        pause_function
+        install_misc_apps "OPENBOX"
+        install_themes "OPENBOX"
+        #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+        systemctl enable upower.service
+        ;;
+        #}}}
+        "b")
+        break
+        ;;
+      *)
+        invalid_option
+        ;;
+    esac
     #Fix p7FM {{{
     [[ ${KDE} -eq 0 ]] && package_install "wxgtk"
     #}}}
