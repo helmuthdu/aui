@@ -65,10 +65,6 @@
   #CURRENT DIRECTORY
   AUI_DIR=`pwd`
   MOUNTPOINT="/mnt"
-  #VIDEO DRIVER
-  NVIDIA=0
-  ATI=0
-  VIRTUALBOX_GUEST=0
   # VERBOSE MODE
   if [[ $1 == "-v" || $1 == "--verbose" ]]; then
     VERBOSE_MODE=1
@@ -175,43 +171,33 @@
   } #}}}
   check_vga() { #{{{
     # Determine video chipset - only Intel, ATI and nvidia are supported by this script"
-    ncecho "${BBlue}==>${White} Detecting video chipset "
-    local VGA=`lspci | grep VGA`
-    echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q nvidia
-    if [[ $? -eq 0 ]]; then
+    ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Detecting video chipset "
+    local VGA=`lspci | grep VGA | tr "[:upper:]" "[:lower:]"`
+    if [[ -n $(dmidecode --type 1 | grep VirtualBox) ]]; then
+      cecho Virtualbox
+      VIDEO_DRIVER="virtualbox"
+    elif [[ -n $(echo ${VGA} | grep "nvidia") ]]; then
       cecho Nvidia
       read_input_text "Install NVIDIA proprietary driver" $PROPRIETARY_DRIVER
       if [[ $OPTION == y ]]; then
-        NVIDIA=1
+        VIDEO_DRIVER="nvidia"
       else
         VIDEO_DRIVER="nouveau"
       fi
-    else
-      echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q "intel corporation"
-      if [[ $? -eq 0 ]]; then
-        cecho Intel
-        VIDEO_DRIVER="intel"
+    elif [[ -n $(echo ${VGA} | grep "intel corporation") ]]; then
+      cecho Intel
+      VIDEO_DRIVER="intel"
+    elif [[ -n $(echo ${VGA} | grep "advanced micro devices") ]]; then
+      cecho AMD/ATI
+      read_input_text "Install ATI proprietary driver" $PROPRIETARY_DRIVER
+      if [[ $OPTION == y ]]; then
+        VIDEO_DRIVER="catalyst"
       else
-        echo ${VGA} | tr "[:upper:]" "[:lower:]" | grep -q "advanced micro devices"
-        if [[ $? -eq 0 ]]; then
-          cecho AMD/ATI
-          read_input_text "Install ATI proprietary driver" $PROPRIETARY_DRIVER
-          if [[ $OPTION == y ]]; then
-            ATI=1
-          else
-            VIDEO_DRIVER="ati"
-          fi
-        else
-          echo `dmidecode --type 1 | grep VirtualBox`
-          if [[ $? -eq 0 ]]; then
-            cecho VIRTUALBOX
-            VIRTUALBOX_GUEST=1
-          else
-            cecho VESA
-            VIDEO_DRIVER="vesa"
-          fi
-        fi
+        VIDEO_DRIVER="ati"
       fi
+    else
+      cecho VESA
+      VIDEO_DRIVER="vesa"
     fi
     OPTION="y"
     [[ $VIDEO_DRIVER == intel || $VIDEO_DRIVER == vesa ]] && read -p "Confirm video driver: $VIDEO_DRIVER [Y/n]" OPTION
@@ -325,7 +311,7 @@
           NEW_MODULES="${MODULES} ${NEW_MODULE}"
         fi
         replaceinfile "MODULES=\"${MODULES}\"" "MODULES=\"${NEW_MODULES}\"" /etc/mkinitcpio.conf
-        ncecho "${BBlue}==>${White} Rebuilding init "
+        ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Rebuilding init "
         mkinitcpio -p linux >>"$LOG" 2>&1 &
         pid=$!;progress $pid
       fi
@@ -365,7 +351,7 @@
     for PKG in $1; do
       if ! is_package_installed "${PKG}" ; then
         if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
-          ncecho "${BBlue}==>${White} Installing ${AUR} ${BWhite}${PKG}${White} "
+          ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Installing ${AUR} ${BWhite}${PKG}${White} "
           su - ${USER_NAME} -c "${AUR_HELPER} --noconfirm -S ${PKG}" >>"$LOG" 2>&1 &
           pid=$!;progress $pid
         else
@@ -373,7 +359,7 @@
         fi
       else
         if [[ $VERBOSE_MODE -eq 0 ]]; then
-          cecho "${BBlue}==>${White} Installing ${AUR} ${BWhite}${PKG}${White} success"
+          cecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Installing ${AUR} ${BWhite}${PKG}${White} success"
         else
           echo -e "Warning: ${PKG} is up to date --skipping"
         fi
@@ -400,11 +386,11 @@
             ;;
         esac
         if ! is_package_installed "${PKG}" ; then
-          ncecho "${BBlue}==>${White} Installing (${PKG_REPO}) ${BWhite}${PKG}${White} "
+          ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Installing (${PKG_REPO}) ${BWhite}${PKG}${White} "
           pacman -S --noconfirm --needed ${PKG} >>"$LOG" 2>&1 &
           pid=$!;progress $pid
         else
-          cecho "${BBlue}==>${White} Installing (${PKG_REPO}) ${BWhite}${PKG}${White} exists "
+          cecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Installing (${PKG_REPO}) ${BWhite}${PKG}${White} exists "
         fi
       done
     else
@@ -416,7 +402,7 @@
     for PKG in ${1}; do
       if is_package_installed "${PKG}" ; then
         if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
-          ncecho "${BBlue}==>${White} Removing ${BWhite}${PKG}${White} "
+          ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Removing ${BWhite}${PKG}${White} "
           pacman -Rcsn --noconfirm ${PKG} >>"$LOG" 2>&1 &
           pid=$!;progress $pid
         else
@@ -427,7 +413,7 @@
   } #}}}
   system_upgrade(){ #{{{
     if [[ $VERBOSE_MODE -eq 0 ]]; then
-      ncecho "${BBlue}==>${White} Upgrading packages "
+      ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Upgrading packages "
       pacman -Syu --noconfirm --noprogress >>"$LOG" 2>&1 &
       pid=$!;progress $pid
     else
@@ -479,10 +465,17 @@
       error_msg "ERROR! 'add_user_to_group' was not given enough parameters."
     fi
 
-    ncecho "${BBlue}==>${White} Adding ${BWhite}${_USER}${White} to ${BWhite}${_GROUP}${White} "
+    ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Adding ${BWhite}${_USER}${White} to ${BWhite}${_GROUP}${White} "
     gpasswd -a ${_USER} ${_GROUP} >>"$LOG" 2>&1 &
     pid=$!;progress $pid
   } #}}}
+  system_ctl () {
+    local ACTION=${1}
+    local OBJECT=${2}
+    ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} systemctl ${ACTION} ${OBJECT} "
+    systemctl ${ACTION} ${OBJECT} >>"$LOG" 2>&1
+    pid=$!;progress $pid
+  }
 #}}}
 
 case "$1" in
@@ -1462,7 +1455,7 @@ case "$1" in
             ;;
         esac
       done
-      ncecho "${BBlue}==>${White} Syncing repositories "
+      ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Syncing repositories "
       pacman -Syy >>"$LOG" 2>&1 &
       pid=$!;progress $pid
       pause_function
@@ -1490,10 +1483,10 @@ case "$1" in
     print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
     print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
     package_install "systemd systemd-sysvcompat"
-    systemctl enable cronie.service
+    system_ctl enable cronie.service
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
     package_install "bc rsync mlocate bash-completion ntp pkgstats"
-    systemctl enable ntpd.service
+    system_ctl enable ntpd.service
     pause_function
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
     print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
@@ -1505,13 +1498,13 @@ case "$1" in
     print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
     print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD service discovery. It allows programs to publish and discover services and hosts running on a local network with no specific configuration."
     package_install "avahi nss-mdns"
-    is_package_installed "avahi" && systemctl enable avahi-daemon.service
-    is_package_installed "avahi" && systemctl enable avahi-dnsconfd.service
+    is_package_installed "avahi" && system_ctl enable avahi-daemon.service
+    is_package_installed "avahi" && system_ctl enable avahi-dnsconfd.service
     pause_function
     print_title "ACPI - https://wiki.archlinux.org/index.php/ACPI_modules"
     print_info "acpid is a flexible and extensible daemon for delivering ACPI events."
     package_install "acpi acpid"
-    is_package_installed "acpid" && systemctl enable acpid.service
+    is_package_installed "acpid" && system_ctl enable acpid.service
     pause_function
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
     print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
@@ -1544,7 +1537,7 @@ case "$1" in
     if [[ $OPTION == y ]]; then
       package_install "openssh"
       aur_package_install "rssh"
-      systemctl enable sshd.service
+      system_ctl enable sshd.service
       [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
       #CONFIGURE SSHD_CONF #{{{
         sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
@@ -1589,7 +1582,7 @@ case "$1" in
     read_input_text "Install nfs" $NFS
     if [[ $OPTION == y ]]; then
       package_install "nfs-utils"
-      systemctl enable rpc-statd.service
+      system_ctl enable rpc-statd.service
       pause_function
     fi
   }
@@ -1602,9 +1595,9 @@ case "$1" in
     if [[ $OPTION == y ]]; then
       package_install "samba"
       cp /etc/samba/smb.conf.default /etc/samba/smb.conf
-      systemctl enable smbd.service
-      systemctl enable nmbd.service
-      systemctl enable winbindd.service
+      system_ctl enable smbd.service
+      system_ctl enable nmbd.service
+      system_ctl enable winbindd.service
       pause_function
     fi
   }
@@ -1616,7 +1609,7 @@ case "$1" in
     read_input_text "Install Preload" $PRELOAD
     if [[ $OPTION == y ]]; then
       package_install "preload"
-      systemctl enable preload.service
+      system_ctl enable preload.service
       pause_function
     fi
   }
@@ -1628,7 +1621,7 @@ case "$1" in
     read_input_text "Install Zram" $ZRAM
     if [[ $OPTION == y ]]; then
       aur_package_install "zramswap"
-      systemctl enable zramswap.service
+      system_ctl enable zramswap.service
       pause_function
     fi
   }
@@ -1640,19 +1633,20 @@ case "$1" in
     read_input_text "Install Laptop Mode Tools" $LMT
     if [[ $OPTION == y ]]; then
       package_install "laptop-mode-tools"
-      systemctl enable laptop-mode.service
+      system_ctl enable laptop-mode.service
       pause_function
     fi
   }
   #}}}
-  #UFW {{{
-  install_ufw(){
-    print_title "UFW - https://wiki.archlinux.org/index.php/Uncomplicated_Firewall"
-    print_info "Uncomplicated Firewall (ufw) is a simple frontend for iptables that is designed to be easy to use."
-    read_input_text "Install ufw" $UFW
+  #FIREWALLD {{{
+  install_fwd(){
+    print_title "FirewallD - https://fedoraproject.org/wiki/FirewallD"
+    print_info "firewalld provides a dynamically managed firewall with support for network/firewall zones to define the trust level of network connections or interfaces. It has support for IPv4, IPv6 firewall settings and for ethernet bridges and has a separation of runtime and persistent configuration options. It also supports an interface for services or applications to add firewall rules directly."
+    read_input_text "Install FirewallD" $FWD
     if [[ $OPTION == y ]]; then
-      package_install "ufw"
-      systemctl enable ufw
+      is_package_installed "ufw" && package_remove "ufw"
+      aur_package_install "firewalld"
+      system_ctl enable firewalld
       pause_function
     fi
   }
@@ -1739,14 +1733,15 @@ case "$1" in
     package_install "dmidecode"
     print_title "VIDEO CARD"
     check_vga
-    if [[ ${VIRTUALBOX_GUEST} -eq 1 ]]; then
+    if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
       package_install "virtualbox-guest-utils"
       add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
       add_user_to_group ${USER_NAME} vboxsf
-      systemctl disable ntpd.service
-      systemctl enable vboxservice.service
-    elif [[ ${NVIDIA} -eq 1 ]]; then
-      pacman -Rcsn $(pacman -Qe | grep xf86-video | awk '{print $1}')
+      system_ctl disable ntpd.service
+      system_ctl enable vboxservice.service
+    elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
+      XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
+      [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
       pacman -S --needed nvidia{,-utils}
       #fix nvidia-settings open
       package_install "pangox-compat"
@@ -1757,27 +1752,30 @@ case "$1" in
       sed -i 's/options nouveau modeset=1/#options nouveau modeset=1/' /etc/modprobe.d/modprobe.conf
       sed -i 's/MODULES="nouveau"/#MODULES="nouveau"/' /etc/mkinitcpio.conf
       mkinitcpio -p linux
-    elif [[ ${ATI} -eq 1 ]]; then
+    elif [[ ${VIDEO_DRIVER} == catalyst ]]; then
+      XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
+      [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
       package_install "linux-headers"
-      pacman -Rcsn $(pacman -Qe | grep xf86-video | awk '{print $1}')
       pacman -S --needed catalyst-dkms
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-catalyst-utils"
       fi
-    elif [[ -n ${VIDEO_DRIVER} ]]; then
+    elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
       is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils} lib32-nvidia-utils
-      is_package_installed "catalyst-dkms" && pacman -Rdds --noconfirm catalyst{-dkms,-utils} lib32-catalyst-utils
       pacman -S --asdeps libgl
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
-      if [[ ${VIDEO_DRIVER} == nouveau ]]; then
-        sed -i 's/#*options nouveau modeset=1/options nouveau modeset=1/' /etc/modprobe.d/modprobe.conf
-        sed -i 's/#*MODULES="nouveau"/MODULES="nouveau"/' /etc/mkinitcpio.conf
-        mkinitcpio -p linux
-      else [[ ${VIDEO_DRIVER} == radeon ]]
-        add_module "${VIDEO_DRIVER}"
+      sed -i 's/#*options nouveau modeset=1/options nouveau modeset=1/' /etc/modprobe.d/modprobe.conf
+      sed -i 's/#*MODULES="nouveau"/MODULES="nouveau"/' /etc/mkinitcpio.conf
+      mkinitcpio -p linux
+    elif [[ ${VIDEO_DRIVER} == ati ]]; then
+      is_package_installed "catalyst-dkms" && pacman -Rdds --noconfirm catalyst{-dkms,-utils} lib32-catalyst-utils
+      pacman -S --asdeps libgl
+      package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
+      if [[ ${ARCHI} == x86_64 ]]; then
+        package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
     else
       package_install "xf86-video-${VIDEO_DRIVER}"
@@ -1793,7 +1791,7 @@ case "$1" in
     if [[ $OPTION == y ]]; then
       package_install "cups cups-filters ghostscript gsfonts"
       package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
-      systemctl enable cups.service
+      system_ctl enable cups.service
       pause_function
     fi
   }
@@ -1887,10 +1885,10 @@ case "$1" in
       fi
       groupadd -g 42 privoxy
       useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
-      systemctl start tor.service
-      systemctl start privoxy.service
-      systemctl enable tor.service
-      systemctl enable privoxy.service
+      system_ctl start tor.service
+      system_ctl start privoxy.service
+      system_ctl enable tor.service
+      system_ctl enable privoxy.service
       pause_function
     fi
   }
@@ -2033,24 +2031,24 @@ case "$1" in
           case "$OPT" in
             1)
               aur_package_install "entrance-svn"
-              systemctl enable entrace.service
+              system_ctl enable entrace.service
               ;;
             2)
               package_install "gdm"
-              systemctl enable gdm.service
+              system_ctl enable gdm.service
               ;;
             3)
               aur_package_install "lightdm lightdm-gtk-greeter"
               sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
-              systemctl enable lightdm.service
+              system_ctl enable lightdm.service
               ;;
             4)
               package_install "lxdm"
-              systemctl enable lxdm.service
+              system_ctl enable lxdm.service
               ;;
             5)
               package_install "slim"
-              systemctl enable slim.service
+              system_ctl enable slim.service
               ;;
             "b")
               break
@@ -2322,11 +2320,11 @@ case "$1" in
         pause_function
         install_themes "CINNAMON"
         #Gnome Display Manager (a reimplementation of xdm)
-        systemctl enable gdm.service
+        system_ctl enable gdm.service
         #D-Bus interface for user account query and manipulation
-        systemctl enable accounts-daemon.service
+        system_ctl enable accounts-daemon.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
+        system_ctl enable upower.service
         ;;
         #}}}
         2)
@@ -2345,7 +2343,7 @@ case "$1" in
         install_misc_apps "E17"
         install_themes "E17"
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
+        system_ctl enable upower.service
         ;;
         #}}}
         3)
@@ -2366,11 +2364,11 @@ case "$1" in
         pause_function
         install_themes "GNOME"
         #Gnome Display Manager (a reimplementation of xdm)
-        systemctl enable gdm.service
+        system_ctl enable gdm.service
         #D-Bus interface for user account query and manipulation
-        systemctl enable accounts-daemon.service
+        system_ctl enable accounts-daemon.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
+        system_ctl enable upower.service
         ;;
         #}}}
         4)
@@ -2458,9 +2456,9 @@ case "$1" in
           elihw
         done
         #}}}
-        systemctl enable kdm.service
+        system_ctl enable kdm.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
+        system_ctl enable upower.service
         KDE=1
         ;;
         #}}}
@@ -2484,7 +2482,7 @@ case "$1" in
         install_misc_apps "LXDE"
         install_themes "LXDE"
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
+        system_ctl enable upower.service
         ;;
         #}}}
         6)
@@ -2500,9 +2498,9 @@ case "$1" in
         pause_function
         install_themes "MATE"
         #D-Bus interface for user account query and manipulation
-        systemctl enable accounts-daemon.service
+        system_ctl enable accounts-daemon.service
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
+        system_ctl enable upower.service
         ;;
         #}}}
         7)
@@ -2518,7 +2516,7 @@ case "$1" in
         install_display_manager
         install_themes "XFCE"
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
+        system_ctl enable upower.service
         ;;
         #}}}
         8)
@@ -2539,7 +2537,7 @@ case "$1" in
         install_misc_apps "AWESOME"
         install_themes "AWESOME"
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
+        system_ctl enable upower.service
         ;;
         #}}}
         9)
@@ -2557,7 +2555,7 @@ case "$1" in
         install_themes "FLUXBOX"
         pause_function
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
+        system_ctl enable upower.service
         ;;
         #}}}
         10)
@@ -2580,7 +2578,7 @@ case "$1" in
         install_misc_apps "OPENBOX"
         install_themes "OPENBOX"
         #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-        systemctl enable upower.service
+        system_ctl enable upower.service
         ;;
         #}}}
         "b")
@@ -2615,10 +2613,9 @@ case "$1" in
           package_install "networkmanager network-manager-applet"
         fi
         is_package_installed "ntp" && package_install "networkmanager-dispatcher-ntpd"
-        groupadd networkmanager
         add_user_to_group ${USER_NAME} networkmanager
         #Network Management daemon
-        systemctl enable NetworkManager.service
+        system_ctl enable NetworkManager.service
         pause_function
         ;;
       2)
@@ -2630,7 +2627,7 @@ case "$1" in
           package_install "wicd wicd-gtk"
         fi
         #WICD daemon
-        systemctl enable wicd.service
+        system_ctl enable wicd.service
         pause_function
         ;;
       3)
@@ -2638,7 +2635,7 @@ case "$1" in
         print_info "ConnMan is an alternative to NetworkManager and Wicd and was created by Intel and the Moblin project for use with embedded devices."
         package_install "connman "
         #ConnMan daemon
-        systemctl enable connman.service
+        system_ctl enable connman.service
         pause_function
         ;;
     esac
@@ -3034,15 +3031,15 @@ case "$1" in
               modprobe -a vboxdrv
               add_user_to_group ${USER_NAME} vboxusers
             else
-              cecho "VirtualBox was not installed as we are a VirtualBox guest."
+              cecho " ${BBlue}[${White}${BWhite}!${White}${BBlue}]${White} VirtualBox was not installed as we are a VirtualBox guest."
             fi
             ;;
           5)
             package_install "webmin perl-net-ssleay"
-            systemctl enable webmin.service
+            system_ctl enable webmin.service
             ;;
           6)
-            package_install "wine wine_gecko winetricks"
+            package_install "icoutils wine wine_gecko winetricks"
             ;;
           "b")
             break
@@ -3544,6 +3541,7 @@ case "$1" in
                     ;;
                   9)
                     package_install "rhythmbox"
+                    aur_package_install "rhythmbox-equalizer-git"
                     ;;
                   10)
                     aur_package_install "radiotray"
@@ -3580,7 +3578,7 @@ case "$1" in
             do
               print_title "AUDIO EDITORS|TOOLS"
               echo " 1) $(menu_item "soundconverter soundkonverter" "$([[ ${KDE} -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
-              echo " 2) $(menu_item "puddletag") $AUR"
+              echo " 2) $(menu_item "easytag")"
               echo " 3) $(menu_item "audacity")"
               echo " 4) $(menu_item "ocenaudio") $AUR"
               echo ""
@@ -3598,7 +3596,7 @@ case "$1" in
                     fi
                     ;;
                   2)
-                    aur_package_install "puddletag"
+                    package_install "easytag"
                     ;;
                   3)
                     package_install "audacity"
@@ -4403,8 +4401,8 @@ case "$1" in
       1)
         package_install "apache mysql php php-apache php-mcrypt php-gd"
         aur_package_install "adminer"
-        systemctl enable httpd.service
-        systemctl enable mysqld.service
+        system_ctl enable httpd.service
+        system_ctl enable mysqld.service
         systemctl start mysqld.service
         #echo "Enter your new mysql root account password"
         #/usr/bin/mysqladmin -u root password
@@ -4446,8 +4444,8 @@ case "$1" in
           su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'"
         fi
         sed -i '/PGROOT/s/^#//' /etc/conf.d/postgresql
-        systemctl enable httpd.service
-        systemctl enable postgresql.service
+        system_ctl enable httpd.service
+        system_ctl enable postgresql.service
         systemctl start postgresql.service
         #CONFIGURE HTTPD.CONF {{{
         if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
@@ -4798,7 +4796,7 @@ case "$1" in
           install_cups
           install_additional_firmwares
           install_git_tor
-          install_ufw
+          install_fwd
           checklist[1]=1
           ;;
         2)

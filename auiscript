@@ -36,20 +36,17 @@
 #}}}
 #BASIC SETUP {{{
   CUPS="y"
-  CUSTOMREPO="n"
-  FIRMWARE="n"
+  CUSTOMREPO="n"         # Add custom repositories
+  FIRMWARE="n"           # Install custom firmwares
   GITTOR="y"
   NFS="n"
   PRELOAD="y"
   SAMBA="y"
   SSH="y"
-  TLP="n"
-  UFW="n"
+  TLP="n"                # Laptop Mode Tools
+  FWD="n"                # FirewallD
   ZRAM="y"
-
-  #install proprietary drive (NVIDIA|ATI)
-  PROPRIETARY_DRIVER="n"
-
+  PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA|ATI) driver
   #ADDITIONAL FIRMWARE {{{
     # 1) alsa-firmware
     # 2) ipw2100
@@ -336,7 +333,7 @@
   #}}}
   #EDITORS|TOOLS {{{
     # 1) Soundconverter|Soundkonverter
-    # 2) Puddletag
+    # 2) Easytag
     # 3) Audacity
     # 4) OcenAudio
     AUDIO_EDITOR_OPTIONS="1"
