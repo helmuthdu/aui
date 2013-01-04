@@ -66,14 +66,10 @@
   AUI_DIR=`pwd`
   MOUNTPOINT="/mnt"
   # VERBOSE MODE
-  if [[ $1 == "-v" || $1 == "--verbose" ]]; then
-    VERBOSE_MODE=1
-  else
-    VERBOSE_MODE=0
-  fi
+  [[ $1 == "-v" || $1 == "--verbose" ]] && VERBOSE_MODE=1 || VERBOSE_MODE=0
   # LOG FILE
   LOG="${AUI_DIR}/`basename ${0}`.log"
-  [[ -f $LOG ]] && rm $LOG 2>/dev/null
+  [[ -f $LOG ]] && rm $LOG
   # CONNECTION CHECK
   XPINGS=0
   #MISC
@@ -205,16 +201,6 @@
       read -p "Type your video driver [ex: sis, fbdev, modesetting]: " VIDEO_DRIVER
     fi
   } #}}}
-  check_wireless() { #{{{
-    lspci | grep -q BCM4312
-    if [[ $? -eq 0 ]]; then
-      WIRELESS_PKG="dkms-broadcom-wl"
-      WIRELESS_MOD="wl"
-    else
-      WIRELESS_PKG=""
-      WIRELESS_MOD=""
-    fi
-  } #}}}
   read_input(){ #{{{
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
       OPTION=$1
@@ -281,7 +267,7 @@
     FILEBASE=`basename ${3}`
 
     sed -e "s/${SEARCH}/${REPLACE}/" ${FILEPATH} > /tmp/${FILEBASE} 2>"$LOG"
-    if [ ${?} -eq 0 ]; then
+    if [[ ${?} -eq 0 ]]; then
       mv /tmp/${FILEBASE} ${FILEPATH}
     else
       cecho "failed: ${SEARCH} - ${FILEPATH}"
@@ -1743,23 +1729,28 @@ case "$1" in
       XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
       pacman -S --needed nvidia{,-utils}
+      is_package_installed "nouveau-dri" && pacman package_remove "nouveau-dri"
       #fix nvidia-settings open
       package_install "pangox-compat"
       package_install "libva-vdpau-driver"
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-nvidia-utils"
       fi
-      sed -i 's/options nouveau modeset=1/#options nouveau modeset=1/' /etc/modprobe.d/modprobe.conf
-      sed -i 's/MODULES="nouveau"/#MODULES="nouveau"/' /etc/mkinitcpio.conf
+      replaceinfile 'options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
+      replaceinfile 'MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
       mkinitcpio -p linux
     elif [[ ${VIDEO_DRIVER} == catalyst ]]; then
       XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
+      is_package_installed "ati-dri" && pacman package_remove "ati-dri"
+      [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
       package_install "linux-headers"
       pacman -S --needed catalyst-dkms
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-catalyst-utils"
       fi
+      aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
+      add_module "fglrx"
     elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
       is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils} lib32-nvidia-utils
       pacman -S --asdeps libgl
@@ -1767,8 +1758,8 @@ case "$1" in
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
-      sed -i 's/#*options nouveau modeset=1/options nouveau modeset=1/' /etc/modprobe.d/modprobe.conf
-      sed -i 's/#*MODULES="nouveau"/MODULES="nouveau"/' /etc/mkinitcpio.conf
+      replaceinfile '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
+      replaceinfile '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
       mkinitcpio -p linux
     elif [[ ${VIDEO_DRIVER} == ati ]]; then
       is_package_installed "catalyst-dkms" && pacman -Rdds --noconfirm catalyst{-dkms,-utils} lib32-catalyst-utils
@@ -1777,6 +1768,7 @@ case "$1" in
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
+      add_module "radeon"
     else
       package_install "xf86-video-${VIDEO_DRIVER}"
     fi
@@ -2039,7 +2031,7 @@ case "$1" in
               ;;
             3)
               aur_package_install "lightdm lightdm-gtk-greeter"
-              sed -i 's/#greeter-session=.*$/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
+              replaceinfile '#greeter-session=.*$' 'greeter-session=lightdm-gtk-greeter' /etc/lightdm/lightdm.conf
               system_ctl enable lightdm.service
               ;;
             4)
@@ -4387,7 +4379,7 @@ case "$1" in
   install_web_server(){
     create_sites_folder(){
       [[ ! -f  /etc/httpd/conf/extra/httpd-userdir.conf.aui ]] && cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
-      sed -i 's/public_html/Sites/g' /etc/httpd/conf/extra/httpd-userdir.conf
+      replaceinfile 'public_html' 'Sites' /etc/httpd/conf/extra/httpd-userdir.conf
       su - ${USER_NAME} -c "mkdir -p ~/Sites"
       su - ${USER_NAME} -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
       print_line
@@ -4419,7 +4411,7 @@ case "$1" in
           echo -e 'application/x-httpd-php5		php php5' >> /etc/httpd/conf/mime.types
           sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
           echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
-          sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
+          replaceinfile 'DirectoryIndex\ index.html' 'DirectoryIndex\ index.html\ index.php' /etc/httpd/conf/httpd.conf
         fi
         #}}}
         #CONFIGURE PHP.INI {{{
@@ -4459,7 +4451,7 @@ case "$1" in
           echo -e 'application/x-httpd-php5		php php5' >> /etc/httpd/conf/mime.types
           sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
           echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
-          sed -i 's/DirectoryIndex\ index.html/DirectoryIndex\ index.html\ index.php/g' /etc/httpd/conf/httpd.conf
+          replaceinfile 'DirectoryIndex\ index.html' 'DirectoryIndex\ index.html\ index.php' /etc/httpd/conf/httpd.conf
         fi
         #}}}
         #CONFIGURE PHP.INI {{{
