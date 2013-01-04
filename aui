@@ -4129,6 +4129,7 @@ case "$1" in
                     ;;
                   2)
                     aur_package_install "leagueoflegends"
+                    add_user_to_group ${USER_NAME} "lol"
                     ;;
                   3)
                     aur_package_install "manaplus"
