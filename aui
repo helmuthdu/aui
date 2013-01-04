@@ -4111,11 +4111,12 @@ case "$1" in
             do
               print_title "MMO"
               echo " 1) $(menu_item "hon" "Heroes of Newerth") $AUR"
-              echo " 2) $(menu_item "manaplus") $AUR"
-              echo " 3) $(menu_item "unix-runescape-client" "Runescape") $AUR"
-              echo " 4) $(menu_item "savage2") $AUR"
-              echo " 5) $(menu_item "spiral-knights") $AUR"
-              echo " 6) $(menu_item "wakfu") $AUR"
+              echo " 2) $(menu_item "leagueoflegends" "League of Legends") $AUR"
+              echo " 3) $(menu_item "manaplus") $AUR"
+              echo " 4) $(menu_item "unix-runescape-client" "Runescape") $AUR"
+              echo " 5) $(menu_item "savage2") $AUR"
+              echo " 6) $(menu_item "spiral-knights") $AUR"
+              echo " 7) $(menu_item "wakfu") $AUR"
               echo ""
               echo " b) BACK"
               echo ""
@@ -4127,18 +4128,21 @@ case "$1" in
                     aur_package_install "hon"
                     ;;
                   2)
-                    aur_package_install "manaplus"
+                    aur_package_install "leagueoflegends"
                     ;;
                   3)
-                    aur_package_install "unix-runescape-client"
+                    aur_package_install "manaplus"
                     ;;
                   4)
-                    aur_package_install "savage2"
+                    aur_package_install "unix-runescape-client"
                     ;;
                   5)
-                    aur_package_install "spiral-knights"
+                    aur_package_install "savage2"
                     ;;
                   6)
+                    aur_package_install "spiral-knights"
+                    ;;
+                  7)
                     aur_package_install "wakfu"
                     ;;
                   "b")

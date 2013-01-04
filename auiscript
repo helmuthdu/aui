@@ -436,12 +436,13 @@
     FPS=""
   #}}}
   #MMO {{{
-    # 1) ManaPlus
-    # 2) Heroes of Newerth
-    # 3) Runescape
-    # 4) Savage II
-    # 5) Spiral Knights
-    # 6) Wakfu
+    # 1) Heroes of Newerth
+    # 2) League of Legends
+    # 3) ManaPlus
+    # 4) Runescape
+    # 5) Savage II
+    # 6) Spiral Knights
+    # 7) Wakfu
     MMO=""
   #}}}
   #PUZZLE {{{
