@@ -1196,8 +1196,6 @@ case "$1" in
             git clone https://github.com/helmuthdu/dotfiles
             cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc ~/
             cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc /home/${USER_NAME}/
-            mkdir -p /home/${USER_NAME}/.config/fontconfig
-            cp -i dotfiles/fonts.conf /home/${USER_NAME}/.config/fontconfig
             rm -fr dotfiles
             break
             ;;
