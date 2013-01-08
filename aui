@@ -1736,8 +1736,8 @@ case "$1" in
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-nvidia-utils"
       fi
-      replaceinfile 'options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
-      replaceinfile 'MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
+      replaceinfile '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
+      replaceinfile '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
       mkinitcpio -p linux
     elif [[ ${VIDEO_DRIVER} == catalyst ]]; then
       XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
@@ -2603,9 +2603,10 @@ case "$1" in
           package_install "networkmanager network-manager-applet"
         fi
         is_package_installed "ntp" && package_install "networkmanager-dispatcher-ntpd"
-        add_user_to_group ${USER_NAME} networkmanager
+        #Disable netcfg
+        system_ctl enable netcfg
         #Network Management daemon
-        system_ctl enable NetworkManager.service
+        system_ctl enable NetworkManager
         pause_function
         ;;
       2)
@@ -2616,6 +2617,8 @@ case "$1" in
         else
           package_install "wicd wicd-gtk"
         fi
+        #Disable netcfg
+        system_ctl enable netcfg
         #WICD daemon
         system_ctl enable wicd.service
         pause_function
@@ -2624,6 +2627,8 @@ case "$1" in
         print_title "CONNMAN - https://wiki.archlinux.org/index.php/Connman"
         print_info "ConnMan is an alternative to NetworkManager and Wicd and was created by Intel and the Moblin project for use with embedded devices."
         package_install "connman "
+        #Disable netcfg
+        system_ctl enable netcfg
         #ConnMan daemon
         system_ctl enable connman.service
         pause_function
