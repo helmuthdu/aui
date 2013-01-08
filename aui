@@ -3535,7 +3535,7 @@ case "$1" in
                     aur_package_install "nuvolaplayer"
                     ;;
                   9)
-                    package_install "rhythmbox"
+                    package_install "rhythmbox libdmapsharing"
                     aur_package_install "rhythmbox-equalizer-git"
                     ;;
                   10)
