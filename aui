@@ -2602,7 +2602,7 @@ case "$1" in
         fi
         is_package_installed "ntp" && package_install "networkmanager-dispatcher-ntpd"
         #Disable netcfg
-        system_ctl enable netcfg
+        system_ctl disable netcfg
         #Network Management daemon
         system_ctl enable NetworkManager
         pause_function
@@ -2616,7 +2616,7 @@ case "$1" in
           package_install "wicd wicd-gtk"
         fi
         #Disable netcfg
-        system_ctl enable netcfg
+        system_ctl disable netcfg
         #WICD daemon
         system_ctl enable wicd.service
         pause_function
@@ -2626,7 +2626,7 @@ case "$1" in
         print_info "ConnMan is an alternative to NetworkManager and Wicd and was created by Intel and the Moblin project for use with embedded devices."
         package_install "connman "
         #Disable netcfg
-        system_ctl enable netcfg
+        system_ctl disable netcfg
         #ConnMan daemon
         system_ctl enable connman.service
         pause_function
