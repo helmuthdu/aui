@@ -1742,19 +1742,20 @@ case "$1" in
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
       is_package_installed "ati-dri" && pacman package_remove "ati-dri"
       [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
+      [[ -f /etc/modules-load.d/radeon.conf ]] && rm /etc/modules-load.d/radeon.conf
       package_install "linux-headers"
       pacman -S --needed catalyst-dkms
       if [[ ${ARCHI} == x86_64 ]]; then
-        package_install "lib32-catalyst-utils"
+        pacman -S "lib32-catalyst-utils"
       fi
       aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
-      add_module "fglrx"
+      add_module "fglrx" "ati"
     elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
-      is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils} lib32-nvidia-utils
+      is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
       pacman -S --asdeps libgl
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
       if [[ ${ARCHI} == x86_64 ]]; then
-        package_install "lib32-${VIDEO_DRIVER}-dri"
+        pacman -S "lib32-${VIDEO_DRIVER}-dri"
       fi
       replaceinfile '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
       replaceinfile '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
@@ -1762,11 +1763,13 @@ case "$1" in
     elif [[ ${VIDEO_DRIVER} == ati ]]; then
       is_package_installed "catalyst-dkms" && pacman -Rdds --noconfirm catalyst{-dkms,-utils} lib32-catalyst-utils
       pacman -S --asdeps libgl
+      [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
+      [[ -f /etc/modules-load.d/fglrx.conf ]] && rm /etc/modules-load.d/ati.conf
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
       if [[ ${ARCHI} == x86_64 ]]; then
         package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
-      add_module "radeon"
+      add_module "radeon" "ati"
     else
       package_install "xf86-video-${VIDEO_DRIVER}"
     fi
@@ -3033,6 +3036,7 @@ case "$1" in
             ;;
           6)
             package_install "icoutils wine wine_gecko winetricks"
+            aur_package_install "wine-mono-bin"
             ;;
           "b")
             break
@@ -3807,7 +3811,8 @@ case "$1" in
       echo " 9) Racing"
       echo "10) Simulation"
       echo "11) Strategy"
-      echo "12) Steam"
+      echo "12) PlayOnLinux"
+      echo "13) Steam"
       echo ""
       echo " b) BACK"
       echo ""
@@ -4362,6 +4367,9 @@ case "$1" in
             OPT=11
             ;;
           12)
+            aur_package_install "playonlinux"
+            ;;
+          13)
             aur_package_install "steam"
             ;;
           "b")
