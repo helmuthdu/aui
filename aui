@@ -1698,17 +1698,50 @@ case "$1" in
     fi
     #}}}
     pause_function
-    #FONT CONFIGURATION PRESETS {{{
-    print_title "FONT CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
-    print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
-    #enable global fonts configs
-    cd /etc/fonts/conf.d
-    ln -sv ../conf.avail/10-sub-pixel-rgb.conf
-    #ln -sv ../conf.avail/10-autohint.conf
-    ln -sv ../conf.avail/11-lcdfilter-default.conf
-    ln -s ../conf.avail/70-no-bitmaps.conf
-    cd $AUI_DIR
-    #}}}
+  }
+  #}}}
+  #FONT CONFIGURATION {{{
+  font_config(){
+    while [[ 1 ]]
+    do
+      print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
+      print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
+      echo " 1) Default"
+      echo " 2) Infinality (best redering)"
+      echo " 3) Ubuntu"
+      echo ""
+      read_input $FONTSCONFIG_OPTION
+      case "$OPTION" in
+        1)
+          is_package_installed "freetype2-infinality" && pacman -Rdds freetype2-infinality fontconfig-infinality
+          is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
+          pacman -S --asdeps --needed cairo fontconfig freetype2 libxft
+          #enable global fonts configs
+          cd /etc/fonts/conf.d
+          [[ ! -f /etc/fonts/conf.d/10-sub-pixel-rgb.conf ]] && ln -sv ../conf.avail/10-sub-pixel-rgb.conf
+          [[ ! -f /etc/fonts/conf.d/10-autohint.conf ]] && ln -sv ../conf.avail/10-autohint.conf
+          [[ ! -f /etc/fonts/conf.d/11-lcdfilter-default.conf ]] && ln -sv ../conf.avail/11-lcdfilter-default.conf
+          [[ ! -f /etc/fonts/conf.d/70-no-bitmaps.conf ]] && ln -s ../conf.avail/70-no-bitmaps.conf
+          cd $AUI_DIR
+          break
+          ;;
+        2)
+          pacman -Rdds --noconfirm freetype2 fontconfig
+          aur_package_install "freetype2-infinality fontconfig-infinality"
+          /etc/profile.d/infinality-settings.sh
+          infctl setstyle
+          break
+          ;;
+        3)
+          pacman -Rdds --noconfirm freetype2 fontconfig cairo libxft
+          aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
+          break
+          ;;
+        *)
+          invalid_option
+          ;;
+      esac
+    done
     pause_function
   }
   #}}}
@@ -1732,7 +1765,7 @@ case "$1" in
       package_install "pangox-compat"
       package_install "libva-vdpau-driver"
       if [[ ${ARCHI} == x86_64 ]]; then
-        package_install "lib32-nvidia-utils"
+        pacman -S --needed "lib32-nvidia-utils"
       fi
       replaceinfile '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
       replaceinfile '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
@@ -1746,7 +1779,7 @@ case "$1" in
       package_install "linux-headers"
       pacman -S --needed catalyst-dkms
       if [[ ${ARCHI} == x86_64 ]]; then
-        pacman -S "lib32-catalyst-utils"
+        pacman -S --needed "lib32-catalyst-utils"
       fi
       aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
       add_module "fglrx" "ati"
@@ -1755,7 +1788,7 @@ case "$1" in
       pacman -S --asdeps libgl
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
       if [[ ${ARCHI} == x86_64 ]]; then
-        pacman -S "lib32-${VIDEO_DRIVER}-dri"
+        pacman -S --needed "lib32-${VIDEO_DRIVER}-dri"
       fi
       replaceinfile '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
       replaceinfile '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
@@ -4557,7 +4590,6 @@ case "$1" in
     do
       print_title "EXTRA"
       echo " 1) Elementary Project $AUR"
-      echo " 2) Font Configuration $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -4684,43 +4716,6 @@ case "$1" in
             #}}}
             OPT=1
             ;;
-          2)
-            #FONTS CONFIGURATION {{{
-            print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
-            print_warning "\tThese packages may break something or make some programs crash.\n\tUse at your own risk"
-            echo " 1) Ubuntu patched packages"
-            echo " 2) Infinality patched packages"
-            echo " 3) Reverting to unpatched packages"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            read_input $FONTSCONFIG_OPTION
-            case "$OPTION" in
-              1)
-                pacman -Rdd --noconfirm cairo fontconfig freetype2 libxft
-                aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
-
-                ;;
-              2)
-                pacman -Rdd --noconfirm freetype2
-                aur_package_install "freetype2-infinality fontconfig-infinality-git"
-                /etc/profile.d/infinality-settings.sh
-                infctl setstyle
-
-                ;;
-              3)
-                pacman -Rdd freetype2-infinality fontconfig-infinality-git
-                pacman -S --asdeps cairo fontconfig freetype2 libxft
-
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-            pause_function
-            #}}}
-            OPT=2
-            ;;
           "b")
             break
             ;;
@@ -4798,6 +4793,7 @@ case "$1" in
           install_preload
           install_zram
           install_xorg
+          font_config
           install_video_cards
           install_cups
           install_additional_firmwares
