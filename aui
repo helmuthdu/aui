@@ -1707,7 +1707,7 @@ case "$1" in
       print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
       print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
       echo " 1) Default"
-      echo " 2) Infinality (best redering)"
+      echo " 2) Infinality"
       echo " 3) Ubuntu"
       echo ""
       read_input $FONTSCONFIG_OPTION
@@ -1726,7 +1726,7 @@ case "$1" in
           break
           ;;
         2)
-          pacman -Rdds --noconfirm freetype2 fontconfig
+          pacman -Rdds --noconfirm freetype2
           aur_package_install "freetype2-infinality fontconfig-infinality"
           /etc/profile.d/infinality-settings.sh
           infctl setstyle
