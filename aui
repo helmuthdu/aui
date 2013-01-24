@@ -2834,6 +2834,12 @@ case "$1" in
                     ;;
                   3)
                     aur_package_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
+                    groupadd android
+                    add_user_to_group ${USER_NAME} android
+                    add_user_to_group ${USER_NAME} adbusers
+                    chgrp -R android /opt/android-sdk
+                    chmod -R g+w /opt/android-sdk
+                    find /opt/android-sdk -type d -exec chmod g+s {} \;
                     ;;
                   4)
                     aur_package_install "eclipse-wtp-wst"
