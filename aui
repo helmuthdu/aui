@@ -1273,7 +1273,7 @@ case "$1" in
           invalid_option
         fi
       done
-      echo "EDITOR=\"$EDITOR\"" >> /home/${USER_NAME}/.bashrc
+      echo "export EDITOR=\"$EDITOR\"" >> /home/${USER_NAME}/.bashrc
       #}}}
       chown -R ${USER_NAME}:users /home/${USER_NAME}
     }
