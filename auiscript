@@ -51,7 +51,7 @@
     # 1) Default
     # 2) Infinality
     # 3) Ubuntu
-    FONTSCONFIG_OPTION="2"
+    FONTCONFIG=1
   #}}}
   #ADDITIONAL FIRMWARE {{{
     # 1) alsa-firmware
