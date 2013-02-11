@@ -2805,7 +2805,7 @@ case "$1" in
       echo "10) $(menu_item "jdk" "Oracle JDK") $AUR"
       echo "11) $(menu_item "qtcreator")"
       echo "12) $(menu_item "sublime-text" "Sublime Text 2") $AUR"
-      echo "13) $(menu_item "gdb" "Debugger Tools")"
+      echo "13) $(menu_item "gdb" "Debuggers, Syntax Tools")"
       echo "14) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
       echo "15) $(menu_item "meld")"
       echo "16) $(menu_item "rabbitvcs" "RabbitVCS") $AUR"
@@ -2929,7 +2929,16 @@ case "$1" in
             aur_package_install "sublime-text"
             ;;
           13)
-            aur_package_install "valgrind gdb splint tidyhtml python2-pyflakes nodejs-jslint"
+            #c/c++
+            package_install "splint valgrind gdb"
+            #php
+            aur_package_install "php-codesniffer php-tidy"
+            #javascript
+            aur_package_install "closure-compiler nodejs-jslint"
+            #html
+            aur_package_install "tidyhtml"
+            #python
+            aur_package_install "flake8"
             ;;
           14)
             aur_package_install "mysql-workbench-gpl"
