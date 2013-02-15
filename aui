@@ -4469,7 +4469,7 @@ case "$1" in
       pause_function
     }
     print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
-    echo " 1) LAMP - APACHE, MYSQL & PHP + ADMINER"
+    echo " 1) LAMP - APACHE, MariaDB & PHP + ADMINER"
     echo " 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER"
     echo ""
     echo " b) BACK"
@@ -4477,7 +4477,7 @@ case "$1" in
     read_input $WEBSERVER
     case "$OPTION" in
       1)
-        package_install "apache mysql php php-apache php-mcrypt php-gd"
+        package_install "apache mariadb php php-apache php-mcrypt php-gd"
         aur_package_install "adminer"
         system_ctl enable httpd.service
         system_ctl enable mysqld.service
