@@ -545,8 +545,7 @@ case "$1" in
     wget -qO- "$url" | sed 's/^#Server/Server/g' > "$tmpfile"
 
     # Backup and replace current mirrorlist file (if new file is non-zero)
-    if [[ -s "$tmpfile" ]]
-    then
+    if [[ -s "$tmpfile" ]]; then
      { echo " Backing up the original mirrorlist..."
        mv -i /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.orig; } &&
      { echo " Rotating the new list into place..."
@@ -733,22 +732,12 @@ case "$1" in
     echo -e "Configure fstab based on:"
     select OPT in "${FSTAB[@]}"; do
       case "$REPLY" in
-        1)
-          genfstab -p $MOUNTPOINT >> $MOUNTPOINT/etc/fstab
-          break
-          ;;
-        2)
-          genfstab -U $MOUNTPOINT >> $MOUNTPOINT/etc/fstab
-          break
-          ;;
-        3)
-          genfstab -L $MOUNTPOINT >> $MOUNTPOINT/etc/fstab
-          break
-          ;;
-        *)
-          invalid_option
-          ;;
+        1) genfstab -p $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
+        2) genfstab -U $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
+        3) genfstab -L $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
+        *) invalid_option ;;
       esac
+      [[ -n $OPT ]] && break
     done
     echo "Review your fstab"
     pause_function
@@ -766,8 +755,8 @@ case "$1" in
     else
       cp $MOUNTPOINT/etc/hosts.aui $MOUNTPOINT/etc/hosts
     fi
-    chroot $MOUNTPOINT sed -i '/127.0.0.1/s/$/ '$HN'/' /etc/hosts
-    chroot $MOUNTPOINT sed -i '/::1/s/$/ '$HN'/' /etc/hosts
+    arch-chroot $MOUNTPOINT /bin/bash -c "sed -i '/127.0.0.1/s/$/ '${HN}'/' /etc/hosts"
+    arch-chroot $MOUNTPOINT /bin/bash -c "sed -i '/::1/s/$/ '${HN}'/' /etc/hosts"
   }
   #}}}
   #CONFIGURE TIMEZONE {{{
@@ -784,7 +773,7 @@ case "$1" in
           echo "Select subzone:"
           select SUBZONE in "${subzone[@]}"; do
             if contains_element "$SUBZONE" "${subzone[@]}"; then
-              chroot $MOUNTPOINT ln -s /usr/share/zoneinfo/$ZONE/$SUBZONE /etc/localtime
+              arch-chroot $MOUNTPOINT /bin/bash -c "ln -s /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
               break
             else
               invalid_option
@@ -803,17 +792,23 @@ case "$1" in
       settimezone
       read_input_text "Confirm timezone ($ZONE/$SUBZONE)"
     done
-    chroot $MOUNTPOINT echo "$ZONE/$SUBZONE" > /etc/timezone
+    arch-chroot $MOUNTPOINT /bin/bash -c "echo ${ZONE}/${SUBZONE} > /etc/timezone"
   }
   #}}}
   #CONFIGURE HARDWARECLOCK {{{
   configure_hardwareclock(){
     print_title "HARDWARE CLOCK TIME - https://wiki.archlinux.org/index.php/Internationalization"
     print_info "This is set in /etc/adjtime. Set the hardware clock mode uniformly between your operating systems on the same machine. Otherwise, they will overwrite the time and cause clock shifts (which can cause time drift correction to be miscalibrated)."
-    echo -e $prompt3
-    echo -e "You can replace ${BYellow}--utc${White} for ${BYellow}--localtime${White} (discouraged)."
-    print_warning "hwclock --systohc --utc"
-    arch-chroot $MOUNTPOINT
+    hwclock_list=('utc' 'localtime');
+    PS3="$prompt1"
+    select OPT in "${hwclock_list[@]}"; do
+      if contains_element "$OPT" "${hwclock_list[@]}"; then
+        arch-chroot $MOUNTPOINT /bin/bash -c "hwclock --systohc --${OPT}";
+        break
+      else
+        invalid_option
+      fi
+    done
   }
   #}}}
   #CONFIGURE LOCALE {{{
@@ -824,19 +819,15 @@ case "$1" in
     LOCALE_8859="$LOCALE ISO-8859"
     LOCALE_UTF8="$LOCALE.UTF-8"
     echo 'LANG="'$LOCALE_UTF8'"' > $MOUNTPOINT/etc/locale.conf
-    chroot $MOUNTPOINT sed -i '/'$LOCALE'/s/^#//' /etc/locale.gen
-    echo -e $prompt3
-    print_warning "locale-gen"
-    arch-chroot $MOUNTPOINT
+    arch-chroot $MOUNTPOINT /bin/bash -c "sed -i '/'$LOCALE'/s/^#//' /etc/locale.gen"
+    arch-chroot $MOUNTPOINT /bin/bash -c "locale-gen"
   }
   #}}}
   #CONFIGURE MKINITCPIO {{{
   configure_mkinitcpio(){
     print_title "MKINITCPIO - https://wiki.archlinux.org/index.php/Mkinitcpio"
     print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
-    echo -e $prompt3
-    print_warning "mkinitcpio -p linux"
-    arch-chroot $MOUNTPOINT
+    arch-chroot $MOUNTPOINT /bin/bash -c "mkinitcpio -p linux"
   }
   #}}}
   #INSTALL BOOTLOADER {{{
@@ -849,7 +840,7 @@ case "$1" in
     select BOOTLOADER in "${bootloader[@]}"; do
       case "$REPLY" in
         1)
-          # IS UEFI MODE {{{
+          # UEFI|BIOS MODE {{{
           is_uefi_or_bios()
           {
             if [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Inc.' ]] || [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Computer, Inc.' ]]; then
@@ -897,22 +888,20 @@ case "$1" in
       Grub2)
         print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
         print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
-        echo -e $prompt3
+        arch-chroot $MOUNTPOINT /bin/bash -c "modprobe dm-mod"
         if [[ $UEFI -eq 1 ]]; then
-          print_warning "modprobe dm-mod\ngrub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck\ngrub-mkconfig -o /boot/grub/grub.cfg"
+          arch-chroot $MOUNTPOINT /bin/bash -c "grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck"
         else
-          print_warning "modprobe dm-mod\ngrub-install --target=i386-pc --recheck $ROOT_DEVICE\ngrub-mkconfig -o /boot/grub/grub.cfg"
+          arch-chroot /mnt /bin/bash -c "grub-install --recheck --debug ${ROOT_DEVICE}"
         fi
-        arch-chroot $MOUNTPOINT
-        chroot $MOUNTPOINT mkdir -p /boot/grub/locale
-        chroot $MOUNTPOINT cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
+        arch-chroot $MOUNTPOINT /bin/bash -c "mkdir -p /boot/grub/locale"
+        arch-chroot $MOUNTPOINT /bin/bash -c "cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo"
+        arch-chroot $MOUNTPOINT /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
         ;;
       Syslinux)
         print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
         print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
-        echo -e $prompt3
-        print_warning "syslinux-install_update -iam\n$EDITOR /boot/syslinux/syslinux.cfg"
-        arch-chroot $MOUNTPOINT
+        arch-chroot $MOUNTPOINT /bin/bash -c "/usr/sbin/syslinux-install_update -iam;"
         ;;
     esac
   }
@@ -1197,11 +1186,9 @@ case "$1" in
             cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc ~/
             cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc /home/${USER_NAME}/
             rm -fr dotfiles
-            break
             ;;
           2)
             cp /etc/skel/.bashrc /home/${USER_NAME}
-            break
             ;;
           3)
             package_install "git"
@@ -1210,12 +1197,12 @@ case "$1" in
             git clone https://github.com/$GITHUB_USER/$GITHUB_REPO
             cp -R $GITHUB_REPO/.* /home/${USER_NAME}/
             rm -fr $GITHUB_REPO
-            break
             ;;
           *)
             invalid_option
             ;;
         esac
+        [[ -n $OPT ]] && break
       done
       #}}}
       #EDITOR {{{
@@ -1241,10 +1228,8 @@ case "$1" in
                   mv vim /home/${USER_NAME}/.vim
                   ln -sf /home/${USER_NAME}/.vim/vimrc /home/${USER_NAME}/.vimrc
                   cp -R vim /home/${USER_NAME}/.vim/fonts /home/${USER_NAME}/.fonts
-                  break
                   ;;
                 2)
-                  break
                   ;;
                 3)
                   package_install "git"
@@ -1258,21 +1243,21 @@ case "$1" in
                     ln -sf /home/${USER_NAME}/.vim/vimrc /home/${USER_NAME}/.vimrc
                   fi
                   rm -fr $GITHUB_REPO
-                  break
                   ;;
                 *)
                   invalid_option
                   ;;
               esac
+              [[ -n $OPT ]] && break
             done
             #}}}
           else
             package_install "$EDITOR"
           fi
-          break
         else
           invalid_option
         fi
+        [[ -n $OPT ]] && break
       done
       echo "export EDITOR=\"$EDITOR\"" >> /home/${USER_NAME}/.bashrc
       #}}}
@@ -1291,13 +1276,12 @@ case "$1" in
     select OPT in "${users_list[@]}" "Create new user"; do
       if [[ $OPT == "Create new user" ]]; then
         create_new_user
-        break
       elif contains_element "$OPT" "${users_list[@]}"; then
         USER_NAME=$OPT
-        break
       else
         invalid_option
       fi
+      [[ -n $OPT ]] && break
     done
     [[ ! -f /home/${USER_NAME}/.bashrc ]] && configure_user_account;
   }
@@ -1355,7 +1339,6 @@ case "$1" in
             fi
           fi
           AUR_HELPER="yaourt"
-          break
           ;;
         2)
           if ! is_package_installed "packer" ; then
@@ -1369,7 +1352,6 @@ case "$1" in
             fi
           fi
           AUR_HELPER="packer"
-          break
           ;;
         3)
           if ! is_package_installed "pacaur" ; then
@@ -1386,12 +1368,12 @@ case "$1" in
             fi
           fi
           AUR_HELPER="pacaur"
-          break
           ;;
         *)
           invalid_option
           ;;
       esac
+      [[ -n $OPT ]] && break
     done
     pause_function
   }
@@ -1727,14 +1709,15 @@ case "$1" in
           break
           ;;
         2)
-          pacman -Rdds --noconfirm freetype2
+          is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2
           aur_package_install "freetype2-infinality fontconfig-infinality"
           /etc/profile.d/infinality-settings.sh
           infctl setstyle
           break
           ;;
         3)
-          pacman -Rdds --noconfirm freetype2 fontconfig cairo libxft
+
+          is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo libxft
           aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
           break
           ;;
@@ -1771,6 +1754,7 @@ case "$1" in
       replaceinfile '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
       replaceinfile '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
       mkinitcpio -p linux
+      nvidia-xconfig --add-argb-glx-visuals --allow-glx-with-composite --composite -no-logo --render-accel -o /etc/X11/xorg.conf.d/20-nvidia.conf;
     elif [[ ${VIDEO_DRIVER} == catalyst ]]; then
       XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
@@ -1786,6 +1770,7 @@ case "$1" in
       add_module "fglrx" "ati"
     elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
       is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
+      [[ -f /etc/X11/xorg.conf.d/20-nvidia.conf ]] && rm /etc/X11/xorg.conf.d/20-nvidia.conf
       pacman -S --asdeps libgl
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
       if [[ ${ARCHI} == x86_64 ]]; then
@@ -1804,6 +1789,8 @@ case "$1" in
         package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
       add_module "radeon" "ati"
+    elif [[ ${VIDEO_DRIVER} == intel ]]; then
+      package_install "xf86-video-intel intel-dri libva-intel-driver"
     else
       package_install "xf86-video-${VIDEO_DRIVER}"
     fi
@@ -2411,8 +2398,8 @@ case "$1" in
           case "$REPLY" in
             1)
               package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
-              package_install "kde-telepathy telepathy"
               package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite kdenetwork-kopete"
+              package_install "kde-telepathy telepathy"
               break
               ;;
             2)
@@ -2857,7 +2844,7 @@ case "$1" in
                     package_install "eclipse-cdt"
                     ;;
                   3)
-                    aur_package_install "eclipse-android android-apktool android-sdk android-sdk-platform-tools android-udev"
+                    aur_package_install "android-sdk android-apktool android-sdk-platform-tools android-udev eclipse-android"
                     groupadd android
                     add_user_to_group ${USER_NAME} android
                     add_user_to_group ${USER_NAME} adbusers
