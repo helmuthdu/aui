@@ -46,7 +46,7 @@
   TLP="n"                # Laptop Mode Tools
   FWD="n"                # FirewallD
   ZRAM="y"
-  PROPRIETARY_DRIVER="y" # Proprietary (NVIDIA|ATI) driver
+  PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA|ATI) driver
   #FONT CONFIGURATION {{{
     # 1) Default
     # 2) Infinality
@@ -91,7 +91,7 @@
     # 8) Yakuake
     KDE_OPTIONS="1-8"
   #}}}
-  #ESSENTIAL APPS {{{
+  #ESSENTIAL APPS [E17,LXDE,Awesome,Fluxbox,OpenBox] {{{
     # 1) Display Manager
     # 2) Dmenu
     # 3) Viewnior
@@ -132,15 +132,15 @@
   #GTK THEMES {{{
     # 1) Adwaita-X
     # 2) Boje
-    # 3) Blackbird
-    # 4) Bluebird
-    # 5) Greybird
-    # 6) Faience
-    # 7) Gnome Cupertino
-    # 8) MediterraneanNight
+    # 3) Bluebird
+    # 4) Greybird
+    # 5) Faience
+    # 6) Gnome Cupertino
+    # 7) MediterraneanNight
+    # 8) Orion
     # 9) Light (Aka Ambiance/Radiance)
     #10) Zukitwo
-    GTK_THEMES="2 5-7 9 10"
+    GTK_THEMES="5 7"
   #}}}
   #GNOME SHELL THEMES {{{
     # 1) Elegance
@@ -148,15 +148,17 @@
     GNOME_SHELL_THEMES="1 2"
   #}}}
   #CINNAMON THEMES {{{
-    # 1) ambience
-    # 2) baldr
-    # 3) eleganse
-    # 4) elementary-luna
-    # 5) gnome
-    # 6) google+
-    # 7) helios
-    # 8) holo
-    # 9) loki
+    # 1) Ambience
+    # 2) Baldr
+    # 3) Eleganse
+    # 4) Elementary-luna
+    # 5) Faience
+    # 6) Gnome
+    # 7) Google+
+    # 8) Helios
+    # 9) Holo
+    #10) Nadia
+    #11) Loki
     CINNAMON_THEMES="5"
   #}}}
 #}}}
@@ -165,7 +167,7 @@
   # 2) Wicd
   # 3) ConnMan
   # n) None
-  NETWORKMANAGER="1"
+  NETWORKMANAGER=1
   #USB 3G MODEM SUPPORT
   USBMODEM="n"
 #}}}
@@ -176,8 +178,8 @@
   # 4) Deepin Screenshot
   # 5) Dockbarx
   # 6) Docky
-  # 7) Galculator/Speedcrunch
-  # 8) Guake
+  # 7) Galculator|Speedcrunch
+  # 8) Terra [Drop-down Terminal]
   # 9) Kupfer
   #10) Pyrenamer
   #11) Shutter
@@ -197,14 +199,15 @@
   # 7) IntelliJ IDEA
   # 8) Kdevelop
   # 9) Netbeans
-  #10) Oracle JDK
-  #11) QT Creator
-  #12) Sublime Text 2
-  #13) Debugger Tools [Valgrind, Gdb, Splint, Tidyhtml, Pyflakes, Jsl]
-  #14) MySQL Workbench
-  #15) Meld
-  #16) RabbitVCS
-  DEVELOPMENT_OPTIONS="10 5 13"
+  #10) OpenJDK
+  #11) Oracle JDK
+  #12) QT Creator
+  #13) Sublime Text 2
+  #14) Debugger & Syntax Tools [Valgrind, Gdb, Splint, Tidyhtml, flake8]
+  #15) MySQL Workbench
+  #16) Meld
+  #17) RabbitVCS
+  DEVELOPMENT_OPTIONS="11 5 14"
   #ECLIPSE {{{
     # 1) Eclipse Classic
     # 2) Eclipse IDE for C/C++ Developers
@@ -215,6 +218,7 @@
     # 7) Aptana Studio plugin for Eclipse
     # 8) Vim-like editing plugin for Eclipse
     # 9) Git support plugin for Eclipse
+    #10) Colortheme for Eclipse
     ECLIPSE_OPTIONS="1"
   #}}}
 #}}}
@@ -491,7 +495,7 @@
 #WEBSERVER {{{
   # 1) LAMP - APACHE, MYSQL & PHP + ADMINER
   # 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER
-  WEBSERVER="2"
+  WEBSERVER=2
 #}}}
 #FONTS {{{
   # 1) ttf-anka-coder
@@ -532,11 +536,5 @@
     #20) eICONS
     #21) eGTK
     ELEMENTARY_OPTIONS="1-20"
-  #}}}
-  #FONT CONFIGURATION {{{
-    # 1) Ubuntu patched packages
-    # 2) Infinality patched packages
-    # 3) Reverting to unpatched packages
-    FONTSCONFIG_OPTION=""
   #}}}
 #}}}

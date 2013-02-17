@@ -1335,7 +1335,7 @@ case "$1" in
     print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
     print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
     print_warning "\tNone of these tools are officially supported by Arch devs."
-    aurhelper=("Yaourt (recommended)" "Packer" "Pacaur")
+    aurhelper=("Yaourt" "Packer" "Pacaur")
     PS3="$prompt1"
     echo -e "Choose your default AUR helper to install\n"
     select OPT in "${aurhelper[@]}"; do
@@ -1613,7 +1613,7 @@ case "$1" in
   #}}}
   #LAPTOP MODE TOOLS {{{
   install_lmt(){
-    print_title "LAPTOP MODE TOOLS- https://wiki.archlinux.org/index.php/Laptop_Mode_Tools"
+    print_title "LAPTOP MODE TOOLS - https://wiki.archlinux.org/index.php/Laptop_Mode_Tools"
     print_info "Laptop Mode Tools is a laptop power saving package for Linux systems. It is the primary way to enable the Laptop Mode feature of the Linux kernel, which lets your hard drive spin down. In addition, it allows you to tweak a number of other power-related settings using a simple configuration file."
     read_input_text "Install Laptop Mode Tools" $LMT
     if [[ $OPTION == y ]]; then
@@ -1983,13 +1983,13 @@ case "$1" in
         print_title "GTK2/GTK3 THEMES"
         echo " 1) $(menu_item "adwaita-x-dark-and-light-theme" "Adwaita-X")"
         echo " 2) $(menu_item "gtk-theme-boje" "Boje")"
-        echo " 3) $(menu_item "xfce-theme-blackbird" "Blackbird")"
-        echo " 4) $(menu_item "xfce-theme-bluebird" "Bluebird")"
-        echo " 5) $(menu_item "xfce-theme-greybird" "Greybird")"
-        echo " 6) $(menu_item "faience-themes" "Faience")"
-        echo " 7) $(menu_item "gtk-theme-gnome-cupertino" "Gnome Cupertino")"
-        echo " 8) $(menu_item "mediterraneannight-theme" "MediterraneanNight")"
-        echo " 9) $(menu_item "light-themes" "Light") (aka Ambiance/Radiance)"
+        echo " 3) $(menu_item "xfce-theme-bluebird" "Bluebird")"
+        echo " 4) $(menu_item "xfce-theme-greybird" "Greybird")"
+        echo " 5) $(menu_item "faience-themes" "Faience")"
+        echo " 6) $(menu_item "gtk-theme-gnome-cupertino" "Gnome Cupertino")"
+        echo " 7) $(menu_item "mediterraneannight-theme" "MediterraneanNight")"
+        echo " 8) $(menu_item "orion-gtk-theme" "Orion")"
+        echo " 9) $(menu_item "ubuntu-themes") (aka Ambiance/Radiance)"
         echo "10) $(menu_item "zukitwo-themes" "Zukitwo")"
         echo ""
         echo " b) BACK"
@@ -2005,25 +2005,25 @@ case "$1" in
               aur_package_install "gtk-theme-boje"
               ;;
             3)
-              aur_package_install "xfce-theme-blackbird"
-              ;;
-            4)
               aur_package_install "xfce-theme-bluebird"
               ;;
-            5)
+            4)
               aur_package_install "xfce-theme-greybird"
               ;;
-            6)
+            5)
               aur_package_install "faience-themes"
               ;;
-            7)
+            6)
               aur_package_install "gtk-theme-gnome-cupertino"
               ;;
-            8)
+            7)
               aur_package_install "mediterraneannight-theme"
               ;;
+            8)
+              aur_package_install "orion-gtk-theme"
+              ;;
             9)
-              aur_package_install "light-themes"
+              aur_package_install "ubuntu-themes"
               ;;
             10)
               aur_package_install "zukitwo-themes"
@@ -2153,11 +2153,12 @@ case "$1" in
                   echo " 3) $(menu_item "cinnamon-theme-eleganse")"
                   echo " 4) $(menu_item "cinnamon-theme-elementary-luna")"
                   echo " 5) $(menu_item "cinnamon-theme-gnome")"
-                  echo " 6) $(menu_item "cinnamon-theme-google+")"
-                  echo " 7) $(menu_item "cinnamon-theme-helios")"
-                  echo " 8) $(menu_item "cinnamon-theme-holo")"
-                  echo " 9) $(menu_item "cinnamon-theme-loki")"
+                  echo " 6) $(menu_item "cinnamon-theme-faience")"
+                  echo " 7) $(menu_item "cinnamon-theme-google+")"
+                  echo " 8) $(menu_item "cinnamon-theme-helios")"
+                  echo " 9) $(menu_item "cinnamon-theme-holo")"
                   echo "10) $(menu_item "cinnamon-theme-nadia")"
+                  echo "11) $(menu_item "cinnamon-theme-loki")"
                   echo ""
                   echo " b) BACK"
                   echo ""
@@ -2181,19 +2182,22 @@ case "$1" in
                         aur_package_install "cinnamon-theme-gnome"
                         ;;
                       6)
-                        aur_package_install "cinnamon-theme-google+"
+                        aur_package_install "cinnamon-theme-gnome"
                         ;;
                       7)
-                        aur_package_install "cinnamon-theme-helios"
+                        aur_package_install "cinnamon-theme-google+"
                         ;;
                       8)
-                        aur_package_install "cinnamon-theme-holo"
+                        aur_package_install "cinnamon-theme-helios"
                         ;;
                       9)
-                        aur_package_install "cinnamon-theme-loki"
+                        aur_package_install "cinnamon-theme-holo"
                         ;;
                       10)
                         aur_package_install "cinnamon-theme-nadia"
+                        ;;
+                      11)
+                        aur_package_install "cinnamon-theme-loki"
                         ;;
                       "b")
                         break
@@ -2711,7 +2715,7 @@ case "$1" in
       echo " 5) $(menu_item "dockbarx") $AUR"
       echo " 6) $(menu_item "docky") $AUR"
       echo " 7) $(menu_item "speedcrunch galculator" "$([[ ${KDE} -eq 1 ]] && echo "Speedcrunch" || echo "Galculator";)") $AUR"
-      echo " 8) $(menu_item "guake")"
+      echo " 8) $(menu_item "terra-bzr") $AUR"
       echo " 9) $(menu_item "kupfer") $AUR"
       echo "10) $(menu_item "pyrenamer") $AUR"
       echo "11) $(menu_item "shutter") $AUR"
@@ -2752,7 +2756,7 @@ case "$1" in
             fi
             ;;
           8)
-            package_install "guake"
+            aur_package_install "terra-bzr"
             ;;
           9)
             aur_package_install "kupfer"
@@ -2802,13 +2806,14 @@ case "$1" in
       echo " 7) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
       echo " 8) $(menu_item "kdevelop")"
       echo " 9) $(menu_item "netbeans")"
-      echo "10) $(menu_item "jdk" "Oracle JDK") $AUR"
-      echo "11) $(menu_item "qtcreator")"
-      echo "12) $(menu_item "sublime-text" "Sublime Text 2") $AUR"
-      echo "13) $(menu_item "gdb" "Debuggers, Syntax Tools")"
-      echo "14) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-      echo "15) $(menu_item "meld")"
-      echo "16) $(menu_item "rabbitvcs" "RabbitVCS") $AUR"
+      echo "10) $(menu_item "jdk7-openjdk" "OpenJDK") $AUR"
+      echo "11) $(menu_item "jdk" "Oracle JDK") $AUR"
+      echo "12) $(menu_item "qtcreator")"
+      echo "13) $(menu_item "sublime-text" "Sublime Text 2") $AUR"
+      echo "14) $(menu_item "gdb" "Debuggers & Syntax Tools")"
+      echo "15) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
+      echo "16) $(menu_item "meld")"
+      echo "17) $(menu_item "rabbitvcs" "RabbitVCS") $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -2914,39 +2919,38 @@ case "$1" in
             package_install "netbeans"
             ;;
           10)
+            package_remove "jdk"
+            package_install "jdk7-openjdk"
+            ;;
+          11)
             package_remove "jre7-openjdk"
             package_remove "jdk7-openjdk"
             aur_package_install "jdk"
             ;;
-          11)
+          12)
             package_install "qtcreator qt-doc"
             mkdir -p /home/${USER_NAME}/.config/Nokia/qtcreator/styles
             curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
             mv monokai.xml /home/${USER_NAME}/.config/Nokia/qtcreator/styles/
             chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
             ;;
-          12)
+          13)
             aur_package_install "sublime-text"
             ;;
-          13)
-            #c/c++
-            package_install "splint valgrind gdb"
-            #php
-            aur_package_install "php-codesniffer php-tidy"
-            #javascript
-            aur_package_install "closure-compiler nodejs-jslint"
-            #html
-            aur_package_install "tidyhtml"
-            #python
-            aur_package_install "flake8"
-            ;;
           14)
-            aur_package_install "mysql-workbench-gpl"
+            package_install "splint valgrind gdb" #C/C++
+            aur_package_install "php-codesniffer php-tidy" #PHP
+            aur_package_install "closure-compiler nodejs-jslint" #Javascript
+            aur_package_install "tidyhtml" #HTML
+            aur_package_install "flake8" #Python
             ;;
           15)
-            package_install "meld"
+            aur_package_install "mysql-workbench-gpl"
             ;;
           16)
+            package_install "meld"
+            ;;
+          17)
             aur_package_install "rabbitvcs"
             if is_package_installed "nautilus" ; then
               aur_package_install "rabbitvcs-nautilus"
