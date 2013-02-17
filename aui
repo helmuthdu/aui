@@ -43,7 +43,7 @@
   # PROMPT {{{
     prompt1="Enter your option: "
     prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
-    prompt3="You have to manual enter the following commands, then press ${BYellow}ctrl+d${White} or type ${BYellow}exit${White}:"
+    prompt3="Successfully installed"
   #}}}
   # EDITOR {{{
     AUTOMATIC_MODE=0
@@ -476,14 +476,13 @@ case "$1" in
       select KEYMAP in "${keymaps[@]}" "more"; do
         if contains_element "$KEYMAP" "${keymaps[@]}"; then
           loadkeys $KEYMAP
-          break
         elif [[ $KEYMAP == more ]]; then
           read -p "Type your Keyboard Layout [ex: us-acentos]: " KEYMAP
           loadkeys $KEYMAP
-          break
         else
           invalid_option
         fi
+        [[ -n $OPT ]] && break
       done
     }
     print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
@@ -574,7 +573,7 @@ case "$1" in
     }
     print_title "https://wiki.archlinux.org/index.php/Partitioning"
     print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
-    partition_app=("cfdisk" "cgdisk" "gdisk");
+    partition_app=("cfdisk" "cgdisk" "gdisk" "parted");
     PS3="$prompt1"
     echo -e "Select partition program:"
     select APP in "${partition_app[@]}"; do
@@ -840,15 +839,15 @@ case "$1" in
     select BOOTLOADER in "${bootloader[@]}"; do
       case "$REPLY" in
         1)
-          # UEFI|BIOS MODE {{{
-          is_uefi_or_bios()
+          #check for UEFI|BIOS system {{{
+          check_boot_system()
           {
             if [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Inc.' ]] || [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Computer, Inc.' ]]; then
               modprobe -r -q efivars || true  # if MAC
             else
               modprobe -q efivars             # all others
             fi
-            if [ -d "/sys/firmware/efi/vars/" ]; then
+            if [[ -d "/sys/firmware/efi/vars/" ]]; then
               UEFI=1
               echo "UEFI Mode detected"
               if [[ $ARCHI == i686 ]]; then
@@ -863,7 +862,7 @@ case "$1" in
             fi
           }
           #}}}
-          is_uefi_or_bios
+          check_boot_system
           #make grub automatically detect others OS
           pacstrap $MOUNTPOINT os-prober
           break
@@ -892,7 +891,7 @@ case "$1" in
         if [[ $UEFI -eq 1 ]]; then
           arch-chroot $MOUNTPOINT /bin/bash -c "grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck"
         else
-          arch-chroot /mnt /bin/bash -c "grub-install --recheck --debug ${ROOT_DEVICE}"
+          arch-chroot $MOUNTPOINT /bin/bash -c "grub-install --target=i386-pc --boot-directory=/boot --recheck ${ROOT_DEVICE}"
         fi
         arch-chroot $MOUNTPOINT /bin/bash -c "mkdir -p /boot/grub/locale"
         arch-chroot $MOUNTPOINT /bin/bash -c "cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo"
@@ -901,7 +900,7 @@ case "$1" in
       Syslinux)
         print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
         print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
-        arch-chroot $MOUNTPOINT /bin/bash -c "/usr/sbin/syslinux-install_update -iam;"
+        arch-chroot $MOUNTPOINT /bin/bash -c "/usr/sbin/syslinux-install_update -iam"
         ;;
     esac
   }
