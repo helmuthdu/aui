@@ -1715,7 +1715,6 @@ case "$1" in
           break
           ;;
         3)
-
           is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo libxft
           aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
           break
@@ -1733,19 +1732,21 @@ case "$1" in
     package_install "dmidecode"
     print_title "VIDEO CARD"
     check_vga
+    #Virtualbox
     if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
       package_install "virtualbox-guest-utils"
       add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
       add_user_to_group ${USER_NAME} vboxsf
       system_ctl disable ntpd.service
       system_ctl enable vboxservice.service
+      VBoxClient-all
+    #Nvidia
     elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
       XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
       pacman -S --needed nvidia{,-utils}
       is_package_installed "nouveau-dri" && pacman package_remove "nouveau-dri"
-      #fix nvidia-settings open
-      package_install "pangox-compat"
+      package_install "pangox-compat" #fix nvidia-settings open
       package_install "libva-vdpau-driver"
       if [[ ${ARCHI} == x86_64 ]]; then
         pacman -S --needed "lib32-nvidia-utils"
@@ -1754,6 +1755,19 @@ case "$1" in
       replaceinfile '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
       mkinitcpio -p linux
       nvidia-xconfig --add-argb-glx-visuals --allow-glx-with-composite --composite -no-logo --render-accel -o /etc/X11/xorg.conf.d/20-nvidia.conf;
+    #Nouveau [Nvidia]
+    elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
+      is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
+      [[ -f /etc/X11/xorg.conf.d/20-nvidia.conf ]] && rm /etc/X11/xorg.conf.d/20-nvidia.conf
+      pacman -S --asdeps libgl
+      package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
+      if [[ ${ARCHI} == x86_64 ]]; then
+        pacman -S --needed "lib32-${VIDEO_DRIVER}-dri"
+      fi
+      replaceinfile '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
+      replaceinfile '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
+      mkinitcpio -p linux
+    #Catalyst [ATI]
     elif [[ ${VIDEO_DRIVER} == catalyst ]]; then
       XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
@@ -1767,17 +1781,7 @@ case "$1" in
       fi
       aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
       add_module "fglrx" "ati"
-    elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
-      is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
-      [[ -f /etc/X11/xorg.conf.d/20-nvidia.conf ]] && rm /etc/X11/xorg.conf.d/20-nvidia.conf
-      pacman -S --asdeps libgl
-      package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
-      if [[ ${ARCHI} == x86_64 ]]; then
-        pacman -S --needed "lib32-${VIDEO_DRIVER}-dri"
-      fi
-      replaceinfile '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
-      replaceinfile '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
-      mkinitcpio -p linux
+    #ATI
     elif [[ ${VIDEO_DRIVER} == ati ]]; then
       is_package_installed "catalyst-dkms" && pacman -Rdds --noconfirm catalyst{-dkms,-utils} lib32-catalyst-utils
       pacman -S --asdeps libgl
@@ -1788,6 +1792,7 @@ case "$1" in
         package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
       add_module "radeon" "ati"
+    #Intel
     elif [[ ${VIDEO_DRIVER} == intel ]]; then
       package_install "xf86-video-intel intel-dri libva-intel-driver"
     else
@@ -3078,7 +3083,7 @@ case "$1" in
             package_install "htop"
             ;;
           4)
-            # Make sure we are not a VirtualBox Guest
+            #Make sure we are not a VirtualBox Guest
             VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
             if [[ -z ${VIRTUALBOX_GUEST} ]]; then
               package_install "virtualbox virtualbox-host-modules virtualbox-guest-iso"
