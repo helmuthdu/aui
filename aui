@@ -2906,7 +2906,7 @@ case "$1" in
             ;;
           10)
             package_remove "jdk"
-            package_install "jdk7-openjdk"
+            package_install "jdk7-openjdk icedtea-web-java7"
             ;;
           11)
             package_remove "jre7-openjdk"
