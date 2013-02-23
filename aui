@@ -2934,6 +2934,11 @@ case "$1" in
             aur_package_install "closure-compiler nodejs-jslint" #Javascript
             aur_package_install "tidyhtml" #HTML
             aur_package_install "flake8" #Python
+            # syntax tools
+            npm install -g coffeelint
+            npm install -g csslint
+            npm install -g jshint
+            npm install -g jsonlint
             ;;
           15)
             aur_package_install "mysql-workbench-gpl"
