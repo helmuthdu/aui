@@ -3517,6 +3517,7 @@ case "$1" in
                     ;;
                   2)
                     aur_package_install "teamviewer"
+                    ln -s /opt/teamviewer8/tv_bin/script/teamviewerd.service /usr/lib/systemd/system/
                     ;;
                   "b")
                     break
