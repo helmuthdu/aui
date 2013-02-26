@@ -43,7 +43,7 @@
   # PROMPT {{{
     prompt1="Enter your option: "
     prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
-    prompt3="Successfully installed"
+    prompt3="You have to manual enter the following commands, then press ${BYellow}ctrl+d${White} or type ${BYellow}exit${White}:"
   #}}}
   # EDITOR {{{
     AUTOMATIC_MODE=0
@@ -910,6 +910,9 @@ case "$1" in
               break
               ;;
             2)
+              print_info "Your boot partition, on which you plan to install Syslinux, must contain a FAT, ext2, ext3, ext4, or Btrfs file system. You should install it on a mounted directory, not a /dev/sdXY device. You do not have to install it on the root directory of a file system, e.g., with device /dev/sda1 mounted on /boot you can install Syslinux in the syslinux directory"
+              echo -e $prompt3
+              print_warning "mkdir /boot/syslinux\nextlinux --install /boot/syslinux "
               arch-chroot $MOUNTPOINT
               break
               ;;
