@@ -900,7 +900,24 @@ case "$1" in
       Syslinux)
         print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
         print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
-        arch-chroot $MOUNTPOINT /bin/bash -c "/usr/sbin/syslinux-install_update -iam"
+        syslinux_install_mode=("Automatic" "Manual")
+        PS3="$prompt1"
+        echo -e "Syslinux Install:\n"
+        select OPT in "${syslinux_install_mode[@]}"; do
+          case "$REPLY" in
+            1)
+              arch-chroot $MOUNTPOINT /bin/bash -c "syslinux-install_update -i -a -m"
+              break
+              ;;
+            2)
+              arch-chroot $MOUNTPOINT
+              break
+              ;;
+            *)
+              invalid_option
+              ;;
+          esac
+        done
         ;;
     esac
   }
