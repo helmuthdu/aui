@@ -336,7 +336,7 @@
     #install package from aur
     for PKG in $1; do
       if ! is_package_installed "${PKG}" ; then
-        if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
+        if [[ $AUTOMATIC_MODE -eq 1 ]]; then
           ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Installing ${AUR} ${BWhite}${PKG}${White} "
           su - ${USER_NAME} -c "${AUR_HELPER} --noconfirm -S ${PKG}" >>"$LOG" 2>&1 &
           pid=$!;progress $pid
@@ -413,7 +413,7 @@
   config_xinitrc(){ #{{{
     #create a xinitrc file in home user directory
     cp -fv /etc/skel/.xinitrc /home/${USER_NAME}/
-    echo -e "exec ck-launch-session $1" >> /home/${USER_NAME}/.xinitrc
+    echo -e "exec $1" >> /home/${USER_NAME}/.xinitrc
     chown -R ${USER_NAME}:users /home/${USER_NAME}/.xinitrc
   } #}}}
   invalid_option(){ #{{{
@@ -1631,7 +1631,7 @@ case "$1" in
     read_input_text "Install FirewallD" $FWD
     if [[ $OPTION == y ]]; then
       is_package_installed "ufw" && package_remove "ufw"
-      aur_package_install "firewalld"
+      package_install "firewalld"
       system_ctl enable firewalld
       pause_function
     fi
@@ -1960,13 +1960,13 @@ case "$1" in
               aur_package_install "elementary-xfce-icons"
               ;;
             3)
-              aur_package_install "faenza-icon-theme"
+              package_install "faenza-icon-theme"
               ;;
             4)
               aur_package_install "faenza-cupertino-icon-theme"
               ;;
             5)
-              aur_package_install "faience-icon-theme"
+              package_install "faience-icon-theme"
               ;;
             6)
               aur_package_install "inx-icon-theme"
@@ -2022,7 +2022,7 @@ case "$1" in
               aur_package_install "xfce-theme-greybird"
               ;;
             5)
-              aur_package_install "faience-themes"
+              package_install "faience-themes"
               ;;
             6)
               aur_package_install "gtk-theme-gnome-cupertino"
@@ -2327,17 +2327,17 @@ case "$1" in
         #CINNAMON {{{
         print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
         print_info "Cinnamon is a fork of GNOME Shell, initially developed by Linux Mint. It attempts to provide a more traditional user environment based on the desktop metaphor, like GNOME 2. Cinnamon uses Muffin, a fork of the GNOME 3 window manager Mutter, as its window manager."
-        aur_package_install "cinnamon"
-        package_install "gnome-extra gedit-plugins"
+        package_install "cinnamon"
+        package_install "nemo nemo-fileroller cinnamon-screensaver cinnamon-control-panel"
+        package_install "gedit-plugins"
         package_install "telepathy"
-        package_install "gksu nautilus-open-terminal gnome-tweak-tool xdg-user-dirs-gtk gucharmap"
+        package_install "gksu xdg-user-dirs-gtk gucharmap"
         package_install "gvfs-smb gvfs-afc"
         package_install "deja-dup"
         package_install "gnome-packagekit gnome-settings-daemon-updates"
         aur_package_install "gnome-defaults-list"
         #Essential stuffs
         aur_package_install "cinnamon-applet-screenshot-record"
-        aur_package_install "cinnamon-applet-shutdown"
         aur_package_install "cinnamon-extension-coverflow-alt-tab"
         config_xinitrc "gnome-session-cinnamon"
         #Tweaks
@@ -2763,7 +2763,7 @@ case "$1" in
             if [[ ${KDE} -eq 1 ]]; then
               aur_package_install "speedcrunch"
             else
-              aur_package_install "galculator"
+              package_install "galculator"
             fi
             ;;
           8)
@@ -3177,7 +3177,7 @@ case "$1" in
             package_install "gthumb"
             ;;
           5)
-            package_install "inkscape uniconvertor python2-numpy python-lxml"
+            package_install "inkscape python2-numpy python-lxml"
             aur_package_install "sozi"
             ;;
           6)
