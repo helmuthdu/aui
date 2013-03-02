@@ -1278,7 +1278,6 @@ case "$1" in
         fi
         [[ -n $OPT ]] && break
       done
-      echo "export EDITOR=\"$EDITOR\"" >> /home/${USER_NAME}/.bashrc
       #}}}
       chown -R ${USER_NAME}:users /home/${USER_NAME}
     }
@@ -1764,11 +1763,12 @@ case "$1" in
     elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
       XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
+      is_package_installed "nouveau-dri" && pacman -Rdds --noconfirm nouveau-dri
       pacman -S --needed nvidia{,-utils}
-      is_package_installed "nouveau-dri" && pacman package_remove "nouveau-dri"
       package_install "pangox-compat" #fix nvidia-settings open
       package_install "libva-vdpau-driver"
       if [[ ${ARCHI} == x86_64 ]]; then
+        is_package_installed "lib32-nouveau-dri" && pacman -Rdds --noconfirm lib32-nouveau-dri
         pacman -S --needed "lib32-nvidia-utils"
       fi
       replaceinfile '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
@@ -1782,7 +1782,8 @@ case "$1" in
       pacman -S --asdeps libgl
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
       if [[ ${ARCHI} == x86_64 ]]; then
-        pacman -S --needed "lib32-${VIDEO_DRIVER}-dri"
+       is_package_installed "lib32-nvidia-utils" && pacman -Rdds --noconfirm lib32-nvidia-utils
+       pacman -S --needed "lib32-${VIDEO_DRIVER}-dri"
       fi
       replaceinfile '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
       replaceinfile '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
@@ -1797,6 +1798,7 @@ case "$1" in
       package_install "linux-headers"
       pacman -S --needed catalyst-dkms
       if [[ ${ARCHI} == x86_64 ]]; then
+        is_package_installed "lib32-ati-dri" && pacman -Rdds --noconfirm lib32-ati-dri
         pacman -S --needed "lib32-catalyst-utils"
       fi
       aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
@@ -1809,6 +1811,7 @@ case "$1" in
       [[ -f /etc/modules-load.d/fglrx.conf ]] && rm /etc/modules-load.d/ati.conf
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
       if [[ ${ARCHI} == x86_64 ]]; then
+        is_package_installed "lib32-catalyst-utils" && pacman -Rdds --noconfirm lib32-catalyst-utils
         package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
       add_module "radeon" "ati"
@@ -3407,7 +3410,7 @@ case "$1" in
               echo " 2) $(menu_item "google-talkplugin") $AUR"
               echo " 3) $(menu_item "pidgin")"
               echo " 4) $(menu_item "skype")"
-              echo " 5) $(menu_item "teamspeak3") $AUR"
+              echo " 5) $(menu_item "teamspeak3")"
               echo ""
               echo " b) BACK"
               echo ""
@@ -3430,7 +3433,7 @@ case "$1" in
                     package_install "skype"
                     ;;
                   5)
-                    aur_package_install "teamspeak3"
+                    package_install "teamspeak3"
                     ;;
                   "b")
                     break
@@ -4663,28 +4666,29 @@ case "$1" in
               print_title "ELEMENTARY PROJECT"
               print_warning "\tsome of these programs still in alpha stage and may not work"
               echo " 1) $(menu_item "audience-bzr") (media player)"
-              echo " 2) $(menu_item "contractor-bzr") (sharing service)"
-              echo " 3) $(menu_item "eidete-bzr") (screencasting)"
-              echo " 4) $(menu_item "dexter-contacts-bzr") (contacts manager)"
-              echo " 5) $(menu_item "feedler-bzr") (RSS feeds Reader)"
-              echo " 6) $(menu_item "pantheon-files-bzr") (file manager)"
-              echo " 7) $(menu_item "footnote-bzr") (note taking)"
-              echo " 8) $(menu_item "gala-bzr") (compositing manager)"
-              echo " 9) $(menu_item "geary-git") (email client)"
-              echo "10) $(menu_item "lingo-dictionary-bzr") (dictionary)"
-              echo "11) $(menu_item "maya-bzr") (calendar)"
-              echo "12) $(menu_item "midori") (web browser)"
-              echo "13) $(menu_item "noise-bzr") (audio player)"
-              echo "14) $(menu_item "scratch-bzr") (text editor)"
-              echo "15) $(menu_item "pantheon-dock-bzr") (dock)"
-              echo "16) $(menu_item "pantheon-terminal-bzr") (terminal)"
-              echo "17) $(menu_item "slingshot-bzr") (app launcher)"
-              echo "18) $(menu_item "snap-elementary-bzr") (photo booth)"
-              echo "19) $(menu_item "switchboard-bzr") (desktop settings hub)"
-              echo "20) $(menu_item "wingpanel-bzr") (indicators topbar)"
-              echo "21) $(menu_item "elementary-icons-bzr" "elementary icons")"
-              echo "22) $(menu_item "egtk-bzr" "elementary theme")"
-              echo "23) $(menu_item "cerbere-bzr" "session manager")"
+              echo " 2) $(menu_item "cerbere-bzr") session manager"
+              echo " 3) $(menu_item "contractor-bzr") (sharing service)"
+              echo " 4) $(menu_item "eidete-bzr") (screencasting)"
+              echo " 5) $(menu_item "dexter-contacts-bzr") (contacts manager)"
+              echo " 6) $(menu_item "feedler-bzr") (RSS feeds Reader)"
+              echo " 7) $(menu_item "pantheon-files-bzr") (file manager)"
+              echo " 8) $(menu_item "footnote-bzr") (note taking)"
+              echo " 9) $(menu_item "foto-bzr") (photo manager)"
+              echo "10) $(menu_item "gala-bzr") (compositing manager)"
+              echo "11) $(menu_item "geary-git") (email client)"
+              echo "12) $(menu_item "lingo-dictionary-bzr") (dictionary)"
+              echo "13) $(menu_item "maya-bzr") (calendar)"
+              echo "14) $(menu_item "midori") (web browser)"
+              echo "15) $(menu_item "noise-bzr") (audio player)"
+              echo "16) $(menu_item "scratch-bzr") (text editor)"
+              echo "17) $(menu_item "pantheon-dock-bzr") (dock)"
+              echo "18) $(menu_item "pantheon-terminal-bzr") (terminal)"
+              echo "19) $(menu_item "slingshot-bzr") (app launcher)"
+              echo "20) $(menu_item "snap-elementary-bzr") (photo booth)"
+              echo "21) $(menu_item "switchboard-bzr") (desktop settings hub)"
+              echo "22) $(menu_item "wingpanel-bzr") (indicators topbar)"
+              echo "23) $(menu_item "elementary-icons-bzr" "elementary icons")"
+              echo "24) $(menu_item "egtk-bzr" "elementary theme")"
               echo ""
               echo " b) BACK"
               echo ""
@@ -4696,71 +4700,74 @@ case "$1" in
                     aur_package_install "audience-bzr"
                     ;;
                   2)
-                    aur_package_install "contractor-bzr"
+                    aur_package_install "cerbere-bzr"
                     ;;
                   3)
-                    aur_package_install "eidete-bzr"
+                    aur_package_install "contractor-bzr"
                     ;;
                   4)
-                    aur_package_install "dexter-contacts-bzr"
+                    aur_package_install "eidete-bzr"
                     ;;
                   5)
-                    aur_package_install "feedler-bzr"
+                    aur_package_install "dexter-contacts-bzr"
                     ;;
                   6)
-                    aur_package_install "pantheon-files-bzr tumbler"
+                    aur_package_install "feedler-bzr"
                     ;;
                   7)
-                    aur_package_install "footnote-bzr"
+                    aur_package_install "pantheon-files-bzr tumbler"
                     ;;
                   8)
-                    aur_package_install "gala-bzr"
+                    aur_package_install "footnote-bzr"
                     ;;
                   9)
-                    aur_package_install "geary-git"
+                    aur_package_install "foto-bzr"
                     ;;
                   10)
-                    aur_package_install "lingo-dictionary-bzr"
+                    aur_package_install "gala-bzr"
                     ;;
                   11)
-                    aur_package_install "maya-bzr"
+                    aur_package_install "geary-git"
                     ;;
                   12)
-                    aur_package_install "midori"
+                    aur_package_install "lingo-dictionary-bzr"
                     ;;
                   13)
-                    aur_package_install "noise-bzr"
+                    aur_package_install "maya-bzr"
                     ;;
                   14)
-                    aur_package_install "scratch-bzr"
+                    aur_package_install "midori"
                     ;;
                   15)
-                    aur_package_install "pantheon-dock-bzr"
+                    aur_package_install "noise-bzr"
                     ;;
                   16)
-                    aur_package_install "pantheon-terminal-bzr"
+                    aur_package_install "scratch-bzr"
                     ;;
                   17)
-                    aur_package_install "slingshot-bzr"
+                    aur_package_install "pantheon-dock-bzr"
                     ;;
                   18)
-                    aur_package_install "snap-elementary-bzr"
+                    aur_package_install "pantheon-terminal-bzr"
                     ;;
                   19)
-                    aur_package_install "switchboard-bzr"
+                    aur_package_install "slingshot-bzr"
                     ;;
                   20)
-                    aur_package_install "wingpanel-bzr"
+                    aur_package_install "snap-elementary-bzr"
                     ;;
                   21)
+                    aur_package_install "switchboard-bzr"
+                    ;;
+                  22)
+                    aur_package_install "wingpanel-bzr"
+                    ;;
+                  23)
                     aur_package_install "elementary-icons-bzr"
                     gtk-update-icon-cache -f /usr/share/icons/elementary
                     ;;
-                  22)
+                  24)
                     aur_package_install "egtk-bzr"
-                    ;;
-                  23)
-                    aur_package_install "cerbere-bzr"
                     ;;
                   "b")
                     break

@@ -515,26 +515,29 @@
   EXTRA_OPTIONS=""
   #ELEMENTARY PROJECT {{{
     # 1) Audience
-    # 2) Contractor
-    # 3) Eidete
-    # 4) Dexter
-    # 5) Feedler
-    # 6) Files
-    # 7) Footnote
-    # 8) Gala
-    # 9) Geary
-    #10) Lingo
-    #11) Maya
-    #12) Midori
-    #13) Noise
-    #14) Scratch
-    #15) Plank
-    #16) Pantheon Terminal
-    #17) Slingshot
-    #18) Switchboard
-    #19) Wingpanel
-    #20) eICONS
-    #21) eGTK
-    ELEMENTARY_OPTIONS="1-20"
+    # 2) Cerbere
+    # 3) Contractor
+    # 4) Eidete
+    # 5) Dexter
+    # 6) Feedler
+    # 7) Files
+    # 8) Footnote
+    # 9) Foto
+    #10) Gala
+    #11) Geary
+    #12) Lingo
+    #13) Maya
+    #14) Midori
+    #15) Noise
+    #16) Scratch
+    #17) Plank
+    #18) Pantheon Terminal
+    #19) Slingshot
+    #20) Snap
+    #21) Switchboard
+    #22) Wingpanel
+    #23) eICONS
+    #24) eGTK
+    ELEMENTARY_OPTIONS=""
   #}}}
 #}}}
