@@ -1764,8 +1764,9 @@ case "$1" in
       XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
       is_package_installed "nouveau-dri" && pacman -Rdds --noconfirm nouveau-dri
+      is_package_installed "mesa-libgl" && pacman -Rdds --noconfirm mesa-libgl
       pacman -S --needed nvidia{,-utils}
-      package_install "pangox-compat" #fix nvidia-settings open
+      package_install "pangox-compat" #fix nvidia-settings
       package_install "libva-vdpau-driver"
       if [[ ${ARCHI} == x86_64 ]]; then
         is_package_installed "lib32-nouveau-dri" && pacman -Rdds --noconfirm lib32-nouveau-dri
@@ -1793,6 +1794,7 @@ case "$1" in
       XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
       is_package_installed "ati-dri" && pacman package_remove "ati-dri"
+      is_package_installed "mesa-libgl" && pacman -Rdds --noconfirm mesa-libgl
       [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
       [[ -f /etc/modules-load.d/radeon.conf ]] && rm /etc/modules-load.d/radeon.conf
       package_install "linux-headers"
@@ -2196,7 +2198,7 @@ case "$1" in
                         aur_package_install "cinnamon-theme-gnome"
                         ;;
                       6)
-                        aur_package_install "cinnamon-theme-gnome"
+                        aur_package_install "cinnamon-theme-faience"
                         ;;
                       7)
                         aur_package_install "cinnamon-theme-google+"
