@@ -82,14 +82,13 @@
   DESKTOPENV=3
   #KDE {{{
     # 1) Apper
-    # 2) Bangarang
-    # 3) Choqok
-    # 4) Digikam
-    # 5) K3b
-    # 6) Rosa Icon
-    # 7) Plasma Themes [Caledonia, Produkt, Ronak]
-    # 8) Yakuake
-    KDE_OPTIONS="1-8"
+    # 2) Choqok
+    # 3) Digikam
+    # 4) K3b
+    # 5) Rosa Icon
+    # 6) Plasma Themes [Caledonia, Produkt, Ronak]
+    # 7) Yakuake
+    KDE_OPTIONS="1-7"
   #}}}
   #ESSENTIAL APPS [E17,LXDE,Awesome,Fluxbox,OpenBox] {{{
     # 1) Display Manager

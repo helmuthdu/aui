@@ -1751,7 +1751,7 @@ case "$1" in
     package_install "dmidecode"
     print_title "VIDEO CARD"
     check_vga
-    #Virtualbox
+    #Virtualbox {{{
     if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
       package_install "virtualbox-guest-utils"
       add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
@@ -1759,12 +1759,12 @@ case "$1" in
       system_ctl disable ntpd.service
       system_ctl enable vboxservice.service
       VBoxClient-all
-    #Nvidia
+    #}}}
+    #NVIDIA {{{
     elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
       XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
       is_package_installed "nouveau-dri" && pacman -Rdds --noconfirm nouveau-dri
-      is_package_installed "mesa-libgl" && pacman -Rdds --noconfirm mesa-libgl
       pacman -S --needed nvidia{,-utils}
       package_install "pangox-compat" #fix nvidia-settings
       package_install "libva-vdpau-driver"
@@ -1776,11 +1776,12 @@ case "$1" in
       replaceinfile '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
       mkinitcpio -p linux
       nvidia-xconfig --add-argb-glx-visuals --allow-glx-with-composite --composite -no-logo --render-accel -o /etc/X11/xorg.conf.d/20-nvidia.conf;
-    #Nouveau [Nvidia]
+    #}}}
+    #Nouveau [NVIDIA] {{{
     elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
       is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
       [[ -f /etc/X11/xorg.conf.d/20-nvidia.conf ]] && rm /etc/X11/xorg.conf.d/20-nvidia.conf
-      pacman -S --asdeps libgl
+      pacman -S --asdeps mesa-libgl
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
       if [[ ${ARCHI} == x86_64 ]]; then
        is_package_installed "lib32-nvidia-utils" && pacman -Rdds --noconfirm lib32-nvidia-utils
@@ -1789,12 +1790,12 @@ case "$1" in
       replaceinfile '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
       replaceinfile '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
       mkinitcpio -p linux
-    #Catalyst [ATI]
+    #}}}
+    #Catalyst [ATI] {{{
     elif [[ ${VIDEO_DRIVER} == catalyst ]]; then
       XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
       is_package_installed "ati-dri" && pacman package_remove "ati-dri"
-      is_package_installed "mesa-libgl" && pacman -Rdds --noconfirm mesa-libgl
       [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
       [[ -f /etc/modules-load.d/radeon.conf ]] && rm /etc/modules-load.d/radeon.conf
       package_install "linux-headers"
@@ -1805,10 +1806,11 @@ case "$1" in
       fi
       aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
       add_module "fglrx" "ati"
-    #ATI
+    #}}}
+    #ATI {{{
     elif [[ ${VIDEO_DRIVER} == ati ]]; then
       is_package_installed "catalyst-dkms" && pacman -Rdds --noconfirm catalyst{-dkms,-utils} lib32-catalyst-utils
-      pacman -S --asdeps libgl
+      pacman -S --asdeps mesa-libgl
       [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
       [[ -f /etc/modules-load.d/fglrx.conf ]] && rm /etc/modules-load.d/ati.conf
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
@@ -1817,9 +1819,11 @@ case "$1" in
         package_install "lib32-${VIDEO_DRIVER}-dri"
       fi
       add_module "radeon" "ati"
-    #Intel
+    #}}}
+    #Intel {{{
     elif [[ ${VIDEO_DRIVER} == intel ]]; then
       package_install "xf86-video-intel intel-dri libva-intel-driver"
+    #}}}
     else
       package_install "xf86-video-${VIDEO_DRIVER}"
     fi
@@ -2333,7 +2337,7 @@ case "$1" in
         print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
         print_info "Cinnamon is a fork of GNOME Shell, initially developed by Linux Mint. It attempts to provide a more traditional user environment based on the desktop metaphor, like GNOME 2. Cinnamon uses Muffin, a fork of the GNOME 3 window manager Mutter, as its window manager."
         package_install "cinnamon"
-        package_install "nemo nemo-fileroller cinnamon-screensaver cinnamon-control-panel"
+        package_install "cinnamon-screensaver cinnamon-control-panel"
         package_install "gedit-plugins"
         package_install "telepathy"
         package_install "gksu xdg-user-dirs-gtk gucharmap"
@@ -2468,13 +2472,12 @@ case "$1" in
         do
           print_title "KDE CUSTOMIZATION"
           echo " 1) $(menu_item "apper")"
-          echo " 2) $(menu_item "bangarang") $AUR"
-          echo " 3) $(menu_item "choqok")"
-          echo " 4) $(menu_item "digikam")"
-          echo " 5) $(menu_item "k3b")"
-          echo " 6) $(menu_item "rosa-icons") $AUR"
-          echo " 7) $(menu_item "caledonia-bundle plasma-theme-produkt" "Plasma Themes") $AUR"
-          echo " 8) $(menu_item "yakuake")"
+          echo " 2) $(menu_item "choqok")"
+          echo " 3) $(menu_item "digikam")"
+          echo " 4) $(menu_item "k3b")"
+          echo " 5) $(menu_item "rosa-icons") $AUR"
+          echo " 6) $(menu_item "caledonia-bundle plasma-theme-produkt" "Plasma Themes") $AUR"
+          echo " 7) $(menu_item "yakuake")"
           echo ""
           echo " d) DONE"
           echo ""
@@ -2486,24 +2489,21 @@ case "$1" in
                 package_install "apper"
                 ;;
               2)
-                aur_package_install "bangarang"
-                ;;
-              3)
                 package_install "choqok"
                 ;;
-              4)
+              3)
                 package_install "digikam"
                 ;;
-              5)
+              4)
                 package_install "k3b cdrdao dvd+rw-tools"
                 ;;
-              6)
+              5)
                 aur_package_install "rosa-icons"
                 ;;
-              7)
+              6)
                 aur_package_install "caledonia-bundle plasma-theme-rosa plasma-theme-produkt ronak-plasmatheme"
                 ;;
-              8)
+              7)
                 package_install "yakuake"
                 aur_package_install "yakuake-skin-plasma-oxygen-panel"
                 ;;
@@ -3289,7 +3289,7 @@ case "$1" in
             while [[ 1 ]]
             do
               print_title "DOWNLOAD|FILESHARE"
-              echo " 1) $(menu_item "deluge") $AUR"
+              echo " 1) $(menu_item "deluge")"
               echo " 2) $(menu_item "dropbox") $AUR"
               echo " 3) $(menu_item "insync") $AUR"
               echo " 4) $(menu_item "jdownloader") $AUR"
@@ -3601,7 +3601,7 @@ case "$1" in
               echo "11) $(menu_item "spotify") $AUR"
               echo "12) $(menu_item "tomahawk") $AUR"
               echo "13) $(menu_item "timidity++")"
-              echo "14) $(menu_item "xnoise") $AUR"
+              echo "14) $(menu_item "xnoise")"
               echo ""
               echo " b) BACK"
               echo ""
@@ -3651,7 +3651,7 @@ case "$1" in
                     echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                     ;;
                   14)
-                    aur_package_install "xnoise"
+                    package_install "xnoise"
                     ;;
                   "b")
                     break
