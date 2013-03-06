@@ -455,13 +455,14 @@
     gpasswd -a ${_USER} ${_GROUP} >>"$LOG" 2>&1 &
     pid=$!;progress $pid
   } #}}}
-  system_ctl () {
+  system_ctl () { #{{{
     local ACTION=${1}
     local OBJECT=${2}
     ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} systemctl ${ACTION} ${OBJECT} "
     systemctl ${ACTION} ${OBJECT} >>"$LOG" 2>&1
     pid=$!;progress $pid
   }
+  #}}}
 #}}}
 
 case "$1" in
@@ -3503,9 +3504,6 @@ case "$1" in
                 case "$OPT" in
                   1)
                     aur_package_install "google-earth"
-                    if [ -f /etc/fonts/conf.d/65-fonts-persian.conf ]; then
-                      mv /etc/fonts/conf.d/65-fonts-persian.conf /etc/fonts/conf.d/65-fonts-persian.conf.breaks-google-earth
-                    fi
                     ;;
                   2)
                     aur_package_install "worldwind"
