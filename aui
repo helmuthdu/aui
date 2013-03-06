@@ -1509,7 +1509,7 @@ case "$1" in
     pause_function
     print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/File_Systems"
     print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
-    package_install "ntfs-3g ntfsprogs dosfstools exfat-utils fuse fuse-exfat"
+    package_install "ntfs-3g dosfstools exfat-utils fuse fuse-exfat"
     is_package_installed "fuse" && add_module "fuse"
     pause_function
   }
