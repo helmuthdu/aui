@@ -1470,8 +1470,7 @@ case "$1" in
     package_install "bc rsync mlocate bash-completion pkgstats"
     print_title "NTPd - https://wiki.archlinux.org/index.php/NTPd"
     package_install "ntp"
-    system_ctl enable ntpd
-    system_ctl start ntpd
+    is_package_installed "ntp" && system_ctl enable ntpd
     pause_function
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
     print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
