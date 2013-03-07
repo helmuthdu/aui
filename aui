@@ -3296,9 +3296,10 @@ case "$1" in
               echo " 4) $(menu_item "jdownloader") $AUR"
               echo " 5) $(menu_item "nitroshare") $AUR"
               echo " 6) $(menu_item "sparkleshare")"
-              echo " 7) $(menu_item "steadyflow-bzr") $AUR"
-              echo " 8) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
-              echo " 9) $(menu_item "ubuntuone-client" "Ubuntu One") $AUR"
+              echo " 7) $(menu_item "spideroak") $AUR"
+              echo " 8) $(menu_item "steadyflow-bzr") $AUR"
+              echo " 9) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+              echo "10) $(menu_item "ubuntuone-client" "Ubuntu One") $AUR"
               echo ""
               echo " b) BACK"
               echo ""
@@ -3337,6 +3338,9 @@ case "$1" in
                     aur_package_install "steadyflow-bzr"
                     ;;
                   8)
+                    aur_package_install "spideroak"
+                    ;;
+                  9)
                     if [[ ${KDE} -eq 1 ]]; then
                       package_install "transmission-qt"
                     else
@@ -3348,7 +3352,7 @@ case "$1" in
                     fi
 
                     ;;
-                  9)
+                  10)
                     aur_package_install "ubuntuone-client"
                     if is_package_installed "nautilus" ; then
                       aur_package_install "ubuntuone-client-gnome"

@@ -283,9 +283,10 @@
     # 4) Jdownloader
     # 5) Nitroshare
     # 6) Sparkleshare
-    # 7) Steadyflow
-    # 8) Trasmission
-    # 9) Ubuntu One
+    # 7) Spider Oak
+    # 8) Steadyflow
+    # 9) Trasmission
+    #10) Ubuntu One
     DOWNLOAD_OPTIONS="2 4"
   #}}}
   #EMAIL|RSS {{{
