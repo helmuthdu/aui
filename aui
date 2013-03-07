@@ -1466,13 +1466,12 @@ case "$1" in
   #}}}
   #BASIC SETUP {{{
   install_basic_setup(){
-    print_title "SYSTEMD - https://wiki.archlinux.org/index.php/Systemd"
-    print_info "systemd is a replacement for the init daemon for Linux (either System V or BSD-style). It is intended to provide a better framework for expressing services' dependencies, allow more work to be done in parallel at system startup, and to reduce shell overhead."
-    package_install "systemd systemd-sysvcompat"
-    system_ctl enable cronie.service
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-    package_install "bc rsync mlocate bash-completion ntp pkgstats"
-    system_ctl enable ntpd.service
+    package_install "bc rsync mlocate bash-completion pkgstats"
+    print_title "OPENNTPD - https://wiki.archlinux.org/index.php/Openntpd"
+    package_install "openntpd"
+    system_ctl enable openntpd
+    system_ctl start openntpd
     pause_function
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
     print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
@@ -1494,7 +1493,7 @@ case "$1" in
     pause_function
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
     print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
-    package_install "alsa-utils alsa-plugins"
+    package_install "alsa-utils alsa-plugins"#{{{#}}}
     if [[ ${ARCHI} == x86_64 ]]; then
       package_install "lib32-alsa-plugins"
     fi
@@ -1612,14 +1611,15 @@ case "$1" in
     fi
   }
   #}}}
-  #LAPTOP MODE TOOLS {{{
-  install_lmt(){
-    print_title "LAPTOP MODE TOOLS - https://wiki.archlinux.org/index.php/Laptop_Mode_Tools"
-    print_info "Laptop Mode Tools is a laptop power saving package for Linux systems. It is the primary way to enable the Laptop Mode feature of the Linux kernel, which lets your hard drive spin down. In addition, it allows you to tweak a number of other power-related settings using a simple configuration file."
-    read_input_text "Install Laptop Mode Tools" $LMT
+  #TLP {{{
+  install_tlp(){
+    print_title "TLP - https://wiki.archlinux.org/index.php/Tlp"
+    print_info "TLP is an advanced power management tool for Linux. It is a pure command line tool with automated background tasks and does not contain a GUI."
+    read_input_text "Install TLP " $TLP
     if [[ $OPTION == y ]]; then
-      package_install "laptop-mode-tools"
-      system_ctl enable laptop-mode.service
+      aur_package_install "tlp"
+      tlp start
+      system_ctl enable tlp-init.service
       pause_function
     fi
   }
@@ -2477,7 +2477,7 @@ case "$1" in
           echo " 3) $(menu_item "digikam")"
           echo " 4) $(menu_item "k3b")"
           echo " 5) $(menu_item "rosa-icons") $AUR"
-          echo " 6) $(menu_item "caledonia-bundle plasma-theme-produkt" "Plasma Themes") $AUR"
+          echo " 6) $(menu_item "caledonia-bundle") $AUR"
           echo " 7) $(menu_item "yakuake")"
           echo ""
           echo " d) DONE"
@@ -2502,7 +2502,7 @@ case "$1" in
                 aur_package_install "rosa-icons"
                 ;;
               6)
-                aur_package_install "caledonia-bundle plasma-theme-rosa plasma-theme-produkt ronak-plasmatheme"
+                aur_package_install "caledonia-bundle"
                 ;;
               7)
                 package_install "yakuake"
@@ -3636,7 +3636,7 @@ case "$1" in
                     aur_package_install "nuvolaplayer"
                     ;;
                   9)
-                    package_install "rhythmbox libdmapsharing"
+                    package_install "rhythmbox libgpod libdmapsharing"
                     aur_package_install "rhythmbox-equalizer-git"
                     ;;
                   10)
@@ -4859,7 +4859,7 @@ case "$1" in
           install_ssh
           install_nfs
           install_samba
-          install_lmt
+          install_tlp
           install_preload
           install_zram
           install_xorg
