@@ -1468,10 +1468,10 @@ case "$1" in
   install_basic_setup(){
     print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
     package_install "bc rsync mlocate bash-completion pkgstats"
-    print_title "OPENNTPD - https://wiki.archlinux.org/index.php/Openntpd"
-    package_install "openntpd"
-    system_ctl enable openntpd
-    system_ctl start openntpd
+    print_title "NTPd - https://wiki.archlinux.org/index.php/NTPd"
+    package_install "ntp"
+    system_ctl enable ntpd
+    system_ctl start ntpd
     pause_function
     print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
     print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
