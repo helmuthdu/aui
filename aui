@@ -1492,7 +1492,7 @@ case "$1" in
     pause_function
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
     print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
-    package_install "alsa-utils alsa-plugins"#{{{#}}}
+    package_install "alsa-utils alsa-plugins"
     if [[ ${ARCHI} == x86_64 ]]; then
       package_install "lib32-alsa-plugins"
     fi
