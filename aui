@@ -3019,7 +3019,7 @@ case "$1" in
         case "$OPT" in
           1)
             print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
-            package_install "libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer libreoffice-extension-presenter-screen libreoffice-extension-pdfimport"
+            package_install "libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer"
             aur_package_install "hunspell-$LANGUAGE_HS"
             aur_package_install "aspell-$LANGUAGE_AS"
             if [[ ${KDE} -eq 1 ]]; then
