@@ -463,22 +463,23 @@
     pid=$!;progress $pid
   }
   #}}}
+  arch_chroot () { #{{{
+    arch_chroot "${1}"
+  }
+  #}}}
 #}}}
 
 case "$1" in
   --ais)
   #ARCHLINUX INSTALL SCRIPTS MODE {{{
-  #CONFIGURE KEYMAP {{{
-  configure_keymap(){
+  #SELECT KEYMAP {{{
+  select_keymap(){
     setkeymap(){
-      local keymaps=(`ls /usr/share/kbd/keymaps/i386/qwerty | sed 's/.map.gz//g'`)
+      local keymaps=(`localectl list-keymaps`)
       PS3="(shift+pgup/pgdown) $prompt1"
       echo "Select keymap:"
-      select KEYMAP in "${keymaps[@]}" "more"; do
+      select KEYMAP in "${keymaps[@]}"; do
         if contains_element "$KEYMAP" "${keymaps[@]}"; then
-          loadkeys $KEYMAP
-        elif [[ $KEYMAP == more ]]; then
-          read -p "Type your Keyboard Layout [ex: us-acentos]: " KEYMAP
           loadkeys $KEYMAP
         else
           invalid_option
@@ -626,19 +627,10 @@ case "$1" in
       if [[ $OPTION == y ]]; then
         umount_partition "$1"
         [[ -z $3 ]] && select_filesystem
-        if [[ $1 == $ROOT && $TYPE == btrfs ]]; then
-          print_title "https://wiki.archlinux.org/index.php/Btrfs"
-          print_info "btrfs provides a number of features (such as checksumming, snapshots, and subvolumes) that make it an excellent candidate for using it as the root partition in an Arch Linux installation."
-          print_warning "This filesystem still experimental, use at your own risk.\nYou should install the bootloader in a different partition"
-          pause_function
-          mkfs.$TYPE $1
-          mount -t $TYPE $1 $2
-        else
-          mkfs.$TYPE $1
-          fsck $1
-          mkdir -p $2
-          mount -t $TYPE $1 $2
-        fi
+        mkfs.$TYPE $1
+        fsck $1
+        mkdir -p $2
+        mount -t $TYPE $1 $2
         remove_partition "$1"
       fi
     }
@@ -711,11 +703,15 @@ case "$1" in
   install_base_system(){
     print_title "INSTALL BASE SYSTEM"
     print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
-    pacstrap $MOUNTPOINT base base-devel btrfs-progs
+    pacstrap $MOUNTPOINT base base-devel btrfs-progs ntp
+  }
+  #}}}
+  #CONFIGURE KEYMAP {{{
+  install_base_system(){
     #ADD KEYMAP TO THE NEW SETUP
     echo "KEYMAP=$KEYMAP" > $MOUNTPOINT/etc/vconsole.conf
-    echo "FONT=\"\"" >> $MOUNTPOINT/etc/vconsole.conf
-    echo "FONT_MAP=\"\"" >> $MOUNTPOINT/etc/vconsole.conf
+    #arch_chroot "localectl set-keymap ${KEYMAP}"
+    #arch_chroot "localectl set-x11-keymap ${KEYMAP}"
   }
   #}}}
   #CONFIGURE FSTAB {{{
@@ -750,30 +746,31 @@ case "$1" in
     print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
     read -p "Hostname [ex: archlinux]: " HN
     echo "$HN" > $MOUNTPOINT/etc/hostname
+    # arch_chroot "hostnamectl set-hostname ${HN}"
     if [[ ! -f $MOUNTPOINT/etc/hosts.aui ]]; then
       cp $MOUNTPOINT/etc/hosts $MOUNTPOINT/etc/hosts.aui
     else
       cp $MOUNTPOINT/etc/hosts.aui $MOUNTPOINT/etc/hosts
     fi
-    arch-chroot $MOUNTPOINT /bin/bash -c "sed -i '/127.0.0.1/s/$/ '${HN}'/' /etc/hosts"
-    arch-chroot $MOUNTPOINT /bin/bash -c "sed -i '/::1/s/$/ '${HN}'/' /etc/hosts"
+    arch_chroot "sed -i '/127.0.0.1/s/$/ '${HN}'/' /etc/hosts"
+    arch_chroot "sed -i '/::1/s/$/ '${HN}'/' /etc/hosts"
   }
   #}}}
   #CONFIGURE TIMEZONE {{{
   configure_timezone(){
     settimezone(){
-      [[ -f $MOUNTPOINT/etc/localtime ]] && rm $MOUNTPOINT/etc/localtime;
-      local zone=("Africa" "America" "Antarctica" "Arctic" "Asia" "Atlantic" "Australia" "Brazil" "Canada" "Chile" "Europe" "Indian" "Mexico" "Midest" "Pacific" "US");
+      local zone=(`timedatectl list-timezones | sed 's/\/.*$//' | uniq`);
       PS3="$prompt1"
       echo "Select zone:"
       select ZONE in "${zone[@]}"; do
         if contains_element "$ZONE" "${zone[@]}"; then
-          local subzone=(`ls /usr/share/zoneinfo/$ZONE/`)
+          local subzone=(`timedatectl list-timezones | grep ${ZONE} | sed 's/^.*\///'`)
           PS3="$prompt1"
           echo "Select subzone:"
           select SUBZONE in "${subzone[@]}"; do
             if contains_element "$SUBZONE" "${subzone[@]}"; then
-              arch-chroot $MOUNTPOINT /bin/bash -c "ln -s /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
+              arch_chroot "ln -s /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
+              # arch_chroot "timedatectl set-timezone ${ZONE}/${SUBZONE}"
               break
             else
               invalid_option
@@ -792,42 +789,63 @@ case "$1" in
       settimezone
       read_input_text "Confirm timezone ($ZONE/$SUBZONE)"
     done
-    arch-chroot $MOUNTPOINT /bin/bash -c "echo ${ZONE}/${SUBZONE} > /etc/timezone"
   }
   #}}}
   #CONFIGURE HARDWARECLOCK {{{
   configure_hardwareclock(){
     print_title "HARDWARE CLOCK TIME - https://wiki.archlinux.org/index.php/Internationalization"
     print_info "This is set in /etc/adjtime. Set the hardware clock mode uniformly between your operating systems on the same machine. Otherwise, they will overwrite the time and cause clock shifts (which can cause time drift correction to be miscalibrated)."
-    hwclock_list=('utc' 'localtime');
+    hwclock_list=('UTC' 'Localtime');
     PS3="$prompt1"
     select OPT in "${hwclock_list[@]}"; do
-      if contains_element "$OPT" "${hwclock_list[@]}"; then
-        arch-chroot $MOUNTPOINT /bin/bash -c "hwclock --systohc --${OPT}";
-        break
-      else
-        invalid_option
-      fi
+      case "$REPLY" in
+        1) arch_chroot "hwclock --systohc --utc";
+          # arch_chroot "timedatectl set-local-rtc false"
+          ;;
+        2) arch_chroot "hwclock --systohc --localtime";
+          # arch_chroot "timedatectl set-local-rtc true"
+          ;;
+        *) invalid_option ;;
+      esac
+      [[ -n $OPT ]] && break
     done
+    # arch_chroot "timedatectl set-ntp true"
   }
   #}}}
   #CONFIGURE LOCALE {{{
   configure_locale(){
+    setlocale(){
+      local locale_list=(`cat /etc/locale.gen | sed 's/\..*$//' | sed 's/@.*$//' | awk '{print $1}' | uniq | sed 's/#//g'`);
+      PS3="$prompt1"
+      echo "Select locale:"
+      select LOCALE in "${locale_list[@]}"; do
+        if contains_element "$LOCALE" "${locale_list[@]}"; then
+          LOCALE_8859="${LOCALE} ISO-8859"
+          LOCALE_UTF8="${LOCALE}.UTF-8"
+          echo 'LANG="'$LOCALE_UTF8'"' > $MOUNTPOINT/etc/locale.conf
+          #arch_chroot "localectl set-locale LANG=\"${LOCALE_UTF8}\""
+          break
+        else
+          invalid_option
+        fi
+      done
+    }
     print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
     print_info "Locales are used in Linux to define which language the user uses. As the locales define the character sets being used as well, setting up the correct locale is especially important if the language contains non-ASCII characters."
-    read -p "Locale [ex: pt_BR]: " LOCALE
-    LOCALE_8859="$LOCALE ISO-8859"
-    LOCALE_UTF8="$LOCALE.UTF-8"
-    echo 'LANG="'$LOCALE_UTF8'"' > $MOUNTPOINT/etc/locale.conf
-    arch-chroot $MOUNTPOINT /bin/bash -c "sed -i '/'$LOCALE'/s/^#//' /etc/locale.gen"
-    arch-chroot $MOUNTPOINT /bin/bash -c "locale-gen"
+    OPTION=n
+    while [[ $OPTION != y ]]; do
+      setlocale
+      read_input_text "Confirm locale ($LOCALE)"
+    done
+    arch_chroot "sed -i '/'${LOCALE}'/s/^#//' /etc/locale.gen"
+    arch_chroot "locale-gen"
   }
   #}}}
   #CONFIGURE MKINITCPIO {{{
   configure_mkinitcpio(){
     print_title "MKINITCPIO - https://wiki.archlinux.org/index.php/Mkinitcpio"
     print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
-    arch-chroot $MOUNTPOINT /bin/bash -c "mkinitcpio -p linux"
+    arch_chroot "mkinitcpio -p linux"
   }
   #}}}
   #INSTALL BOOTLOADER {{{
@@ -888,15 +906,15 @@ case "$1" in
       Grub2)
         print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
         print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
-        arch-chroot $MOUNTPOINT /bin/bash -c "modprobe dm-mod"
+        arch_chroot "modprobe dm-mod"
         if [[ $UEFI -eq 1 ]]; then
-          arch-chroot $MOUNTPOINT /bin/bash -c "grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck"
+          arch_chroot "grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck"
         else
-          arch-chroot $MOUNTPOINT /bin/bash -c "grub-install --target=i386-pc --boot-directory=/boot --recheck ${ROOT_DEVICE}"
+          arch_chroot "grub-install --target=i386-pc --boot-directory=/boot --recheck ${ROOT_DEVICE}"
         fi
-        arch-chroot $MOUNTPOINT /bin/bash -c "mkdir -p /boot/grub/locale"
-        arch-chroot $MOUNTPOINT /bin/bash -c "cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo"
-        arch-chroot $MOUNTPOINT /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
+        arch_chroot "mkdir -p /boot/grub/locale"
+        arch_chroot "cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo"
+        arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
         ;;
       Syslinux)
         print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
@@ -907,7 +925,7 @@ case "$1" in
         select OPT in "${syslinux_install_mode[@]}"; do
           case "$REPLY" in
             1)
-              arch-chroot $MOUNTPOINT /bin/bash -c "syslinux-install_update -i -a -m"
+              arch_chroot "syslinux-install_update -i -a -m"
               break
               ;;
             2)
@@ -960,7 +978,7 @@ case "$1" in
   while [[ 1 ]]
   do
     print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
-    echo " 1) $(mainmenu_item "${checklist[1]}" "Configure Keymap")"
+    echo " 1) $(mainmenu_item "${checklist[1]}" "Select Keymap")"
     echo " 2) $(mainmenu_item "${checklist[2]}" "Select Editor")"
     echo " 3) $(mainmenu_item "${checklist[3]}" "Configure Mirrorlist")"
     echo " 4) $(mainmenu_item "${checklist[4]}" "Create Partition")"
@@ -981,7 +999,7 @@ case "$1" in
     for OPT in ${OPTIONS[@]}; do
       case "$OPT" in
         1)
-          configure_keymap
+          select_keymap
           checklist[1]=1
           ;;
         2)
@@ -1002,6 +1020,7 @@ case "$1" in
           ;;
         6)
           install_base_system
+          configure_keymap
           checklist[6]=1
           ;;
         7)
@@ -1184,7 +1203,7 @@ case "$1" in
     #CREATE NEW USER {{{
     create_new_user(){
       read -p "Username: " USER_NAME
-      useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner,network -s /bin/bash ${USER_NAME}
+      useradd -m -g users -s /bin/bash ${USER_NAME}
       chfn ${USER_NAME}
       passwd ${USER_NAME}
       pause_function
