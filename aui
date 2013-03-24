@@ -476,6 +476,57 @@
     arch-chroot $MOUNTPOINT /bin/bash -c "${1}"
   }
   #}}}
+  setkeymap(){ #{{{
+    local keymaps=(`localectl list-keymaps`)
+    PS3="(shift+pgup/pgdown) $prompt1"
+    echo "Select keymap:"
+    select KEYMAP in "${keymaps[@]}"; do
+      if contains_element "$KEYMAP" "${keymaps[@]}"; then
+        loadkeys $KEYMAP
+      else
+        invalid_option
+      fi
+      [[ -n $OPT ]] && break
+    done
+  }
+  #}}}
+  setlocale(){ #{{{
+    local locale_list=(`cat /etc/locale.gen | grep _ | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
+    PS3="$prompt1"
+    echo "Select locale:"
+    select LOCALE in "${locale_list[@]}"; do
+      if contains_element "$LOCALE" "${locale_list[@]}"; then
+        LOCALE_8859="${LOCALE} ISO-8859"
+        LOCALE_UTF8="${LOCALE}.UTF-8"
+        break
+      else
+        invalid_option
+      fi
+    done
+  }
+  #}}}
+  settimezone(){ #{{{
+    local zone=(`timedatectl list-timezones | sed 's/\/.*$//' | uniq`);
+    PS3="$prompt1"
+    echo "Select zone:"
+    select ZONE in "${zone[@]}"; do
+      if contains_element "$ZONE" "${zone[@]}"; then
+        local subzone=(`timedatectl list-timezones | grep ${ZONE} | sed 's/^.*\///'`)
+        PS3="$prompt1"
+        echo "Select subzone:"
+        select SUBZONE in "${subzone[@]}"; do
+          if contains_element "$SUBZONE" "${subzone[@]}"; then
+            break
+          else
+            invalid_option
+          fi
+        done
+        break
+      else
+        invalid_option
+      fi
+    done
+  } #}}}
 #}}}
 
 case "$1" in
@@ -483,19 +534,6 @@ case "$1" in
   #ARCHLINUX INSTALL SCRIPTS MODE {{{
   #SELECT KEYMAP {{{
   select_keymap(){
-    setkeymap(){
-      local keymaps=(`localectl list-keymaps`)
-      PS3="(shift+pgup/pgdown) $prompt1"
-      echo "Select keymap:"
-      select KEYMAP in "${keymaps[@]}"; do
-        if contains_element "$KEYMAP" "${keymaps[@]}"; then
-          loadkeys $KEYMAP
-        else
-          invalid_option
-        fi
-        [[ -n $OPT ]] && break
-      done
-    }
     print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
     print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
     OPTION=n
@@ -753,7 +791,6 @@ case "$1" in
     print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
     read -p "Hostname [ex: archlinux]: " HN
     echo "$HN" > $MOUNTPOINT/etc/hostname
-    # arch_chroot "hostnamectl set-hostname ${HN}"
     if [[ ! -f $MOUNTPOINT/etc/hosts.aui ]]; then
       cp $MOUNTPOINT/etc/hosts $MOUNTPOINT/etc/hosts.aui
     else
@@ -765,30 +802,6 @@ case "$1" in
   #}}}
   #CONFIGURE TIMEZONE {{{
   configure_timezone(){
-    settimezone(){
-      local zone=(`timedatectl list-timezones | sed 's/\/.*$//' | uniq`);
-      PS3="$prompt1"
-      echo "Select zone:"
-      select ZONE in "${zone[@]}"; do
-        if contains_element "$ZONE" "${zone[@]}"; then
-          local subzone=(`timedatectl list-timezones | grep ${ZONE} | sed 's/^.*\///'`)
-          PS3="$prompt1"
-          echo "Select subzone:"
-          select SUBZONE in "${subzone[@]}"; do
-            if contains_element "$SUBZONE" "${subzone[@]}"; then
-              arch_chroot "ln -s /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
-              # arch_chroot "timedatectl set-timezone ${ZONE}/${SUBZONE}"
-              break
-            else
-              invalid_option
-            fi
-          done
-          break
-        else
-          invalid_option
-        fi
-      done
-    }
     print_title "TIMEZONE - https://wiki.archlinux.org/index.php/Timezone"
     print_info "In an operating system the time (clock) is determined by four parts: Time value, Time standard, Time Zone, and DST (Daylight Saving Time if applicable)."
     OPTION=n
@@ -796,6 +809,7 @@ case "$1" in
       settimezone
       read_input_text "Confirm timezone ($ZONE/$SUBZONE)"
     done
+    arch_chroot "ln -s /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
   }
   #}}}
   #CONFIGURE HARDWARECLOCK {{{
@@ -807,36 +821,17 @@ case "$1" in
     select OPT in "${hwclock_list[@]}"; do
       case "$REPLY" in
         1) arch_chroot "hwclock --systohc --utc";
-          # arch_chroot "timedatectl set-local-rtc false"
           ;;
         2) arch_chroot "hwclock --systohc --localtime";
-          # arch_chroot "timedatectl set-local-rtc true"
           ;;
         *) invalid_option ;;
       esac
       [[ -n $OPT ]] && break
     done
-    # arch_chroot "timedatectl set-ntp true"
   }
   #}}}
   #CONFIGURE LOCALE {{{
   configure_locale(){
-    setlocale(){
-      local locale_list=(`cat /etc/locale.gen | grep _ | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
-      PS3="$prompt1"
-      echo "Select locale:"
-      select LOCALE in "${locale_list[@]}"; do
-        if contains_element "$LOCALE" "${locale_list[@]}"; then
-          LOCALE_8859="${LOCALE} ISO-8859"
-          LOCALE_UTF8="${LOCALE}.UTF-8"
-          echo 'LANG="'$LOCALE_UTF8'"' > $MOUNTPOINT/etc/locale.conf
-          #arch_chroot "localectl set-locale LANG=\"${LOCALE_UTF8}\""
-          break
-        else
-          invalid_option
-        fi
-      done
-    }
     print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
     print_info "Locales are used in Linux to define which language the user uses. As the locales define the character sets being used as well, setting up the correct locale is especially important if the language contains non-ASCII characters."
     OPTION=n
@@ -844,6 +839,7 @@ case "$1" in
       setlocale
       read_input_text "Confirm locale ($LOCALE)"
     done
+    echo 'LANG="'$LOCALE_UTF8'"' > $MOUNTPOINT/etc/locale.conf
     arch_chroot "sed -i '/'${LOCALE}'/s/^#//' /etc/locale.gen"
     arch_chroot "locale-gen"
   }
@@ -1161,24 +1157,13 @@ case "$1" in
     read_input_text "Default system language: \"$LOCALE\""
     case "$OPTION" in
       "n")
-        setlocale(){
-          local locale_list=(`cat /etc/locale.gen | grep _ | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
-          PS3="$prompt1"
-          echo "Select locale:"
-          select LOCALE in "${locale_list[@]}"; do
-            if contains_element "$LOCALE" "${locale_list[@]}"; then
-              LOCALE_UTF8="${LOCALE}.UTF-8"
-              localectl set-locale LANG=${LOCALE_UTF8}
-              break
-            else
-              invalid_option
-            fi
-          done
-        }
         while [[ $OPTION != y ]]; do
           setlocale
           read_input_text "Confirm locale ($LOCALE)"
         done
+        sed -i '/'${LOCALE}'/s/^#//' /etc/locale.gen
+        locale-gen
+        localectl set-locale LANG=${LOCALE_UTF8}
         #KDE #{{{
         if [[ $LOCALE == pt_BR || $LOCALE == en_GB || $LOCALE == zh_CN ]]; then
           LOCALE_KDE=`echo $LOCALE | tr '[:upper:]' '[:lower:]'`
@@ -1533,16 +1518,12 @@ case "$1" in
     print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
     print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
     package_install "alsa-utils alsa-plugins"
-    if [[ ${ARCHI} == x86_64 ]]; then
-      package_install "lib32-alsa-plugins"
-    fi
+    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-alsa-plugins"
     pause_function
     print_title "PULSEAUDIO - https://wiki.archlinux.org/index.php/Pulseaudio"
     print_info "PulseAudio is the default sound server that serves as a proxy to sound applications using existing kernel sound components like ALSA or OSS"
     package_install "pulseaudio pulseaudio-alsa"
-    if [[ ${ARCHI} == x86_64 ]]; then
-      package_install "lib32-libpulse"
-    fi
+    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-libpulse"
     local CONFIG_PULSEAUDIO=`cat /etc/pulse/default.pa | grep module-switch-on-connect`
     [[ -z $CONFIG_PULSEAUDIO ]] && echo -e "# automatically switch to newly-connected devices\nload-module module-switch-on-connect" >> /etc/pulse/default.pa
     pause_function
@@ -4643,6 +4624,50 @@ case "$1" in
     pacman-optimize
   }
   #}}}
+  #RECONFIGURE SYSTEM {{{
+  reconfigure_system(){
+    print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
+    print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
+    OPTION=n
+    while [[ $OPTION != y ]]; do
+      setkeymap
+      read_input_text "Confirm keymap: $KEYMAP"
+    done
+    localectl set-keymap ${KEYMAP}
+
+    print_title "HOSTNAME - https://wiki.archlinux.org/index.php/HOSTNAME"
+    print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
+    read -p "Hostname [ex: archlinux]: " HN
+    hostnamectl set-hostname $HN
+
+    print_title "TIMEZONE - https://wiki.archlinux.org/index.php/Timezone"
+    print_info "In an operating system the time (clock) is determined by four parts: Time value, Time standard, Time Zone, and DST (Daylight Saving Time if applicable)."
+    OPTION=n
+    while [[ $OPTION != y ]]; do
+      settimezone
+      read_input_text "Confirm timezone ($ZONE/$SUBZONE)"
+    done
+    timedatectl set-timezone ${ZONE}/${SUBZONE}
+
+    print_title "HARDWARE CLOCK TIME - https://wiki.archlinux.org/index.php/Internationalization"
+    print_info "This is set in /etc/adjtime. Set the hardware clock mode uniformly between your operating systems on the same machine. Otherwise, they will overwrite the time and cause clock shifts (which can cause time drift correction to be miscalibrated)."
+    hwclock_list=('UTC' 'Localtime');
+    PS3="$prompt1"
+    select OPT in "${hwclock_list[@]}"; do
+      case "$REPLY" in
+        1)
+          timedatectl set-local-rtc false
+          ;;
+        2)
+          timedatectl set-local-rtc true
+          ;;
+        *) invalid_option ;;
+      esac
+      [[ -n $OPT ]] && break
+    done
+    timedatectl set-ntp true
+  }
+  #}}}
   #EXTRA {{{
   install_extra(){
     while [[ 1 ]]
@@ -4839,6 +4864,7 @@ case "$1" in
     echo "13) $(mainmenu_item "${checklist[13]}" "Fonts")"
     echo "14) $(mainmenu_item "${checklist[14]}" "Extra")"
     echo "15) $(mainmenu_item "${checklist[15]}" "Clean Orphan Packages")"
+    echo "16) $(mainmenu_item "${checklist[16]}" "Reconfigure System")"
     echo ""
     echo " q) Quit"
     echo ""
@@ -4921,10 +4947,17 @@ case "$1" in
           ;;
         14)
           install_extra
-          checklist[15]=1
+          checklist[14]=1
           ;;
         15)
           clean_orphan_packages
+          checklist[15]=1
+          ;;
+        16)
+          print_warning "\nWARNING: THIS OPTION WILL RECONFIGURE THINGS LIKE HOSTNAME, TIMEZONE, CLOCK..."
+          read_input_text "Are you sure you want to continue?"
+          [[ $OPTION != y ]] && continue
+          reconfigure_system
           checklist[16]=1
           ;;
         "q")
