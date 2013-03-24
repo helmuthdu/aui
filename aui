@@ -406,6 +406,15 @@
       pacman -Syu $1
     fi
   } #}}}
+  system_update(){ #{{{
+    if [[ $VERBOSE_MODE -eq 0 ]]; then
+      ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Upgrading packages "
+      pacman -Syy >>"$LOG" 2>&1 &
+      pid=$!;progress $pid
+    else
+      pacman -Syy $1
+    fi
+  } #}}}
   contains_element(){ #{{{
     #check if an element exist in a string
     for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
@@ -1416,6 +1425,22 @@ case "$1" in
     pause_function
   }
   #}}}
+  #AUTOMATIC MODE {{{
+  automatic_mode(){
+    print_title "AUTOMATIC MODE"
+    print_info "Create a custom install with all options pre-selected.\nUse this option with care."
+    print_warning "\tUse this mode only if you already know all the option.\n\tYou won't be able to select anything later."
+    read_input_text "Enable Automatic Mode"
+    if [[ $OPTION == y ]]; then
+      [[ -f packages_not_installed.txt ]] && rm packages_not_installed.txt;
+      $EDITOR auiscript
+      source auiscript
+      echo -e "The installation will start now."
+      pause_function
+      AUTOMATIC_MODE=1
+    fi
+  }
+  #}}}
   #CUSTOM REPOSITORIES {{{
   add_custom_repositories(){
     # ENABLE MULTILIB REPOSITORY {{{
@@ -1460,26 +1485,7 @@ case "$1" in
             ;;
         esac
       done
-      ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Syncing repositories "
-      pacman -Syy >>"$LOG" 2>&1 &
-      pid=$!;progress $pid
-      pause_function
-    fi
-  }
-  #}}}
-  #AUTOMATIC MODE {{{
-  automatic_mode(){
-    print_title "AUTOMATIC MODE"
-    print_info "Create a custom install with all options pre-selected.\nUse this option with care."
-    print_warning "\tUse this mode only if you already know all the option.\n\tYou won't be able to select anything later."
-    read_input_text "Enable Automatic Mode"
-    if [[ $OPTION == y ]]; then
-      [[ -f packages_not_installed.txt ]] && rm packages_not_installed.txt;
-      $EDITOR auiscript
-      source auiscript
-      echo -e "The installation will start now."
-      pause_function
-      AUTOMATIC_MODE=1
+      system_update
     fi
   }
   #}}}
