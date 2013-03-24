@@ -409,10 +409,10 @@
   system_update(){ #{{{
     if [[ $VERBOSE_MODE -eq 0 ]]; then
       ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Upgrading packages "
-      pacman -Syy >>"$LOG" 2>&1 &
+      pacman -Sy >>"$LOG" 2>&1 &
       pid=$!;progress $pid
     else
-      pacman -Syy $1
+      pacman -Sy $1
     fi
   } #}}}
   contains_element(){ #{{{
