@@ -408,7 +408,7 @@
   } #}}}
   system_update(){ #{{{
     if [[ $VERBOSE_MODE -eq 0 ]]; then
-      ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Upgrading packages "
+      ncecho " ${BBlue}[${White}${BWhite}X${White}${BBlue}]${White} Updating packages "
       pacman -Sy >>"$LOG" 2>&1 &
       pid=$!;progress $pid
     else
@@ -1154,7 +1154,7 @@ case "$1" in
     #}}}
     print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
     print_info "Locales are used in Linux to define which language the user uses. As the locales define the character sets being used as well, setting up the correct locale is especially important if the language contains non-ASCII characters."
-    read_input_text "Default system language: \"$LOCALE\""
+    read -p "Default system language: \"$LOCALE\" [Y/n]: " OPTION
     case "$OPTION" in
       "n")
         while [[ $OPTION != y ]]; do
