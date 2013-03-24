@@ -625,10 +625,10 @@ case "$1" in
     partition_app=("cfdisk" "cgdisk" "gdisk" "parted");
     PS3="$prompt1"
     echo -e "Select partition program:"
-    select APP in "${partition_app[@]}"; do
+    select OPT in "${partition_app[@]}"; do
       if contains_element "$APP" "${partition_app[@]}"; then
         select_device
-        $APP $DEVICE
+        $OPT /dev/$DEVICE
         break
       else
         invalid_option
