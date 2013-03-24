@@ -464,7 +464,7 @@
   }
   #}}}
   arch_chroot () { #{{{
-    arch_chroot "${1}"
+    arch-chroot $MOUNTPOINT /bin/bash -c "${1}"
   }
   #}}}
 #}}}
