@@ -2743,7 +2743,8 @@ case "$1" in
     print_info "A number of mobile telephone networks around the world offer mobile internet connections over UMTS (or EDGE or GSM) using a portable USB modem device."
     read_input_text "Install usb 3G modem support" $USBMODEM
     if [[ $OPTION == y ]]; then
-      package_install "usbutils usb_modeswitch modemmanager"
+      package_install "usbutils usb_modeswitch"
+      is_package_installed "networkmanager" && package_install "modemmanager" || package_install "wvdial"
       pause_function
     fi
   }
@@ -2902,7 +2903,7 @@ case "$1" in
                     package_install "eclipse-cdt"
                     ;;
                   3)
-                    aur_package_install "android-sdk android-apktool android-sdk-platform-tools android-udev eclipse-android"
+                    aur_package_install "android-sdk android-apktool android-sdk-platform-tools android-udev eclipse-android simple-mtpfs"
                     groupadd android
                     add_user_to_group ${USER_NAME} android
                     add_user_to_group ${USER_NAME} adbusers
