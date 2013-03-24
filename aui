@@ -609,7 +609,7 @@ case "$1" in
   #CREATE PARTITION {{{
   create_partition(){
     select_device(){
-      devices_list=(`lsblk -d | awk '{print $1}' | grep 'sd\|hd'`);
+      devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd'`);
       PS3="$prompt1"
       echo -e "Select device:\n"
       select DEVICE in "${devices_list[@]}"; do
@@ -628,7 +628,7 @@ case "$1" in
     select OPT in "${partition_app[@]}"; do
       if contains_element "$OPT" "${partition_app[@]}"; then
         select_device
-        $OPT /dev/$DEVICE
+        $OPT $DEVICE
         break
       else
         invalid_option
