@@ -719,8 +719,6 @@ case "$1" in
   configure_keymap(){
     #ADD KEYMAP TO THE NEW SETUP
     echo "KEYMAP=$KEYMAP" > $MOUNTPOINT/etc/vconsole.conf
-    #arch_chroot "localectl set-keymap ${KEYMAP}"
-    #arch_chroot "localectl set-x11-keymap ${KEYMAP}"
   }
   #}}}
   #CONFIGURE FSTAB {{{
@@ -983,7 +981,7 @@ case "$1" in
   print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
   print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
   pause_function
-  pacman -Sy
+  system_update
   while [[ 1 ]]
   do
     print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
@@ -1115,96 +1113,113 @@ case "$1" in
     echo ""
   }
   #}}}
-  #LANGUAGE SELECTOR {{{
+  #LOCALE SELECTOR {{{
   language_selector(){
-    #AUTOMATICALLY DETECTS THE SYSTEM LANGUAGE {{{
+    #AUTOMATICALLY DETECTS THE SYSTEM LOCALE {{{
     #automatically detects the system language based on your locale
-    LANGUAGE=`locale | sed '1!d' | sed 's/LANG=//' | cut -c1-5`
+    LOCALE=`locale | grep LANG | sed 's/LANG=//' | cut -c1-5`
     #KDE #{{{
-    if [[ $LANGUAGE == pt_BR || $LANGUAGE == en_GB || $LANGUAGE == zh_CN ]]; then
-      LANGUAGE_KDE=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]'`
-    elif [[ $LANGUAGE == en_US ]]; then
-      LANGUAGE_KDE="en_gb"
+    if [[ $LOCALE == pt_BR || $LOCALE == en_GB || $LOCALE == zh_CN ]]; then
+      LOCALE_KDE=`echo $LOCALE | tr '[:upper:]' '[:lower:]'`
+    elif [[ $LOCALE == en_US ]]; then
+      LOCALE_KDE="en_gb"
     else
-      LANGUAGE_KDE=`echo $LANGUAGE | cut -d\_ -f1`
+      LOCALE_KDE=`echo $LOCALE | cut -d\_ -f1`
     fi
     #}}}
     #FIREFOX #{{{
-    if [[ $LANGUAGE == pt_BR || $LANGUAGE == pt_PT || $LANGUAGE == en_GB || $LANGUAGE == es_AR || $LANGUAGE == es_ES || $LANGUAGE == zh_CN ]]; then
-      LANGUAGE_FF=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-    elif [[ $LANGUAGE == en_US ]]; then
-      LANGUAGE_FF="en-gb"
+    if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_GB || $LOCALE == es_AR || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
+      LOCALE_FF=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+    elif [[ $LOCALE == en_US ]]; then
+      LOCALE_FF="en-gb"
     else
-      LANGUAGE_FF=`echo $LANGUAGE | cut -d\_ -f1`
+      LOCALE_FF=`echo $LOCALE | cut -d\_ -f1`
     fi
     #}}}
     #HUNSPELL #{{{
-    if [[ $LANGUAGE == pt_BR ]]; then
-      LANGUAGE_HS=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-    elif [[ $LANGUAGE == pt_PT ]]; then
-      LANGUAGE_HS="pt_pt"
+    if [[ $LOCALE == pt_BR ]]; then
+      LOCALE_HS=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+    elif [[ $LOCALE == pt_PT ]]; then
+      LOCALE_HS="pt_pt"
     else
-      LANGUAGE_HS=`echo $LANGUAGE | cut -d\_ -f1`
+      LOCALE_HS=`echo $LOCALE | cut -d\_ -f1`
     fi
     #}}}
     #ASPELL #{{{
-    LANGUAGE_AS=`echo $LANGUAGE | cut -d\_ -f1`
+    LOCALE_AS=`echo $LOCALE | cut -d\_ -f1`
     #}}}
     #LIBREOFFICE #{{{
-    if [[ $LANGUAGE == pt_BR || $LANGUAGE == en_GB || $LANGUAGE == en_US || $LANGUAGE == zh_CN ]]; then
-      LANGUAGE_LO=`echo $LANGUAGE | sed 's/_/-/'`
+    if [[ $LOCALE == pt_BR || $LOCALE == en_GB || $LOCALE == en_US || $LOCALE == zh_CN ]]; then
+      LOCALE_LO=`echo $LOCALE | sed 's/_/-/'`
     else
-      LANGUAGE_LO=`echo $LANGUAGE | cut -d\_ -f1`
+      LOCALE_LO=`echo $LOCALE | cut -d\_ -f1`
     fi
     #}}}
     #}}}
-    print_title "LANGUAGE - https://wiki.archlinux.org/index.php/Locale"
-    read_input_text "Default system language: \"$LANGUAGE\""
+    print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
+    print_info "Locales are used in Linux to define which language the user uses. As the locales define the character sets being used as well, setting up the correct locale is especially important if the language contains non-ASCII characters."
+    read_input_text "Default system language: \"$LOCALE\""
     case "$OPTION" in
       "n")
-        read -p "New system language [ex: en_US]: " LANGUAGE
+        setlocale(){
+          local locale_list=(`cat /etc/locale.gen | grep _ | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
+          PS3="$prompt1"
+          echo "Select locale:"
+          select LOCALE in "${locale_list[@]}"; do
+            if contains_element "$LOCALE" "${locale_list[@]}"; then
+              LOCALE_UTF8="${LOCALE}.UTF-8"
+              localectl set-locale LANG=${LOCALE_UTF8}
+              break
+            else
+              invalid_option
+            fi
+          done
+        }
+        while [[ $OPTION != y ]]; do
+          setlocale
+          read_input_text "Confirm locale ($LOCALE)"
+        done
         #KDE #{{{
-        if [[ $LANGUAGE == pt_BR || $LANGUAGE == en_GB || $LANGUAGE == zh_CN ]]; then
-          LANGUAGE_KDE=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]'`
-        elif [[ $LANGUAGE == en_US ]]; then
-          LANGUAGE_KDE="en_gb"
+        if [[ $LOCALE == pt_BR || $LOCALE == en_GB || $LOCALE == zh_CN ]]; then
+          LOCALE_KDE=`echo $LOCALE | tr '[:upper:]' '[:lower:]'`
+        elif [[ $LOCALE == en_US ]]; then
+          LOCALE_KDE="en_gb"
         else
-          LANGUAGE_KDE=`echo $LANGUAGE | cut -d\_ -f1`
+          LOCALE_KDE=`echo $LOCALE | cut -d\_ -f1`
         fi
         #}}}
         #FIREFOX #{{{
-        if [[ $LANGUAGE == pt_BR || $LANGUAGE == pt_PT || $LANGUAGE == en_GB || $LANGUAGE == es_AR || $LANGUAGE == es_ES || $LANGUAGE == zh_CN ]]; then
-          LANGUAGE_FF=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-        elif [[ $LANGUAGE == en_US ]]; then
-          LANGUAGE_FF="en-gb"
+        if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_GB || $LOCALE == es_AR || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
+          LOCALE_FF=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+        elif [[ $LOCALE == en_US ]]; then
+          LOCALE_FF="en-gb"
         else
-          LANGUAGE_FF=`echo $LANGUAGE | cut -d\_ -f1`
+          LOCALE_FF=`echo $LOCALE | cut -d\_ -f1`
         fi
         #}}}
         #HUNSPELL #{{{
-        if [[ $LANGUAGE == pt_BR ]]; then
-          LANGUAGE_HS=`echo $LANGUAGE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-        elif [[ $LANGUAGE == pt_PT ]]; then
-          LANGUAGE_HS="pt_pt"
+        if [[ $LOCALE == pt_BR ]]; then
+          LOCALE_HS=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+        elif [[ $LOCALE == pt_PT ]]; then
+          LOCALE_HS="pt_pt"
         else
-          LANGUAGE_HS=`echo $LANGUAGE | cut -d\_ -f1`
+          LOCALE_HS=`echo $LOCALE | cut -d\_ -f1`
         fi
         #}}}
         #ASPELL #{{{
-        LANGUAGE_AS=`echo $LANGUAGE | cut -d\_ -f1`
+        LOCALE_AS=`echo $LOCALE | cut -d\_ -f1`
         #}}}
         #LIBREOFFICE #{{{
-        if [[ $LANGUAGE == pt_BR || $LANGUAGE == en_GB || $LANGUAGE == en_US || $LANGUAGE == zh_CN ]]; then
-          LANGUAGE_LO=`echo $LANGUAGE | sed 's/_/-/'`
+        if [[ $LOCALE == pt_BR || $LOCALE == en_GB || $LOCALE == en_US || $LOCALE == zh_CN ]]; then
+          LOCALE_LO=`echo $LOCALE | sed 's/_/-/'`
         else
-          LANGUAGE_LO=`echo $LANGUAGE | cut -d\_ -f1`
+          LOCALE_LO=`echo $LOCALE | cut -d\_ -f1`
         fi
         #}}}
         ;;
       *)
         ;;
     esac
-    pause_function
   }
   #}}}
   #SELECT/CREATE USER {{{
@@ -1670,59 +1685,8 @@ case "$1" in
     package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard"
     package_install "mesa"
     package_install "gamin"
-    [[ ! -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && cp -v /etc/X11/xorg.conf.d/10-evdev.conf /etc/X11/xorg.conf.d/10-evdev.conf.aui;
-    #CONFIGURE QWERTY KEYBOARD IN XORG {{{
-    local file="/etc/X11/xorg.conf.d/10-evdev.conf"
-    #get the line number that has "keyboard" in 10-evdev.conf
-    local line=`grep -n "keyboard" $file | cut -f1 -d:`
-    #sum that line with more 2, it will insert the patch there
-    local line=$(( $line + 2 ))
-    #variable to check if the file wasnt already patched
-    local patch=`cat $file | sed ''$(( $line + 1 ))'!d'`
-    #get the keymap from rc.conf
-    local keymap=`cat /etc/vconsole.conf | sed -n '/KEYMAP[=]/p' | sed 's/KEYMAP=//'`
-    #check if the file wasnt already patched
-    if [[ $patch != *"XkbLayout"* ]]; then
-      if [[ $keymap == us-acentos ]]; then
-        kblayout="\\\tOption \"XkbLayout\" \"us_intl\""
-      else
-        case "$LANGUAGE" in
-          de_DE)
-            kblayout="\\\tOption \"XkbLayout\" \"de\""
-            ;;
-          es_ES | es_CL)
-            KBLAYOUT=("es" "latam");
-            PS3="$prompt1"
-            echo -e "Select keyboard layout:"
-            select KBRD in "${KBLAYOUT[@]}"; do
-              if contains_element "$KBRD" "${KBLAYOUT[@]}"; then
-                kblayout="\\\tOption \"XkbLayout\" \"$KBRD\""
-                break
-              else
-                invalid_option
-              fi
-            done
-            ;;
-          it_IT)
-            kblayout="\\\tOption \"XkbLayout\" \"it\""
-            kblayout+="\n\\tOption \"XkbOptions\" \"terminate:ctrl_alt_bksp\""
-            ;;
-          fr_FR)
-            kblayout="\\\tOption \"XkbLayout\" \"fr\""
-            ;;
-          pt_BR)
-            kblayout="\\\tOption \"XkbLayout\" \"br\""
-            kblayout+="\n\\tOption \"XkbVariant\" \"abnt2\""
-            ;;
-          pt_PT)
-            kblayout="\\\tOption \"XkbLayout\" \"pt-latin9\""
-            ;;
-        esac
-      fi
-      #patch file
-      sed -i "${line}a $kblayout" $file
-    fi
-    #}}}
+    KEYMAP=localectl status | grep Keymap | awk '{print $3}'
+    localectl set-keymap ${KEYMAP}
     pause_function
   }
   #}}}
@@ -2458,13 +2422,13 @@ case "$1" in
         select OPT in "${kde_install[@]}"; do
           case "$REPLY" in
             1)
-              package_install "kde kde-l10n-$LANGUAGE_KDE kipi-plugins"
+              package_install "kde kde-l10n-$LOCALE_KDE kipi-plugins"
               package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite kdenetwork-kopete"
               package_install "kde-telepathy telepathy"
               break
               ;;
             2)
-              package_install "kdebase phonon-gstreamer kde-l10n-$LANGUAGE_KDE"
+              package_install "kdebase phonon-gstreamer kde-l10n-$LOCALE_KDE"
               break
               ;;
             *)
@@ -3049,9 +3013,9 @@ case "$1" in
         case "$OPT" in
           1)
             print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
-            package_install "libreoffice-$LANGUAGE_LO libreoffice-common libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer"
-            aur_package_install "hunspell-$LANGUAGE_HS"
-            aur_package_install "aspell-$LANGUAGE_AS"
+            package_install "libreoffice-$LOCALE_LO libreoffice-common libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer"
+            aur_package_install "hunspell-$LOCALE_HS"
+            aur_package_install "aspell-$LOCALE_AS"
             if [[ ${KDE} -eq 1 ]]; then
               package_install "libreoffice-kde4"
             else
@@ -3064,12 +3028,12 @@ case "$1" in
             else
               package_install "gnumeric abiword abiword-plugins"
             fi
-            aur_package_install "hunspell-$LANGUAGE_HS"
-            aur_package_install "aspell-$LANGUAGE_AS"
+            aur_package_install "hunspell-$LOCALE_HS"
+            aur_package_install "aspell-$LOCALE_AS"
             ;;
           3)
             package_install "texlive-most"
-            if [[ $LANGUAGE == pt_BR ]]; then
+            if [[ $LOCALE == pt_BR ]]; then
               aur_package_install "abntex"
             fi
             read_input_text "Install texmaker?"
@@ -3092,7 +3056,7 @@ case "$1" in
             ;;
           9)
             package_install "ocrfeeder tesseract gocr"
-            aur_package_install "aspell-$LANGUAGE_AS"
+            aur_package_install "aspell-$LOCALE_AS"
             ;;
           10)
             aur_package_install "uberwriter"
@@ -3296,7 +3260,7 @@ case "$1" in
                     fi
                     ;;
                   4)
-                    package_install "firefox firefox-i18n-$LANGUAGE_FF firefox-adblock-plus flashplugin "
+                    package_install "firefox firefox-i18n-$LOCALE_FF firefox-adblock-plus flashplugin "
                     ;;
                   5)
                     package_install "opera flashplugin "
@@ -3416,7 +3380,7 @@ case "$1" in
               for OPT in ${OPTIONS[@]}; do
                 case "$OPT" in
                   1)
-                    package_install "thunderbird thunderbird-i18n-$LANGUAGE_FF"
+                    package_install "thunderbird thunderbird-i18n-$LOCALE_FF"
                     ;;
                   2)
                     package_install "liferea"
