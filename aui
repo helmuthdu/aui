@@ -1104,7 +1104,7 @@ case "$1" in
     # backup old configs
     [[ ! -f /etc/pacman.conf.aui ]] && cp -v /etc/pacman.conf /etc/pacman.conf.aui || echo "/etc/pacman.conf.aui";
     [[ -f /etc/ssh/sshd_config.aui ]] && echo "/etc/ssh/sshd_conf.aui";
-    [[ -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && echo "/etc/X11/xorg.conf.d/10-evdev.conf.aui";
+    [[ -f /etc/sudoers.aui ]] && echo "/etc/sudoers.aui";
     pause_function
     echo ""
   }
