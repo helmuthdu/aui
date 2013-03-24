@@ -626,7 +626,7 @@ case "$1" in
     PS3="$prompt1"
     echo -e "Select partition program:"
     select OPT in "${partition_app[@]}"; do
-      if contains_element "$APP" "${partition_app[@]}"; then
+      if contains_element "$OPT" "${partition_app[@]}"; then
         select_device
         $OPT /dev/$DEVICE
         break
