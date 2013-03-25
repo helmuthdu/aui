@@ -1212,7 +1212,7 @@ case "$1" in
     #CREATE NEW USER {{{
     create_new_user(){
       read -p "Username: " USER_NAME
-      useradd -m -g users -s /bin/bash ${USER_NAME}
+      useradd -m -g users -G wheel -s /bin/bash ${USER_NAME}
       chfn ${USER_NAME}
       passwd ${USER_NAME}
       pause_function
