@@ -1666,7 +1666,7 @@ case "$1" in
     package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard"
     package_install "mesa"
     package_install "gamin"
-    KEYMAP=localectl status | grep Keymap | awk '{print $3}'
+    KEYMAP=$(localectl status | grep Keymap | awk '{print $3}')
     localectl set-keymap ${KEYMAP}
     pause_function
   }
