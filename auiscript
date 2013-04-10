@@ -64,7 +64,6 @@
     # 8) bluez-firmware
     # 9) libffado [Fireware Audio Devices]
     #10) libraw1394 [IEE1394 Driver]
-    #11) sane-gt68xx-firmware
     FIRMWARE_OPTIONS="1"
   #}}}
 #}}}

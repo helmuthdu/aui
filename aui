@@ -1767,7 +1767,6 @@ case "$1" in
       [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
       is_package_installed "ati-dri" && pacman package_remove "ati-dri"
       [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
-      [[ -f /etc/modules-load.d/radeon.conf ]] && rm /etc/modules-load.d/radeon.conf
       package_install "linux-headers"
       pacman -S --needed catalyst-dkms
       if [[ ${ARCHI} == x86_64 ]]; then
@@ -1781,8 +1780,8 @@ case "$1" in
     elif [[ ${VIDEO_DRIVER} == ati ]]; then
       is_package_installed "catalyst-dkms" && pacman -Rdds --noconfirm catalyst{-dkms,-utils} lib32-catalyst-utils
       pacman -S --asdeps mesa-libgl
+      [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
       [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
-      [[ -f /etc/modules-load.d/fglrx.conf ]] && rm /etc/modules-load.d/ati.conf
       package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
       if [[ ${ARCHI} == x86_64 ]]; then
         is_package_installed "lib32-catalyst-utils" && pacman -Rdds --noconfirm lib32-catalyst-utils
