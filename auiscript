@@ -168,7 +168,7 @@
   # n) None
   NETWORKMANAGER=1
   #USB 3G MODEM SUPPORT
-  USBMODEM="n"
+  USBMODEM="y"
 #}}}
 #ACCESSORIES {{{
   # 1) Cairo Dock
@@ -234,7 +234,7 @@
   #10) UberWriter
   #11) Xmind
   #12) Zathura
-  OFFICE_OPTIONS="1 6 8 10"
+  OFFICE_OPTIONS="1 10"
 #}}}
 #SYSTEM TOOLS {{{
   # 1) Gparted
@@ -292,8 +292,7 @@
   #EMAIL|RSS {{{
     # 1) Mozilla Thunderbird
     # 2) Liferea
-    # 3) LightRead
-    EMAIL_OPTIONS="3"
+    EMAIL_OPTIONS=""
   #}}}
   #IM {{{
     # 1) Emesene
@@ -401,7 +400,6 @@
     # 6) OpenTyrian
     # 7) Sonic Robot Bast 2
     # 8) SteelStorm
-    # 9) Yo Frankie!
     ACTION=""
   #}}}
   #ARCADE {{{
@@ -493,8 +491,10 @@
   #}}}
 #}}}
 #WEBSERVER {{{
-  # 1) LAMP - APACHE, MYSQL & PHP + ADMINER
+  # 1) LAMP - APACHE, MariaDB & PHP + ADMINER
   # 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER
+  # 3) LNMP - NGINX, MariaDB & PHP + ADMINER
+  # 4) LNPP - NGINX, POSTGRESQL & PHP + ADMINER
   WEBSERVER=2
 #}}}
 #FONTS {{{
@@ -511,7 +511,6 @@
 #}}}
 #EXTRA {{{
   # 1) Elementary Project
-  # 2) Font Configuration
   EXTRA_OPTIONS=""
   #ELEMENTARY PROJECT {{{
     # 1) Audience

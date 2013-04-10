@@ -1452,7 +1452,7 @@ case "$1" in
         echo -e '\nMultilib repository added into pacman.conf file'
       else
         sed -i "${multilib}s/^#//" /etc/pacman.conf
-        multilib=$(( $multilib + 2 ))
+        multilib=$(( $multilib + 1 ))
         sed -i "${multilib}s/^#//" /etc/pacman.conf
       fi
       pacman -Sy
@@ -1831,7 +1831,6 @@ case "$1" in
         echo " 8) $(menu_item "bluez-firmware") "
         echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
         echo "10) $(menu_item "libraw1394") [IEEE1394 Driver]"
-        echo "11) $(menu_item "sane-gt68xx-firmware")"
         echo ""
         echo " d) DONE"
         echo ""
@@ -1868,9 +1867,6 @@ case "$1" in
               ;;
             10)
               package_install "libraw1394"
-              ;;
-            11)
-              package_install "sane-gt68xx-firmware"
               ;;
             "d")
               break
@@ -2931,14 +2927,9 @@ case "$1" in
           14)
             package_install "splint valgrind gdb" #C/C++
             aur_package_install "php-codesniffer php-tidy" #PHP
-            aur_package_install "closure-compiler nodejs-jslint" #Javascript
+            aur_package_install "closure-compiler nodejs-jslint nodejs-jshint" #Javascript
+            aur_package_install "nodejs-coffee-script" #coffeescript
             aur_package_install "tidyhtml" #HTML
-            aur_package_install "flake8" #Python
-            # syntax tools
-            npm install -g coffeelint
-            npm install -g csslint
-            npm install -g jshint
-            npm install -g jsonlint
             ;;
           15)
             aur_package_install "mysql-workbench-gpl"
@@ -3355,7 +3346,6 @@ case "$1" in
               print_title "EMAIL|RSS"
               echo " 1) $(menu_item "thunderbird")"
               echo " 2) $(menu_item "liferea")"
-              echo " 3) $(menu_item "lightread") $AUR"
               echo ""
               echo " b) BACK"
               echo ""
@@ -3368,9 +3358,6 @@ case "$1" in
                     ;;
                   2)
                     package_install "liferea"
-                    ;;
-                  3)
-                    aur_package_install "lightread"
                     ;;
                   "b")
                     break
@@ -3909,7 +3896,6 @@ case "$1" in
               echo " 6) $(menu_item "opentyrian-hg") $AUR"
               echo " 7) $(menu_item "srb2" "Sonic Robot Blast 2") $AUR"
               echo " 8) $(menu_item "steelstorm") $AUR"
-              echo " 9) $(menu_item "yofrankie" "Yo Frankie!") $AUR"
               echo ""
               echo " b) BACK"
               echo ""
@@ -3941,9 +3927,6 @@ case "$1" in
                     ;;
                   8)
                     aur_package_install "steelstorm"
-                    ;;
-                  9)
-                    aur_package_install "yofrankie"
                     ;;
                   "b")
                     break
@@ -4475,8 +4458,8 @@ case "$1" in
     print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
     echo " 1) LAMP - APACHE, MariaDB & PHP + ADMINER"
     echo " 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER"
-    echo " 3) NAMP - NGINX, MariaDB & PHP + ADMINER"
-    echo " 4) NAPP - NGINX, POSTGRESQL & PHP + ADMINER"
+    echo " 3) LNMP - NGINX, MariaDB & PHP + ADMINER"
+    echo " 4) LNPP - NGINX, POSTGRESQL & PHP + ADMINER"
     echo ""
     echo " b) BACK"
     echo ""
