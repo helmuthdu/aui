@@ -66,14 +66,17 @@
   AUI_DIR=`pwd`
   MOUNTPOINT="/mnt"
   # VERBOSE MODE
-  [[ $1 == "-v" || $1 == "--verbose" ]] && VERBOSE_MODE=1 || VERBOSE_MODE=0
+  [[ $1 == -v || $1 == --verbose ]] && VERBOSE_MODE=1 || VERBOSE_MODE=0
   # LOG FILE
-  LOG="${AUI_DIR}/`basename ${0}`.log"
+  LOG="${AUI_DIR}/`basename ${0}`_error.log"
   [[ -f $LOG ]] && rm -f $LOG
+  PKG_FAIL="${AUI_DIR}/`basename ${0}`_pkg_fail_list.log"
+  [[ -f $PKG_FAIL ]] && rm -f $PKG_FAIL
   # CONNECTION CHECK
   XPINGS=0
   #MISC
   SPIN="/-\|"
+  PKG=""
   AUTOMATIC_MODE=0
 #}}}
 #COMMON FUNCTIONS {{{
@@ -97,25 +100,25 @@
   } #}}}
   progress() { #{{{
     ncecho "  ";
-    while [ /bin/true ]; do
-      kill -0 $pid 2>/dev/null;
-      if [[ $? = "0" ]]; then
+    while true; do
+      kill -0 $pid 2> /dev/null;
+      if [[ $? == 0 ]]; then
         spinny
         sleep 0.25
       else
         ncecho "\b\b";
         wait $pid
         retcode=$?
-        echo "$pid's retcode: $retcode" >> "$LOG"
-        if [[ $retcode = "0" ]] || [[ $retcode = "255" ]]; then
+        echo "$pid's retcode: $retcode" >> $LOG
+        if [[ $retcode == 0 ]] || [[ $retcode == 255 ]]; then
           cecho success
         else
           cecho failed
-          echo -e "${BRed}==>${White} Showing the last 10 lines from $LOG";
-          tail -n10 "$LOG"
-          read -e -sn 1 -p "Press any key to continue..."
+          echo "$PKG" >> $PKG_FAIL
+          read_input_text " View logfile?"
+          [[ $OPTION == y ]] && less $PKG_FAIL
         fi
-        break 1; #was2
+        break
       fi
     done
   } #}}}
@@ -698,7 +701,7 @@ case "$1" in
       echo "WARNING: Not Successfully mounted"
     fi
     }
-    while [[ 1 ]]; do
+    while true; do
       PS3="$prompt1"
       echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
       select DEVICE in "${partitions[@]}"; do
@@ -978,7 +981,7 @@ case "$1" in
   print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
   pause_function
   system_update
-  while [[ 1 ]]
+  while true
   do
     print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
     echo " 1) $(mainmenu_item "${checklist[1]}" "Select Keymap")"
@@ -1461,7 +1464,7 @@ case "$1" in
     print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
     read_input_text "Add custom repositories" $CUSTOMREPO
     if [[ $OPTION == y ]]; then
-      while [[ 1 ]]
+      while true
       do
         print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
         echo " 1) \"Add new repository\""
@@ -1673,7 +1676,7 @@ case "$1" in
   #}}}
   #FONT CONFIGURATION {{{
   font_config(){
-    while [[ 1 ]]
+    while true
     do
       print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
       print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
@@ -1792,9 +1795,11 @@ case "$1" in
     #Intel {{{
     elif [[ ${VIDEO_DRIVER} == intel ]]; then
       package_install "xf86-video-intel intel-dri libva-intel-driver"
+      [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
     #}}}
     else
       package_install "xf86-video-${VIDEO_DRIVER}"
+      [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
     fi
     pause_function
   }
@@ -1817,7 +1822,7 @@ case "$1" in
     print_title "INSTALL ADDITIONAL FIRMWARES"
     read_input_text "Install additional firmwares [Audio,Bluetooth,Scanner,Wireless]" $FIRMWARE
     if [[ $OPTION == y ]]; then
-      while [[ 1 ]]
+      while true
       do
         print_title "INSTALL ADDITIONAL FIRMWARES"
         echo " 1) $(menu_item "alsa-firmware")"
@@ -1909,7 +1914,7 @@ case "$1" in
   install_desktop_environment(){
     install_icon_theme() { #{{{
       package_install "gtk-update-icon-cache"
-      while [[ 1 ]]
+      while true
       do
         print_title "GNOME ICONS"
         echo " 1) $(menu_item "awoken-icons" "Awoken")"
@@ -1963,7 +1968,7 @@ case "$1" in
       done
     } #}}}
     install_gtk_theme() { #{{{
-      while [[ 1 ]]
+      while true
       do
         print_title "GTK2/GTK3 THEMES"
         echo " 1) $(menu_item "adwaita-x-dark-and-light-theme" "Adwaita-X")"
@@ -2025,7 +2030,7 @@ case "$1" in
       done
     } #}}}
     install_display_manager() { #{{{
-      while [[ 1 ]]
+      while true
       do
         print_title "DISPLAY MANAGER - https://wiki.archlinux.org/index.php/Display_Manager"
         print_info "A display manager, or login manager, is a graphical interface screen that is displayed at the end of the boot process in place of the default shell."
@@ -2077,7 +2082,7 @@ case "$1" in
       done
     } #}}}
     install_themes() { #{{{
-      while [[ 1 ]]
+      while true
       do
         print_title "$1 THEMES"
         echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-xfce-icons inx-icon-theme matrilineare-icon-theme nitrux-icon-theme" "Icons Themes") $AUR"
@@ -2102,7 +2107,7 @@ case "$1" in
             3)
               if [[ $GNOME -eq 1 ]]; then
                 #GNOME SHELL THEMES {{{
-                while [[ 1 ]]
+                while true
                 do
                   print_title "GNOME SHELL THEMES"
                   echo " 1) $(menu_item "gnome-shell-theme-elegance")"
@@ -2133,7 +2138,7 @@ case "$1" in
                 #}}}
               elif [[ $CINNAMON -eq 1 ]]; then
                 #CINNAMON THEMES {{{
-                while [[ 1 ]]
+                while true
                 do
                   print_title "CINNAMON THEMES"
                   echo " 1) $(menu_item "cinnamon-theme-ambience")"
@@ -2215,7 +2220,7 @@ case "$1" in
       done
     } #}}}
     install_misc_apps() { #{{{
-      while [[ 1 ]]
+      while true
       do
         print_title "$1 ESSENTIAL APPS"
         echo " 1) $(menu_item "entrance-svn gdm lightdm lxdm slim" "Display Manager") $AUR"
@@ -2436,7 +2441,7 @@ case "$1" in
         rm -fr Kawai Sweet
         #}}}
         #KDE CUSTOMIZATION {{{
-        while [[ 1 ]]
+        while true
         do
           print_title "KDE CUSTOMIZATION"
           echo " 1) $(menu_item "apper")"
@@ -2691,7 +2696,7 @@ case "$1" in
   #}}}
   #ACCESSORIES {{{
   install_accessories_apps(){
-    while [[ 1 ]]
+    while true
     do
       print_title "ACCESSORIES APPS"
       echo " 1) $(menu_item "cairo-dock") $AUR"
@@ -2780,7 +2785,7 @@ case "$1" in
   #}}}
   #DEVELOPEMENT {{{
   install_development_apps(){
-    while [[ 1 ]]
+    while true
     do
       print_title "DEVELOPMENT APPS"
       echo " 1) $(menu_item "aptana-studio") $AUR"
@@ -2815,7 +2820,7 @@ case "$1" in
             ;;
           3)
             #ECLIPSE {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "ECLIPSE - https://wiki.archlinux.org/index.php/Eclipse"
               print_info "Eclipse is an open source community project, which aims to provide a universal development platform."
@@ -2960,7 +2965,7 @@ case "$1" in
   #}}}
   #OFFICE {{{
   install_office_apps(){
-    while [[ 1 ]]
+    while true
     do
       print_title "OFFICE APPS"
       echo " 1) $(menu_item "libreoffice-common" "LibreOffice")"
@@ -3052,7 +3057,7 @@ case "$1" in
   #}}}
   #SYSTEM TOOLS {{{
   install_system_apps(){
-    while [[ 1 ]]
+    while true
     do
       print_title "SYSTEM TOOLS APPS"
       echo " 1) $(menu_item "gparted")"
@@ -3112,7 +3117,7 @@ case "$1" in
   #}}}
   #GRAPHICS {{{
   install_graphics_apps(){
-    while [[ 1 ]]
+    while true
     do
       print_title "GRAPHICS APPS"
       echo " 1) $(menu_item "blender")"
@@ -3182,7 +3187,7 @@ case "$1" in
   #}}}
   #INTERNET {{{
   install_internet_apps(){
-    while [[ 1 ]]
+    while true
     do
       print_title "INTERNET APPS"
       echo " 1) Browser"
@@ -3202,7 +3207,7 @@ case "$1" in
           1)
             #BROWSER {{{
             is_package_installed "epiphany" && package_remove "epiphany"
-            while [[ 1 ]]
+            while true
             do
               print_title "BROWSER"
               echo " 1) $(menu_item "chromium")"
@@ -3254,7 +3259,7 @@ case "$1" in
             ;;
           2)
             #DOWNLOAD|FILESHARE {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "DOWNLOAD|FILESHARE"
               echo " 1) $(menu_item "deluge")"
@@ -3340,7 +3345,7 @@ case "$1" in
             ;;
           3)
             #EMAIL {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "EMAIL|RSS"
               echo " 1) $(menu_item "thunderbird")"
@@ -3373,7 +3378,7 @@ case "$1" in
             ;;
           4)
             #IM {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "IM - INSTANT MESSAGING"
               echo " 1) $(menu_item "emesene")"
@@ -3420,7 +3425,7 @@ case "$1" in
             ;;
           5)
             #IRC {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "IRC"
               echo " 1) $(menu_item "irssi")"
@@ -3457,7 +3462,7 @@ case "$1" in
             ;;
           6)
             #MAPPING {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "MAPPING TOOLS"
               echo " 1) $(menu_item "google-earth") $AUR"
@@ -3490,7 +3495,7 @@ case "$1" in
             ;;
           7)
             #DESKTOP SHARE {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "DESKTOP SHARE"
               echo " 1) $(menu_item "remmina")"
@@ -3535,7 +3540,7 @@ case "$1" in
   #}}}
   #AUDIO {{{
   install_audio_apps(){
-    while [[ 1 ]]
+    while true
     do
       print_title "AUDIO APPS"
       echo " 1) Players"
@@ -3550,7 +3555,7 @@ case "$1" in
         case "$OPT" in
           1)
             #PLAYERS {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "AUDIO PLAYERS"
               echo " 1) $(menu_item "amarok")"
@@ -3633,7 +3638,7 @@ case "$1" in
             ;;
           2)
             #EDITORS {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "AUDIO EDITORS|TOOLS"
               echo " 1) $(menu_item "soundconverter soundkonverter" "$([[ ${KDE} -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
@@ -3703,7 +3708,7 @@ case "$1" in
   #}}}
   #VIDEO {{{
   install_video_apps(){
-    while [[ 1 ]]
+    while true
     do
       print_title "VIDEO APPS"
       echo " 1) Players"
@@ -3718,7 +3723,7 @@ case "$1" in
         case "$OPT" in
           1)
             #PLAYERS {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "VIDEO PLAYERS"
               echo " 1) $(menu_item "audience-bzr") $AUR"
@@ -3783,7 +3788,7 @@ case "$1" in
             ;;
           2)
             #EDITORS {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "VIDEO EDITORS|TOOLS"
               echo " 1) $(menu_item "avidemux-gtk avidemux-qt" "Avidemux")"
@@ -3845,6 +3850,8 @@ case "$1" in
             else
               aur_package_install "codecs64"
             fi
+            sudo -u ${USER_NAME} mkdir -p ~/.config/aacs/
+            sudo -u ${USER_NAME} cd ~/.config/aacs/ && wget http://vlc-bluray.whoknowsmy.name/files/KEYDB.cfg
             ;;
           "b")
             break
@@ -3860,7 +3867,7 @@ case "$1" in
   #}}}
   #GAMES {{{
   install_games(){
-    while [[ 1 ]]
+    while true
     do
       print_title "GAMES - https://wiki.archlinux.org/index.php/Games"
       echo " 1) Action|Adventure"
@@ -3885,7 +3892,7 @@ case "$1" in
         case "$OPT" in
           1)
             #ACTION|ADVENTURE {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "ACTION AND ADVENTURE"
               echo " 1) $(menu_item "astromenace")"
@@ -3943,7 +3950,7 @@ case "$1" in
             ;;
           2)
             #ARCADE|PLATFORMER {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "ARCADE AND PLATFORMER"
               echo " 1) $(menu_item "abuse")"
@@ -4016,7 +4023,7 @@ case "$1" in
             ;;
           3)
             #DUNGEON {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "DUNGEON"
               echo " 1) $(menu_item "adom") $AUR"
@@ -4061,7 +4068,7 @@ case "$1" in
             ;;
           4)
             #EMULATORS {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "EMULATORS"
               echo " 1) $(menu_item "bsnes" "BSNES") $AUR"
@@ -4118,7 +4125,7 @@ case "$1" in
             ;;
           5)
             #FPS {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "FPS"
               echo " 1) $(menu_item "alienarena")"
@@ -4164,7 +4171,7 @@ case "$1" in
             ;;
           6)
             #MMO {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "MMO"
               echo " 1) $(menu_item "hon" "Heroes of Newerth") $AUR"
@@ -4218,7 +4225,7 @@ case "$1" in
             ;;
           7)
             #PUZZLE {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "PUZZLE"
               echo " 1) $(menu_item "frozen-bubble")"
@@ -4255,7 +4262,7 @@ case "$1" in
             ;;
           8)
             #RPG {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "RPG"
               echo " 1) $(menu_item "ardentryst") $AUR"
@@ -4292,7 +4299,7 @@ case "$1" in
             ;;
           9)
             #RACING {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "RACING"
               echo " 1) $(menu_item "maniadrive") $AUR"
@@ -4337,7 +4344,7 @@ case "$1" in
             ;;
           10)
             #SIMULATION {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "SIMULATION"
               echo " 1) $(menu_item "simutrans")"
@@ -4374,7 +4381,7 @@ case "$1" in
             ;;
           11)
             #STRATEGY {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "STRATEGY"
               echo " 1) $(menu_item "0ad")"
@@ -4475,7 +4482,7 @@ case "$1" in
         #/usr/bin/mysqladmin -u root password
         /usr/bin/mysql_secure_installation
         #CONFIGURE HTTPD.CONF {{{
-          if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
+          if [[ ! -f /etc/httpd/conf/httpd.conf.aui ]]; then
             cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
             echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
             echo -e 'application/x-httpd-php5		php php5' >> /etc/httpd/conf/mime.types
@@ -4485,12 +4492,12 @@ case "$1" in
           fi
         #}}}
         #CONFIGURE PHP.INI {{{
-          if [[ -f  /etc/php/php.ini.pacnew ]]; then
+          if [[ -f /etc/php/php.ini.pacnew ]]; then
             mv -v /etc/php/php.ini /etc/php/php.ini.pacold
             mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
             rm -v /etc/php/php.ini.aui
           fi
-          [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui || cp -v /etc/php/php.ini /etc/php/php.ini.aui";
+          [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/php/php.ini /etc/php/php.ini.aui
           sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
           sed -i '/mysql.so/s/^;//' /etc/php/php.ini
           sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
@@ -4515,7 +4522,7 @@ case "$1" in
         system_ctl enable httpd
         system_ctl enable postgresql
         #CONFIGURE HTTPD.CONF {{{
-          if [[ ! -f  /etc/httpd/conf/httpd.conf.aui ]]; then
+          if [[ ! -f /etc/httpd/conf/httpd.conf.aui ]]; then
             cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
             echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
             echo -e 'application/x-httpd-php5		php php5' >> /etc/httpd/conf/mime.types
@@ -4525,12 +4532,12 @@ case "$1" in
           fi
         #}}}
         #CONFIGURE PHP.INI {{{
-          if [[ -f  /etc/php/php.ini.pacnew ]]; then
+          if [[ -f /etc/php/php.ini.pacnew ]]; then
             mv -v /etc/php/php.ini /etc/php/php.ini.pacold
             mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
             rm -v /etc/php/php.ini.aui
           fi
-          [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui || cp -v /etc/php/php.ini /etc/php/php.ini.aui";
+          [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/php/php.ini /etc/php/php.ini.aui
           sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
           sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
           sed -i '/gd.so/s/^;//' /etc/php/php.ini
@@ -4552,7 +4559,7 @@ case "$1" in
             mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
             rm -v /etc/php/php.ini.aui
           fi
-          [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui || cp -v /etc/php/php.ini /etc/php/php.ini.aui";
+          [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/php/php.ini /etc/php/php.ini.aui
           sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
           sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
           sed -i '/gd.so/s/^;//' /etc/php/php.ini
@@ -4581,7 +4588,7 @@ case "$1" in
             mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
             rm -v /etc/php/php.ini.aui
           fi
-          [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui || cp -v /etc/php/php.ini /etc/php/php.ini.aui";
+          [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/php/php.ini /etc/php/php.ini.aui;
           sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
           sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
           sed -i '/gd.so/s/^;//' /etc/php/php.ini
@@ -4594,7 +4601,7 @@ case "$1" in
   #}}}
   #FONTS {{{
   install_fonts(){
-    while [[ 1 ]]
+    while true
     do
       print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
       echo " 1) $(menu_item "ttf-anka-coder") $AUR"
@@ -4709,7 +4716,7 @@ case "$1" in
   #}}}
   #EXTRA {{{
   install_extra(){
-    while [[ 1 ]]
+    while true
     do
       print_title "EXTRA"
       echo " 1) Elementary Project $AUR"
@@ -4722,7 +4729,7 @@ case "$1" in
         case "$OPT" in
           1)
             #ELEMENTARY PROJECT {{{
-            while [[ 1 ]]
+            while true
             do
               print_title "ELEMENTARY PROJECT"
               print_warning "\tsome of these programs still in alpha stage and may not work"
@@ -4860,7 +4867,8 @@ case "$1" in
     print_title "WARNING: PACKAGES INSTALLED FROM AUR"
     print_warning "List of packages not officially supported that may kill your cat:"
     pause_function
-    pacman -Qm | awk '{print $1}' > aur_pkglist.txt
+    AUR_PKG_LIST="${AUI_DIR}/aur_pkg_list.log"
+    pacman -Qm | awk '{print $1}' > $AUR_PKG_LIST
     less aur_pkglist.txt
     print_title "INSTALL COMPLETED"
     echo -e "Thanks for using the Archlinux Ultimate Install script by helmuthdu\n"
@@ -4885,7 +4893,7 @@ case "$1" in
 
   if is_package_installed "kdebase-workspace"; then KDE=1; fi
 
-  while [[ 1 ]]
+  while true
   do
     print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
     echo " 1) $(mainmenu_item "${checklist[1]}" "Basic Setup")"
