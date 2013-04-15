@@ -3850,6 +3850,7 @@ case "$1" in
             else
               aur_package_install "codecs64"
             fi
+            aur_package_install "libaacs"
             sudo -u ${USER_NAME} mkdir -p ~/.config/aacs/
             sudo -u ${USER_NAME} cd ~/.config/aacs/ && wget http://vlc-bluray.whoknowsmy.name/files/KEYDB.cfg
             ;;
