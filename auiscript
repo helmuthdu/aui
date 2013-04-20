@@ -43,7 +43,7 @@
   PRELOAD="y"
   SAMBA="y"
   SSH="y"
-  TLP="n"                # Laptop Mode Tools
+  TLP="n"                # Laptop Power Manager
   FWD="n"                # FirewallD
   ZRAM="y"
   PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA|ATI) driver
@@ -506,7 +506,7 @@
   # 7) ttf-ms-fonts
   # 8) ttf-vista-fonts
   # 9) wqy-microhei
-  FONTS_OPTIONS="1-9"
+  FONTS_OPTIONS="1-4 6-9"
 #}}}
 #EXTRA {{{
   # 1) Elementary Project
