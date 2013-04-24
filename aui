@@ -374,7 +374,7 @@ automatic_mode(){
   print_warning "\tUse this mode only if you already know all the option.\n\tYou won't be able to select anything later."
   read_input_text "Enable Automatic Mode"
   if [[ $OPTION == y ]]; then
-    $EDITOR aui_automode
+    $EDITOR ${AUI_DIR}/aui_automode
     source ${AUI_DIR}/aui_automode
     echo -e "The installation will start now."
     pause_function

@@ -20,10 +20,10 @@ You can try it first with a `virtualbox`
 - get the script: ` wget --no-check-certificate https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
 
 ## How to use
-- default mode: `cd <dir> && ./aui`
-- ais mode: `cd <dir> && ./aui --ais`
+- aui mode: `cd <dir> && ./aui`
+- ais mode: `cd <dir> && ./ais`
 
-## Archlinux Install Script Mode
+## Archlinux Install Script (ais)
 - Configure keymap
 - Select editor
 - Automatic configure mirrorlist
@@ -40,13 +40,13 @@ You can try it first with a `virtualbox`
 - Configure mirrorlist
 - Configure root password
 
-## Default mode
+## Archlinux Ultimate Install (aui)
 - Backup all modified files
 - Install additional repositories
 - Create and configure new user
 - Install and configure sudo
 - Automatic enable services in systemd
-- Install an AUR Helper [yaourt, packer]
+- Install an AUR Helper [yaourt, packer, pacaur]
 - Install base system
 - Install systemd
 - Install Preload
