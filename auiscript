@@ -125,25 +125,20 @@
     # 6) iNX
     # 7) Matrilineare
     # 8) Nitrux
-    ICONS_THEMES="3-5"
+    ICONS_THEMES="3 5"
   #}}}
   #GTK THEMES {{{
-    # 1) Adwaita-X
-    # 2) Boje
-    # 3) Bluebird
-    # 4) Greybird
-    # 5) Faience
-    # 6) Gnome Cupertino
-    # 7) MediterraneanNight
-    # 8) Orion
-    # 9) Light (Aka Ambiance/Radiance)
-    #10) Zukitwo
-    GTK_THEMES="5 7"
+    # 1) Greybird
+    # 2) Faience
+    # 3) Gnome Cupertino
+    # 4) MediterraneanNight
+    # 5) Numix
+    # 6) Zukitwo
+    GTK_THEMES="1-6"
   #}}}
   #GNOME SHELL THEMES {{{
-    # 1) Elegance
-    # 2) eOS
-    GNOME_SHELL_THEMES="1 2"
+    # 1) Default-Mod
+    GNOME_SHELL_THEMES="1"
   #}}}
   #CINNAMON THEMES {{{
     # 1) Ambience
@@ -236,13 +231,14 @@
   OFFICE_OPTIONS="1 10"
 #}}}
 #SYSTEM TOOLS {{{
-  # 1) Gparted
-  # 2) Grsync
-  # 3) Htop
-  # 4) Virtualbox
-  # 5) Webmin
-  # 6) Wine
-  SYSTEMTOOLS_OPTIONS="1-4 6"
+  # 1) ClamAV
+  # 2) Gparted
+  # 3) Grsync
+  # 4) Htop
+  # 5) Virtualbox
+  # 6) Webmin
+  # 7) Wine
+  SYSTEMTOOLS_OPTIONS="2-5 7"
 #}}}
 #GRAPHICS {{{
   # 1) Blender

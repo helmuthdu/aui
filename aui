@@ -1966,16 +1966,12 @@ case "$1" in
       while true
       do
         print_title "GTK2/GTK3 THEMES"
-        echo " 1) $(menu_item "adwaita-x-dark-and-light-theme" "Adwaita-X")"
-        echo " 2) $(menu_item "gtk-theme-boje" "Boje")"
-        echo " 3) $(menu_item "xfce-theme-bluebird" "Bluebird")"
-        echo " 4) $(menu_item "xfce-theme-greybird" "Greybird")"
-        echo " 5) $(menu_item "faience-themes" "Faience")"
-        echo " 6) $(menu_item "gtk-theme-gnome-cupertino" "Gnome Cupertino")"
-        echo " 7) $(menu_item "mediterraneannight-theme" "MediterraneanNight")"
-        echo " 8) $(menu_item "orion-gtk-theme" "Orion")"
-        echo " 9) $(menu_item "ubuntu-themes") (aka Ambiance/Radiance)"
-        echo "10) $(menu_item "zukitwo-themes" "Zukitwo")"
+        echo " 1) $(menu_item "xfce-theme-greybird" "Greybird")"
+        echo " 2) $(menu_item "faience-themes" "Faience")"
+        echo " 3) $(menu_item "gtk-theme-gnome-cupertino" "Gnome Cupertino")"
+        echo " 4) $(menu_item "mediterraneannight-theme" "MediterraneanNight")"
+        echo " 5) $(menu_item "gtk-theme-numix" "Numix")"
+        echo " 6) $(menu_item "zukitwo-themes" "Zukitwo")"
         echo ""
         echo " b) BACK"
         echo ""
@@ -1984,33 +1980,21 @@ case "$1" in
         for OPT in ${OPTIONS[@]}; do
           case "$OPT" in
             1)
-              aur_package_install "adwaita-x-dark-and-light-theme"
-              ;;
-            2)
-              aur_package_install "gtk-theme-boje"
-              ;;
-            3)
-              aur_package_install "xfce-theme-bluebird"
-              ;;
-            4)
               aur_package_install "xfce-theme-greybird"
               ;;
-            5)
+            2)
               package_install "faience-themes"
               ;;
-            6)
+            3)
               aur_package_install "gtk-theme-gnome-cupertino"
               ;;
-            7)
+            4)
               aur_package_install "mediterraneannight-theme"
               ;;
-            8)
-              aur_package_install "orion-gtk-theme"
+            5)
+              aur_package_install "gtk-theme-numix"
               ;;
-            9)
-              aur_package_install "ubuntu-themes"
-              ;;
-            10)
+            6)
               aur_package_install "zukitwo-themes"
               ;;
             "b")
@@ -2081,8 +2065,8 @@ case "$1" in
       do
         print_title "$1 THEMES"
         echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-xfce-icons inx-icon-theme matrilineare-icon-theme nitrux-icon-theme" "Icons Themes") $AUR"
-        echo " 2) $(menu_item "adwaita-x-dark-and-light-theme gtk-theme-boje xfce-theme-blackbird xfce-theme-bluebird xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
-        [[ $GNOME -eq 1 ]] && echo " 3) $(menu_item "gnome-shell-theme-elegance gnome-shell-theme-eos" "Gnome Shell Themes") $AUR"
+        echo " 2) $(menu_item "xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
+        [[ $GNOME -eq 1 ]] && echo " 3) $(menu_item "gnome-shell-theme-default-mod" "Gnome Shell Themes") $AUR"
         [[ $CINNAMON -eq 1 ]] && echo " 3) $(menu_item "cinnamon-theme-ambience cinnamon-theme-baldr cinnamon-theme-google+ cinnamon-theme-eleganse cinnamon-theme-helios cinnamon-theme-elementary-luna cinnamon-theme-holo cinnamon-theme-gnome cinnamon-theme-loki" "Cinnamon themes") $AUR"
         echo ""
         echo " d) DONE"
@@ -2105,8 +2089,7 @@ case "$1" in
                 while true
                 do
                   print_title "GNOME SHELL THEMES"
-                  echo " 1) $(menu_item "gnome-shell-theme-elegance")"
-                  echo " 2) $(menu_item "gnome-shell-theme-eos")"
+                  echo " 1) $(menu_item "gnome-shell-theme-default-mod")"
                   echo ""
                   echo " b) BACK"
                   echo ""
@@ -2115,10 +2098,7 @@ case "$1" in
                   for OPT in ${OPTIONS[@]}; do
                     case "$OPT" in
                       1)
-                        aur_package_install "gnome-shell-theme-elegance"
-                        ;;
-                      2)
-                        aur_package_install "gnome-shell-theme-eos"
+                        aur_package_install "gnome-shell-theme-default-mod"
                         ;;
                       "b")
                         break
@@ -3055,12 +3035,13 @@ case "$1" in
     while true
     do
       print_title "SYSTEM TOOLS APPS"
-      echo " 1) $(menu_item "gparted")"
-      echo " 2) $(menu_item "grsync")"
-      echo " 3) $(menu_item "htop")"
-      echo " 4) $(menu_item "virtualbox")"
-      echo " 5) $(menu_item "webmin")"
-      echo " 6) $(menu_item "wine")"
+      echo " 1) $(menu_item "clamav")"
+      echo " 2) $(menu_item "gparted")"
+      echo " 3) $(menu_item "grsync")"
+      echo " 4) $(menu_item "htop")"
+      echo " 5) $(menu_item "virtualbox")"
+      echo " 6) $(menu_item "webmin")"
+      echo " 7) $(menu_item "wine")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -3069,15 +3050,21 @@ case "$1" in
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            package_install "gparted"
+            package_install "clamav"
+            $EDITOR /etc/conf.d/clamav
+            system_ctl enable clamd
+            freshclam
             ;;
           2)
-            package_install "grsync"
+            package_install "gparted"
             ;;
           3)
-            package_install "htop"
+            package_install "grsync"
             ;;
           4)
+            package_install "htop"
+            ;;
+          5)
             #Make sure we are not a VirtualBox Guest
             VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
             if [[ -z ${VIRTUALBOX_GUEST} ]]; then
@@ -3090,11 +3077,11 @@ case "$1" in
               cecho " ${BBlue}[${White}${BWhite}!${White}${BBlue}]${White} VirtualBox was not installed as we are a VirtualBox guest."
             fi
             ;;
-          5)
+          6)
             package_install "webmin perl-net-ssleay"
             system_ctl enable webmin
             ;;
-          6)
+          7)
             package_install "icoutils wine wine_gecko winetricks"
             aur_package_install "wine-mono-bin"
             ;;
@@ -3679,7 +3666,7 @@ case "$1" in
           3)
             package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good \
                              gst-plugins-bad gst-plugins-ugly gst-ffmpeg"
-            if check_package "banshee clementine exaile rhythmbox xfburn" ; then
+            if check_package "amarok banshee clementine exaile rhythmbox xfburn" ; then
               package_install "gstreamer0.10 gstreamer0.10-plugins"
               [[ ${KDE} -eq 1 ]] && package_install "phonon-gstreamer"
               # Use the 'standard' preset by default. This preset should generally be
@@ -4865,7 +4852,7 @@ case "$1" in
     pause_function
     AUR_PKG_LIST="${AUI_DIR}/aur_pkg_list.log"
     pacman -Qm | awk '{print $1}' > $AUR_PKG_LIST
-    less aur_pkglist.txt
+    less $AUR_PKG_LIST
     print_title "INSTALL COMPLETED"
     echo -e "Thanks for using the Archlinux Ultimate Install script by helmuthdu\n"
     #REBOOT
