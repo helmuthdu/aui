@@ -3586,8 +3586,7 @@ case "$1" in
                     aur_package_install "nuvolaplayer"
                     ;;
                   9)
-                    package_install "rhythmbox libgpod libdmapsharing"
-                    aur_package_install "rhythmbox-equalizer-git"
+                    package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako pywebkitgtk"
                     ;;
                   10)
                     aur_package_install "radiotray"
