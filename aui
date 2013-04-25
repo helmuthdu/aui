@@ -1543,10 +1543,6 @@ install_desktop_environment(){
 #}}}
 #CONNMAN/NETWORKMANAGER/WICD {{{
 install_nm_wicd(){
-  disable_networks() {
-    systemctl disable netcfg
-    systemctl disable net-auto-wireless
-  }
   print_title "NETWORK MANAGER"
   echo " 1) Networkmanager"
   echo " 2) Wicd"
@@ -1565,7 +1561,6 @@ install_nm_wicd(){
         package_install "networkmanager dnsmasq network-manager-applet"
       fi
       is_package_installed "ntp" && package_install "networkmanager-dispatcher-ntpd"
-      disable_networks
       # Network Management daemon
       system_ctl enable NetworkManager
       pause_function
@@ -1578,7 +1573,6 @@ install_nm_wicd(){
       else
         package_install "wicd wicd-gtk"
       fi
-      disable_networks
       # WICD daemon
       system_ctl enable wicd
       pause_function
@@ -1587,7 +1581,6 @@ install_nm_wicd(){
       print_title "CONNMAN - https://wiki.archlinux.org/index.php/Connman"
       print_info "ConnMan is an alternative to NetworkManager and Wicd and was created by Intel and the Moblin project for use with embedded devices."
       package_install "connman "
-      disable_networks
       # ConnMan daemon
       system_ctl enable connman
       pause_function
