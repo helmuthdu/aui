@@ -29,7 +29,7 @@ fi
 #WELCOME {{{
 welcome(){
   clear
-  echo -e "${BWhite}Welcome to the Archlinux Ultimate install script by helmuthdu${White}"
+  echo -e "${Bold}Welcome to the Archlinux Ultimate install script by helmuthdu${White}"
   print_line
   echo "Requirements:"
   echo "-> Archlinux installation"
@@ -2007,7 +2007,7 @@ install_system_apps(){
             modprobe -a vboxdrv
             add_user_to_group ${USER_NAME} vboxusers
           else
-            cecho " ${BBlue}[${White}${BWhite}!${White}${BBlue}]${White} VirtualBox was not installed as we are a VirtualBox guest."
+            cecho " ${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
           ;;
         6)
