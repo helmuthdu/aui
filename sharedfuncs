@@ -21,8 +21,9 @@
 #VARIABLES {{{
   checklist=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
   # COLORS {{{
-    Reset=$(tput sgr0)
     Bold=$(tput bold)
+    Underline=$(tput sgr 0 1)
+    Reset=$(tput sgr0)
     # Regular Colors
     Red=$(tput setaf 1)
     Green=$(tput setaf 2)
