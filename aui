@@ -2121,7 +2121,6 @@ install_internet_apps(){
       case "$OPT" in
         1)
           #BROWSER {{{
-          is_package_installed "epiphany" && package_remove "epiphany"
           while true
           do
             print_title "BROWSER"
@@ -2138,10 +2137,11 @@ install_internet_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
-                  package_install "chromium flashplugin"
+                  package_install "chromium"
+                  aur_package_install "chromium-pepper-flash chromium-libpdf"
                   ;;
                 2)
-                  aur_package_install "google-chrome flashplugin"
+                  aur_package_install "google-chrome"
                   ;;
                 3)
                   if [[ ${KDE} -eq 1 ]]; then
@@ -2157,7 +2157,7 @@ install_internet_apps(){
                   upx --best /usr/lib/firefox/firefox
                   ;;
                 5)
-                  package_install "opera flashplugin "
+                  package_install "opera"
                   ;;
                 "b")
                   break
