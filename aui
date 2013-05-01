@@ -3381,10 +3381,9 @@ install_web_server(){
       package_install "apache mariadb php php-apache php-mcrypt php-gd"
       aur_package_install "adminer"
       system_ctl enable httpd
+      /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
       system_ctl enable mysqld
       systemctl start mysqld
-      #echo "Enter your new mysql root account password"
-      #/usr/bin/mysqladmin -u root password
       /usr/bin/mysql_secure_installation
       #CONFIGURE HTTPD.CONF {{{
         if [[ ! -f /etc/httpd/conf/httpd.conf.aui ]]; then
@@ -3453,6 +3452,7 @@ install_web_server(){
     3)
       package_install "nginx mariadb php php-mcrypt php-fpme"
       aur_package_install "adminer"
+      /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
       system_ctl enable mysqld
       systemctl start mysqld
       /usr/bin/mysql_secure_installation
