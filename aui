@@ -3423,7 +3423,7 @@ install_web_server(){
       passwd postgres
       if [[ ! -d /var/lib/postgres/data ]]; then
         echo "Enter your postgres account password:"
-        su - postgres -c "initdb --locale ${LOCALE_UTF8} -D /var/lib/postgres/data"
+        su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
       fi
       system_ctl enable httpd
       system_ctl enable postgresql
@@ -3483,7 +3483,7 @@ install_web_server(){
       passwd postgres
       if [[ ! -d /var/lib/postgres/data ]]; then
         echo "Enter your postgres account password:"
-        su - postgres -c "initdb --locale ${LOCALE_UTF8} -D /var/lib/postgres/data"
+        su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
       fi
       system_ctl enable nginx
       system_ctl enable postgresql
