@@ -2589,7 +2589,7 @@ install_audio_apps(){
         3)
           package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good \
                            gst-plugins-bad gst-plugins-ugly gst-ffmpeg"
-          if check_package "amarok banshee clementine exaile rhythmbox xfburn" ; then
+          if is_package_installed "amarok banshee clementine exaile rhythmbox xfburn" ; then
             package_install "gstreamer0.10 gstreamer0.10-plugins"
             [[ ${KDE} -eq 1 ]] && package_install "phonon-gstreamer"
             # Use the 'standard' preset by default. This preset should generally be
