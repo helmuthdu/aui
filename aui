@@ -1608,18 +1608,16 @@ install_accessories_apps(){
     echo " 1) $(menu_item "cairo-dock") $AUR"
     echo " 2) $(menu_item "catfish")"
     echo " 3) $(menu_item "conky-lua") $AUR"
-    echo " 4) $(menu_item "deepin-screenshot-git") $AUR"
-    echo " 5) $(menu_item "dockbarx") $AUR"
-    echo " 6) $(menu_item "docky") $AUR"
-    echo " 7) $(menu_item "speedcrunch galculator" "$([[ ${KDE} -eq 1 ]] && echo "Speedcrunch" || echo "Galculator";)") $AUR"
-    echo " 8) $(menu_item "terra-bzr") $AUR"
-    echo " 9) $(menu_item "kupfer") $AUR"
-    echo "10) $(menu_item "pyrenamer") $AUR"
-    echo "11) $(menu_item "shutter") $AUR"
-    echo "12) $(menu_item "stormcloud") $AUR"
-    echo "13) $(menu_item "synapse") $AUR"
-    echo "14) $(menu_item "terminator")"
-    echo "15) $(menu_item "zim")"
+    echo " 4) $(menu_item "dockbarx") $AUR"
+    echo " 5) $(menu_item "docky") $AUR"
+    echo " 6) $(menu_item "speedcrunch galculator" "$([[ ${KDE} -eq 1 ]] && echo "Speedcrunch" || echo "Galculator";)") $AUR"
+    echo " 7) $(menu_item "terra-bzr") $AUR"
+    echo " 8) $(menu_item "kupfer") $AUR"
+    echo " 9) $(menu_item "pyrenamer") $AUR"
+    echo "10) $(menu_item "shutter") $AUR"
+    echo "11) $(menu_item "stormcloud") $AUR"
+    echo "12) $(menu_item "terminator")"
+    echo "13) $(menu_item "zim")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1637,44 +1635,37 @@ install_accessories_apps(){
           aur_package_install "conky-lua"
           ;;
         4)
-          aur_package_install "deepin-screenshot-git"
-          ;;
-        5)
           aur_package_install "dockbarx dockbarx-shinybar-theme"
           ;;
-        6)
+        5)
           package_install "docky"
           ;;
-        7)
+        6)
           if [[ ${KDE} -eq 1 ]]; then
             aur_package_install "speedcrunch"
           else
             package_install "galculator"
           fi
           ;;
-        8)
+        7)
           aur_package_install "terra-bzr"
           ;;
-        9)
+        8)
           aur_package_install "kupfer"
           ;;
-        10)
+        9)
           aur_package_install "pyrenamer"
           ;;
-        11)
+        10)
           aur_package_install "shutter"
           ;;
-        12)
+        11)
           aur_package_install "stormcloud"
           ;;
-        13)
-          package_install "zeitgeist"
-          aur_package_install "libzeitgeist zeitgeist-datahub synapse"
-          ;;
-        14)
+        12)
           package_install "terminator"
           ;;
-        15)
+        13)
           package_install "zim"
           ;;
         "b")
