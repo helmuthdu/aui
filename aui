@@ -438,10 +438,6 @@ install_basic_setup(){
   package_install "ntp"
   is_package_installed "ntp" && timedatectl set-ntp true
   pause_function
-  print_title "DBUS - https://wiki.archlinux.org/index.php/D-Bus"
-  print_info "D-Bus is a message bus system that provides an easy way for inter-process communication. It consists of a daemon, which can be run both system-wide and for each user session, and a set of libraries to allow applications to use D-Bus."
-  package_install "dbus"
-  pause_function
   print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
   package_install "zip unzip unrar p7zip"
   pause_function
