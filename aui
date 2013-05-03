@@ -951,7 +951,7 @@ install_desktop_environment(){
     do
       print_title "DISPLAY MANAGER - https://wiki.archlinux.org/index.php/Display_Manager"
       print_info "A display manager, or login manager, is a graphical interface screen that is displayed at the end of the boot process in place of the default shell."
-      echo " 1) $(menu_item "entrance-svn" "Elsa") $AUR"
+      echo " 1) $(menu_item "entrance-git" "Entrance") $AUR"
       echo " 2) $(menu_item "gdm" "GDM")"
       echo " 3) $(menu_item "lightdm" "LightDM") $AUR"
       echo " 4) $(menu_item "lxdm" "LXDM")"
@@ -964,8 +964,8 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            aur_package_install "entrance-svn"
-            system_ctl enable entrace
+            aur_package_install "entrance-git"
+            system_ctl enable entrance
             ;;
           2)
             package_install "gdm"
@@ -1148,6 +1148,7 @@ install_desktop_environment(){
       echo "10) $(menu_item "volwheel")"
       echo "11) $(menu_item "xfburn")"
       echo "12) $(menu_item "xcompmgr")"
+      echo "13) $(menu_item "zathura")"
       echo ""
       echo " d) DONE"
       echo ""
@@ -1169,7 +1170,7 @@ install_desktop_environment(){
             package_install "gmrun"
             ;;
           5)
-            package_install "pcmanfm polkit-gnome gvfs"
+            package_install "pcmanfm gvfs"
             ;;
           6)
             package_install "rxvt-unicode"
@@ -1191,6 +1192,9 @@ install_desktop_environment(){
             ;;
           12)
             package_install "xcompmgr transset-df"
+            ;;
+          13)
+            package_install "zathura"
             ;;
           "d")
             break
@@ -1876,7 +1880,6 @@ install_office_apps(){
     echo " 9) $(menu_item "ocrfeeder")"
     echo "10) $(menu_item "uberwriter") $AUR"
     echo "11) $(menu_item "xmind") $AUR"
-    echo "12) $(menu_item "zathura")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1936,9 +1939,6 @@ install_office_apps(){
           ;;
         11)
           aur_package_install "xmind"
-          ;;
-        12)
-          package_install "zathura"
           ;;
         "b")
           break
@@ -2170,14 +2170,12 @@ install_internet_apps(){
             print_title "DOWNLOAD|FILESHARE"
             echo " 1) $(menu_item "deluge")"
             echo " 2) $(menu_item "dropbox") $AUR"
-            echo " 3) $(menu_item "insync") $AUR"
-            echo " 4) $(menu_item "jdownloader") $AUR"
-            echo " 5) $(menu_item "nitroshare") $AUR"
-            echo " 6) $(menu_item "sparkleshare")"
-            echo " 7) $(menu_item "spideroak") $AUR"
-            echo " 8) $(menu_item "steadyflow-bzr") $AUR"
-            echo " 9) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
-            echo "10) $(menu_item "ubuntuone-client" "Ubuntu One") $AUR"
+            echo " 3) $(menu_item "jdownloader") $AUR"
+            echo " 4) $(menu_item "nitroshare") $AUR"
+            echo " 5) $(menu_item "sparkleshare")"
+            echo " 6) $(menu_item "spideroak") $AUR"
+            echo " 7) $(menu_item "steadyflow-bzr") $AUR"
+            echo " 8) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2201,24 +2199,21 @@ install_internet_apps(){
                   fi
                   ;;
                 3)
-                  aur_package_install "insync"
-                  ;;
-                4)
                   aur_package_install "jdownloader"
                   ;;
-                5)
+                4)
                   aur_package_install "nitroshare"
                   ;;
-                6)
+                5)
                   package_install "sparkleshare"
                   ;;
-                7)
+                6)
                   aur_package_install "spideroak"
                   ;;
-                8)
+                7)
                   aur_package_install "steadyflow-bzr"
                   ;;
-                9)
+                8)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "transmission-qt"
                   else
@@ -2229,12 +2224,6 @@ install_internet_apps(){
                     replaceinfile "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${USER_NAME}/.config/transmission/settings.json
                   fi
 
-                  ;;
-                10)
-                  aur_package_install "ubuntuone-client"
-                  if is_package_installed "nautilus" ; then
-                    aur_package_install "ubuntuone-client-gnome"
-                  fi
                   ;;
                 "b")
                   break

@@ -102,6 +102,7 @@
     #10) Volwheel
     #11) Xfburn
     #12) Xcompmgr
+    #13) Zathura
     MISCAPPS="1 3"
   #}}}
   #DISPLAY MANAGER {{{
@@ -225,7 +226,6 @@
   # 9) OCRFeeder
   #10) UberWriter
   #11) Xmind
-  #12) Zathura
   OFFICE_OPTIONS="1 10"
 #}}}
 #SYSTEM TOOLS {{{
@@ -272,15 +272,13 @@
   #DOWNLOAD|FILESHARE {{{
     # 1) Deluge
     # 2) Dropbox
-    # 3) Insync
-    # 4) Jdownloader
-    # 5) Nitroshare
-    # 6) Sparkleshare
-    # 7) Spider Oak
-    # 8) Steadyflow
-    # 9) Trasmission
-    #10) Ubuntu One
-    DOWNLOAD_OPTIONS="2 4"
+    # 3) Jdownloader
+    # 4) Nitroshare
+    # 5) Sparkleshare
+    # 6) Spider Oak
+    # 7) Steadyflow
+    # 8) Trasmission
+    DOWNLOAD_OPTIONS="2 3"
   #}}}
   #EMAIL|RSS {{{
     # 1) Mozilla Thunderbird
