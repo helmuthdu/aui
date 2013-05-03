@@ -575,7 +575,7 @@ install_tlp(){
   if [[ $OPTION == y ]]; then
     aur_package_install "tlp"
     tlp start
-    system_ctl enable tlp-init
+    system_ctl enable tlp
     pause_function
   fi
 }
