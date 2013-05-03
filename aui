@@ -523,7 +523,8 @@ install_nfs(){
   read_input_text "Install nfs" $NFS
   if [[ $OPTION == y ]]; then
     package_install "nfs-utils"
-    system_ctl enable rpc-statd
+    system_ctl enable rpc-idmapd
+    system_ctl enable rpc-mountd
     pause_function
   fi
 }
