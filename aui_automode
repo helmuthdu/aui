@@ -44,7 +44,6 @@
   SAMBA="y"
   SSH="y"
   TLP="n"                # Laptop Power Manager
-  FWD="n"                # FirewallD
   ZRAM="y"
   PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA|ATI) driver
   #FONT CONFIGURATION {{{
@@ -230,13 +229,14 @@
 #}}}
 #SYSTEM TOOLS {{{
   # 1) ClamAV
-  # 2) Gparted
-  # 3) Grsync
-  # 4) Htop
-  # 5) Virtualbox
-  # 6) Webmin
-  # 7) Wine
-  SYSTEMTOOLS_OPTIONS="2-5 7"
+  # 2) FirewallD
+  # 3) Gparted
+  # 4) Grsync
+  # 5) Htop
+  # 6) Virtualbox
+  # 7) Webmin
+  # 8) Wine
+  SYSTEMTOOLS_OPTIONS="3-5 8"
 #}}}
 #GRAPHICS {{{
   # 1) Blender
