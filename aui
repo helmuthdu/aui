@@ -536,7 +536,20 @@ install_samba(){
   read_input_text "Install Samba" $SAMBA
   if [[ $OPTION == y ]]; then
     package_install "samba"
-    cp /etc/samba/smb.conf.default /etc/samba/smb.conf
+    [[ ! -f /etc/samba/smb.conf ]] && cp /etc/samba/smb.conf.default /etc/samba/smb.conf
+    local CONFIG_SAMBA=`cat /etc/samba/smb.conf | grep usershare`
+    if [[ -z $CONFIG_SAMBA ]]; then
+      # configure usershare
+      export USERSHARES_DIR="/var/lib/samba/usershares"
+      export USERSHARES_GROUP="sambashare"
+      mkdir -p ${USERSHARES_DIR}
+      groupadd ${USERSHARES_GROUP}
+      chown root:${USERSHARES_GROUP} ${USERSHARES_DIR}
+      chmod 01770 ${USERSHARES_DIR}
+      sed -i -e '/\[global\]/a\\n   usershare path = /var/lib/samba/usershares\n   usershare max shares = 100\n   usershare allow guests = yes\n   usershare owner only = False' /etc/samba/smb.conf
+      usermod -a -G ${USERSHARES_GROUP} ${USER_NAME}
+    fi
+    # enable services
     system_ctl enable smbd
     system_ctl enable nmbd
     system_ctl enable winbindd
