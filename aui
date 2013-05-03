@@ -531,7 +531,7 @@ install_samba(){
   print_info "Samba is a re-implementation of the SMB/CIFS networking protocol, it facilitates file and printer sharing among Linux and Windows systems as an alternative to NFS."
   read_input_text "Install Samba" $SAMBA
   if [[ $OPTION == y ]]; then
-    package_install "samba"
+    package_install "samba smbnetfs"
     [[ ! -f /etc/samba/smb.conf ]] && cp /etc/samba/smb.conf.default /etc/samba/smb.conf
     local CONFIG_SAMBA=`cat /etc/samba/smb.conf | grep usershare`
     if [[ -z $CONFIG_SAMBA ]]; then
@@ -544,11 +544,12 @@ install_samba(){
       chmod 01770 ${USERSHARES_DIR}
       sed -i -e '/\[global\]/a\\n   usershare path = /var/lib/samba/usershares\n   usershare max shares = 100\n   usershare allow guests = yes\n   usershare owner only = False' /etc/samba/smb.conf
       usermod -a -G ${USERSHARES_GROUP} ${USER_NAME}
+      sed -i '/user_allow_other/s/^#//' /etc/fuse.conf
+      modprobe fuse
     fi
     # enable services
     system_ctl enable smbd
     system_ctl enable nmbd
-    system_ctl enable winbindd
     pause_function
   fi
 }
