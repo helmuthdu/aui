@@ -3830,7 +3830,6 @@ do
         install_cups
         install_additional_firmwares
         install_git_tor
-        install_fwd
         checklist[1]=1
         ;;
       2)
