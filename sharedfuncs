@@ -110,7 +110,7 @@
         ncecho "\b\b";
         wait $pid
         retcode=$?
-        echo "$pid's retcode: $retcode" >> $LOG
+        echo -ne "$pid's retcode: $retcode" >> $LOG
         if [[ $retcode == 0 ]] || [[ $retcode == 255 ]]; then
           cecho success
         else
