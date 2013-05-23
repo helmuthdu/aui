@@ -248,10 +248,11 @@
   # 5) Inkscape
   # 6) MComix
   # 7) Mypaint
-  # 8) Scribus
-  # 9) Shotwell
-  #10) Simple Scan
-  #11) XnViewMP
+  # 8) Pencil
+  # 9) Scribus
+  #10) Shotwell
+  #11) Simple Scan
+  #12) XnViewMP
   GRAPHICS_OPTIONS="2-7 9"
 #}}}
 #INTERNET {{{
