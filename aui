@@ -2044,10 +2044,11 @@ install_graphics_apps(){
     echo " 5) $(menu_item "inkscape")"
     echo " 6) $(menu_item "mcomix")"
     echo " 7) $(menu_item "mypaint")"
-    echo " 8) $(menu_item "scribus")"
-    echo " 9) $(menu_item "shotwell")"
-    echo "10) $(menu_item "simple-scan")"
-    echo "11) $(menu_item "xnviewmp") $AUR"
+    echo " 7) $(menu_item "pencil") [Prototyping Tool] $AUR"
+    echo " 9) $(menu_item "scribus")"
+    echo "10) $(menu_item "shotwell")"
+    echo "11) $(menu_item "simple-scan")"
+    echo "12) $(menu_item "xnviewmp") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2079,15 +2080,18 @@ install_graphics_apps(){
           package_install "mypaint"
           ;;
         8)
-          package_install "scribus"
+          aur_package_install "pencil"
           ;;
         9)
-          package_install "shotwell"
+          package_install "scribus"
           ;;
         10)
-          package_install "simple-scan"
+          package_install "shotwell"
           ;;
         11)
+          package_install "simple-scan"
+          ;;
+        12)
           aur_package_install "xnviewmp"
           ;;
         "b")
