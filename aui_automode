@@ -422,9 +422,10 @@
     # 3) Dolphin
     # 4) ePSXe
     # 5) Project64
-    # 6) VisualBoyAdvanced
-    # 7) wxMupen64Plus
-    # 8) ZSNES
+    # 6) Snes9x
+    # 7) VisualBoyAdvanced
+    # 8) wxMupen64Plus
+    # 9) ZSNES
     EMULATORS=""
   #}}}
   #FPS {{{
