@@ -116,7 +116,7 @@ language_selector(){
       fi
       #}}}
       #FIREFOX #{{{
-      if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_GB || $LOCALE == es_AR || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
+      if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_GB || $LOCALE == es_AR || $LOCALE == es_CL || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
         LOCALE_FF=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
       elif [[ $LOCALE == en_US ]]; then
         LOCALE_FF="en-gb"
@@ -602,6 +602,59 @@ install_xorg(){
   package_install "gamin"
   KEYMAP=$(localectl status | grep Keymap | awk '{print $3}')
   localectl set-keymap ${KEYMAP}
+  [[ ! -f /etc/X11/xorg.conf.d/10-evdev.conf.aui ]] && cp -v /etc/X11/xorg.conf.d/10-evdev.conf /etc/X11/xorg.conf.d/10-evdev.conf.aui;
+  #CONFIGURE QWERTY KEYBOARD IN XORG {{{
+  local file="/etc/X11/xorg.conf.d/10-evdev.conf"
+  #get the line number that has "keyboard" in 10-evdev.conf
+  local line=`grep -n "keyboard" $file | cut -f1 -d:`
+  #sum that line with more 2, it will insert the patch there
+  local line=$(( $line + 2 ))
+  #variable to check if the file wasnt already patched
+  local patch=`cat $file | sed ''$(( $line + 1 ))'!d'`
+  #get the keymap from rc.conf
+  local keymap=`cat /etc/vconsole.conf | sed -n '/KEYMAP[=]/p' | sed 's/KEYMAP=//'`
+  #check if the file wasnt already patched
+  if [[ $patch != *"XkbLayout"* ]]; then
+    if [[ $keymap == us-acentos ]]; then
+      kblayout="\\\tOption \"XkbLayout\" \"us_intl\""
+    else
+      case "$LANGUAGE" in
+        de_DE)
+          kblayout="\\\tOption \"XkbLayout\" \"de\""
+          ;;
+        es_ES | es_CL)
+          KBLAYOUT=("es" "latam");
+          PS3="$prompt1"
+          echo -e "Select keyboard layout:"
+          select KBRD in "${KBLAYOUT[@]}"; do
+            if contains_element "$KBRD" "${KBLAYOUT[@]}"; then
+              kblayout="\\\tOption \"XkbLayout\" \"$KBRD\""
+              break
+            else
+              invalid_option
+            fi
+          done
+          ;;
+        it_IT)
+          kblayout="\\\tOption \"XkbLayout\" \"it\""
+          kblayout+="\n\\tOption \"XkbOptions\" \"terminate:ctrl_alt_bksp\""
+          ;;
+        fr_FR)
+          kblayout="\\\tOption \"XkbLayout\" \"fr\""
+          ;;
+        pt_BR)
+          kblayout="\\\tOption \"XkbLayout\" \"br\""
+          kblayout+="\n\\tOption \"XkbVariant\" \"abnt2\""
+          ;;
+        pt_PT)
+          kblayout="\\\tOption \"XkbLayout\" \"pt-latin9\""
+          ;;
+      esac
+    fi
+    #patch file
+    sed -i "${line}a $kblayout" $file
+  fi
+  #}}}
   pause_function
 }
 #}}}
