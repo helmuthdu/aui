@@ -66,12 +66,19 @@ language_selector(){
   fi
   #}}}
   #FIREFOX #{{{
-  if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_GB || $LOCALE == es_AR || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
+  if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_GB || $LOCALE == en_US || $LOCALE == es_AR || $LOCALE == es_CL || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
     LOCALE_FF=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-  elif [[ $LOCALE == en_US ]]; then
-    LOCALE_FF="en-gb"
   else
     LOCALE_FF=`echo $LOCALE | cut -d\_ -f1`
+  fi
+  #}}}
+  #THUNDERBIRD #{{{
+  if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_US || $LOCALE == en_GB || $LOCALE == es_AR || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
+    LOCALE_TB=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+  elif [[ $LOCALE == es_CL ]]; then
+    LOCALE_TB="es-es"
+  else
+    LOCALE_TB=`echo $LOCALE | cut -d\_ -f1`
   fi
   #}}}
   #HUNSPELL #{{{
@@ -116,12 +123,19 @@ language_selector(){
       fi
       #}}}
       #FIREFOX #{{{
-      if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_GB || $LOCALE == es_AR || $LOCALE == es_CL || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
+      if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_GB || $LOCALE == en_US || $LOCALE == es_AR || $LOCALE == es_CL || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
         LOCALE_FF=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
-      elif [[ $LOCALE == en_US ]]; then
-        LOCALE_FF="en-gb"
       else
         LOCALE_FF=`echo $LOCALE | cut -d\_ -f1`
+      fi
+      #}}}
+      #THUNDERBIRD #{{{
+      if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_US || $LOCALE == en_GB || $LOCALE == es_AR || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
+        LOCALE_TB=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+      elif [[ $LOCALE == es_CL ]]; then
+        LOCALE_TB="es-es"
+      else
+        LOCALE_TB=`echo $LOCALE | cut -d\_ -f1`
       fi
       #}}}
       #HUNSPELL #{{{
@@ -2321,7 +2335,7 @@ install_internet_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
-                  package_install "thunderbird thunderbird-i18n-$LOCALE_FF"
+                  package_install "thunderbird thunderbird-i18n-$LOCALE_TB"
                   ;;
                 2)
                   package_install "liferea"
