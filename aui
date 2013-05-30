@@ -3564,6 +3564,7 @@ install_fonts(){
         5)
           package_remove ttf-droid
           package_remove ttf-roboto
+          package_remove cantarell-fonts
           package_remove ttf-ubuntu-font-family
           aur_package_install "ttf-google-fonts-git"
           ;;
