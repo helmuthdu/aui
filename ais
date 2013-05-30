@@ -138,7 +138,7 @@ format_device(){
   partitions=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd'`)
   device_name=("root" "swap" "another")
   select_filesystem(){
-    filesystem=("ext4" "ext3" "ext2" "btrfs" "vfat" "ntfs" "jfs" "xfs");
+    filesystem=("ext4" "ext3" "ext2" "btrfs" "nilfs2" "ntfs" "vfat" "f2fs" "jfs" "xfs");
     PS3="$prompt1"
     echo -e "Select filesystem:\n"
     select TYPE in "${filesystem[@]}"; do

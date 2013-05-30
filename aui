@@ -38,7 +38,6 @@ welcome(){
   print_line
   echo "Script can be cancelled at any time with CTRL+C"
   print_line
-  echo "This version is still in BETA. Send bugreports to: "
   echo "http://www.github.com/helmuthdu/aui"
   print_line
   echo -e "\nBackups:"
@@ -401,16 +400,15 @@ add_custom_repositories(){
   # ENABLE MULTILIB REPOSITORY {{{
   # this option will avoid any problem with packages install
   if [[ $ARCHI == x86_64 ]]; then
-    multilib=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
-    if $multilib &> /dev/null; then
+    local MULTILIB=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
+    if [[ -z $MULTILIB ]]; then
       echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
       echo -e '\nMultilib repository added into pacman.conf file'
     else
-      sed -i "${multilib}s/^#//" /etc/pacman.conf
-      multilib=$(( $multilib + 1 ))
-      sed -i "${multilib}s/^#//" /etc/pacman.conf
+      sed -i "${MULTILIB}s/^#//" /etc/pacman.conf
+      local MULTILIB=$(( $MULTILIB + 1 ))
+      sed -i "${MULTILIB}s/^#//" /etc/pacman.conf
     fi
-    pacman -Sy
   fi
   #}}}
   print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
@@ -440,8 +438,8 @@ add_custom_repositories(){
           ;;
       esac
     done
-    system_update
   fi
+  system_update
 }
 #}}}
 #BASIC SETUP {{{
@@ -1714,7 +1712,7 @@ install_development_apps(){
     echo " 7) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
     echo " 8) $(menu_item "kdevelop")"
     echo " 9) $(menu_item "netbeans")"
-    echo "10) $(menu_item "jdk7-openjdk" "OpenJDK") $AUR"
+    echo "10) $(menu_item "jdk7-openjdk" "OpenJDK")"
     echo "11) $(menu_item "jdk" "Oracle JDK") $AUR"
     echo "12) $(menu_item "qtcreator")"
     echo "13) $(menu_item "sublime-text" "Sublime Text 2") $AUR"
@@ -3539,7 +3537,7 @@ install_fonts(){
     echo " 2) $(menu_item "ttf-dejavu")"
     echo " 3) $(menu_item "ttf-exljbris") $AUR"
     echo " 4) $(menu_item "ttf-funfonts") $AUR"
-    echo " 5) $(menu_item "ttf-google-webfonts-git") $AUR"
+    echo " 5) $(menu_item "ttf-google-fonts-git") $AUR"
     echo " 6) $(menu_item "ttf-liberation")"
     echo " 7) $(menu_item "ttf-ms-fonts") $AUR"
     echo " 8) $(menu_item "ttf-vista-fonts") $AUR"
@@ -3567,7 +3565,7 @@ install_fonts(){
           package_remove ttf-droid
           package_remove ttf-roboto
           package_remove ttf-ubuntu-font-family
-          aur_package_install "ttf-google-webfonts-git"
+          aur_package_install "ttf-google-fonts-git"
           ;;
         6)
           package_install "ttf-liberation"

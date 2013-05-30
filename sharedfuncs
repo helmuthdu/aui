@@ -162,9 +162,39 @@
     if [[ -z $IP_ADDR ]]; then
       if [[ $XPINGS -gt 4 ]]; then
         error_msg "ERROR! Could not find valid IP address."
-        exit 1
+        read_input "I will configure my connection by myself"
+        if [[ $OPTION == y ]]; then
+          conn_type_list=("Wired" "Wireless");
+          PS3="$prompt1"
+          select OPT in "${conn_type_list[@]}"; do
+            case "$REPLY" in
+              1)
+                systemctl stop dhcpcd.service
+                local INTERFACE=`ip link | grep enp | awk '{print $2}'| sed 's/://'`
+                ip link set ${INTERFACE} up
+                read -p "Enter IP/Submask numbers: " IP_ADDR
+                ip addr add ${IP_ADDR} dev ${INTERFACE}
+                read -p "Enter gateway: " GATEWAY
+                ip route add default via ${INTERFACE}
+                break
+                ;;
+              2)
+                read -p "Enter your device ID [ex: wlp3s0]: " WLD
+                ip link set ${WLD} up
+                wifi-menu ${WLD}
+                break
+                ;;
+              *)
+                invalid_option
+                ;;
+            esac
+          done
+          check_connection
+        else
+          exit 1
+        fi
       fi
-      [[ $XPINGS -eq 1 ]] && dhcpcd
+      [[ $XPINGS -eq 1 ]] && systemctl start dhcpcd.service
       sleep 3
       check_connection
     fi
