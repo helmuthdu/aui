@@ -159,29 +159,29 @@
   check_connection() { #{{{
     XPINGS=$(( $XPINGS + 1 ))
     IP_ADDR=`ip addr 2>/dev/null | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' | egrep -v '255|(127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})' | sed 's/ //g'`
+    WIRED_DEV=`ip link | grep enp | awk '{print $2}'| sed 's/://'`
     if [[ -z $IP_ADDR ]]; then
       if [[ $XPINGS -gt 4 ]]; then
         error_msg "ERROR! Could not find valid IP address."
-        read_input "I will configure my connection by myself"
+        read_input "Set up connection manually"
         if [[ $OPTION == y ]]; then
           conn_type_list=("Wired" "Wireless");
           PS3="$prompt1"
           select OPT in "${conn_type_list[@]}"; do
             case "$REPLY" in
               1)
-                systemctl stop dhcpcd.service
-                local INTERFACE=`ip link | grep enp | awk '{print $2}'| sed 's/://'`
-                ip link set ${INTERFACE} up
-                read -p "Enter IP/Submask numbers: " IP_ADDR
-                ip addr add ${IP_ADDR} dev ${INTERFACE}
-                read -p "Enter gateway: " GATEWAY
-                ip route add default via ${INTERFACE}
+                systemctl stop dhcpcd@${WIRED_DEV}.service
+                ip link set ${WIRED_DEV} up
+                read -p "IP/Submask: " IP_ADDR
+                ip addr add ${IP_ADDR} dev ${WIRED_DEV}
+                read -p "Gateway: " GATEWAY
+                ip route add default via ${WIRED_DEV}
                 break
                 ;;
               2)
-                read -p "Enter your device ID [ex: wlp3s0]: " WLD
-                ip link set ${WLD} up
-                wifi-menu ${WLD}
+                read -p "Device ID [ex: wlp3s0]: " WIRELESS_DEV
+                ip link set ${WIRELESS_DEV} up
+                wifi-menu ${WIRELESS_DEV}
                 break
                 ;;
               *)
@@ -194,7 +194,7 @@
           exit 1
         fi
       fi
-      [[ $XPINGS -eq 1 ]] && systemctl start dhcpcd.service
+      [[ $XPINGS -eq 1 ]] && systemctl start dhcpcd@${WIRED_DEV}.service
       sleep 3
       check_connection
     fi
