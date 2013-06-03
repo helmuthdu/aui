@@ -1251,9 +1251,10 @@ install_desktop_environment(){
       package_install "gksu xdg-user-dirs-gtk gucharmap"
       package_install "gvfs-smb gvfs-afc"
       aur_package_install "gnome-defaults-list"
-      #Essential stuffs
+      # extensions
       aur_package_install "cinnamon-applet-screenshot-record"
       aur_package_install "cinnamon-extension-coverflow-alt-tab"
+      # config xinitrc
       config_xinitrc "gnome-session-cinnamon"
       #Tweaks
       sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-effect scale
@@ -1293,6 +1294,7 @@ install_desktop_environment(){
       package_install "lxappearance"
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
+      # config xinitrc
       config_xinitrc "enlightenment_start"
       pause_function
       install_misc_apps "E17"
@@ -1305,14 +1307,16 @@ install_desktop_environment(){
       #GNOME {{{
       print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
-      package_install "gnome gnome-extra telepathy"
+      package_install "gnome gnome-extra zeitgeist telepathy"
       package_install "gksu nautilus-open-terminal gedit-plugins gnome-tweak-tool gucharmap"
       package_install "gvfs-smb gvfs-afc gvfs-goa"
       package_install "deja-dup"
       package_install "gnome-packagekit gnome-settings-daemon-updates"
       aur_package_install "gnome-defaults-list"
+      # empathy theme
       package_install "python2-distutils-extra"
       aur_package_install "empathy-theme-ubuntu-adium-bzr"
+      # config xinitrc
       config_xinitrc "gnome-session"
       GNOME=1
       pause_function
@@ -1354,6 +1358,7 @@ install_desktop_environment(){
       aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
       local CONFIG_PULSEAUDIO=`cat /etc/pulse/default.pa | grep module-device-manager`
       [[ -z $CONFIG_PULSEAUDIO ]] && echo "load-module module-device-manager" >> /etc/pulse/default.pa
+      # config xinitrc
       config_xinitrc "startkde"
       pause_function
       #QTCURVE THEMES #{{{
@@ -1443,6 +1448,7 @@ install_desktop_environment(){
       cp /etc/xdg/openbox/menu.xml /home/${USER_NAME}/.config/openbox/
       cp /etc/xdg/openbox/autostart /home/${USER_NAME}/.config/openbox/
       chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+      # config xinitrc
       config_xinitrc "startlxde"
       pause_function
       install_misc_apps "LXDE"
@@ -1460,6 +1466,7 @@ install_desktop_environment(){
       package_install "mate mate-extras"
       package_install "gvfs"
       aur_package_install "gnome-defaults-list"
+      # config xinitrc
       config_xinitrc "mate-session"
       pause_function
       install_themes "MATE"
@@ -1477,6 +1484,7 @@ install_desktop_environment(){
       package_install "gvfs"
       package_install "xdg-user-dirs"
       aur_package_install "gnome-defaults-list"
+      # config xinitrc
       config_xinitrc "startxfce4"
       pause_function
       install_display_manager
@@ -1498,6 +1506,7 @@ install_desktop_environment(){
       mkdir -p /home/${USER_NAME}/.config/awesome/
       cp /etc/xdg/awesome/rc.lua /home/${USER_NAME}/.config/awesome/
       chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+      # config xinitrc
       config_xinitrc "awesome"
       pause_function
       install_misc_apps "AWESOME"
@@ -1516,6 +1525,7 @@ install_desktop_environment(){
       package_install "leafpad epdfview"
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
+      # config xinitrc
       config_xinitrc "startfluxbox"
       install_misc_apps "FLUXBOX"
       install_themes "FLUXBOX"
@@ -1539,6 +1549,7 @@ install_desktop_environment(){
       cp /etc/xdg/openbox/menu.xml /home/${USER_NAME}/.config/openbox/
       cp /etc/xdg/openbox/autostart /home/${USER_NAME}/.config/openbox/
       chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+      # config xinitrc
       config_xinitrc "openbox-session"
       pause_function
       install_misc_apps "OPENBOX"
@@ -2714,11 +2725,12 @@ install_video_apps(){
             print_title "VIDEO EDITORS|TOOLS"
             echo " 1) $(menu_item "avidemux-gtk avidemux-qt" "Avidemux")"
             echo " 2) $(menu_item "arista-transcoder" "Arista") $AUR"
-            echo " 3) $(menu_item "transmageddon")"
-            echo " 4) $(menu_item "kdeenlive")"
-            echo " 5) $(menu_item "openshot")"
-            echo " 6) $(menu_item "pitivi")"
-            echo " 7) $(menu_item "kazam-bzr") $AUR"
+            echo " 3) $(menu_item "handbrake")"
+            echo " 4) $(menu_item "transmageddon")"
+            echo " 5) $(menu_item "kdeenlive")"
+            echo " 6) $(menu_item "openshot")"
+            echo " 7) $(menu_item "pitivi")"
+            echo " 8) $(menu_item "kazam-bzr") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2737,18 +2749,21 @@ install_video_apps(){
                   aur_package_install "arista-transcoder"
                   ;;
                 3)
-                  package_install "transmageddon"
+                  package_install "handbrake"
                   ;;
                 4)
-                  package_install "kdenlive"
+                  package_install "transmageddon"
                   ;;
                 5)
-                  package_install "openshot"
+                  package_install "kdenlive"
                   ;;
                 6)
-                  package_install "pitivi"
+                  package_install "openshot"
                   ;;
                 7)
+                  package_install "pitivi"
+                  ;;
+                8)
                   aur_package_install "kazam-bzr"
                   ;;
                 "b")

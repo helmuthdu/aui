@@ -238,7 +238,7 @@
   # 6) Virtualbox
   # 7) Webmin
   # 8) Wine
-  SYSTEMTOOLS_OPTIONS="3-5 8"
+  SYSTEMTOOLS_OPTIONS="3-6 8"
 #}}}
 #GRAPHICS {{{
   # 1) Blender
@@ -253,7 +253,7 @@
   #10) Shotwell
   #11) Simple Scan
   #12) XnViewMP
-  GRAPHICS_OPTIONS="2-7 9"
+  GRAPHICS_OPTIONS="2-8 10"
 #}}}
 #INTERNET {{{
   # 1) Browser
@@ -362,11 +362,12 @@
   #EDITORS|TOOLS {{{
     # 1) Avidemux
     # 2) Arista
-    # 3) Transmageddon
-    # 4) Kdenlive
-    # 5) Openshot
-    # 6) Pitivi
-    # 7) Kazam
+    # 3) Handbrake
+    # 4) Transmageddon
+    # 5) Kdenlive
+    # 6) Openshot
+    # 7) Pitivi
+    # 8) Kazam
     VIDEO_EDITOR_OPTIONS="2"
   #}}}
 #}}}
@@ -502,7 +503,7 @@
   # 7) ttf-ms-fonts
   # 8) ttf-vista-fonts
   # 9) wqy-microhei
-  FONTS_OPTIONS="1-4 6-9"
+  FONTS_OPTIONS="1-9"
 #}}}
 #EXTRA {{{
   # 1) Elementary Project
