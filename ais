@@ -83,14 +83,15 @@ configure_mirrorlist(){
   tmpfile=$(mktemp --suffix=-mirrorlist)
 
   # Get latest mirror list and save to tmpfile
-  wget -qO- "$url" | sed 's/^#Server/Server/g' > "$tmpfile"
+  curl -o ${tmpfile} ${url}
+  sed -i 's/^#Server/Server/g' ${tmpfile}
 
   # Backup and replace current mirrorlist file (if new file is non-zero)
-  if [[ -s "$tmpfile" ]]; then
+  if [[ -s ${tmpfile} ]]; then
    { echo " Backing up the original mirrorlist..."
      mv -i /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.orig; } &&
    { echo " Rotating the new list into place..."
-     mv -i "$tmpfile" /etc/pacman.d/mirrorlist; }
+     mv -i ${tmpfile} /etc/pacman.d/mirrorlist; }
   else
     echo " Unable to update, could not download list."
   fi
