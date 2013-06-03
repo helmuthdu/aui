@@ -1729,8 +1729,9 @@ install_development_apps(){
     echo "13) $(menu_item "sublime-text" "Sublime Text 2") $AUR"
     echo "14) $(menu_item "gdb" "Debuggers & Syntax Tools")"
     echo "15) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-    echo "16) $(menu_item "meld")"
-    echo "17) $(menu_item "rabbitvcs" "RabbitVCS") $AUR"
+    echo "16) $(menu_item "sql-power-architect" "SQL Power Architect") $AUR"
+    echo "17) $(menu_item "meld")"
+    echo "18) $(menu_item "rabbitvcs" "RabbitVCS") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1865,9 +1866,12 @@ install_development_apps(){
           aur_package_install "mysql-workbench-gpl"
           ;;
         16)
-          package_install "meld"
+          aur_package_install "sql-power-architect"
           ;;
         17)
+          package_install "meld"
+          ;;
+        18)
           aur_package_install "rabbitvcs"
           if is_package_installed "nautilus" ; then
             aur_package_install "rabbitvcs-nautilus"

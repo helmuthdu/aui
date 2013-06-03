@@ -196,10 +196,11 @@
   #11) Oracle JDK
   #12) QT Creator
   #13) Sublime Text 2
-  #14) Debugger & Syntax Tools [Valgrind, Gdb, Splint, Tidyhtml, flake8]
+  #14) Debugger & Syntax Tools
   #15) MySQL Workbench
-  #16) Meld
-  #17) RabbitVCS
+  #16) SQL Power Architect
+  #17) Meld
+  #18) RabbitVCS
   DEVELOPMENT_OPTIONS="11 5 14"
   #ECLIPSE {{{
     # 1) Eclipse Classic
