@@ -69,7 +69,6 @@ configure_mirrorlist(){
       fi
     done
   }
-  package_install "wget"
   print_title "MIRRORLIST - https://wiki.archlinux.org/index.php/Mirrors"
   print_info "This option is a guide to selecting and configuring your mirrors, and a listing of current available mirrors."
   OPTION=n
@@ -78,12 +77,12 @@ configure_mirrorlist(){
     read_input_text "Confirm country: $OPT"
   done
 
-  url="https://www.archlinux.org/mirrorlist/?country=$country&protocol=ftp&protocol=http&ip_version=4&use_mirror_status=on"
+  url="https://www.archlinux.org/mirrorlist/?country=$country"
 
   tmpfile=$(mktemp --suffix=-mirrorlist)
 
   # Get latest mirror list and save to tmpfile
-  curl -o ${tmpfile} ${url}
+  curl -so ${tmpfile} ${url}
   sed -i 's/^#Server/Server/g' ${tmpfile}
 
   # Backup and replace current mirrorlist file (if new file is non-zero)
