@@ -78,7 +78,7 @@ configure_mirrorlist(){
     read_input_text "Confirm country: $OPT"
   done
 
-  url="https://www.archlinux.org/mirrorlist/?country=$country"
+  url="https://www.archlinux.org/mirrorlist/?country=${country}&use_mirror_status=on"
 
   tmpfile=$(mktemp --suffix=-mirrorlist)
 
