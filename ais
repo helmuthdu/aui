@@ -34,6 +34,7 @@ select_keymap(){
     setkeymap
     read_input_text "Confirm keymap: $KEYMAP"
   done
+  loadkeys $KEYMAP
 }
 #}}}
 #DEFAULT EDITOR {{{

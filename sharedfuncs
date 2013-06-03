@@ -516,11 +516,10 @@
     echo "Select keymap:"
     select KEYMAP in "${keymaps[@]}"; do
       if contains_element "$KEYMAP" "${keymaps[@]}"; then
-        loadkeys $KEYMAP
+        break
       else
         invalid_option
       fi
-      [[ -n $OPT ]] && break
     done
   }
   #}}}
