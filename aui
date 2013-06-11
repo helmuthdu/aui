@@ -2032,8 +2032,8 @@ install_system_apps(){
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
             package_install "virtualbox virtualbox-host-modules virtualbox-guest-iso"
             aur_package_install "virtualbox-ext-oracle"
-            add_module "vboxdrv" "virtualbox-host"
-            modprobe -a vboxdrv
+            add_module "vboxdrv vboxnetflt" "virtualbox-host"
+            modprobe vboxdrv vboxnetflt
             add_user_to_group ${USER_NAME} vboxusers
           else
             cecho " ${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
