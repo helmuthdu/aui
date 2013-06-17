@@ -43,8 +43,7 @@
   PRELOAD="y"
   SAMBA="y"
   SSH="y"
-  TLP="n"                # Laptop Mode Tools
-  FWD="n"                # FirewallD
+  TLP="n"                # Laptop Power Manager
   ZRAM="y"
   PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA|ATI) driver
   #FONT CONFIGURATION {{{
@@ -64,7 +63,8 @@
     # 8) bluez-firmware
     # 9) libffado [Fireware Audio Devices]
     #10) libraw1394 [IEE1394 Driver]
-    #11) sane-gt68xx-firmware
+    #11) aic94xx-firmware
+    #12) bfa-firmware
     FIRMWARE_OPTIONS="1"
   #}}}
 #}}}
@@ -103,6 +103,7 @@
     #10) Volwheel
     #11) Xfburn
     #12) Xcompmgr
+    #13) Zathura
     MISCAPPS="1 3"
   #}}}
   #DISPLAY MANAGER {{{
@@ -126,25 +127,20 @@
     # 6) iNX
     # 7) Matrilineare
     # 8) Nitrux
-    ICONS_THEMES="3-5"
+    ICONS_THEMES="3 5"
   #}}}
   #GTK THEMES {{{
-    # 1) Adwaita-X
-    # 2) Boje
-    # 3) Bluebird
-    # 4) Greybird
-    # 5) Faience
-    # 6) Gnome Cupertino
-    # 7) MediterraneanNight
-    # 8) Orion
-    # 9) Light (Aka Ambiance/Radiance)
-    #10) Zukitwo
-    GTK_THEMES="5 7"
+    # 1) Greybird
+    # 2) Faience
+    # 3) Gnome Cupertino
+    # 4) MediterraneanNight
+    # 5) Numix
+    # 6) Zukitwo
+    GTK_THEMES="1-6"
   #}}}
   #GNOME SHELL THEMES {{{
-    # 1) Elegance
-    # 2) eOS
-    GNOME_SHELL_THEMES="1 2"
+    # 1) Default-Mod
+    GNOME_SHELL_THEMES="1"
   #}}}
   #CINNAMON THEMES {{{
     # 1) Ambience
@@ -168,24 +164,22 @@
   # n) None
   NETWORKMANAGER=1
   #USB 3G MODEM SUPPORT
-  USBMODEM="n"
+  USBMODEM="y"
 #}}}
 #ACCESSORIES {{{
   # 1) Cairo Dock
   # 2) Catfish
   # 3) Conky
-  # 4) Deepin Screenshot
-  # 5) Dockbarx
-  # 6) Docky
-  # 7) Galculator|Speedcrunch
-  # 8) Terra [Drop-down Terminal]
-  # 9) Kupfer
-  #10) Pyrenamer
-  #11) Shutter
-  #12) Stormcloud
-  #13) Synapse
-  #14) Terminator
-  #15) Zim
+  # 4) Dockbarx
+  # 5) Docky
+  # 6) Galculator|Speedcrunch
+  # 7) Terra [Drop-down Terminal]
+  # 8) Kupfer
+  # 9) Pyrenamer
+  #10) Shutter
+  #11) Stormcloud
+  #12) Terminator
+  #13) Zim
   ACCESSORIES_OPTIONS=""
 #}}}
 #DEVELOPEMENT {{{
@@ -202,10 +196,11 @@
   #11) Oracle JDK
   #12) QT Creator
   #13) Sublime Text 2
-  #14) Debugger & Syntax Tools [Valgrind, Gdb, Splint, Tidyhtml, flake8]
+  #14) Debugger & Syntax Tools
   #15) MySQL Workbench
-  #16) Meld
-  #17) RabbitVCS
+  #16) SQL Power Architect
+  #17) Meld
+  #18) RabbitVCS
   DEVELOPMENT_OPTIONS="11 5 14"
   #ECLIPSE {{{
     # 1) Eclipse Classic
@@ -233,17 +228,18 @@
   # 9) OCRFeeder
   #10) UberWriter
   #11) Xmind
-  #12) Zathura
-  OFFICE_OPTIONS="1 6 8 10"
+  OFFICE_OPTIONS="1 10"
 #}}}
 #SYSTEM TOOLS {{{
-  # 1) Gparted
-  # 2) Grsync
-  # 3) Htop
-  # 4) Virtualbox
-  # 5) Webmin
-  # 6) Wine
-  SYSTEMTOOLS_OPTIONS="1-4 6"
+  # 1) ClamAV
+  # 2) FirewallD
+  # 3) Gparted
+  # 4) Grsync
+  # 5) Htop
+  # 6) Virtualbox
+  # 7) Webmin
+  # 8) Wine
+  SYSTEMTOOLS_OPTIONS="3-6 8"
 #}}}
 #GRAPHICS {{{
   # 1) Blender
@@ -253,11 +249,12 @@
   # 5) Inkscape
   # 6) MComix
   # 7) Mypaint
-  # 8) Scribus
-  # 9) Shotwell
-  #10) Simple Scan
-  #11) XnViewMP
-  GRAPHICS_OPTIONS="2-7 9"
+  # 8) Pencil
+  # 9) Scribus
+  #10) Shotwell
+  #11) Simple Scan
+  #12) XnViewMP
+  GRAPHICS_OPTIONS="2-8 10"
 #}}}
 #INTERNET {{{
   # 1) Browser
@@ -279,21 +276,18 @@
   #DOWNLOAD|FILESHARE {{{
     # 1) Deluge
     # 2) Dropbox
-    # 3) Insync
-    # 4) Jdownloader
-    # 5) Nitroshare
-    # 6) Sparkleshare
-    # 7) Spider Oak
-    # 8) Steadyflow
-    # 9) Trasmission
-    #10) Ubuntu One
-    DOWNLOAD_OPTIONS="2 4"
+    # 3) Jdownloader
+    # 4) Nitroshare
+    # 5) Sparkleshare
+    # 6) Spider Oak
+    # 7) Steadyflow
+    # 8) Trasmission
+    DOWNLOAD_OPTIONS="2 3"
   #}}}
   #EMAIL|RSS {{{
     # 1) Mozilla Thunderbird
     # 2) Liferea
-    # 3) LightRead
-    EMAIL_OPTIONS="3"
+    EMAIL_OPTIONS=""
   #}}}
   #IM {{{
     # 1) Emesene
@@ -369,11 +363,12 @@
   #EDITORS|TOOLS {{{
     # 1) Avidemux
     # 2) Arista
-    # 3) Transmageddon
-    # 4) Kdenlive
-    # 5) Openshot
-    # 6) Pitivi
-    # 7) Kazam
+    # 3) Handbrake
+    # 4) Transmageddon
+    # 5) Kdenlive
+    # 6) Openshot
+    # 7) Pitivi
+    # 8) Kazam
     VIDEO_EDITOR_OPTIONS="2"
   #}}}
 #}}}
@@ -401,7 +396,6 @@
     # 6) OpenTyrian
     # 7) Sonic Robot Bast 2
     # 8) SteelStorm
-    # 9) Yo Frankie!
     ACTION=""
   #}}}
   #ARCADE {{{
@@ -433,9 +427,10 @@
     # 3) Dolphin
     # 4) ePSXe
     # 5) Project64
-    # 6) VisualBoyAdvanced
-    # 7) wxMupen64Plus
-    # 8) ZSNES
+    # 6) Snes9x
+    # 7) VisualBoyAdvanced
+    # 8) wxMupen64Plus
+    # 9) ZSNES
     EMULATORS=""
   #}}}
   #FPS {{{
@@ -493,8 +488,10 @@
   #}}}
 #}}}
 #WEBSERVER {{{
-  # 1) LAMP - APACHE, MYSQL & PHP + ADMINER
+  # 1) LAMP - APACHE, MariaDB & PHP + ADMINER
   # 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER
+  # 3) LNMP - NGINX, MariaDB & PHP + ADMINER
+  # 4) LNPP - NGINX, POSTGRESQL & PHP + ADMINER
   WEBSERVER=2
 #}}}
 #FONTS {{{
@@ -511,7 +508,6 @@
 #}}}
 #EXTRA {{{
   # 1) Elementary Project
-  # 2) Font Configuration
   EXTRA_OPTIONS=""
   #ELEMENTARY PROJECT {{{
     # 1) Audience

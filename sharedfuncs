@@ -1,0 +1,563 @@
+#!/bin/bash
+#-------------------------------------------------------------------------------
+#Created by helmuthdu mailto: helmuthdu[at]gmail[dot]com
+#Contribution: flexiondotorg
+#-------------------------------------------------------------------------------
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# Run this script after your first boot with archlinux (as root)
+
+#VARIABLES {{{
+  checklist=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
+  # COLORS {{{
+    Bold=$(tput bold)
+    Underline=$(tput sgr 0 1)
+    Reset=$(tput sgr0)
+    # Regular Colors
+    Red=$(tput setaf 1)
+    Green=$(tput setaf 2)
+    Yellow=$(tput setaf 3)
+    Blue=$(tput setaf 4)
+    Purple=$(tput setaf 5)
+    Cyan=$(tput setaf 6)
+    White=$(tput setaf 7)
+    # Bold
+    BRed=${Bold}$(tput setaf 1)
+    BGreen=${Bold}$(tput setaf 2)
+    BYellow=${Bold}$(tput setaf 3)
+    BBlue=${Bold}$(tput setaf 4)
+    BPurple=${Bold}$(tput setaf 5)
+    BCyan=${Bold}$(tput setaf 6)
+    BWhite=${Bold}$(tput setaf 7)
+  #}}}
+  # PROMPT {{{
+    prompt1="Enter your option: "
+    prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
+    prompt3="You have to manual enter the following commands, then press ${BYellow}ctrl+d${Reset} or type ${BYellow}exit${Reset}:"
+  #}}}
+  # EDITOR {{{
+    AUTOMATIC_MODE=0
+    if [[ -f /usr/bin/vim ]]; then
+      EDITOR="vim"
+    elif [[ -z $EDITOR ]]; then
+      EDITOR="nano"
+    fi
+  #}}}
+  # DESKTOP ENVIRONMENT
+  CINNAMON=0
+  GNOME=0
+  KDE=0
+  # ARCHITECTURE
+  ARCHI=`uname -m`
+  UEFI=0
+  # AUR PACKAGE
+  AUR=`echo -e "(${BPurple}aur${Reset})"`
+  #CURRENT DIRECTORY
+  AUI_DIR=`pwd`
+  MOUNTPOINT="/mnt"
+  # VERBOSE MODE
+  [[ $1 == -v || $1 == --verbose ]] && VERBOSE_MODE=1 || VERBOSE_MODE=0
+  # LOG FILE
+  LOG="${AUI_DIR}/`basename ${0}`_error.log"
+  [[ -f $LOG ]] && rm -f $LOG
+  PKG_FAIL="${AUI_DIR}/`basename ${0}`_pkg_fail_list.log"
+  [[ -f $PKG_FAIL ]] && rm -f $PKG_FAIL
+  # CONNECTION CHECK
+  XPINGS=0
+  #MISC
+  SPIN="/-\|"
+  PKG=""
+  AUTOMATIC_MODE=0
+#}}}
+#COMMON FUNCTIONS {{{
+  error_msg() { #{{{
+    local MSG="${1}"
+    echo "${MSG}"
+    exit 1
+  } #}}}
+  cecho() { #{{{
+    echo -e "$1"
+    echo -e "$1" >>"$LOG"
+    tput sgr0;
+  } #}}}
+  ncecho() { #{{{
+    echo -ne "$1"
+    echo -ne "$1" >>"$LOG"
+    tput sgr0
+  } #}}}
+  spinny() { #{{{
+    echo -ne "\b${SPIN:i++%${#SPIN}:1}"
+  } #}}}
+  progress() { #{{{
+    ncecho "  ";
+    while true; do
+      kill -0 $pid 2> /dev/null;
+      if [[ $? == 0 ]]; then
+        spinny
+        sleep 0.25
+      else
+        ncecho "\b\b";
+        wait $pid
+        retcode=$?
+        echo -ne "$pid's retcode: $retcode" >> $LOG
+        if [[ $retcode == 0 ]] || [[ $retcode == 255 ]]; then
+          cecho success
+        else
+          cecho failed
+          echo "$PKG" >> $PKG_FAIL
+          read_input_text " View logfile?"
+          [[ $OPTION == y ]] && less $LOG
+        fi
+        break
+      fi
+    done
+  } #}}}
+  check_root() { #{{{
+    if [ "$(id -u)" != "0" ]; then
+      error_msg "ERROR! You must execute the script as the 'root' user."
+    fi
+  } #}}}
+  check_user() { #{{{
+    if [ "$(id -u)" == "0" ]; then
+      error_msg "ERROR! You must execute the script as a normal user."
+    fi
+  } #}}}
+  check_archlinux() { #{{{
+    if [ ! -e /etc/arch-release ]; then
+      error_msg "ERROR! You must execute the script on Arch Linux."
+    fi
+  } #}}}
+  check_hostname() { #{{{
+    if [ `echo ${HOSTNAME} | sed 's/ //g'` == "" ]; then
+      error_msg "ERROR! Hostname is not configured."
+    fi
+  } #}}}
+  check_domainname() { #{{{
+    DOMAINNAME=`echo ${HOSTNAME} | cut -d'.' -f2- | sed 's/ //g'`
+
+    # Hmm, still no domain name. Keep looking...
+    if [[ "${DOMAINNAME}" == "" ]]; then
+      DOMAINNAME=`grep domain /etc/resolv.conf | sed 's/domain //g' | sed 's/ //g'`
+    fi
+
+    # OK, give up.
+    if [[ "${DOMAINNAME}" == "" ]]; then
+      error_msg "ERROR! Domain name is not configured."
+    fi
+  } #}}}
+  check_connection() { #{{{
+    XPINGS=$(( $XPINGS + 1 ))
+    IP_ADDR=`ip addr 2>/dev/null | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' | egrep -v '255|(127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})' | sed 's/ //g'`
+    WIRED_DEV=`ip link | grep enp | awk '{print $2}'| sed 's/://'`
+    if [[ -z $IP_ADDR ]]; then
+      if [[ $XPINGS -gt 4 ]]; then
+        error_msg "ERROR! Could not find valid IP address."
+        read_input "Set up connection manually"
+        if [[ $OPTION == y ]]; then
+          conn_type_list=("Wired" "Wireless");
+          PS3="$prompt1"
+          select OPT in "${conn_type_list[@]}"; do
+            case "$REPLY" in
+              1)
+                systemctl stop dhcpcd@${WIRED_DEV}.service
+                ip link set ${WIRED_DEV} up
+                read -p "IP/Submask: " IP_ADDR
+                ip addr add ${IP_ADDR} dev ${WIRED_DEV}
+                read -p "Gateway: " GATEWAY
+                ip route add default via ${WIRED_DEV}
+                break
+                ;;
+              2)
+                read -p "Device ID [ex: wlp3s0]: " WIRELESS_DEV
+                ip link set ${WIRELESS_DEV} up
+                wifi-menu ${WIRELESS_DEV}
+                break
+                ;;
+              *)
+                invalid_option
+                ;;
+            esac
+          done
+          check_connection
+        else
+          exit 1
+        fi
+      fi
+      [[ $XPINGS -eq 1 ]] && systemctl start dhcpcd@${WIRED_DEV}.service
+      sleep 3
+      check_connection
+    fi
+  } #}}}
+  check_vga() { #{{{
+    # Determine video chipset - only Intel, ATI and nvidia are supported by this script"
+    ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Detecting video chipset "
+    local VGA=`lspci | grep VGA | tr "[:upper:]" "[:lower:]"`
+    if [[ -n $(dmidecode --type 1 | grep VirtualBox) ]]; then
+      cecho Virtualbox
+      VIDEO_DRIVER="virtualbox"
+    elif [[ -n $(echo ${VGA} | grep "nvidia") ]]; then
+      cecho Nvidia
+      read_input_text "Install NVIDIA proprietary driver" $PROPRIETARY_DRIVER
+      if [[ $OPTION == y ]]; then
+        VIDEO_DRIVER="nvidia"
+      else
+        VIDEO_DRIVER="nouveau"
+      fi
+    elif [[ -n $(echo ${VGA} | grep "intel corporation") ]]; then
+      cecho Intel
+      VIDEO_DRIVER="intel"
+    elif [[ -n $(echo ${VGA} | grep "advanced micro devices") ]]; then
+      cecho AMD/ATI
+      read_input_text "Install ATI proprietary driver" $PROPRIETARY_DRIVER
+      if [[ $OPTION == y ]]; then
+        VIDEO_DRIVER="catalyst"
+      else
+        VIDEO_DRIVER="ati"
+      fi
+    else
+      cecho VESA
+      VIDEO_DRIVER="vesa"
+    fi
+    OPTION="y"
+    [[ $VIDEO_DRIVER == intel || $VIDEO_DRIVER == vesa ]] && read -p "Confirm video driver: $VIDEO_DRIVER [Y/n]" OPTION
+    if [[ $OPTION == n ]]; then
+      read -p "Type your video driver [ex: sis, fbdev, modesetting]: " VIDEO_DRIVER
+    fi
+  } #}}}
+  read_input(){ #{{{
+    if [[ $AUTOMATIC_MODE -eq 1 ]]; then
+      OPTION=$1
+    else
+      read -p "$prompt1" OPTION
+    fi
+  } #}}}
+  read_input_text(){ #{{{
+    if [[ $AUTOMATIC_MODE -eq 1 ]]; then
+      OPTION=$2
+    else
+      read -p "$1 [y/N]: " OPTION
+      echo ""
+    fi
+    OPTION=`echo "$OPTION" | tr '[:upper:]' '[:lower:]'`
+  } #}}}
+  read_input_options(){ #{{{
+    local line
+    local packages
+    if [[ $AUTOMATIC_MODE -eq 1 ]]; then
+      array=("$1")
+    else
+      read -p "$prompt2" OPTION
+      array=("$OPTION")
+    fi
+    for line in ${array[@]/,/ }; do
+      if [[ ${line/-/} != $line ]]; then
+        for ((i=${line%-*}; i<=${line#*-}; i++)); do
+          packages+=($i);
+        done
+      else
+        packages+=($line)
+      fi
+    done
+    OPTIONS=("${packages[@]}")
+  } #}}}
+  print_line(){ #{{{
+    printf "%$(tput cols)s\n"|tr ' ' '-'
+  } #}}}
+  print_title(){ #{{{
+    clear
+    print_line
+    echo -e "# ${Bold}$1${Reset}"
+    print_line
+    echo ""
+  } #}}}
+  print_info(){ #{{{
+    #Console width number
+    T_COLS=`tput cols`
+    echo -e "${Bold}$1${Reset}\n" | fold -sw $(( $T_COLS - 18 )) | sed 's/^/\t/'
+  } #}}}
+  print_warning(){ #{{{
+    #Console width number
+    T_COLS=`tput cols`
+    echo -e "${BRed}$1${Reset}\n" | fold -sw $(( $T_COLS - 1 ))
+  } #}}}
+  start_module(){ #{{{
+    modprobe $1
+  } #}}}
+  replaceinfile() { #{{{
+    SEARCH=${1}
+    REPLACE=${2}
+    FILEPATH=${3}
+    FILEBASE=`basename ${3}`
+
+    sed -e "s/${SEARCH}/${REPLACE}/" ${FILEPATH} > /tmp/${FILEBASE} 2>"$LOG"
+    if [[ ${?} -eq 0 ]]; then
+      mv /tmp/${FILEBASE} ${FILEPATH}
+    else
+      cecho "failed: ${SEARCH} - ${FILEPATH}"
+    fi
+  } #}}}
+  add_module(){ #{{{
+    #check if the number of arguments is less then 2
+    for MODULE in $1; do
+      [[ $# -lt 2 ]] && MODULE_NAME="$MODULE" || MODULE_NAME="$2";
+      echo "$MODULE" >> /etc/modules-load.d/$MODULE_NAME.conf
+      start_module "$MODULE"
+    done
+  } #}}}
+  update_early_modules() { #{{{
+    local NEW_MODULE=${1}
+    local OLD_ARRAY=`egrep ^MODULES= /etc/mkinitcpio.conf`
+
+    if [[ -n ${NEW_MODULE} ]]; then
+      # Determine if the new module is already listed.
+      _EXISTS=`echo ${OLD_ARRAY} | grep ${NEW_MODULE}`
+      if [ $? -eq 1 ]; then
+
+        source /etc/mkinitcpio.conf
+        if [[ -z ${MODULES} ]]; then
+          NEW_MODULES="${NEW_MODULE}"
+        else
+          NEW_MODULES="${MODULES} ${NEW_MODULE}"
+        fi
+        replaceinfile "MODULES=\"${MODULES}\"" "MODULES=\"${NEW_MODULES}\"" /etc/mkinitcpio.conf
+        ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Rebuilding init "
+        mkinitcpio -p linux >>"$LOG" 2>&1 &
+        pid=$!;progress $pid
+      fi
+    fi
+  } #}}}
+  is_package_installed(){ #{{{
+    #check if a package is already installed
+    for PKG in $1; do
+      pacman -Q $PKG &> /dev/null && return 0;
+    done
+    return 1
+  } #}}}
+  checkbox(){ #{{{
+    #display [X] or [ ]
+    [[ "$1" -eq 1 ]] && echo -e "${BBlue}[${Reset}${Bold}X${BBlue}]${Reset}" || echo -e "${BBlue}[ ${BBlue}]${Reset}";
+  } #}}}
+  checkbox_package(){ #{{{
+    #check if [X] or [ ]
+    is_package_installed "$1" && checkbox 1 || checkbox 0
+  } #}}}
+  aui_download_packages(){ #{{{
+    for PKG in $1; do
+      #exec command as user instead of root
+      su - ${USER_NAME} -c "
+        [[ ! -d aui_packages ]] && mkdir aui_packages
+        cd aui_packages
+        curl -o $PKG.tar.gz https://aur.archlinux.org/packages/${PKG:0:2}/$PKG/$PKG.tar.gz
+        tar zxvf $PKG.tar.gz
+        rm $PKG.tar.gz
+        cd $PKG
+        makepkg -si --noconfirm
+      "
+    done
+  } #}}}
+  aur_package_install(){ #{{{
+    #install package from aur
+    for PKG in $1; do
+      if ! is_package_installed "${PKG}" ; then
+        if [[ $AUTOMATIC_MODE -eq 1 ]]; then
+          ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing ${AUR} ${Bold}${PKG}${Reset} "
+          su - ${USER_NAME} -c "${AUR_HELPER} --noconfirm -S ${PKG}" >>"$LOG" 2>&1 &
+          pid=$!;progress $pid
+        else
+          su - ${USER_NAME} -c "${AUR_HELPER} -S ${PKG}"
+        fi
+      else
+        if [[ $VERBOSE_MODE -eq 0 ]]; then
+          cecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing ${AUR} ${Bold}${PKG}${Reset} success"
+        else
+          echo -e "Warning: ${PKG} is up to date --skipping"
+        fi
+      fi
+    done
+  } #}}}
+  package_install(){ #{{{
+    #install packages using pacman
+    if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
+      for PKG in ${1}; do
+        PKG_REPO=`pacman -Sp --print-format %r ${PKG} | uniq | sed '1!d'`
+        case $PKG_REPO in
+          "core")
+            PKG_REPO="${BRed}${PKG_REPO}${Reset}"
+            ;;
+          "extra")
+            PKG_REPO="${BYellow}${PKG_REPO}${Reset}"
+            ;;
+          "community")
+            PKG_REPO="${BGreen}${PKG_REPO}${Reset}"
+            ;;
+          "multilib")
+            PKG_REPO="${BCyan}${PKG_REPO}${Reset}"
+            ;;
+        esac
+        if ! is_package_installed "${PKG}" ; then
+          ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing (${PKG_REPO}) ${Bold}${PKG}${Reset} "
+          pacman -S --noconfirm --needed ${PKG} >>"$LOG" 2>&1 &
+          pid=$!;progress $pid
+        else
+          cecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing (${PKG_REPO}) ${Bold}${PKG}${Reset} exists "
+        fi
+      done
+    else
+      pacman -S --needed $1
+    fi
+  } #}}}
+  package_remove(){ #{{{
+    #remove package
+    for PKG in ${1}; do
+      if is_package_installed "${PKG}" ; then
+        if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
+          ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Removing ${Bold}${PKG}${Reset} "
+          pacman -Rcsn --noconfirm ${PKG} >>"$LOG" 2>&1 &
+          pid=$!;progress $pid
+        else
+         pacman -Rcsn ${PKG}
+        fi
+      fi
+    done
+  } #}}}
+  system_upgrade(){ #{{{
+    if [[ $VERBOSE_MODE -eq 0 ]]; then
+      ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Upgrading packages "
+      pacman -Syu --noconfirm --noprogress >>"$LOG" 2>&1 &
+      pid=$!;progress $pid
+    else
+      pacman -Syu $1
+    fi
+  } #}}}
+  system_update(){ #{{{
+    if [[ $VERBOSE_MODE -eq 0 ]]; then
+      ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Updating packages "
+      pacman -Sy >>"$LOG" 2>&1 &
+      pid=$!;progress $pid
+    else
+      pacman -Sy $1
+    fi
+  } #}}}
+  contains_element(){ #{{{
+    #check if an element exist in a string
+    for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
+  } #}}}
+  config_xinitrc(){ #{{{
+    #create a xinitrc file in home user directory
+    cp -fv /etc/skel/.xinitrc /home/${USER_NAME}/
+    echo -e "exec $1" >> /home/${USER_NAME}/.xinitrc
+    chown -R ${USER_NAME}:users /home/${USER_NAME}/.xinitrc
+  } #}}}
+  invalid_option(){ #{{{
+    print_line
+    echo "Invalid option. Try another one."
+    pause_function
+  } #}}}
+  pause_function(){ #{{{
+    print_line
+    if [[ $AUTOMATIC_MODE -eq 0 ]]; then
+      read -e -sn 1 -p "Press any key to continue..."
+    fi
+  } #}}}
+  menu_item(){ #{{{
+    #check if the number of arguments is less then 2
+    [[ $# -lt 2 ]] && PACKAGE_NAME="$1" || PACKAGE_NAME="$2";
+    #list of chars to remove from the package name
+    CHARS_TO_REMOVE=("Ttf-" "-bzr" "-hg" "-svn" "-git" "-stable" "-icon-theme" "Gnome-shell-theme-" "Gnome-shell-extension-");
+    #remove chars from package name
+    for CHARS in ${CHARS_TO_REMOVE[@]}; do PACKAGE_NAME=`echo ${PACKAGE_NAME^} | sed 's/'$CHARS'//'`; done
+    #display checkbox and package name
+    echo -e "$(checkbox_package "$1") ${Bold}$PACKAGE_NAME${Reset}"
+  } #}}}
+  mainmenu_item(){ #{{{
+    echo -e "$(checkbox "$1") ${Bold}$2${Reset}"
+  } #}}}
+  elihw() { #{{{
+    [[ $OPT == b || $OPT == d ]] && break;
+  } #}}}
+  add_user_to_group() { #{{{
+    local _USER=${1}
+    local _GROUP=${2}
+
+    if [[ -z ${_GROUP} ]]; then
+      error_msg "ERROR! 'add_user_to_group' was not given enough parameters."
+    fi
+
+    ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Adding ${Bold}${_USER}${Reset} to ${Bold}${_GROUP}${Reset} "
+    gpasswd -a ${_USER} ${_GROUP} >>"$LOG" 2>&1 &
+    pid=$!;progress $pid
+  } #}}}
+  system_ctl () { #{{{
+    local ACTION=${1}
+    local OBJECT=${2}
+    ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} systemctl ${ACTION} ${OBJECT} "
+    systemctl ${ACTION} ${OBJECT} >>"$LOG" 2>&1
+    pid=$!;progress $pid
+  }
+  #}}}
+  arch_chroot () { #{{{
+    arch-chroot $MOUNTPOINT /bin/bash -c "${1}"
+  }
+  #}}}
+  setkeymap(){ #{{{
+    local keymaps=(`localectl list-keymaps`)
+    PS3="(shift+pgup/pgdown) $prompt1"
+    echo "Select keymap:"
+    select KEYMAP in "${keymaps[@]}"; do
+      if contains_element "$KEYMAP" "${keymaps[@]}"; then
+        break
+      else
+        invalid_option
+      fi
+    done
+  }
+  #}}}
+  setlocale(){ #{{{
+    local locale_list=(`cat /etc/locale.gen | grep _ | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
+    PS3="$prompt1"
+    echo "Select locale:"
+    select LOCALE in "${locale_list[@]}"; do
+      if contains_element "$LOCALE" "${locale_list[@]}"; then
+        LOCALE_8859="${LOCALE} ISO-8859"
+        LOCALE_UTF8="${LOCALE}.UTF-8"
+        break
+      else
+        invalid_option
+      fi
+    done
+  }
+  #}}}
+  settimezone(){ #{{{
+    local zone=(`timedatectl list-timezones | sed 's/\/.*$//' | uniq`);
+    PS3="$prompt1"
+    echo "Select zone:"
+    select ZONE in "${zone[@]}"; do
+      if contains_element "$ZONE" "${zone[@]}"; then
+        local subzone=(`timedatectl list-timezones | grep ${ZONE} | sed 's/^.*\///'`)
+        PS3="$prompt1"
+        echo "Select subzone:"
+        select SUBZONE in "${subzone[@]}"; do
+          if contains_element "$SUBZONE" "${subzone[@]}"; then
+            break
+          else
+            invalid_option
+          fi
+        done
+        break
+      else
+        invalid_option
+      fi
+    done
+  } #}}}
+#}}}

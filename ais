@@ -1,0 +1,565 @@
+#!/bin/bash
+#-------------------------------------------------------------------------------
+#Created by helmuthdu mailto: helmuthdu[at]gmail[dot]com
+#-------------------------------------------------------------------------------
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# Run this script after your first boot with archlinux (as root)
+
+if [[ -f `pwd`/sharedfuncs ]]; then
+  source sharedfuncs
+else
+  echo "missing file: sharedfuncs"
+  exit 1
+fi
+
+#ARCHLINUX INSTALL SCRIPTS MODE {{{
+#SELECT KEYMAP {{{
+select_keymap(){
+  print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
+  print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
+  OPTION=n
+  while [[ $OPTION != y ]]; do
+    setkeymap
+    read_input_text "Confirm keymap: $KEYMAP"
+  done
+  loadkeys $KEYMAP
+}
+#}}}
+#DEFAULT EDITOR {{{
+select_editor(){
+  print_title "DEFAULT EDITOR"
+  editors_list=("emacs" "nano" "vi" "vim");
+  PS3="$prompt1"
+  echo -e "Select editor\n"
+  select EDITOR in "${editors_list[@]}"; do
+    if contains_element "$EDITOR" "${editors_list[@]}"; then
+      package_install "$EDITOR"
+      break
+    else
+      invalid_option
+    fi
+  done
+}
+#}}}
+#MIRRORLIST {{{
+configure_mirrorlist(){
+  local countries_code=("AU" "BY" "BE" "BR" "BG" "CA" "CL" "CN" "CO" "CZ" "DK" "EE" "FI" "FR" "DE" "GR" "HU" "IN" "IE" "IL" "IT" "JP" "KZ" "KR" "LV" "LU" "MK" "NL" "NC" "NZ" "NO" "PL" "PT" "RO" "RU" "RS" "SG" "SK" "ZA" "ES" "LK" "SE" "CH" "TW" "TR" "UA" "GB" "US" "UZ" "VN")
+  local countries_name=("Australia" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Latvia" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russian" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
+  country_list(){
+    #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/^/"/g' | sed 's/,.*//g' | sed 's/ *$//g'  | sed 's/$/"/g' | sed -e :a -e '$!N; s/\n/ /; ta'`
+    PS3="$prompt1"
+    echo "Select your country:"
+    select OPT in "${countries_name[@]}"; do
+      if contains_element "$OPT" "${countries_name[@]}"; then
+        country=${countries_code[$(( $REPLY - 1 ))]}
+        break
+      else
+        invalid_option
+      fi
+    done
+  }
+  print_title "MIRRORLIST - https://wiki.archlinux.org/index.php/Mirrors"
+  print_info "This option is a guide to selecting and configuring your mirrors, and a listing of current available mirrors."
+  OPTION=n
+  while [[ $OPTION != y ]]; do
+    country_list
+    read_input_text "Confirm country: $OPT"
+  done
+
+  url="https://www.archlinux.org/mirrorlist/?country=${country}&use_mirror_status=on"
+
+  tmpfile=$(mktemp --suffix=-mirrorlist)
+
+  # Get latest mirror list and save to tmpfile
+  curl -so ${tmpfile} ${url}
+  sed -i 's/^#Server/Server/g' ${tmpfile}
+
+  # Backup and replace current mirrorlist file (if new file is non-zero)
+  if [[ -s ${tmpfile} ]]; then
+   { echo " Backing up the original mirrorlist..."
+     mv -i /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.orig; } &&
+   { echo " Rotating the new list into place..."
+     mv -i ${tmpfile} /etc/pacman.d/mirrorlist; }
+  else
+    echo " Unable to update, could not download list."
+  fi
+  # allow global read access (required for non-root yaourt execution)
+  chmod +r /etc/pacman.d/mirrorlist
+  $EDITOR /etc/pacman.d/mirrorlist
+}
+#}}}
+#CREATE PARTITION {{{
+create_partition(){
+  select_device(){
+    devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd'`);
+    PS3="$prompt1"
+    echo -e "Select device:\n"
+    select DEVICE in "${devices_list[@]}"; do
+      if contains_element "$DEVICE" "${devices_list[@]}"; then
+        break
+      else
+        invalid_option
+      fi
+    done
+  }
+  print_title "https://wiki.archlinux.org/index.php/Partitioning"
+  print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
+  partition_app=("cfdisk" "cgdisk" "gdisk" "parted");
+  PS3="$prompt1"
+  echo -e "Select partition program:"
+  select OPT in "${partition_app[@]}"; do
+    if contains_element "$OPT" "${partition_app[@]}"; then
+      select_device
+      $OPT $DEVICE
+      break
+    else
+      invalid_option
+    fi
+  done
+}
+#}}}
+#FORMAT DEVICE {{{
+format_device(){
+  print_title "https://wiki.archlinux.org/index.php/Format_a_device"
+  print_info "This step will select and format the selected partiton where the archlinux will be installed"
+  print_warning "\tAll data on the ROOT and SWAP partition will be LOST."
+  i=0
+  partitions=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd'`)
+  device_name=("root" "swap" "another")
+  select_filesystem(){
+    filesystem=("ext4" "ext3" "ext2" "btrfs" "nilfs2" "ntfs" "vfat" "f2fs" "jfs" "xfs");
+    PS3="$prompt1"
+    echo -e "Select filesystem:\n"
+    select TYPE in "${filesystem[@]}"; do
+      if contains_element "$TYPE" "${filesystem[@]}"; then
+        break
+      else
+        invalid_option
+      fi
+    done
+  }
+  umount_partition(){
+    #check if swap is on and umount
+    swapon -s|grep $1 && swapoff $1
+    #check if partition is mounted and umount
+    mount|grep $1 && umount $1
+  }
+  remove_partition(){
+    #remove the selected partition from list
+    unset partitions[$DEVICE_NUMBER]
+    partitions=(${partitions[@]})
+    #increase i
+    [[ ${device_name[i]} != another ]] && i=$(( i + 1 ))
+  }
+  format_partition(){
+    read_input_text "Confirm format $1 partition"
+    if [[ $OPTION == y ]]; then
+      umount_partition "$1"
+      [[ -z $3 ]] && select_filesystem
+      mkfs.$TYPE $1
+      fsck $1
+      mkdir -p $2
+      mount -t $TYPE $1 $2
+      remove_partition "$1"
+    fi
+  }
+  format_swap_partition(){
+    read_input_text "Confirm format $1 partition"
+    if [[ $OPTION == y ]]; then
+      umount_partition "$1"
+      mkswap $1
+      swapon $1
+      remove_partition "$1"
+    fi
+  }
+  function check_mountpoint(){
+  if mount|grep $2; then
+    echo "Successfully mounted"
+    remove_partition "$1"
+  else
+    echo "WARNING: Not Successfully mounted"
+  fi
+  }
+  while true; do
+    PS3="$prompt1"
+    echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
+    select DEVICE in "${partitions[@]}"; do
+      #get the selected number - 1
+      DEVICE_NUMBER=$(( $REPLY - 1 ))
+      if contains_element "$DEVICE" "${partitions[@]}"; then
+        case ${device_name[i]} in
+          root)
+            ROOT=$DEVICE
+            ROOT_DEVICE=`echo $ROOT | sed 's/[0-9]//'`
+            format_partition "$DEVICE" "$MOUNTPOINT"
+            ;;
+          swap)
+            format_swap_partition "$DEVICE"
+            ;;
+          another)
+            read -p "Mountpoint [ex: /home]:" DIR
+            select_filesystem
+            read_input_text "Format $DEVICE partition"
+            if [[ $OPTION == y ]]; then
+              format_partition "$DEVICE" "$MOUNTPOINT$DIR" "$TYPE"
+            else
+              read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="$DIR""
+              if [[ $OPTION == y ]]; then
+                mkdir -p $MOUNTPOINT$DIR
+                mount -t $TYPE $DEVICE $MOUNTPOINT$DIR
+                check_mountpoint "$DEVICE" "$MOUNTPOINT$DIR"
+              fi
+            fi
+            ;;
+        esac
+        break
+      else
+        invalid_option
+      fi
+    done
+    #check if there is no partitions left
+    if [[ ${#partitions[@]} -eq 0 ]]; then
+      break
+    elif [[ ${device_name[i]} == another ]]; then
+      read_input_text "Configure more partitions"
+      [[ $OPTION != y ]] && break
+    fi
+  done
+  pause_function
+}
+#}}}
+#INSTALL BASE SYSTEM {{{
+install_base_system(){
+  print_title "INSTALL BASE SYSTEM"
+  print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
+  pacstrap $MOUNTPOINT base base-devel btrfs-progs ntp
+}
+#}}}
+#CONFIGURE KEYMAP {{{
+configure_keymap(){
+  #ADD KEYMAP TO THE NEW SETUP
+  echo "KEYMAP=$KEYMAP" > $MOUNTPOINT/etc/vconsole.conf
+}
+#}}}
+#CONFIGURE FSTAB {{{
+configure_fstab(){
+  print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
+  print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific device or partition."
+  if [[ ! -f $MOUNTPOINT/etc/fstab.aui ]]; then
+    cp $MOUNTPOINT/etc/fstab $MOUNTPOINT/etc/fstab.aui
+  else
+    cp $MOUNTPOINT/etc/fstab.aui $MOUNTPOINT/etc/fstab
+  fi
+  FSTAB=("DEV" "UUID" "LABEL");
+  PS3="$prompt1"
+  echo -e "Configure fstab based on:"
+  select OPT in "${FSTAB[@]}"; do
+    case "$REPLY" in
+      1) genfstab -p $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
+      2) genfstab -U $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
+      3) genfstab -L $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
+      *) invalid_option ;;
+    esac
+    [[ -n $OPT ]] && break
+  done
+  echo "Review your fstab"
+  pause_function
+  $EDITOR $MOUNTPOINT/etc/fstab
+}
+#}}}
+#CONFIGURE HOSTNAME {{{
+configure_hostname(){
+  print_title "HOSTNAME - https://wiki.archlinux.org/index.php/HOSTNAME"
+  print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
+  read -p "Hostname [ex: archlinux]: " HN
+  echo "$HN" > $MOUNTPOINT/etc/hostname
+  if [[ ! -f $MOUNTPOINT/etc/hosts.aui ]]; then
+    cp $MOUNTPOINT/etc/hosts $MOUNTPOINT/etc/hosts.aui
+  else
+    cp $MOUNTPOINT/etc/hosts.aui $MOUNTPOINT/etc/hosts
+  fi
+  arch_chroot "sed -i '/127.0.0.1/s/$/ '${HN}'/' /etc/hosts"
+  arch_chroot "sed -i '/::1/s/$/ '${HN}'/' /etc/hosts"
+}
+#}}}
+#CONFIGURE TIMEZONE {{{
+configure_timezone(){
+  print_title "TIMEZONE - https://wiki.archlinux.org/index.php/Timezone"
+  print_info "In an operating system the time (clock) is determined by four parts: Time value, Time standard, Time Zone, and DST (Daylight Saving Time if applicable)."
+  OPTION=n
+  while [[ $OPTION != y ]]; do
+    settimezone
+    read_input_text "Confirm timezone ($ZONE/$SUBZONE)"
+  done
+  arch_chroot "ln -s /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
+}
+#}}}
+#CONFIGURE HARDWARECLOCK {{{
+configure_hardwareclock(){
+  print_title "HARDWARE CLOCK TIME - https://wiki.archlinux.org/index.php/Internationalization"
+  print_info "This is set in /etc/adjtime. Set the hardware clock mode uniformly between your operating systems on the same machine. Otherwise, they will overwrite the time and cause clock shifts (which can cause time drift correction to be miscalibrated)."
+  hwclock_list=('UTC' 'Localtime');
+  PS3="$prompt1"
+  select OPT in "${hwclock_list[@]}"; do
+    case "$REPLY" in
+      1) arch_chroot "hwclock --systohc --utc";
+        ;;
+      2) arch_chroot "hwclock --systohc --localtime";
+        ;;
+      *) invalid_option ;;
+    esac
+    [[ -n $OPT ]] && break
+  done
+}
+#}}}
+#CONFIGURE LOCALE {{{
+configure_locale(){
+  print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
+  print_info "Locales are used in Linux to define which language the user uses. As the locales define the character sets being used as well, setting up the correct locale is especially important if the language contains non-ASCII characters."
+  OPTION=n
+  while [[ $OPTION != y ]]; do
+    setlocale
+    read_input_text "Confirm locale ($LOCALE)"
+  done
+  echo 'LANG="'$LOCALE_UTF8'"' > $MOUNTPOINT/etc/locale.conf
+  arch_chroot "sed -i '/'${LOCALE}'/s/^#//' /etc/locale.gen"
+  arch_chroot "locale-gen"
+}
+#}}}
+#CONFIGURE MKINITCPIO {{{
+configure_mkinitcpio(){
+  print_title "MKINITCPIO - https://wiki.archlinux.org/index.php/Mkinitcpio"
+  print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
+  arch_chroot "mkinitcpio -p linux"
+}
+#}}}
+#INSTALL BOOTLOADER {{{
+install_bootloader(){
+  print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
+  print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
+  bootloader=("Grub2" "Syslinux" "Skip")
+  PS3="$prompt1"
+  echo -e "Install bootloader:\n"
+  select BOOTLOADER in "${bootloader[@]}"; do
+    case "$REPLY" in
+      1)
+        #check for UEFI|BIOS system {{{
+        check_boot_system()
+        {
+          if [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Inc.' ]] || [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Computer, Inc.' ]]; then
+            modprobe -r -q efivars || true  # if MAC
+          else
+            modprobe -q efivars             # all others
+          fi
+          if [[ -d "/sys/firmware/efi/vars/" ]]; then
+            UEFI=1
+            echo "UEFI Mode detected"
+            if [[ $ARCHI == i686 ]]; then
+              pacstrap $MOUNTPOINT grub-efi-i386
+            else
+              pacstrap $MOUNTPOINT grub-efi-x86_64
+            fi
+          else
+            UEFI=0
+            echo "BIOS Mode detected"
+            pacstrap $MOUNTPOINT grub-bios
+          fi
+        }
+        #}}}
+        check_boot_system
+        #make grub automatically detect others OS
+        pacstrap $MOUNTPOINT os-prober
+        break
+        ;;
+      2)
+        pacstrap $MOUNTPOINT syslinux
+        break
+        ;;
+      3)
+        break
+        ;;
+      *)
+        invalid_option
+        ;;
+    esac
+  done
+}
+#}}}
+#CONFIGURE BOOTLOADER {{{
+configure_bootloader(){
+  case $BOOTLOADER in
+    Grub2)
+      print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
+      print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
+      arch_chroot "modprobe dm-mod"
+      if [[ $UEFI -eq 1 ]]; then
+        arch_chroot "grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck"
+      else
+        arch_chroot "grub-install --target=i386-pc --boot-directory=/boot --recheck ${ROOT_DEVICE}"
+      fi
+      arch_chroot "mkdir -p /boot/grub/locale"
+      arch_chroot "cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo"
+      arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
+      ;;
+    Syslinux)
+      print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
+      print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
+      syslinux_install_mode=("Automatic" "Manual")
+      PS3="$prompt1"
+      echo -e "Syslinux Install:\n"
+      select OPT in "${syslinux_install_mode[@]}"; do
+        case "$REPLY" in
+          1)
+            arch_chroot "syslinux-install_update -i -a -m"
+            break
+            ;;
+          2)
+            print_info "Your boot partition, on which you plan to install Syslinux, must contain a FAT, ext2, ext3, ext4, or Btrfs file system. You should install it on a mounted directory, not a /dev/sdXY device. You do not have to install it on the root directory of a file system, e.g., with device /dev/sda1 mounted on /boot you can install Syslinux in the syslinux directory"
+            echo -e $prompt3
+            print_warning "mkdir /boot/syslinux\nextlinux --install /boot/syslinux "
+            arch-chroot $MOUNTPOINT
+            break
+            ;;
+          *)
+            invalid_option
+            ;;
+        esac
+      done
+      ;;
+  esac
+}
+#}}}
+#ROOT PASSWORD {{{
+root_password(){
+  print_title "ROOT PASSWORD"
+  print_warning "Enter your new root password"
+  arch_chroot "passwd"
+  pause_function
+}
+#}}}
+#FINISH {{{
+finish(){
+  print_title "INSTALL COMPLETED"
+  #COPY AUI TO ROOT FOLDER IN THE NEW SYSTEM
+  print_warning "\nA copy of the AUI will be placed in /root directory of your new system"
+  cp -R `pwd` $MOUNTPOINT/root
+  read_input_text "Reboot system"
+  if [[ $OPTION == y ]]; then
+    #umount mounted partitions
+    mounted_partitions=(`findmnt --fstab -o TARGET -t noswap,notmpfs | grep /mnt`)
+    for i in ${mounted_partitions[@]}; do
+      umount $i
+    done
+    reboot
+  fi
+  exit 0
+}
+#}}}
+
+print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
+print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
+pause_function
+system_update
+while true
+do
+  print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
+  echo " 1) $(mainmenu_item "${checklist[1]}" "Select Keymap")"
+  echo " 2) $(mainmenu_item "${checklist[2]}" "Select Editor")"
+  echo " 3) $(mainmenu_item "${checklist[3]}" "Configure Mirrorlist")"
+  echo " 4) $(mainmenu_item "${checklist[4]}" "Create Partition")"
+  echo " 5) $(mainmenu_item "${checklist[5]}" "Format Device")"
+  echo " 6) $(mainmenu_item "${checklist[6]}" "Install Base System")"
+  echo " 7) $(mainmenu_item "${checklist[7]}" "Configure Fstab")"
+  echo " 8) $(mainmenu_item "${checklist[8]}" "Configure Hostname")"
+  echo " 9) $(mainmenu_item "${checklist[9]}" "Configure Timezone")"
+  echo "10) $(mainmenu_item "${checklist[10]}" "Configure Hardware Clock")"
+  echo "11) $(mainmenu_item "${checklist[11]}" "Configure Locale")"
+  echo "12) $(mainmenu_item "${checklist[12]}" "Configure Mkinitcpio")"
+  echo "13) $(mainmenu_item "${checklist[13]}" "Install Bootloader")"
+  echo "14) $(mainmenu_item "${checklist[14]}" "Root Password")"
+  echo ""
+  echo " d) Done"
+  echo ""
+  read_input_options
+  for OPT in ${OPTIONS[@]}; do
+    case "$OPT" in
+      1)
+        select_keymap
+        checklist[1]=1
+        ;;
+      2)
+        select_editor
+        checklist[2]=1
+        ;;
+      3)
+        configure_mirrorlist
+        checklist[3]=1
+        ;;
+      4)
+        create_partition
+        checklist[4]=1
+        ;;
+      5)
+        format_device
+        checklist[5]=1
+        ;;
+      6)
+        install_base_system
+        configure_keymap
+        checklist[6]=1
+        ;;
+      7)
+        configure_fstab
+        checklist[7]=1
+        ;;
+      8)
+        configure_hostname
+        checklist[8]=1
+        ;;
+      9)
+        configure_timezone
+        checklist[9]=1
+        ;;
+      10)
+        configure_hardwareclock
+        checklist[10]=1
+        ;;
+      11)
+        configure_locale
+        checklist[11]=1
+        ;;
+      12)
+        configure_mkinitcpio
+        checklist[12]=1
+        ;;
+      13)
+        install_bootloader
+        configure_bootloader
+        checklist[13]=1
+        ;;
+      14)
+        root_password
+        checklist[14]=1
+        ;;
+      "d")
+        finish
+        ;;
+      *)
+        invalid_option
+        ;;
+    esac
+  done
+done
+#}}}
