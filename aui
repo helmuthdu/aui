@@ -1775,7 +1775,12 @@ install_development_apps(){
                   package_install "eclipse-cdt"
                   ;;
                 3)
-                  aur_package_install "android-sdk android-apktool android-sdk-platform-tools android-udev eclipse-android simple-mtpfs"
+                  aur_package_install "android-sdk android-apktool android-sdk-platform-tools android-udev eclipse-android libmtp simple-mtpfs"
+                  if [[ ${KDE} -eq 1 ]]; then
+                    package_install "kio-mtp"
+                  else
+                    package_install "gvfs-mtp"
+                  fi
                   groupadd android
                   add_user_to_group ${USER_NAME} android
                   add_user_to_group ${USER_NAME} adbusers
