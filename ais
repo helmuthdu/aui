@@ -370,10 +370,10 @@ install_bootloader(){
             UEFI=0
             echo "BIOS Mode detected"
           fi
-          pacstrap $MOUNTPOINT grub
         }
         #}}}
         check_boot_system
+        pacstrap $MOUNTPOINT grub
         #make grub automatically detect others OS
         pacstrap $MOUNTPOINT os-prober
         break
