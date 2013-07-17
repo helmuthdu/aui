@@ -220,39 +220,41 @@ select_user(){
         elif [[ $EDITOR == vim ]]; then
           ! is_package_installed "gvim" && package_install "vim ctags"
           #VIMRC {{{
-          vimrc_list=("Default" "Vanilla" "Get from github");
-          PS3="$prompt1"
-          echo -e "Choose your .vimrc\n"
-          select OPT in "${vimrc_list[@]}"; do
-            case "$REPLY" in
-              1)
-                package_install "git"
-                git clone https://github.com/helmuthdu/vim
-                mv vim /home/${USER_NAME}/.vim
-                ln -sf /home/${USER_NAME}/.vim/vimrc /home/${USER_NAME}/.vimrc
-                cp -R vim /home/${USER_NAME}/.vim/fonts /home/${USER_NAME}/.fonts
-                ;;
-              2)
-                ;;
-              3)
-                package_install "git"
-                read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
-                read -p "Enter your github repository [ex: vim]: " GITHUB_REPO
-                git clone https://github.com/$GITHUB_USER/$GITHUB_REPO
-                cp -R $GITHUB_REPO/.vim /home/${USER_NAME}/
-                if [[ -f $GITHUB_REPO/.vimrc ]]; then
-                  cp $GITHUB_REPO/.vimrc /home/${USER_NAME}/
-                else
+          if [[ -f /home/${USER_NAME}/.vimrc ]]; then
+            vimrc_list=("Default" "Vanilla" "Get from github");
+            PS3="$prompt1"
+            echo -e "Choose your .vimrc\n"
+            select OPT in "${vimrc_list[@]}"; do
+              case "$REPLY" in
+                1)
+                  package_install "git"
+                  git clone https://github.com/helmuthdu/vim
+                  mv vim /home/${USER_NAME}/.vim
                   ln -sf /home/${USER_NAME}/.vim/vimrc /home/${USER_NAME}/.vimrc
-                fi
-                rm -fr $GITHUB_REPO
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-            [[ -n $OPT ]] && break
-          done
+                  cp -R vim /home/${USER_NAME}/.vim/fonts /home/${USER_NAME}/.fonts
+                  ;;
+                2)
+                  ;;
+                3)
+                  package_install "git"
+                  read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
+                  read -p "Enter your github repository [ex: vim]: " GITHUB_REPO
+                  git clone https://github.com/$GITHUB_USER/$GITHUB_REPO
+                  cp -R $GITHUB_REPO/.vim /home/${USER_NAME}/
+                  if [[ -f $GITHUB_REPO/vimrc ]]; then
+                    ln -sf /home/${USER_NAME}/.vim/vimrc /home/${USER_NAME}/.vimrc
+                  else
+                    ln -sf /home/${USER_NAME}/.vim/.vimrc /home/${USER_NAME}/.vimrc
+                  fi
+                  rm -fr $GITHUB_REPO
+                  ;;
+                *)
+                  invalid_option
+                  ;;
+              esac
+              [[ -n $OPT ]] && break
+            done
+          fi
           #}}}
         else
           package_install "$EDITOR"
@@ -1309,7 +1311,7 @@ install_desktop_environment(){
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
       package_install "gnome gnome-extra zeitgeist telepathy"
       package_install "gksu nautilus-open-terminal gedit-plugins gnome-tweak-tool gucharmap"
-      package_install "gvfs-smb gvfs-afc gvfs-goa"
+      package_install "gvfs-smb gvfs-afc gvfs-goa gvfs-mtp"
       package_install "deja-dup"
       package_install "gnome-packagekit gnome-settings-daemon-updates"
       aur_package_install "gnome-defaults-list"

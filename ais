@@ -404,8 +404,6 @@ configure_bootloader(){
       else
         arch_chroot "grub-install --target=i386-pc --boot-directory=/boot --recheck ${ROOT_DEVICE}"
       fi
-      arch_chroot "mkdir -p /boot/grub/locale"
-      arch_chroot "cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo"
       arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
       ;;
     Syslinux)
