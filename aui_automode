@@ -37,7 +37,7 @@
 #BASIC SETUP {{{
   CUPS="y"
   CUSTOMREPO="n"         # Add custom repositories
-  FIRMWARE="n"           # Install custom firmwares
+  FIRMWARE="y"           # Install custom firmwares
   GITTOR="y"
   NFS="n"
   PRELOAD="y"
@@ -59,13 +59,13 @@
     # 4) b43
     # 5) b43legacy
     # 6) broadcom-wl
-    # 7) zd1211-firmware
-    # 8) bluez-firmware
+    # 7) bluez-firmware
+    # 8) libmtp
     # 9) libffado [Fireware Audio Devices]
     #10) libraw1394 [IEE1394 Driver]
     #11) aic94xx-firmware
     #12) bfa-firmware
-    FIRMWARE_OPTIONS="1"
+    FIRMWARE_OPTIONS="8"
   #}}}
 #}}}
 #DESKTOP ENVIRONMENT|WINDOW MANAGER {{{
@@ -191,17 +191,18 @@
   # 6) Geany
   # 7) IntelliJ IDEA
   # 8) Kdevelop
-  # 9) Netbeans
-  #10) OpenJDK
-  #11) Oracle JDK
-  #12) QT Creator
-  #13) Sublime Text 2
-  #14) Debugger & Syntax Tools
-  #15) MySQL Workbench
-  #16) SQL Power Architect
-  #17) Meld
-  #18) RabbitVCS
-  DEVELOPMENT_OPTIONS="11 5 14"
+  # 9) LightTable
+  #10) Netbeans
+  #11) OpenJDK
+  #12) Oracle JDK
+  #13) QT Creator
+  #14) Sublime Text
+  #15) Debugger & Syntax Tools
+  #16) MySQL Workbench
+  #17) SQL Power Architect
+  #18) Meld
+  #19) RabbitVCS
+  DEVELOPMENT_OPTIONS="12 5 15"
   #ECLIPSE {{{
     # 1) Eclipse Classic
     # 2) Eclipse IDE for C/C++ Developers

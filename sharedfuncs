@@ -71,13 +71,14 @@
   # LOG FILE
   LOG="${AUI_DIR}/`basename ${0}`_error.log"
   [[ -f $LOG ]] && rm -f $LOG
+  PKG_MANAGER="pacman"
+  PKG=""
   PKG_FAIL="${AUI_DIR}/`basename ${0}`_pkg_fail_list.log"
   [[ -f $PKG_FAIL ]] && rm -f $PKG_FAIL
   # CONNECTION CHECK
   XPINGS=0
   #MISC
   SPIN="/-\|"
-  PKG=""
   AUTOMATIC_MODE=0
 #}}}
 #COMMON FUNCTIONS {{{
@@ -372,10 +373,10 @@
       if ! is_package_installed "${PKG}" ; then
         if [[ $AUTOMATIC_MODE -eq 1 ]]; then
           ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing ${AUR} ${Bold}${PKG}${Reset} "
-          su - ${USER_NAME} -c "${AUR_HELPER} --noconfirm -S ${PKG}" >>"$LOG" 2>&1 &
+          su - ${USER_NAME} -c "${AUR_PKG_MANAGER} --noconfirm -S ${PKG}" >>"$LOG" 2>&1 &
           pid=$!;progress $pid
         else
-          su - ${USER_NAME} -c "${AUR_HELPER} -S ${PKG}"
+          su - ${USER_NAME} -c "${AUR_PKG_MANAGER} -S ${PKG}"
         fi
       else
         if [[ $VERBOSE_MODE -eq 0 ]]; then
@@ -407,14 +408,14 @@
         esac
         if ! is_package_installed "${PKG}" ; then
           ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing (${PKG_REPO}) ${Bold}${PKG}${Reset} "
-          pacman -S --noconfirm --needed ${PKG} >>"$LOG" 2>&1 &
+          $PKG_MANAGER -S --noconfirm --needed ${PKG} >>"$LOG" 2>&1 &
           pid=$!;progress $pid
         else
           cecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing (${PKG_REPO}) ${Bold}${PKG}${Reset} exists "
         fi
       done
     else
-      pacman -S --needed $1
+      $PKG_MANAGER -S --needed $1
     fi
   } #}}}
   package_remove(){ #{{{
@@ -432,13 +433,7 @@
     done
   } #}}}
   system_upgrade(){ #{{{
-    if [[ $VERBOSE_MODE -eq 0 ]]; then
-      ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Upgrading packages "
-      pacman -Syu --noconfirm --noprogress >>"$LOG" 2>&1 &
-      pid=$!;progress $pid
-    else
-      pacman -Syu $1
-    fi
+    pacman -Syu $1
   } #}}}
   system_update(){ #{{{
     if [[ $VERBOSE_MODE -eq 0 ]]; then

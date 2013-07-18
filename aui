@@ -342,7 +342,7 @@ choose_aurhelper(){
             exit 0
           fi
         fi
-        AUR_HELPER="yaourt"
+        AUR_PKG_MANAGER="yaourt"
         ;;
       2)
         if ! is_package_installed "packer" ; then
@@ -355,7 +355,7 @@ choose_aurhelper(){
             exit 0
           fi
         fi
-        AUR_HELPER="packer"
+        AUR_PKG_MANAGER="packer"
         ;;
       3)
         if ! is_package_installed "pacaur" ; then
@@ -371,7 +371,7 @@ choose_aurhelper(){
             exit 0
           fi
         fi
-        AUR_HELPER="pacaur"
+        AUR_PKG_MANAGER="pacaur"
         ;;
       *)
         invalid_option
@@ -380,6 +380,39 @@ choose_aurhelper(){
     [[ -n $OPT ]] && break
   done
   pause_function
+}
+#}}}
+#POWERPILL {{{
+install_powerpill (){
+  print_title "POWERPILL - https://wiki.archlinux.org/index.php/Powerpill"
+  print_info "Powerpill is a Pacman wrapper that uses parallel and segmented downloading to try to speed up downloads for Pacman."
+  read_input_text "Install Powerpill"
+  if [[ $OPTION == y ]]; then
+    aur_package_install "powerpill"
+    PKG_MANAGER="powerpill"
+    echo ""
+    local countries_name=("Australia" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Latvia" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russian" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
+    country_list(){
+      #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/^/"/g' | sed 's/,.*//g' | sed 's/ *$//g'  | sed 's/$/"/g' | sed -e :a -e '$!N; s/\n/ /; ta'`
+      PS3="$prompt1"
+      echo "Select your country:"
+      select country in "${countries_name[@]}"; do
+        if contains_element "$country" "${countries_name[@]}"; then
+          break
+        else
+          invalid_option
+        fi
+      done
+    }
+    OPTION=n
+    while [[ $OPTION != y ]]; do
+      country_list
+      read_input_text "Confirm country: $country"
+    done
+    CONFIG_POWERPILL=`cat /etc/powerpill/powerpill.json | grep $country`
+    [[ -z $CONFIG_POWERPILL ]] && sed -i -e '/"http"/a\      "--country",\n      "'${country}'",' /etc/powerpill/powerpill.json
+    pause_function
+  fi
 }
 #}}}
 #AUTOMATIC MODE {{{
@@ -776,8 +809,8 @@ install_additional_firmwares(){
       echo " 4) $(menu_item "b43-firmware") $AUR"
       echo " 5) $(menu_item "b43-firmware-legacy") $AUR"
       echo " 6) $(menu_item "broadcom-wl") $AUR"
-      echo " 7) $(menu_item "zd1211-firmware ")"
-      echo " 8) $(menu_item "bluez-firmware") "
+      echo " 7) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
+      echo " 8) $(menu_item "libmtp") [Android Devices]"
       echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
       echo "10) $(menu_item "libraw1394") [IEEE1394 Driver]"
       echo "11) $(menu_item "aic94xx-firmware") $AUR"
@@ -808,10 +841,11 @@ install_additional_firmwares(){
             aur_package_install "broadcom-wl"
             ;;
           7)
-            package_install "zd1211-firmware"
+            package_install "bluez-firmware"
             ;;
           8)
-            package_install "bluez-firmware"
+            package_install "libmtp"
+            aur_package_install "android-udev"
             ;;
           9)
             package_install "libffado"
@@ -1311,7 +1345,7 @@ install_desktop_environment(){
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
       package_install "gnome gnome-extra zeitgeist telepathy"
       package_install "gksu nautilus-open-terminal gedit-plugins gnome-tweak-tool gucharmap"
-      package_install "gvfs-smb gvfs-afc gvfs-goa gvfs-mtp"
+      package_install "gvfs-smb gvfs-afc gvfs-goa"
       package_install "deja-dup"
       package_install "gnome-packagekit gnome-settings-daemon-updates"
       aur_package_install "gnome-defaults-list"
@@ -1567,8 +1601,14 @@ install_desktop_environment(){
       invalid_option
       ;;
   esac
-  #Fix p7FM {{{
-  [[ ${KDE} -eq 0 ]] && package_install "wxgtk"
+  #MTP SUPPORT {{{
+  if is_package_installed "libmtp" ; then
+    if [[ ${KDE} -eq 1 ]]; then
+      package_install "kio-mtp"
+    else
+      package_install "gvfs-mtp"
+    fi
+  fi
   #}}}
 }
 #}}}
@@ -1724,16 +1764,17 @@ install_development_apps(){
     echo " 6) $(menu_item "geany")"
     echo " 7) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
     echo " 8) $(menu_item "kdevelop")"
-    echo " 9) $(menu_item "netbeans")"
-    echo "10) $(menu_item "jdk7-openjdk" "OpenJDK")"
-    echo "11) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "12) $(menu_item "qtcreator")"
-    echo "13) $(menu_item "sublime-text" "Sublime Text 2") $AUR"
-    echo "14) $(menu_item "gdb" "Debuggers & Syntax Tools")"
-    echo "15) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-    echo "16) $(menu_item "sql-power-architect" "SQL Power Architect") $AUR"
-    echo "17) $(menu_item "meld")"
-    echo "18) $(menu_item "rabbitvcs" "RabbitVCS") $AUR"
+    echo " 9) $(menu_item "lighttable") $AUR"
+    echo "10) $(menu_item "netbeans")"
+    echo "11) $(menu_item "jdk7-openjdk" "OpenJDK")"
+    echo "12) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "13) $(menu_item "qtcreator")"
+    echo "14) $(menu_item "sublime-text" "Sublime Text") $AUR"
+    echo "15) $(menu_item "gdb" "Debuggers & Syntax Tools")"
+    echo "16) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
+    echo "17) $(menu_item "sql-power-architect" "SQL Power Architect") $AUR"
+    echo "18) $(menu_item "meld")"
+    echo "19) $(menu_item "rabbitvcs" "RabbitVCS") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1777,12 +1818,13 @@ install_development_apps(){
                   package_install "eclipse-cdt"
                   ;;
                 3)
-                  aur_package_install "android-sdk android-apktool android-sdk-platform-tools android-udev eclipse-android libmtp simple-mtpfs"
+                  aur_package_install "android-sdk android-apktool android-sdk-platform-tools android-udev eclipse-android libmtp"
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "kio-mtp"
                   else
                     package_install "gvfs-mtp"
                   fi
+                  aur_package_install "simple-mtpfs"
                   groupadd android
                   add_user_to_group ${USER_NAME} android
                   add_user_to_group ${USER_NAME} adbusers
@@ -1841,44 +1883,47 @@ install_development_apps(){
           package_install "kdevelop"
           ;;
         9)
-          package_install "netbeans"
+          aur_package_install "lighttable"
           ;;
         10)
+          package_install "netbeans"
+          ;;
+        11)
           package_remove "jdk"
           package_install "jdk7-openjdk icedtea-web-java7"
           ;;
-        11)
+        12)
           package_remove "jre7-openjdk"
           package_remove "jdk7-openjdk"
           aur_package_install "jdk"
           ;;
-        12)
+        13)
           package_install "qtcreator qt-doc"
           mkdir -p /home/${USER_NAME}/.config/Nokia/qtcreator/styles
           curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
           mv monokai.xml /home/${USER_NAME}/.config/Nokia/qtcreator/styles/
           chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
           ;;
-        13)
+        14)
           aur_package_install "sublime-text"
           ;;
-        14)
+        15)
           package_install "splint valgrind gdb" #C/C++
           aur_package_install "php-codesniffer php-tidy" #PHP
           aur_package_install "closure-compiler nodejs-jslint nodejs-jshint" #Javascript
           aur_package_install "nodejs-coffee-script" #coffeescript
           aur_package_install "tidyhtml" #HTML
           ;;
-        15)
+        16)
           aur_package_install "mysql-workbench-gpl"
           ;;
-        16)
+        17)
           aur_package_install "sql-power-architect"
           ;;
-        17)
+        18)
           package_install "meld"
           ;;
-        18)
+        19)
           aur_package_install "rabbitvcs"
           if is_package_installed "nautilus" ; then
             aur_package_install "rabbitvcs-nautilus"
@@ -3845,6 +3890,7 @@ language_selector
 configure_sudo
 select_user
 choose_aurhelper
+install_powerpill
 automatic_mode
 
 if is_package_installed "kdebase-workspace"; then KDE=1; fi
