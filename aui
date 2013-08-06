@@ -2262,14 +2262,16 @@ install_internet_apps(){
           while true
           do
             print_title "DOWNLOAD|FILESHARE"
-            echo " 1) $(menu_item "deluge")"
-            echo " 2) $(menu_item "dropbox") $AUR"
-            echo " 3) $(menu_item "jdownloader") $AUR"
-            echo " 4) $(menu_item "nitroshare") $AUR"
-            echo " 5) $(menu_item "sparkleshare")"
-            echo " 6) $(menu_item "spideroak") $AUR"
-            echo " 7) $(menu_item "steadyflow-bzr") $AUR"
-            echo " 8) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+            echo " 1) $(menu_item "aerofs") $AUR"
+            echo " 2) $(menu_item "bittorrent-sync" "BitTorrent Sync") $AUR"
+            echo " 3) $(menu_item "deluge")"
+            echo " 4) $(menu_item "dropbox") $AUR"
+            echo " 5) $(menu_item "jdownloader") $AUR"
+            echo " 6) $(menu_item "nitroshare") $AUR"
+            echo " 7) $(menu_item "sparkleshare")"
+            echo " 8) $(menu_item "spideroak") $AUR"
+            echo " 9) $(menu_item "steadyflow-bzr") $AUR"
+            echo " 10) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2278,9 +2280,15 @@ install_internet_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
-                  package_install "deluge"
+                  aur_package_install "aerofs"
                   ;;
                 2)
+                  aur_package_install "bittorrent-sync"
+                  ;;
+                3)
+                  package_install "deluge"
+                  ;;
+                4)
                   aur_package_install "dropbox"
                   if is_package_installed "nautilus" ; then
                     aur_package_install "nautilus-dropbox"
@@ -2292,22 +2300,22 @@ install_internet_apps(){
                     aur_package_install "dropbox-cli"
                   fi
                   ;;
-                3)
+                5)
                   aur_package_install "jdownloader"
                   ;;
-                4)
+                6)
                   aur_package_install "nitroshare"
                   ;;
-                5)
+                7)
                   package_install "sparkleshare"
                   ;;
-                6)
+                8)
                   aur_package_install "spideroak"
                   ;;
-                7)
+                9)
                   aur_package_install "steadyflow-bzr"
                   ;;
-                8)
+                10)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "transmission-qt"
                   else

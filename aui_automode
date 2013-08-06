@@ -275,15 +275,17 @@
     BROWSERS_OPTIONS="2 4"
   #}}}
   #DOWNLOAD|FILESHARE {{{
-    # 1) Deluge
-    # 2) Dropbox
-    # 3) Jdownloader
-    # 4) Nitroshare
-    # 5) Sparkleshare
-    # 6) Spider Oak
-    # 7) Steadyflow
-    # 8) Trasmission
-    DOWNLOAD_OPTIONS="2 3"
+    # 1) AeroFS
+    # 2) BitTorrent Sync
+    # 3) Deluge
+    # 4) Dropbox
+    # 5) Jdownloader
+    # 6) Nitroshare
+    # 7) Sparkleshare
+    # 8) Spider Oak
+    # 9) Steadyflow
+    #10) Trasmission
+    DOWNLOAD_OPTIONS="4 5"
   #}}}
   #EMAIL|RSS {{{
     # 1) Mozilla Thunderbird
