@@ -643,7 +643,7 @@ install_xorg(){
   print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
   print_info "Xorg is the public, open-source implementation of the X window system version 11."
   echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
-  package_install "xorg-server xorg-xinit xorg-utils"
+  package_install "xorg-server xorg-server-utils xorg-xinit"
   package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard"
   package_install "mesa"
   package_install "gamin"
@@ -1344,7 +1344,7 @@ install_desktop_environment(){
       print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
       package_install "gnome gnome-extra zeitgeist telepathy"
-      package_install "gksu nautilus-open-terminal gedit-plugins gnome-tweak-tool gucharmap"
+      package_install "gksu nautilus-open-terminal gedit-plugins gnome-tweak-tool gnome-power-manager gucharmap"
       package_install "gvfs-smb gvfs-afc gvfs-goa"
       package_install "deja-dup"
       package_install "gnome-packagekit gnome-settings-daemon-updates"
@@ -1392,8 +1392,6 @@ install_desktop_environment(){
       package_install "xdg-user-dirs"
       aur_package_install "kde-gtk-config"
       aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
-      local CONFIG_PULSEAUDIO=`cat /etc/pulse/default.pa | grep module-device-manager`
-      [[ -z $CONFIG_PULSEAUDIO ]] && echo "load-module module-device-manager" >> /etc/pulse/default.pa
       # config xinitrc
       config_xinitrc "startkde"
       pause_function
@@ -1467,6 +1465,14 @@ install_desktop_environment(){
       system_ctl enable kdm
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
       system_ctl enable upower
+      # Tweaks
+      # nepomuk
+      echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
+      # pulseaudio
+      local CONFIG_PULSEAUDIO=`cat /etc/pulse/default.pa | grep module-device-manager`
+      [[ -z $CONFIG_PULSEAUDIO ]] && echo "load-module module-device-manager" >> /etc/pulse/default.pa
+      # speed up application startup
+      mkdir -p ~/.compose-cache
       KDE=1
       ;;
       #}}}
@@ -1480,9 +1486,7 @@ install_desktop_environment(){
       package_install "leafpad obconf epdfview"
       aur_package_install "gnome-defaults-list"
       mkdir -p /home/${USER_NAME}/.config/openbox/
-      cp /etc/xdg/openbox/rc.xml /home/${USER_NAME}/.config/openbox/
-      cp /etc/xdg/openbox/menu.xml /home/${USER_NAME}/.config/openbox/
-      cp /etc/xdg/openbox/autostart /home/${USER_NAME}/.config/openbox/
+      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${USER_NAME}/.config/openbox/
       chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
       # config xinitrc
       config_xinitrc "startlxde"
@@ -1498,7 +1502,7 @@ install_desktop_environment(){
       print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
       print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
       echo -e '\n[mate]\nSigLevel = Optional TrustAll\nServer = http://repo.mate-desktop.org/archlinux/$arch' >> /etc/pacman.conf
-      pacman -Sy
+      pacman -Syy
       package_install "mate mate-extras"
       package_install "gvfs"
       aur_package_install "gnome-defaults-list"
@@ -1516,7 +1520,7 @@ install_desktop_environment(){
       #XFCE {{{
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
-      package_install "xfce4 xfce4-goodies"
+      package_install "xfce4 xfce4-goodies mupdf"
       package_install "gvfs"
       package_install "xdg-user-dirs"
       aur_package_install "gnome-defaults-list"
@@ -1581,9 +1585,7 @@ install_desktop_environment(){
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
       mkdir -p /home/${USER_NAME}/.config/openbox/
-      cp /etc/xdg/openbox/rc.xml /home/${USER_NAME}/.config/openbox/
-      cp /etc/xdg/openbox/menu.xml /home/${USER_NAME}/.config/openbox/
-      cp /etc/xdg/openbox/autostart /home/${USER_NAME}/.config/openbox/
+      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${USER_NAME}/.config/openbox/
       chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
       # config xinitrc
       config_xinitrc "openbox-session"
@@ -2679,7 +2681,7 @@ install_audio_apps(){
           ;;
         3)
           package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good \
-                           gst-plugins-bad gst-plugins-ugly gst-ffmpeg"
+                           gst-plugins-bad gst-plugins-ugly gst-libav"
           if is_package_installed "amarok banshee clementine exaile rhythmbox xfburn" ; then
             package_install "gstreamer0.10 gstreamer0.10-plugins"
             [[ ${KDE} -eq 1 ]] && package_install "phonon-gstreamer"
