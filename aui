@@ -2273,7 +2273,7 @@ install_internet_apps(){
             echo " 7) $(menu_item "sparkleshare")"
             echo " 8) $(menu_item "spideroak") $AUR"
             echo " 9) $(menu_item "steadyflow-bzr") $AUR"
-            echo " 10) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+            echo "10) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
             echo ""
             echo " b) BACK"
             echo ""
