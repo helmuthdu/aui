@@ -1497,7 +1497,7 @@ install_desktop_environment(){
       #MATE {{{
       print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
       print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
-      echo -e '\n[mate]\nServer = http://repo.mate-desktop.org/archlinux/$arch' >> /etc/pacman.conf
+      echo -e '\n[mate]\nSigLevel = Optional TrustAll\nServer = http://repo.mate-desktop.org/archlinux/$arch' >> /etc/pacman.conf
       pacman -Sy
       package_install "mate mate-extras"
       package_install "gvfs"
@@ -3882,7 +3882,7 @@ finish(){
   print_title "INSTALL COMPLETED"
   echo -e "Thanks for using the Archlinux Ultimate Install script by helmuthdu\n"
   #REBOOT
-  read -p "Reboot yourt system [y/N]: " OPTION
+  read -p "Reboot your system [y/N]: " OPTION
   [[ $OPTION == y ]] && reboot
   exit 0
 }

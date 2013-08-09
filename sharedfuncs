@@ -62,7 +62,7 @@
   ARCHI=`uname -m`
   UEFI=0
   # AUR PACKAGE
-  AUR=`echo -e "(${BPurple}aur${Reset})"`
+  AUR=`echo -e "(${BPurple}AUR${Reset})"`
   #CURRENT DIRECTORY
   AUI_DIR=`pwd`
   MOUNTPOINT="/mnt"
@@ -159,44 +159,49 @@
   } #}}}
   check_connection() { #{{{
     XPINGS=$(( $XPINGS + 1 ))
-    IP_ADDR=`ip addr 2>/dev/null | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' | egrep -v '255|(127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})' | sed 's/ //g'`
+    ping_gw() {
+      GATEWAY=`ip r | grep default | cut -d ' ' -f 3`
+      [[ -z $GATEWAY ]] && GATEWAY="8.8.8.8"
+      ping -q -w 1 -c 1 ${GATEWAY} > /dev/null && return 1 || return 0
+    }
     WIRED_DEV=`ip link | grep enp | awk '{print $2}'| sed 's/://'`
-    if [[ -z $IP_ADDR ]]; then
-      if [[ $XPINGS -gt 4 ]]; then
-        error_msg "ERROR! Could not find valid IP address."
-        read_input "Set up connection manually"
-        if [[ $OPTION == y ]]; then
-          conn_type_list=("Wired" "Wireless");
-          PS3="$prompt1"
-          select OPT in "${conn_type_list[@]}"; do
-            case "$REPLY" in
-              1)
-                systemctl stop dhcpcd@${WIRED_DEV}.service
-                ip link set ${WIRED_DEV} up
-                read -p "IP/Submask: " IP_ADDR
-                ip addr add ${IP_ADDR} dev ${WIRED_DEV}
-                read -p "Gateway: " GATEWAY
-                ip route add default via ${WIRED_DEV}
-                break
-                ;;
-              2)
-                read -p "Device ID [ex: wlp3s0]: " WIRELESS_DEV
-                ip link set ${WIRELESS_DEV} up
-                wifi-menu ${WIRELESS_DEV}
-                break
-                ;;
-              *)
-                invalid_option
-                ;;
-            esac
-          done
-          check_connection
-        else
-          exit 1
-        fi
+    WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://'`
+    if ping_gw; then
+      print_warning "ERROR! Connection not Found."
+      print_info "Network Setup"
+      conn_type_list=("Wired Automatic" "Wired Manual" "Wireless")
+      PS3="$prompt1"
+      select CONNECTION_TYPE in "${conn_type_list[@]}"; do
+        case "$REPLY" in
+          1)
+            systemctl start dhcpcd@${WIRED_DEV}.service
+            break
+            ;;
+          2)
+            systemctl stop dhcpcd@${WIRED_DEV}.service
+            read -p "IP Address: " IP_ADDR
+            read -p "Submask: " SUBMASK
+            read -p "Gateway: " GATEWAY
+            ip link set ${WIRED_DEV} up
+            ip addr add ${IP_ADDR}/${SUBMASK} dev ${WIRED_DEV}
+            ip route add default via ${GATEWAY}
+            $EDITOR /etc/resolv.conf
+            break
+            ;;
+          3)
+            ip link set ${WIRELESS_DEV} up
+            wifi-menu ${WIRELESS_DEV}
+            break
+            ;;
+          *)
+            invalid_option
+            ;;
+        esac
+      done
+      if [[ $XPINGS -gt 2 ]]; then
+        print_warning "Can't establish connection. exiting..."
+        exit 1
       fi
-      [[ $XPINGS -eq 1 ]] && systemctl start dhcpcd@${WIRED_DEV}.service
-      sleep 3
       check_connection
     fi
   } #}}}
