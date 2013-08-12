@@ -1923,7 +1923,7 @@ install_development_apps(){
                   npm_install "backbone"
                   ;;
                 2)
-                  npm_install "coffe-script"
+                  npm_install "coffee-script"
                   ;;
                 3)
                   npm_install "express"
