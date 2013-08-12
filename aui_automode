@@ -193,16 +193,17 @@
   # 8) Kdevelop
   # 9) LightTable
   #10) Netbeans
-  #11) OpenJDK
-  #12) Oracle JDK
-  #13) QT Creator
-  #14) Sublime Text
-  #15) Debugger & Syntax Tools
-  #16) MySQL Workbench
-  #17) SQL Power Architect
-  #18) Meld
-  #19) RabbitVCS
-  DEVELOPMENT_OPTIONS="12 5 15"
+  #11) NodeJS
+  #12) OpenJDK
+  #13) Oracle JDK
+  #14) QT Creator
+  #15) Sublime Text
+  #16) Debuggers
+  #17) MySQL Workbench
+  #18) SQL Power Architect
+  #19) Meld
+  #20) RabbitVCS
+  DEVELOPMENT_OPTIONS="12 5 11 15"
   #ECLIPSE {{{
     # 1) Eclipse Classic
     # 2) Eclipse IDE for C/C++ Developers
@@ -215,6 +216,21 @@
     # 9) Git support plugin for Eclipse
     #10) Colortheme for Eclipse
     ECLIPSE_OPTIONS="1"
+  #}}}
+  #NODEJS {{{
+    # 1) backbone
+    # 2) coffee-script
+    # 3) express
+    # 4) grunt
+    # 5) jshint
+    # 6) jslint
+    # 7) less
+    # 8) markdown
+    # 9) mocha
+    # 10) stylus
+    # 11) uglify-js
+    # 12) underscore
+    NODEJS_OPTIONS="2 5 6 7 11"
   #}}}
 #}}}
 #OFFICE {{{
