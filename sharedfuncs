@@ -116,7 +116,7 @@
           cecho success
         else
           cecho failed
-          echo "$PKG" >> $PKG_FAIL
+          echo -e "$PKG" | perl -pe 's/\e\[?.*?[\@-~]//g' >> $PKG_FAIL
           read_input_text " View logfile?"
           [[ $OPTION == y ]] && less $LOG
         fi
