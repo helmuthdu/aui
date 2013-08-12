@@ -249,7 +249,7 @@ install_base_system(){
   pacstrap $MOUNTPOINT base base-devel btrfs-progs ntp
   WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://'`
   if [[ -n $WIRELESS_DEV ]]; then
-    pacstrap iw wireless_tools wpa_actiond wpa_supplicant
+    pacstrap $MOUNTPOINT iw wireless_tools wpa_actiond wpa_supplicant
   fi
 }
 #}}}
