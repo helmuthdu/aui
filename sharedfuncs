@@ -62,7 +62,7 @@
   ARCHI=`uname -m`
   UEFI=0
   # AUR PACKAGE
-  AUR=`echo -e "(${BPurple}AUR${Reset})"`
+  AUR=`echo -e "(${BPurple}aur${Reset})"`
   #CURRENT DIRECTORY
   AUI_DIR=`pwd`
   MOUNTPOINT="/mnt"
@@ -116,9 +116,9 @@
           cecho success
         else
           cecho failed
-          echo -e "$PKG" | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" >> $PKG_FAIL
+          echo -e "$PKG" >> $PKG_FAIL
           read_input_text " View logfile?"
-          [[ $OPTION == y ]] && less $LOG
+          [[ $OPTION == y ]] && cat $LOG
         fi
         break
       fi
