@@ -128,27 +128,27 @@
     done
   } #}}}
   check_root() { #{{{
-    if [ "$(id -u)" != "0" ]; then
+    if [[ "$(id -u)" != "0" ]]; then
       error_msg "ERROR! You must execute the script as the 'root' user."
     fi
   } #}}}
   check_user() { #{{{
-    if [ "$(id -u)" == "0" ]; then
+    if [[ "$(id -u)" == "0" ]]; then
       error_msg "ERROR! You must execute the script as a normal user."
     fi
   } #}}}
   check_archlinux() { #{{{
-    if [ ! -e /etc/arch-release ]; then
+    if [[ ! -e /etc/arch-release ]]; then
       error_msg "ERROR! You must execute the script on Arch Linux."
     fi
   } #}}}
   check_hostname() { #{{{
-    if [ `echo ${HOSTNAME} | sed 's/ //g'` == "" ]; then
+    if [[ `echo ${HOSTNAME} | sed 's/ //g'` == "" ]]; then
       error_msg "ERROR! Hostname is not configured."
     fi
   } #}}}
   check_pacman_blocked() { #{{{
-    if [[ -f  /var/lib/pacman/db.lck ]]; then
+    if [[ -f /var/lib/pacman/db.lck ]]; then
       error_msg "ERROR! Pacman is blocked. \nIf not running remove the /var/lib/pacman/db.lck file."
     fi
   } #}}}

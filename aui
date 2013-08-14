@@ -607,7 +607,6 @@ install_preload(){
   print_info "Preload is a program which runs as a daemon and records statistics about usage of programs using Markov chains; files of more frequently-used programs are, during a computer's spare time, loaded into memory. This results in faster startup times as less data needs to be fetched from disk. preload is often paired with prelink."
   read_input_text "Install Preload" $PRELOAD
   if [[ $OPTION == y ]]; then
-    package_install "preload"
     system_ctl enable preload
     pause_function
   fi
@@ -1364,7 +1363,8 @@ install_desktop_environment(){
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
       system_ctl enable upower
       #Improvements
-      echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
+      local MAX_WTCHES=`cat /etc/sysctl.conf | grep fs.inotify.max_user_watches`
+      [[ -z $MAX_WTCHES ]] && echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
       ;;
       #}}}
       4)
@@ -1469,7 +1469,8 @@ install_desktop_environment(){
       system_ctl enable upower
       # Tweaks
       # nepomuk
-      echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
+      local MAX_WTCHES=`cat /etc/sysctl.conf | grep fs.inotify.max_user_watches`
+      [[ -z $MAX_WTCHES ]] && echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
       # pulseaudio
       local CONFIG_PULSEAUDIO=`cat /etc/pulse/default.pa | grep module-device-manager`
       [[ -z $CONFIG_PULSEAUDIO ]] && echo "load-module module-device-manager" >> /etc/pulse/default.pa
@@ -2378,6 +2379,8 @@ install_internet_apps(){
                   else
                     aur_package_install "dropbox-cli"
                   fi
+                  local MAX_WTCHES=`cat /etc/sysctl.conf | grep fs.inotify.max_user_watches`
+                  [[ -z $MAX_WTCHES ]] && echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
                   ;;
                 5)
                   aur_package_install "jdownloader"
