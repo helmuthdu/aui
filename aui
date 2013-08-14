@@ -412,7 +412,7 @@ install_powerpill (){
     [[ -z $CONFIG_POWERPILL ]] && sed -i -e '/"http"/a\      "--country",\n      "'${country}'",' /etc/powerpill/powerpill.json
     pause_function
   fi
-  is_package_installed && PKG_MANAGER="powerpill"
+  is_package_installed "powerpill" && PKG_MANAGER="powerpill"
 }
 #}}}
 #AUTOMATIC MODE {{{
