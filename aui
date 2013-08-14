@@ -491,8 +491,8 @@ install_basic_setup(){
   print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
   print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers and hosts running on a local network with no specific configuration."
   package_install "avahi nss-mdns"
-  is_package_installed "avahi" && systemctl enable avahi-daemon
-  is_package_installed "avahi" && systemctl enable avahi-dnsconfd
+  is_package_installed "avahi" && system_ctl enable avahi-daemon
+  is_package_installed "avahi" && system_ctl enable avahi-dnsconfd
   pause_function
   print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
   print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
@@ -521,7 +521,7 @@ install_ssh(){
   if [[ $OPTION == y ]]; then
     package_install "openssh"
     aur_package_install "rssh"
-    systemctl enable sshd
+    system_ctl enable sshd
     [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
     #CONFIGURE SSHD_CONF #{{{
       sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
@@ -566,8 +566,8 @@ install_nfs(){
   read_input_text "Install nfs" $NFS
   if [[ $OPTION == y ]]; then
     package_install "nfs-utils"
-    systemctl enable rpc-idmapd
-    systemctl enable rpc-mountd
+    system_ctl enable rpc-idmapd
+    system_ctl enable rpc-mountd
     pause_function
   fi
 }
@@ -595,8 +595,8 @@ install_samba(){
       modprobe fuse
     fi
     # enable services
-    systemctl enable smbd
-    systemctl enable nmbd
+    system_ctl enable smbd
+    system_ctl enable nmbd
     pause_function
   fi
 }
@@ -608,7 +608,7 @@ install_preload(){
   read_input_text "Install Preload" $PRELOAD
   if [[ $OPTION == y ]]; then
     package_install "preload"
-    systemctl enable preload
+    system_ctl enable preload
     pause_function
   fi
 }
@@ -620,7 +620,7 @@ install_zram (){
   read_input_text "Install Zram" $ZRAM
   if [[ $OPTION == y ]]; then
     aur_package_install "zramswap"
-    systemctl enable zramswap
+    system_ctl enable zramswap
     pause_function
   fi
 }
@@ -633,7 +633,7 @@ install_tlp(){
   if [[ $OPTION == y ]]; then
     aur_package_install "tlp"
     tlp start
-    systemctl enable tlp
+    system_ctl enable tlp
     pause_function
   fi
 }
@@ -707,8 +707,8 @@ install_video_cards(){
     package_install "virtualbox-guest-utils"
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${USER_NAME} vboxsf
-    systemctl disable ntpd
-    systemctl enable vbo
+    system_ctl disable ntpd
+    system_ctl enable vbo
     VBoxClient-all
   #}}}
   #NVIDIA {{{
@@ -790,7 +790,7 @@ install_cups(){
   if [[ $OPTION == y ]]; then
     package_install "cups cups-filters ghostscript gsfonts"
     package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
-    systemctl enable cups
+    system_ctl enable cups
     pause_function
   fi
 }
@@ -889,10 +889,10 @@ install_git_tor(){
     fi
     groupadd -g 42 privoxy
     useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
-    systemctl start tor
-    systemctl start privoxy
-    systemctl enable tor
-    systemctl enable privoxy
+    system_ctl start tor
+    system_ctl start privoxy
+    system_ctl enable tor
+    system_ctl enable privoxy
     pause_function
   fi
 }
@@ -1019,11 +1019,11 @@ install_desktop_environment(){
         case "$OPT" in
           1)
             aur_package_install "entrance-git"
-            systemctl enable entrance
+            system_ctl enable entrance
             ;;
           2)
             package_install "gdm"
-            systemctl enable gdm
+            system_ctl enable gdm
             ;;
           3)
             if [[ ${KDE} -eq 1 ]]; then
@@ -1031,15 +1031,15 @@ install_desktop_environment(){
             else
               package_install "lightdm lightdm-gtk3-greeter"
             fi
-            systemctl enable lightdm
+            system_ctl enable lightdm
             ;;
           4)
             package_install "lxdm"
-            systemctl enable lxdm
+            system_ctl enable lxdm
             ;;
           5)
             package_install "slim"
-            systemctl enable slim
+            system_ctl enable slim
             ;;
           "b")
             break
@@ -1312,11 +1312,11 @@ install_desktop_environment(){
       pause_function
       install_themes "CINNAMON"
       #Gnome Display Manager (a reimplementation of xdm)
-      systemctl enable gdm
+      system_ctl enable gdm
       #D-Bus interface for user account query and manipulation
-      systemctl enable accounts-daemon
+      system_ctl enable accounts-daemon
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      systemctl enable upower
+      system_ctl enable upower
       ;;
       #}}}
       2)
@@ -1336,7 +1336,7 @@ install_desktop_environment(){
       install_misc_apps "E17"
       install_themes "E17"
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      systemctl enable upower
+      system_ctl enable upower
       ;;
       #}}}
       3)
@@ -1358,11 +1358,11 @@ install_desktop_environment(){
       pause_function
       install_themes "GNOME"
       #Gnome Display Manager (a reimplementation of xdm)
-      systemctl enable gdm
+      system_ctl enable gdm
       #D-Bus interface for user account query and manipulation
-      systemctl enable accounts-daemon
+      system_ctl enable accounts-daemon
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      systemctl enable upower
+      system_ctl enable upower
       #Improvements
       echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
       ;;
@@ -1464,9 +1464,9 @@ install_desktop_environment(){
         elihw
       done
       #}}}
-      systemctl enable kdm
+      system_ctl enable kdm
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      systemctl enable upower
+      system_ctl enable upower
       # Tweaks
       # nepomuk
       echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
@@ -1496,7 +1496,7 @@ install_desktop_environment(){
       install_misc_apps "LXDE"
       install_themes "LXDE"
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      systemctl enable upower
+      system_ctl enable upower
       ;;
       #}}}
       6)
@@ -1513,9 +1513,9 @@ install_desktop_environment(){
       pause_function
       install_themes "MATE"
       #D-Bus interface for user account query and manipulation
-      systemctl enable accounts-daemon
+      system_ctl enable accounts-daemon
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      systemctl enable upower
+      system_ctl enable upower
       ;;
       #}}}
       7)
@@ -1532,7 +1532,7 @@ install_desktop_environment(){
       install_display_manager
       install_themes "XFCE"
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      systemctl enable upower
+      system_ctl enable upower
       ;;
       #}}}
       8)
@@ -1554,7 +1554,7 @@ install_desktop_environment(){
       install_misc_apps "AWESOME"
       install_themes "AWESOME"
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      systemctl enable upower
+      system_ctl enable upower
       ;;
       #}}}
       9)
@@ -1573,7 +1573,7 @@ install_desktop_environment(){
       install_themes "FLUXBOX"
       pause_function
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      systemctl enable upower
+      system_ctl enable upower
       ;;
       #}}}
       10)
@@ -1595,7 +1595,7 @@ install_desktop_environment(){
       install_misc_apps "OPENBOX"
       install_themes "OPENBOX"
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      systemctl enable upower
+      system_ctl enable upower
       ;;
       #}}}
       "b")
@@ -1637,7 +1637,7 @@ install_nm_wicd(){
       fi
       is_package_installed "ntp" && package_install "networkmanager-dispatcher-ntpd"
       # Network Management daemon
-      systemctl enable NetworkManager
+      system_ctl enable NetworkManager
       pause_function
       ;;
     2)
@@ -1649,7 +1649,7 @@ install_nm_wicd(){
         package_install "wicd wicd-gtk"
       fi
       # WICD daemon
-      systemctl enable wicd
+      system_ctl enable wicd
       pause_function
       ;;
     3)
@@ -1657,7 +1657,7 @@ install_nm_wicd(){
       print_info "ConnMan is an alternative to NetworkManager and Wicd and was created by Intel and the Moblin project for use with embedded devices."
       package_install "connman "
       # ConnMan daemon
-      systemctl enable connman
+      system_ctl enable connman
       pause_function
       ;;
   esac
@@ -2138,7 +2138,7 @@ install_system_apps(){
           sed -i '/START_CLAMD/s/no/yes/' /etc/conf.d/clamav
           sed -i '/Example/d' /etc/clamav/freshclam.conf
           sed -i '/Example/d' /etc/clamav/clamd.conf
-          systemctl enable clamd
+          system_ctl enable clamd
           freshclam
           ;;
         2)
@@ -2146,7 +2146,7 @@ install_system_apps(){
           print_info "firewalld provides a dynamically managed firewall with support for network/firewall zones to define the trust level of network connections or interfaces. It has support for IPv4, IPv6 firewall settings and for ethernet bridges and has a separation of runtime and persistent configuration options. It also supports an interface fors or applications to add firewall rules directly."
           is_package_installed "ufw" && package_remove "ufw"
           package_install "firewalld"
-          systemctl enable firewalld
+          system_ctl enable firewalld
           ;;
         3)
           package_install "gparted"
@@ -2172,7 +2172,7 @@ install_system_apps(){
           ;;
         7)
           package_install "webmin perl-net-ssleay"
-          systemctl enable webmin
+          system_ctl enable webmin
           ;;
         8)
           package_install "icoutils wine wine_gecko winetricks"
@@ -3562,9 +3562,9 @@ install_web_server(){
     1)
       package_install "apache mariadb php php-apache php-mcrypt php-gd"
       aur_package_install "adminer"
-      systemctl enable httpd
+      system_ctl enable httpd
       /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-      systemctl enable mysqld
+      system_ctl enable mysqld
       systemctl start mysqld
       /usr/bin/mysql_secure_installation
       #CONFIGURE HTTPD.CONF {{{
@@ -3605,8 +3605,8 @@ install_web_server(){
         echo "Enter your postgres account password:"
         su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
       fi
-      systemctl enable httpd
-      systemctl enable postgresql
+      system_ctl enable httpd
+      system_ctl enable postgresql
       #CONFIGURE HTTPD.CONF {{{
         if [[ ! -f /etc/httpd/conf/httpd.conf.aui ]]; then
           cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
@@ -3635,11 +3635,11 @@ install_web_server(){
       package_install "nginx mariadb php php-mcrypt php-fpme"
       aur_package_install "adminer"
       /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-      systemctl enable mysqld
+      system_ctl enable mysqld
       systemctl start mysqld
       /usr/bin/mysql_secure_installation
-      systemctl enable nginx
-      systemctl enable php-fpm
+      system_ctl enable nginx
+      system_ctl enable php-fpm
       #CONFIGURE PHP.INI {{{
         if [[ -f  /etc/php/php.ini.pacnew ]]; then
           mv -v /etc/php/php.ini /etc/php/php.ini.pacold
@@ -3666,9 +3666,9 @@ install_web_server(){
         echo "Enter your postgres account password:"
         su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
       fi
-      systemctl enable nginx
-      systemctl enable postgresql
-      systemctl enable php-fpm
+      system_ctl enable nginx
+      system_ctl enable postgresql
+      system_ctl enable php-fpm
       #CONFIGURE PHP.INI {{{
         if [[ -f  /etc/php/php.ini.pacnew ]]; then
           mv -v /etc/php/php.ini /etc/php/php.ini.pacold

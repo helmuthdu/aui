@@ -119,7 +119,7 @@
           echo -e "$PKG" >> $PKG_FAIL
           read_input_text " View logfile?"
           if [[ $OPTION == y ]]; then
-            cat $LOG
+            tail -n 15 $LOG
             read -e -sn 1 -p "Press any key to continue..."
           fi
         fi
@@ -441,15 +441,23 @@
     done
   } #}}}
   system_upgrade(){ #{{{
-    pacman -Syu $1
+    local MODIFY=`stat /var/lib/pacman/sync | egrep ^Modify | cut -d':' -f2 | cut -d' ' -f2`
+    local TODAY=`date +%Y-%m-%d`
+    if [ "${MODIFY}" != "${TODAY}" ]; then
+      pacman -Syu $1
+    fi
   } #}}}
   system_update(){ #{{{
-    if [[ $VERBOSE_MODE -eq 0 ]]; then
-      ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Updating packages "
-      pacman -Sy >>"$LOG" 2>&1 &
-      pid=$!;progress $pid
-    else
-      pacman -Sy $1
+    local MODIFY=`stat /var/lib/pacman/sync | egrep ^Modify | cut -d':' -f2 | cut -d' ' -f2`
+    local TODAY=`date +%Y-%m-%d`
+    if [ "${MODIFY}" != "${TODAY}" ]; then
+      if [[ $VERBOSE_MODE -eq 0 ]]; then
+        ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Updating packages "
+        pacman -Syy >>"$LOG" 2>&1 &
+        pid=$!;progress $pid
+      else
+        pacman -Syy $1
+      fi
     fi
   } #}}}
   npm_install(){ #{{{
@@ -505,6 +513,14 @@
     gpasswd -a ${_USER} ${_GROUP} >>"$LOG" 2>&1 &
     pid=$!;progress $pid
   } #}}}
+  system_ctl () { #{{{
+    local ACTION=${1}
+    local OBJECT=${2}
+    ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} systemctl ${ACTION} ${OBJECT} "
+    systemctl ${ACTION} ${OBJECT} >> "$LOG" 2>&1
+    pid=$!;progress $pid
+  }
+  #}}}
   arch_chroot () { #{{{
     arch-chroot $MOUNTPOINT /bin/bash -c "${1}"
   }
