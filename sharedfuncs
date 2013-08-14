@@ -118,7 +118,10 @@
           cecho failed
           echo -e "$PKG" >> $PKG_FAIL
           read_input_text " View logfile?"
-          [[ $OPTION == y ]] && cat $LOG
+          if [[ $OPTION == y ]]; then
+            cat $LOG
+            read -e -sn 1 -p "Press any key to continue..."
+          fi
         fi
         break
       fi
