@@ -607,6 +607,7 @@ install_preload(){
   print_info "Preload is a program which runs as a daemon and records statistics about usage of programs using Markov chains; files of more frequently-used programs are, during a computer's spare time, loaded into memory. This results in faster startup times as less data needs to be fetched from disk. preload is often paired with prelink."
   read_input_text "Install Preload" $PRELOAD
   if [[ $OPTION == y ]]; then
+    aur_package_install "preload"
     system_ctl enable preload
     pause_function
   fi
