@@ -505,14 +505,6 @@
     gpasswd -a ${_USER} ${_GROUP} >>"$LOG" 2>&1 &
     pid=$!;progress $pid
   } #}}}
-  system_ctl () { #{{{
-    local ACTION=${1}
-    local OBJECT=${2}
-    ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} systemctl ${ACTION} ${OBJECT} "
-    systemctl ${ACTION} ${OBJECT} >>"$LOG" 2>&1
-    pid=$!;progress $pid
-  }
-  #}}}
   arch_chroot () { #{{{
     arch-chroot $MOUNTPOINT /bin/bash -c "${1}"
   }
