@@ -40,7 +40,7 @@
   FIRMWARE="y"           # Install custom firmwares
   GITTOR="y"
   NFS="n"
-  PRELOAD="y"
+  READAHEAD="y"
   SAMBA="y"
   SSH="y"
   TLP="n"                # Laptop Power Manager
