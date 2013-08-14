@@ -2035,13 +2035,14 @@ install_office_apps(){
     echo " 2) $(menu_item "goffice calligra" "$([[ ${KDE} -eq 1 ]] && echo "Caligra" || echo "Abiword + Gnumeric";)")"
     echo " 3) $(menu_item "texlive-core" "latex")"
     echo " 4) $(menu_item "calibre")"
-    echo " 5) $(menu_item "gcstar")"
-    echo " 6) $(menu_item "homebank")"
-    echo " 7) $(menu_item "impressive")"
-    echo " 8) $(menu_item "nitrotasks") $AUR"
-    echo " 9) $(menu_item "ocrfeeder")"
-    echo "10) $(menu_item "uberwriter") $AUR"
-    echo "11) $(menu_item "xmind") $AUR"
+    echo " 5) $(menu_item "everpad") $AUR"
+    echo " 6) $(menu_item "gcstar")"
+    echo " 7) $(menu_item "homebank")"
+    echo " 8) $(menu_item "impressive")"
+    echo " 9) $(menu_item "nitrotasks") $AUR"
+    echo "10) $(menu_item "ocrfeeder")"
+    echo "11) $(menu_item "uberwriter") $AUR"
+    echo "12) $(menu_item "xmind") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2081,25 +2082,28 @@ install_office_apps(){
           package_install "calibre"
           ;;
         5)
-          package_install "gcstar"
+          package_install "everpad"
           ;;
         6)
-          package_install "homebank"
+          package_install "gcstar"
           ;;
         7)
-          package_install "impressive"
+          package_install "homebank"
           ;;
         8)
-          aur_package_install "nitrotasks"
+          package_install "impressive"
           ;;
         9)
+          aur_package_install "nitrotasks"
+          ;;
+        10)
           package_install "ocrfeeder tesseract gocr"
           aur_package_install "aspell-$LOCALE_AS"
           ;;
-        10)
+        11)
           aur_package_install "uberwriter"
           ;;
-        11)
+        12)
           aur_package_install "xmind"
           ;;
         "b")

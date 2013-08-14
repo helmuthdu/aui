@@ -120,7 +120,7 @@
           read_input_text " View logfile?"
           if [[ $OPTION == y ]]; then
             tail -n 15 $LOG
-            read -e -sn 1 -p "Press any key to continue..."
+            exit 1
           fi
         fi
         break

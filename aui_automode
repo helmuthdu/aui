@@ -238,14 +238,15 @@
   # 2) Abiword+Gnumeric|Calligra
   # 3) Latex + Texmaker
   # 4) Calibre
-  # 5) GCStar
-  # 6) Homebank
-  # 7) Impressive
-  # 8) Nitrotask
-  # 9) OCRFeeder
-  #10) UberWriter
-  #11) Xmind
-  OFFICE_OPTIONS="1 10"
+  # 5) Everpad
+  # 6) GCStar
+  # 7) Homebank
+  # 8) Impressive
+  # 9) Nitrotask
+  #10) OCRFeeder
+  #11) UberWriter
+  #12) Xmind
+  OFFICE_OPTIONS="1 11"
 #}}}
 #SYSTEM TOOLS {{{
   # 1) ClamAV
