@@ -3972,6 +3972,7 @@ check_root
 check_archlinux
 check_hostname
 check_connection
+check_pacman_blocked
 system_upgrade
 language_selector
 configure_sudo

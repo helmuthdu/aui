@@ -84,7 +84,7 @@
 #COMMON FUNCTIONS {{{
   error_msg() { #{{{
     local MSG="${1}"
-    echo "${MSG}"
+    echo -e "${MSG}"
     exit 1
   } #}}}
   cecho() { #{{{
@@ -147,6 +147,11 @@
       error_msg "ERROR! Hostname is not configured."
     fi
   } #}}}
+  check_pacman_blocked() { #{{{
+    if [[ -f  /var/lib/pacman/db.lck ]]; then
+      error_msg "ERROR! Pacman is blocked. \nIf not running remove the /var/lib/pacman/db.lck file."
+    fi
+  } #}}}
   check_domainname() { #{{{
     DOMAINNAME=`echo ${HOSTNAME} | cut -d'.' -f2- | sed 's/ //g'`
 
@@ -160,7 +165,7 @@
       error_msg "ERROR! Domain name is not configured."
     fi
   } #}}}
-  check_connection() { #{{{
+  check_connection(){ #{{{
     XPINGS=$(( $XPINGS + 1 ))
     ping_gw() {
       IP_ADDR=`ip r | grep default | cut -d ' ' -f 3`
@@ -244,14 +249,14 @@
       read -p "Type your video driver [ex: sis, fbdev, modesetting]: " VIDEO_DRIVER
     fi
   } #}}}
-  read_input(){ #{{{
+  read_input() { #{{{
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
       OPTION=$1
     else
       read -p "$prompt1" OPTION
     fi
   } #}}}
-  read_input_text(){ #{{{
+  read_input_text() { #{{{
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
       OPTION=$2
     else
@@ -260,7 +265,7 @@
     fi
     OPTION=`echo "$OPTION" | tr '[:upper:]' '[:lower:]'`
   } #}}}
-  read_input_options(){ #{{{
+  read_input_options() { #{{{
     local line
     local packages
     if [[ $AUTOMATIC_MODE -eq 1 ]]; then
@@ -280,27 +285,27 @@
     done
     OPTIONS=("${packages[@]}")
   } #}}}
-  print_line(){ #{{{
+  print_line() { #{{{
     printf "%$(tput cols)s\n"|tr ' ' '-'
   } #}}}
-  print_title(){ #{{{
+  print_title() { #{{{
     clear
     print_line
     echo -e "# ${Bold}$1${Reset}"
     print_line
     echo ""
   } #}}}
-  print_info(){ #{{{
+  print_info() { #{{{
     #Console width number
     T_COLS=`tput cols`
     echo -e "${Bold}$1${Reset}\n" | fold -sw $(( $T_COLS - 18 )) | sed 's/^/\t/'
   } #}}}
-  print_warning(){ #{{{
+  print_warning() { #{{{
     #Console width number
     T_COLS=`tput cols`
     echo -e "${BRed}$1${Reset}\n" | fold -sw $(( $T_COLS - 1 ))
   } #}}}
-  start_module(){ #{{{
+  start_module() { #{{{
     modprobe $1
   } #}}}
   replaceinfile() { #{{{
@@ -316,7 +321,7 @@
       cecho "failed: ${SEARCH} - ${FILEPATH}"
     fi
   } #}}}
-  add_module(){ #{{{
+  add_module() { #{{{
     #check if the number of arguments is less then 2
     for MODULE in $1; do
       [[ $# -lt 2 ]] && MODULE_NAME="$MODULE" || MODULE_NAME="$2";
@@ -346,22 +351,22 @@
       fi
     fi
   } #}}}
-  is_package_installed(){ #{{{
+  is_package_installed() { #{{{
     #check if a package is already installed
     for PKG in $1; do
       pacman -Q $PKG &> /dev/null && return 0;
     done
     return 1
   } #}}}
-  checkbox(){ #{{{
+  checkbox() { #{{{
     #display [X] or [ ]
     [[ "$1" -eq 1 ]] && echo -e "${BBlue}[${Reset}${Bold}X${BBlue}]${Reset}" || echo -e "${BBlue}[ ${BBlue}]${Reset}";
   } #}}}
-  checkbox_package(){ #{{{
+  checkbox_package() { #{{{
     #check if [X] or [ ]
     is_package_installed "$1" && checkbox 1 || checkbox 0
   } #}}}
-  aui_download_packages(){ #{{{
+  aui_download_packages() { #{{{
     for PKG in $1; do
       #exec command as user instead of root
       su - ${USER_NAME} -c "
@@ -371,11 +376,11 @@
         tar zxvf $PKG.tar.gz
         rm $PKG.tar.gz
         cd $PKG
-        makepkg -si --noconfirm
+        makepkg -csi --noconfirm
       "
     done
   } #}}}
-  aur_package_install(){ #{{{
+  aur_package_install() { #{{{
     #install package from aur
     for PKG in $1; do
       if ! is_package_installed "${PKG}" ; then
@@ -395,7 +400,7 @@
       fi
     done
   } #}}}
-  package_install(){ #{{{
+  package_install() { #{{{
     #install packages using pacman
     if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
       for PKG in ${1}; do
@@ -426,7 +431,7 @@
       $PKG_MANAGER -S --needed $1
     fi
   } #}}}
-  package_remove(){ #{{{
+  package_remove() { #{{{
     #remove package
     for PKG in ${1}; do
       if is_package_installed "${PKG}" ; then
@@ -440,14 +445,14 @@
       fi
     done
   } #}}}
-  system_upgrade(){ #{{{
+  system_upgrade() { #{{{
     local MODIFY=`stat /var/lib/pacman/sync | egrep ^Modify | cut -d':' -f2 | cut -d' ' -f2`
     local TODAY=`date +%Y-%m-%d`
     if [ "${MODIFY}" != "${TODAY}" ]; then
       pacman -Syu $1
     fi
   } #}}}
-  system_update(){ #{{{
+  system_update() { #{{{
     local MODIFY=`stat /var/lib/pacman/sync | egrep ^Modify | cut -d':' -f2 | cut -d' ' -f2`
     local TODAY=`date +%Y-%m-%d`
     if [ "${MODIFY}" != "${TODAY}" ]; then
@@ -460,32 +465,32 @@
       fi
     fi
   } #}}}
-  npm_install(){ #{{{
+  npm_install() { #{{{
     #install packages using pacman
     npm install -g $1
   } #}}}
-  contains_element(){ #{{{
+  contains_element() { #{{{
     #check if an element exist in a string
     for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
   } #}}}
-  config_xinitrc(){ #{{{
+  config_xinitrc() { #{{{
     #create a xinitrc file in home user directory
     cp -fv /etc/skel/.xinitrc /home/${USER_NAME}/
     echo -e "exec $1" >> /home/${USER_NAME}/.xinitrc
     chown -R ${USER_NAME}:users /home/${USER_NAME}/.xinitrc
   } #}}}
-  invalid_option(){ #{{{
+  invalid_option() { #{{{
     print_line
     echo "Invalid option. Try another one."
     pause_function
   } #}}}
-  pause_function(){ #{{{
+  pause_function() { #{{{
     print_line
     if [[ $AUTOMATIC_MODE -eq 0 ]]; then
       read -e -sn 1 -p "Press any key to continue..."
     fi
   } #}}}
-  menu_item(){ #{{{
+  menu_item() { #{{{
     #check if the number of arguments is less then 2
     [[ $# -lt 2 ]] && PACKAGE_NAME="$1" || PACKAGE_NAME="$2";
     #list of chars to remove from the package name
@@ -495,7 +500,7 @@
     #display checkbox and package name
     echo -e "$(checkbox_package "$1") ${Bold}$PACKAGE_NAME${Reset}"
   } #}}}
-  mainmenu_item(){ #{{{
+  mainmenu_item() { #{{{
     echo -e "$(checkbox "$1") ${Bold}$2${Reset}"
   } #}}}
   elihw() { #{{{
@@ -513,7 +518,7 @@
     gpasswd -a ${_USER} ${_GROUP} >>"$LOG" 2>&1 &
     pid=$!;progress $pid
   } #}}}
-  system_ctl () { #{{{
+  system_ctl() { #{{{
     local ACTION=${1}
     local OBJECT=${2}
     ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} systemctl ${ACTION} ${OBJECT} "
@@ -521,11 +526,11 @@
     pid=$!;progress $pid
   }
   #}}}
-  arch_chroot () { #{{{
+  arch_chroot() { #{{{
     arch-chroot $MOUNTPOINT /bin/bash -c "${1}"
   }
   #}}}
-  setkeymap(){ #{{{
+  setkeymap() { #{{{
     local keymaps=(`localectl list-keymaps`)
     PS3="(shift+pgup/pgdown) $prompt1"
     echo "Select keymap:"
@@ -538,7 +543,7 @@
     done
   }
   #}}}
-  setlocale(){ #{{{
+  setlocale() { #{{{
     local locale_list=(`cat /etc/locale.gen | grep _ | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
     PS3="$prompt1"
     echo "Select locale:"
@@ -553,7 +558,7 @@
     done
   }
   #}}}
-  settimezone(){ #{{{
+  settimezone() { #{{{
     local zone=(`timedatectl list-timezones | sed 's/\/.*$//' | uniq`);
     PS3="$prompt1"
     echo "Select zone:"
