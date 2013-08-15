@@ -453,16 +453,12 @@
     fi
   } #}}}
   system_update() { #{{{
-    local MODIFY=`stat /var/lib/pacman/sync | egrep ^Modify | cut -d':' -f2 | cut -d' ' -f2`
-    local TODAY=`date +%Y-%m-%d`
-    if [ "${MODIFY}" != "${TODAY}" ]; then
-      if [[ $VERBOSE_MODE -eq 0 ]]; then
-        ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Updating packages "
-        pacman -Syy >>"$LOG" 2>&1 &
-        pid=$!;progress $pid
-      else
-        pacman -Syy $1
-      fi
+    if [[ $VERBOSE_MODE -eq 0 ]]; then
+      ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Updating packages "
+      pacman -Syy >>"$LOG" 2>&1 &
+      pid=$!;progress $pid
+    else
+      pacman -Syy $1
     fi
   } #}}}
   npm_install() { #{{{

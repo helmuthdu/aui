@@ -425,7 +425,7 @@ configure_bootloader(){
       select OPT in "${syslinux_install_mode[@]}"; do
         case "$REPLY" in
           1)
-            arch_chroot "syslinux-install_update -i -a -m"
+            arch_chroot "syslinux-install_update -iam"
             break
             ;;
           2)
