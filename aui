@@ -409,7 +409,6 @@ install_powerpill (){
         country_list
         read_input_text "Confirm country: $country"
       done
-      CONFIG_POWERPILL=`cat /etc/powerpill/powerpill.json | grep $country`
       sed -i -e '/"http"/a\      "--country",\n      "'${country}'",' /etc/powerpill/powerpill.json
     fi
   fi
