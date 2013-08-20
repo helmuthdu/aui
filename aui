@@ -220,7 +220,7 @@ select_user(){
         elif [[ $EDITOR == vim ]]; then
           ! is_package_installed "gvim" && package_install "vim ctags"
           #VIMRC {{{
-          if [[ -f /home/${USER_NAME}/.vimrc ]]; then
+          if [[ ! -f /home/${USER_NAME}/.vimrc ]]; then
             vimrc_list=("Default" "Vanilla" "Get from github");
             PS3="$prompt1"
             echo -e "Choose your .vimrc\n"
@@ -389,28 +389,28 @@ install_powerpill (){
   read_input_text "Install Powerpill"
   if [[ $OPTION == y ]]; then
     aur_package_install "powerpill"
-    echo ""
-    local countries_name=("Australia" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Latvia" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russian" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
-    country_list(){
-      #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/^/"/g' | sed 's/,.*//g' | sed 's/ *$//g'  | sed 's/$/"/g' | sed -e :a -e '$!N; s/\n/ /; ta'`
-      PS3="$prompt1"
-      echo "Select your country:"
-      select country in "${countries_name[@]}"; do
-        if contains_element "$country" "${countries_name[@]}"; then
-          break
-        else
-          invalid_option
-        fi
-      done
-    }
-    OPTION=n
-    while [[ $OPTION != y ]]; do
-      country_list
-      read_input_text "Confirm country: $country"
-    done
     CONFIG_POWERPILL=`cat /etc/powerpill/powerpill.json | grep $country`
-    [[ -z $CONFIG_POWERPILL ]] && sed -i -e '/"http"/a\      "--country",\n      "'${country}'",' /etc/powerpill/powerpill.json
-    pause_function
+    if [[ -z $CONFIG_POWERPILL ]]; then
+      local countries_name=("Australia" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Latvia" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russian" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
+      country_list(){
+        #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/^/"/g' | sed 's/,.*//g' | sed 's/ *$//g'  | sed 's/$/"/g' | sed -e :a -e '$!N; s/\n/ /; ta'`
+        PS3="$prompt1"
+        echo "Select your country:"
+        select country in "${countries_name[@]}"; do
+          if contains_element "$country" "${countries_name[@]}"; then
+            break
+          else
+            invalid_option
+          fi
+        done
+      }
+      OPTION=n
+      while [[ $OPTION != y ]]; do
+        country_list
+        read_input_text "Confirm country: $country"
+      done
+      sed -i -e '/"http"/a\      "--country",\n      "'${country}'",' /etc/powerpill/powerpill.json
+    fi
   fi
   is_package_installed "powerpill" && PKG_MANAGER="powerpill"
 }
@@ -597,11 +597,13 @@ install_samba(){
     # enable services
     system_ctl enable smbd
     system_ctl enable nmbd
+    # automatic mounting
+    system_ctl enable smbnetfs
     pause_function
   fi
 }
 #}}}
-#PRELOAD {{{
+#READAHEAD {{{
 enable_readahead(){
   print_title "Readahead - https://wiki.archlinux.org/index.php/Improve_Boot_Performance"
   print_info "Systemd comes with its own readahead implementation, this should in principle improve boot time. However, depending on your kernel version and the type of your hard drive, your mileage may vary (i.e. it might be slower)."
@@ -2938,7 +2940,9 @@ install_video_apps(){
             aur_package_install "codecs64"
           fi
           aur_package_install "libaacs"
-          sudo -u ${USER_NAME} mkdir -p /home/${USER_NAME}/.config/aacs/ &&  cd /home/${USER_NAME}/.config/aacs/ && wget http://vlc-bluray.whoknowsmy.name/files/KEYDB.cfg
+          sudo -u ${USER_NAME} mkdir -p /home/${USER_NAME}/.config/aacs/ &&
+            cd /home/${USER_NAME}/.config/aacs/ &&
+            wget http://vlc-bluray.whoknowsmy.name/files/KEYDB.cfg
           ;;
         "b")
           break

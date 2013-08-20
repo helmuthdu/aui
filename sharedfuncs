@@ -117,11 +117,9 @@
         else
           cecho failed
           echo -e "$PKG" >> $PKG_FAIL
-          read_input_text " View logfile?"
-          if [[ $OPTION == y ]]; then
-            tail -n 15 $LOG
-            exit 1
-          fi
+          tail -n 15 $LOG
+          read -p "ERROR! Continue install [y/N]?" OPTION
+          [[ $OPTION != y ]] && exit 1
         fi
         break
       fi
@@ -149,7 +147,7 @@
   } #}}}
   check_pacman_blocked() { #{{{
     if [[ -f /var/lib/pacman/db.lck ]]; then
-      error_msg "ERROR! Pacman is blocked. \nIf not running remove the /var/lib/pacman/db.lck file."
+      error_msg "ERROR! Pacman is blocked. \nIf not running remove /var/lib/pacman/db.lck."
     fi
   } #}}}
   check_domainname() { #{{{
@@ -448,8 +446,8 @@
   system_upgrade() { #{{{
     local MODIFY=`stat /var/lib/pacman/sync | egrep ^Modify | cut -d':' -f2 | cut -d' ' -f2`
     local TODAY=`date +%Y-%m-%d`
-    if [ "${MODIFY}" != "${TODAY}" ]; then
-      pacman -Syu $1
+    if [[ ${MODIFY} != ${TODAY} ]]; then
+      pacman -Syu ${1}
     fi
   } #}}}
   system_update() { #{{{
