@@ -170,17 +170,16 @@
   # 1) Cairo Dock
   # 2) Catfish
   # 3) Conky
-  # 4) Dockbarx
-  # 5) Docky
-  # 6) Galculator|Speedcrunch
-  # 7) Terra [Drop-down Terminal]
-  # 8) Kupfer
-  # 9) Pyrenamer
-  #10) Shutter
-  #11) Stormcloud
-  #12) Synapse
-  #13) Terminator
-  #14) Zim
+  # 4) Docky
+  # 5) Galculator|Speedcrunch
+  # 6) Terra [Drop-down Terminal]
+  # 7) Kupfer
+  # 8) Pyrenamer
+  # 9) Shutter
+  #10) Stormcloud
+  #11) Synapse
+  #12) Terminator
+  #13) Zim
   ACCESSORIES_OPTIONS=""
 #}}}
 #DEVELOPEMENT {{{
