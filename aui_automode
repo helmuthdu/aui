@@ -178,8 +178,9 @@
   # 9) Pyrenamer
   #10) Shutter
   #11) Stormcloud
-  #12) Terminator
-  #13) Zim
+  #12) Synapse
+  #13) Terminator
+  #14) Zim
   ACCESSORIES_OPTIONS=""
 #}}}
 #DEVELOPEMENT {{{
@@ -203,7 +204,7 @@
   #18) SQL Power Architect
   #19) Meld
   #20) RabbitVCS
-  DEVELOPMENT_OPTIONS="12 5 11 15"
+  DEVELOPMENT_OPTIONS="13 5 11 15"
   #ECLIPSE {{{
     # 1) Eclipse Classic
     # 2) Eclipse IDE for C/C++ Developers
@@ -246,7 +247,7 @@
   #10) OCRFeeder
   #11) UberWriter
   #12) Xmind
-  OFFICE_OPTIONS="1 11"
+  OFFICE_OPTIONS="1"
 #}}}
 #SYSTEM TOOLS {{{
   # 1) ClamAV
@@ -257,7 +258,7 @@
   # 6) Virtualbox
   # 7) Webmin
   # 8) Wine
-  SYSTEMTOOLS_OPTIONS="3-6 8"
+  SYSTEMTOOLS_OPTIONS="6 8"
 #}}}
 #GRAPHICS {{{
   # 1) Blender
@@ -510,8 +511,8 @@
 #WEBSERVER {{{
   # 1) LAMP - APACHE, MariaDB & PHP + ADMINER
   # 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER
-  # 3) LNMP - NGINX, MariaDB & PHP + ADMINER
-  # 4) LNPP - NGINX, POSTGRESQL & PHP + ADMINER
+  # 3) LEMP - NGINX, MariaDB & PHP + ADMINER
+  # 4) LEPP - NGINX, POSTGRESQL & PHP + ADMINER
   WEBSERVER=2
 #}}}
 #FONTS {{{

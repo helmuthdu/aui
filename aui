@@ -702,7 +702,7 @@ font_config(){
 #VIDEO CARDS {{{
 install_video_cards(){
   package_install "dmidecode"
-  print_title "VIDEO CARD"
+  prnt_title "VIDEO CARD"
   check_vga
   #Virtualbox {{{
   if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
@@ -1684,17 +1684,17 @@ install_accessories_apps(){
   while true
   do
     print_title "ACCESSORIES APPS"
-    echo " 1) $(menu_item "cairo-dock") $AUR"
+    echo " 1) $(menu_item "cairo-dock")"
     echo " 2) $(menu_item "catfish")"
     echo " 3) $(menu_item "conky-lua") $AUR"
-    echo " 4) $(menu_item "dockbarx") $AUR"
-    echo " 5) $(menu_item "docky") $AUR"
-    echo " 6) $(menu_item "speedcrunch galculator" "$([[ ${KDE} -eq 1 ]] && echo "Speedcrunch" || echo "Galculator";)") $AUR"
-    echo " 7) $(menu_item "terra-bzr") $AUR"
-    echo " 8) $(menu_item "kupfer") $AUR"
-    echo " 9) $(menu_item "pyrenamer") $AUR"
-    echo "10) $(menu_item "shutter") $AUR"
-    echo "11) $(menu_item "stormcloud") $AUR"
+    echo " 4) $(menu_item "docky") $AUR"
+    echo " 5) $(menu_item "galculator") $AUR"
+    echo " 6) $(menu_item "terra-bzr") $AUR"
+    echo " 7) $(menu_item "kupfer") $AUR"
+    echo " 8) $(menu_item "pyrenamer") $AUR"
+    echo " 9) $(menu_item "shutter") $AUR"
+    echo "10) $(menu_item "stormcloud") $AUR"
+    echo "11) $(menu_item "synapse")"
     echo "12) $(menu_item "terminator")"
     echo "13) $(menu_item "zim")"
     echo ""
@@ -1705,7 +1705,7 @@ install_accessories_apps(){
     for OPT in ${OPTIONS[@]}; do
       case "$OPT" in
         1)
-          aur_package_install "cairo-dock cairo-dock-plugins"
+          package_install "cairo-dock cairo-dock-plugins"
           ;;
         2)
           package_install "catfish"
@@ -1714,32 +1714,29 @@ install_accessories_apps(){
           aur_package_install "conky-lua"
           ;;
         4)
-          aur_package_install "dockbarx dockbarx-shinybar-theme"
+          package_install "docky"
+          aur_package_install "dockmanager"
           ;;
         5)
-          package_install "docky"
+          package_install "galculator"
           ;;
         6)
-          if [[ ${KDE} -eq 1 ]]; then
-            aur_package_install "speedcrunch"
-          else
-            package_install "galculator"
-          fi
-          ;;
-        7)
           aur_package_install "terra-bzr"
           ;;
-        8)
+        7)
           aur_package_install "kupfer"
           ;;
-        9)
+        8)
           aur_package_install "pyrenamer"
           ;;
-        10)
+        9)
           aur_package_install "shutter"
           ;;
-        11)
+        10)
           aur_package_install "stormcloud"
+          ;;
+        11)
+          package_install "synapse"
           ;;
         12)
           package_install "terminator"
@@ -3564,8 +3561,8 @@ install_web_server(){
   print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
   echo " 1) LAMP - APACHE, MariaDB & PHP + ADMINER"
   echo " 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER"
-  echo " 3) LNMP - NGINX, MariaDB & PHP + ADMINER"
-  echo " 4) LNPP - NGINX, POSTGRESQL & PHP + ADMINER"
+  echo " 3) LEMP - NGINX, MariaDB & PHP + ADMINER"
+  echo " 4) LEPP - NGINX, POSTGRESQL & PHP + ADMINER"
   echo ""
   echo " b) BACK"
   echo ""
