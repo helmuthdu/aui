@@ -702,7 +702,7 @@ font_config(){
 #VIDEO CARDS {{{
 install_video_cards(){
   package_install "dmidecode"
-  prnt_title "VIDEO CARD"
+  print_title "VIDEO CARD"
   check_vga
   #Virtualbox {{{
   if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
