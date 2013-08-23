@@ -192,18 +192,17 @@
   # 7) IntelliJ IDEA
   # 8) Kdevelop
   # 9) LightTable
-  #10) Netbeans
-  #11) NodeJS
-  #12) OpenJDK
-  #13) Oracle JDK
-  #14) QT Creator
-  #15) Sublime Text
-  #16) Debuggers
-  #17) MySQL Workbench
-  #18) SQL Power Architect
+  #10) Monodevelop
+  #11) Netbeans
+  #12) NodeJS
+  #13) OpenJDK
+  #14) Oracle JDK
+  #15) QT Creator
+  #16) Sublime Text
+  #17) Debuggers
+  #18) MySQL Workbench
   #19) Meld
-  #20) RabbitVCS
-  DEVELOPMENT_OPTIONS="13 5 11 15"
+  DEVELOPMENT_OPTIONS="14 5 12 16"
   #ECLIPSE {{{
     # 1) Eclipse Classic
     # 2) Eclipse IDE for C/C++ Developers
@@ -508,10 +507,12 @@
   #}}}
 #}}}
 #WEBSERVER {{{
-  # 1) LAMP - APACHE, MariaDB & PHP + ADMINER
-  # 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER
-  # 3) LEMP - NGINX, MariaDB & PHP + ADMINER
-  # 4) LEPP - NGINX, POSTGRESQL & PHP + ADMINER
+  # 1) LAMP - APACHE, MariaDB & PHP
+  # 2) LAPP - APACHE, POSTGRESQL & PHP
+  # 3) LAMA - APACHE, MariaDB & ASP.NET
+  # 4) LAPA - APACHE, POSTGRESQL & ASP.NET
+  # 5) LEMP - NGINX, MariaDB & PHP
+  # 6) LEPP - NGINX, POSTGRESQL & PHP
   WEBSERVER=2
 #}}}
 #FONTS {{{

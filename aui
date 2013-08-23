@@ -1770,17 +1770,16 @@ install_development_apps(){
     echo " 7) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
     echo " 8) $(menu_item "kdevelop")"
     echo " 9) $(menu_item "lighttable") $AUR"
-    echo "10) $(menu_item "netbeans")"
-    echo "11) $(menu_item "nodejs")"
-    echo "12) $(menu_item "jdk7-openjdk" "OpenJDK")"
-    echo "13) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "14) $(menu_item "qtcreator")"
-    echo "15) $(menu_item "sublime-text" "Sublime Text") $AUR"
-    echo "16) $(menu_item "gdb" "Debuggers")"
-    echo "17) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-    echo "18) $(menu_item "sql-power-architect" "SQL Power Architect") $AUR"
+    echo "10) $(menu_item "monodevelop")"
+    echo "11) $(menu_item "netbeans")"
+    echo "12) $(menu_item "nodejs")"
+    echo "13) $(menu_item "jdk7-openjdk" "OpenJDK")"
+    echo "14) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "15) $(menu_item "qtcreator")"
+    echo "16) $(menu_item "sublime-text" "Sublime Text") $AUR"
+    echo "17) $(menu_item "gdb" "Debuggers")"
+    echo "18) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
     echo "19) $(menu_item "meld")"
-    echo "20) $(menu_item "rabbitvcs" "RabbitVCS") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1892,9 +1891,12 @@ install_development_apps(){
           aur_package_install "lighttable"
           ;;
         10)
-          package_install "netbeans"
+          package_install "monodevelop monodevelop-debugger-gdb"
           ;;
         11)
+          package_install "netbeans"
+          ;;
+        12)
           package_install "nodejs"
           #NODEJS {{{
           while true
@@ -1969,49 +1971,36 @@ install_development_apps(){
           #}}}
           OPT=11
           ;;
-        12)
+        13)
           package_remove "jdk"
           package_install "jdk7-openjdk icedtea-web-java7"
           ;;
-        13)
+        14)
           package_remove "jre7-openjdk"
           package_remove "jdk7-openjdk"
           aur_package_install "jdk"
           ;;
-        14)
+        15)
           package_install "qtcreator qt-doc"
           mkdir -p /home/${USER_NAME}/.config/Nokia/qtcreator/styles
           curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
           mv monokai.xml /home/${USER_NAME}/.config/Nokia/qtcreator/styles/
           chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
           ;;
-        15)
+        16)
           aur_package_install "sublime-text"
           ;;
-        16)
+        17)
           package_install "splint valgrind gdb" #C/C++
           aur_package_install "php-codesniffer php-tidy" #PHP
           aur_package_install "closure-compiler" #Javascript
           aur_package_install "tidyhtml" #HTML
           ;;
-        17)
-          aur_package_install "mysql-workbench-gpl"
-          ;;
         18)
-          aur_package_install "sql-power-architect"
+          aur_package_install "mysql-workbench-gpl"
           ;;
         19)
           package_install "meld"
-          ;;
-        20)
-          aur_package_install "rabbitvcs"
-          if is_package_installed "nautilus" ; then
-            aur_package_install "rabbitvcs-nautilus"
-          elif is_package_installed "thunar" ; then
-            aur_package_install "rabbitvcs-thunar"
-          else
-            aur_package_install "rabbitvcs-cli"
-          fi
           ;;
         "b")
           break
@@ -3558,11 +3547,19 @@ install_web_server(){
     echo "You can access your projects at \"http://localhost/~username\""
     pause_function
   } #}}}
+  install_adminer(){ #{{{
+    aur_package_install "adminer"
+    local ADMINER=`cat /etc/httpd/conf/httpd.conf | grep Adminer`
+    [[ -z $ADMINER ]] && echo -e '\n# Adminer Configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
+  } #}}}
   print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
-  echo " 1) LAMP - APACHE, MariaDB & PHP + ADMINER"
-  echo " 2) LAPP - APACHE, POSTGRESQL & PHP + ADMINER"
-  echo " 3) LEMP - NGINX, MariaDB & PHP + ADMINER"
-  echo " 4) LEPP - NGINX, POSTGRESQL & PHP + ADMINER"
+  print_info "*Adminer is installed by default in all options"
+  echo " 1) LAMP - APACHE, MariaDB & PHP"
+  echo " 2) LAPP - APACHE, POSTGRESQL & PHP"
+  echo " 3) LAMA - APACHE, MariaDB & ASP.NET"
+  echo " 4) LAPA - APACHE, POSTGRESQL & ASP.NET"
+  echo " 5) LEMP - NGINX, MariaDB & PHP"
+  echo " 6) LEPP - NGINX, POSTGRESQL & PHP"
   echo ""
   echo " b) BACK"
   echo ""
@@ -3570,16 +3567,20 @@ install_web_server(){
   case "$OPTION" in
     1)
       package_install "apache mariadb php php-apache php-mcrypt php-gd"
-      aur_package_install "adminer"
+      install_adminer
       system_ctl enable httpd
       /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
       system_ctl enable mysqld
       systemctl start mysqld
       /usr/bin/mysql_secure_installation
-      #CONFIGURE HTTPD.CONF {{{
-        if [[ ! -f /etc/httpd/conf/httpd.conf.aui ]]; then
-          cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-          echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
+      #ADD PHP SUPPORT {{{
+        if [[ -f /etc/httpd/conf/httpd.conf.pacnew ]]; then
+          mv -v /etc/httpd/conf/httpd.conf.pacnew /etc/httpd/conf/httpd.conf
+          rm -v /etc/httpd/conf/httpd.conf.aui
+        fi
+        [[ -f /etc/httpd/conf/httpd.conf.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
+        local MOD_PHP=`cat /etc/httpd/conf/httpd.conf | grep php5_module.conf`
+        if [[ -z $MOD_PHP ]]; then
           echo -e 'application/x-httpd-php5		php php5' >> /etc/httpd/conf/mime.types
           sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
           echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
@@ -3604,7 +3605,7 @@ install_web_server(){
       ;;
     2)
       package_install "apache postgresql php php-apache php-pgsql php-gd"
-      aur_package_install "adminer"
+      install_adminer
       systemd-tmpfiles --create postgresql.conf
       mkdir -p /var/lib/postgres
       chown -R postgres:postgres /var/lib/postgres
@@ -3616,10 +3617,14 @@ install_web_server(){
       fi
       system_ctl enable httpd
       system_ctl enable postgresql
-      #CONFIGURE HTTPD.CONF {{{
-        if [[ ! -f /etc/httpd/conf/httpd.conf.aui ]]; then
-          cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-          echo -e '\n# adminer configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
+      #ADD PHP SUPPORT {{{
+        if [[ -f /etc/httpd/conf/httpd.conf.pacnew ]]; then
+          mv -v /etc/httpd/conf/httpd.conf.pacnew /etc/httpd/conf/httpd.conf
+          rm -v /etc/httpd/conf/httpd.conf.aui
+        fi
+        [[ -f /etc/httpd/conf/httpd.conf.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
+        local MOD_PHP=`cat /etc/httpd/conf/httpd.conf | grep php5_module.conf`
+        if [[ -z $MOD_PHP ]]; then
           echo -e 'application/x-httpd-php5		php php5' >> /etc/httpd/conf/mime.types
           sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
           echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
@@ -3641,8 +3646,46 @@ install_web_server(){
       create_sites_folder
       ;;
     3)
+      package_install "apache mariadb mono mod_mono xsp"
+      install_adminer
+      system_ctl enable httpd
+      /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+      system_ctl enable mysqld
+      systemctl start mysqld
+      /usr/bin/mysql_secure_installation
+      #ADD ASP.NET SUPPORT {{{
+        local MOD_MONO=`cat /etc/httpd/conf/httpd.conf | grep mod_mono`
+        if [[ -z $MOD_MONO ]]; then
+          echo -e '\n# ASP.NET Configuration\nInclude /etc/httpd/conf/mod_mono.conf' >> /etc/httpd/conf/httpd.conf
+        fi
+      #}}}
+      create_sites_folder
+      ;;
+    4)
+      package_install "apache postgresql mono mod_mono xsp"
+      install_adminer
+      systemd-tmpfiles --create postgresql.conf
+      mkdir -p /var/lib/postgres
+      chown -R postgres:postgres /var/lib/postgres
+      echo "Enter your new postgres account password:"
+      passwd postgres
+      if [[ ! -d /var/lib/postgres/data ]]; then
+        echo "Enter your postgres account password:"
+        su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
+      fi
+      system_ctl enable httpd
+      system_ctl enable postgresql
+      #ADD ASP.NET SUPPORT {{{
+        local MOD_MONO=`cat /etc/httpd/conf/httpd.conf | grep mod_mono`
+        if [[ -z $MOD_MONO ]]; then
+          echo -e '\n# ASP.NET Configuration\nInclude /etc/httpd/conf/mod_mono.conf' >> /etc/httpd/conf/httpd.conf
+        fi
+      #}}}
+      create_sites_folder
+      ;;
+    5)
       package_install "nginx mariadb php php-mcrypt php-fpme"
-      aur_package_install "adminer"
+      install_adminer
       /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
       system_ctl enable mysqld
       systemctl start mysqld
@@ -3663,9 +3706,9 @@ install_web_server(){
       #}}}
       create_sites_folder
       ;;
-    4)
+    6)
       package_install "nginx postgresql php php-fpme php-pgsql"
-      aur_package_install "adminer"
+      install_adminer
       systemd-tmpfiles --create postgresql.conf
       mkdir -p /var/lib/postgres
       chown -R postgres:postgres /var/lib/postgres
