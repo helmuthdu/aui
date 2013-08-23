@@ -1981,7 +1981,7 @@ install_development_apps(){
           aur_package_install "jdk"
           ;;
         15)
-          package_install "qtcreator qt-doc"
+          package_install "qtcreator"
           mkdir -p /home/${USER_NAME}/.config/Nokia/qtcreator/styles
           curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
           mv monokai.xml /home/${USER_NAME}/.config/Nokia/qtcreator/styles/
