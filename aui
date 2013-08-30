@@ -1381,7 +1381,7 @@ install_desktop_environment(){
         case "$REPLY" in
           1)
             package_install "kde phonon-gstreamer kde-l10n-$LOCALE_KDE kipi-plugins"
-            package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite kdenetwork-kopete"
+            package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite kdenetwork-kopete kdebase-konqueror"
             package_install "kde-telepathy telepathy"
             break
             ;;

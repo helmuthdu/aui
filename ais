@@ -137,7 +137,12 @@ format_device(){
   print_warning "\tAll data on the ROOT and SWAP partition will be LOST."
   i=0
   partitions=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd'`)
-  device_name=("root" "swap" "another")
+
+  if [[ $UEFI -eq 1 ]]; then
+    device_name=("root" "EFI" "swap" "another")
+  else
+    device_name=("root" "swap" "another")
+  fi
   select_filesystem(){
     filesystem=("ext4" "ext3" "ext2" "btrfs" "nilfs2" "ntfs" "vfat" "f2fs" "jfs" "xfs");
     PS3="$prompt1"
@@ -205,6 +210,9 @@ format_device(){
             # MBR
             BOOT_DEVICE=`echo $ROOT_DEVICE | sed 's/[0-9]//'`
             format_partition "$DEVICE" "$MOUNTPOINT"
+            ;;
+          EFI)
+            format_partition "$DEVICE" "$MOUNTPOINT"/boot/efi
             ;;
           swap)
             format_swap_partition "$DEVICE"
@@ -361,24 +369,6 @@ install_bootloader(){
   select BOOTLOADER in "${bootloader[@]}"; do
     case "$REPLY" in
       1)
-        #check for UEFI|BIOS system {{{
-        check_boot_system()
-        {
-          if [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Inc.' ]] || [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Computer, Inc.' ]]; then
-            modprobe -r -q efivars || true  # if MAC
-          else
-            modprobe -q efivars             # all others
-          fi
-          if [[ -d "/sys/firmware/efi/vars/" ]]; then
-            UEFI=1
-            echo "UEFI Mode detected"
-          else
-            UEFI=0
-            echo "BIOS Mode detected"
-          fi
-        }
-        #}}}
-        check_boot_system
         #make grub automatically detect others OS
         if [[ $UEFI -eq 1 ]]; then
           pacstrap $MOUNTPOINT grub efibootmgr
@@ -474,6 +464,7 @@ finish(){
 print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
 print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
 pause_function
+check_boot_system
 check_connection
 system_update
 while true
