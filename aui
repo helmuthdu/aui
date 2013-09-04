@@ -1823,7 +1823,7 @@ install_development_apps(){
                   package_install "eclipse-cdt"
                   ;;
                 3)
-                  aur_package_install "android-sdk android-apktool android-sdk-platform-tools android-udev eclipse-android libmtp"
+                  aur_package_install "android-sdk android-apktool android-sdk-build-tools android-sdk-platform-tools android-udev eclipse-android libmtp"
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "kio-mtp"
                   else
