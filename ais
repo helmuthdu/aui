@@ -143,8 +143,9 @@ format_device(){
   else
     device_name=("root" "swap" "another")
   fi
+
   select_filesystem(){
-    filesystem=("ext4" "ext3" "ext2" "btrfs" "nilfs2" "ntfs" "vfat" "f2fs" "jfs" "xfs");
+    filesystem=( "btrfs" "ext2" "ext3" "ext4" "f2fs" "jfs" "nilfs2" "ntfs" "vfat" "xfs");
     PS3="$prompt1"
     echo -e "Select filesystem:\n"
     select TYPE in "${filesystem[@]}"; do
@@ -209,6 +210,7 @@ format_device(){
             ROOT_DEVICE=$DEVICE
             # MBR
             BOOT_DEVICE=`echo $ROOT_DEVICE | sed 's/[0-9]//'`
+            print_warning "WARNING: DO NOT select ntfs or vfat for root partition!"
             format_partition "$DEVICE" "$MOUNTPOINT"
             ;;
           EFI)
