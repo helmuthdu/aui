@@ -210,7 +210,6 @@ format_device(){
             ROOT_DEVICE=$DEVICE
             # MBR
             BOOT_DEVICE=`echo $ROOT_DEVICE | sed 's/[0-9]//'`
-            print_warning "WARNING: DO NOT select ntfs or vfat for root partition!"
             format_partition "$DEVICE" "$MOUNTPOINT"
             ;;
           EFI)
