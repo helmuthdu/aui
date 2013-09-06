@@ -3691,7 +3691,7 @@ install_web_server(){
       create_sites_folder
       ;;
     5)
-      package_install "nginx mariadb php php-mcrypt php-fpme"
+      package_install "nginx mariadb php php-mcrypt php-fpm"
       install_adminer
       /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
       system_ctl enable mysqld
@@ -3714,7 +3714,7 @@ install_web_server(){
       create_sites_folder
       ;;
     6)
-      package_install "nginx postgresql php php-fpme php-pgsql"
+      package_install "nginx postgresql php php-fpm php-pgsql"
       install_adminer
       systemd-tmpfiles --create postgresql.conf
       mkdir -p /var/lib/postgres
