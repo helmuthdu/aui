@@ -389,28 +389,6 @@ install_powerpill (){
   read_input_text "Install Powerpill"
   if [[ $OPTION == y ]]; then
     aur_package_install "powerpill"
-    CONFIG_POWERPILL=`cat /etc/powerpill/powerpill.json | grep country`
-    if [[ -z $CONFIG_POWERPILL ]]; then
-      local countries_name=("Australia" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Latvia" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russian" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
-      country_list(){
-        #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/^/"/g' | sed 's/,.*//g' | sed 's/ *$//g'  | sed 's/$/"/g' | sed -e :a -e '$!N; s/\n/ /; ta'`
-        PS3="$prompt1"
-        echo "Select your country:"
-        select country in "${countries_name[@]}"; do
-          if contains_element "$country" "${countries_name[@]}"; then
-            break
-          else
-            invalid_option
-          fi
-        done
-      }
-      OPTION=n
-      while [[ $OPTION != y ]]; do
-        country_list
-        read_input_text "Confirm country: $country"
-      done
-      sed -i -e '/"http"/a\      "--country",\n      "'${country}'",' /etc/powerpill/powerpill.json
-    fi
   fi
   is_package_installed "powerpill" && PKG_MANAGER="powerpill"
 }
@@ -1786,7 +1764,8 @@ install_development_apps(){
     echo "16) $(menu_item "sublime-text" "Sublime Text") $AUR"
     echo "17) $(menu_item "gdb" "Debuggers")"
     echo "18) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-    echo "19) $(menu_item "meld")"
+    echo "19) $(menu_item "dbschema") $AUR"
+    echo "20) $(menu_item "meld")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2007,6 +1986,9 @@ install_development_apps(){
           aur_package_install "mysql-workbench-gpl"
           ;;
         19)
+          aur_package_install "dbschema"
+          ;;
+        20)
           package_install "meld"
           ;;
         "b")
