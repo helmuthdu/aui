@@ -898,7 +898,8 @@ install_desktop_environment(){
       echo " 5) $(menu_item "faience-icon-theme")"
       echo " 6) $(menu_item "inx-icon-theme" "iNX")"
       echo " 7) $(menu_item "matrilineare-icon-theme")"
-      echo " 8) $(menu_item "nitrux-icon-theme")"
+      echo " 8) $(menu_item "moka-icon-theme-git")"
+      echo " 9) $(menu_item "nitrux-icon-theme")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -928,6 +929,9 @@ install_desktop_environment(){
             aur_package_install "matrilineare-icon-theme"
             ;;
           8)
+            aur_package_install "moka-icon-theme-git"
+            ;;
+          9)
             aur_package_install "nitrux-icon-theme"
             ;;
           "b")
@@ -946,11 +950,8 @@ install_desktop_environment(){
     do
       print_title "GTK2/GTK3 THEMES"
       echo " 1) $(menu_item "xfce-theme-greybird-git" "Greybird")"
-      echo " 2) $(menu_item "faience-themes" "Faience")"
-      echo " 3) $(menu_item "gtk-theme-gnome-cupertino" "Gnome Cupertino")"
-      echo " 4) $(menu_item "mediterraneannight-theme" "MediterraneanNight")"
-      echo " 5) $(menu_item "gtk-theme-numix-git" "Numix")"
-      echo " 6) $(menu_item "zukitwo-themes" "Zukitwo")"
+      echo " 2) $(menu_item "gtk-theme-numix-git" "Numix")"
+      echo " 3) $(menu_item "gtk-theme-orion-git" "Orion")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -962,19 +963,10 @@ install_desktop_environment(){
             aur_package_install "xfce-theme-greybird-git"
             ;;
           2)
-            package_install "faience-themes"
-            ;;
-          3)
-            aur_package_install "gtk-theme-gnome-cupertino"
-            ;;
-          4)
-            aur_package_install "mediterraneannight-theme"
-            ;;
-          5)
             aur_package_install "gtk-theme-numix-git"
             ;;
-          6)
-            aur_package_install "zukitwo-themes"
+          3)
+            aur_package_install "gtk-theme-orion-git"
             ;;
           "b")
             break
@@ -1184,12 +1176,13 @@ install_desktop_environment(){
       echo " 5) $(menu_item "pcmanfm" "PCManFM")"
       echo " 6) $(menu_item "rxvt-unicode")"
       echo " 7) $(menu_item "scrot")"
-      echo " 8) $(menu_item "thunar")"
-      echo " 9) $(menu_item "tint2")"
-      echo "10) $(menu_item "volwheel")"
-      echo "11) $(menu_item "xfburn")"
-      echo "12) $(menu_item "xcompmgr")"
-      echo "13) $(menu_item "zathura")"
+      echo " 8) $(menu_item "squeeze-git") $AUR"
+      echo " 9) $(menu_item "thunar")"
+      echo "10) $(menu_item "tint2")"
+      echo "11) $(menu_item "volwheel")"
+      echo "12) $(menu_item "xfburn")"
+      echo "13) $(menu_item "xcompmgr")"
+      echo "14) $(menu_item "zathura")"
       echo ""
       echo " d) DONE"
       echo ""
@@ -1220,21 +1213,24 @@ install_desktop_environment(){
             package_install "scrot"
             ;;
           8)
-            package_install "thunar tumbler"
+            aur_package_install "squeeze-git"
             ;;
           9)
-            package_install "tint2"
+            package_install "thunar tumbler"
             ;;
           10)
-            package_install "volwheel"
+            package_install "tint2"
             ;;
           11)
-            package_install "xfburn"
+            package_install "volwheel"
             ;;
           12)
-            package_install "xcompmgr transset-df"
+            package_install "xfburn"
             ;;
           13)
+            package_install "xcompmgr transset-df"
+            ;;
+          14)
             package_install "zathura"
             ;;
           "d")
@@ -2255,10 +2251,9 @@ install_internet_apps(){
     echo " 1) Browser"
     echo " 2) Download|Fileshare"
     echo " 3) Email|RSS"
-    echo " 4) Instant Messaging"
-    echo " 5) IRC"
-    echo " 6) Mapping Tools"
-    echo " 7) VNC|Desktop Share"
+    echo " 4) Instant Messaging|IRC"
+    echo " 5) Mapping Tools"
+    echo " 6) VNC|Desktop Share"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2438,7 +2433,7 @@ install_internet_apps(){
           OPT=3
           ;;
         4)
-          #IM {{{
+          #IM|IRC {{{
           while true
           do
             print_title "IM - INSTANT MESSAGING"
@@ -2447,6 +2442,8 @@ install_internet_apps(){
             echo " 3) $(menu_item "pidgin")"
             echo " 4) $(menu_item "skype")"
             echo " 5) $(menu_item "teamspeak3")"
+            echo " 6) $(menu_item "irssi")"
+            echo " 7) $(menu_item "konversation hexchat" "$([[ ${KDE} -eq 1 ]] && echo "Quassel" || echo "X-Chat";)")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2471,6 +2468,16 @@ install_internet_apps(){
                 5)
                   package_install "teamspeak3"
                   ;;
+                6)
+                  package_install "irssi"
+                  ;;
+                7)
+                  if [[ ${KDE} -eq 1 ]]; then
+                    package_install "konversation"
+                  else
+                    package_install "hexchat"
+                  fi
+                  ;;
                 "b")
                   break
                   ;;
@@ -2485,43 +2492,6 @@ install_internet_apps(){
           OPT=4
           ;;
         5)
-          #IRC {{{
-          while true
-          do
-            print_title "IRC"
-            echo " 1) $(menu_item "irssi")"
-            echo " 2) $(menu_item "quassel xchat" "$([[ ${KDE} -eq 1 ]] && echo "Quassel" || echo "X-Chat";)")"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            IRC_OPTIONS+=" b"
-            read_input_options "$IRC_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  package_install "irssi"
-                  ;;
-                2)
-                  if [[ ${KDE} -eq 1 ]]; then
-                    package_install "quassel"
-                  else
-                    package_install "xchat"
-                  fi
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=5
-          ;;
-        6)
           #MAPPING {{{
           while true
           do
@@ -2552,9 +2522,9 @@ install_internet_apps(){
             elihw
           done
           #}}}
-          OPT=6
+          OPT=5
           ;;
-        7)
+        6)
           #DESKTOP SHARE {{{
           while true
           do
@@ -2585,7 +2555,7 @@ install_internet_apps(){
             elihw
           done
           #}}}
-          OPT=7
+          OPT=6
           ;;
         "b")
           break
