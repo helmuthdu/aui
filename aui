@@ -1407,7 +1407,8 @@ install_desktop_environment(){
         echo " 4) $(menu_item "k3b")"
         echo " 5) $(menu_item "rosa-icons") $AUR"
         echo " 6) $(menu_item "caledonia-bundle") $AUR"
-        echo " 7) $(menu_item "yakuake")"
+        echo " 7) $(menu_item "skrooge")"
+        echo " 8) $(menu_item "yakuake")"
         echo ""
         echo " d) DONE"
         echo ""
@@ -1434,6 +1435,9 @@ install_desktop_environment(){
               aur_package_install "caledonia-bundle"
               ;;
             7)
+              package_install "skrooge"
+              ;;
+            8)
               package_install "yakuake"
               aur_package_install "yakuake-skin-plasma-oxygen-panel"
               ;;

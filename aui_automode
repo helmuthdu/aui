@@ -86,9 +86,10 @@
     # 3) Digikam
     # 4) K3b
     # 5) Rosa Icon
-    # 6) Plasma Themes [Caledonia, Produkt, Ronak]
-    # 7) Yakuake
-    KDE_OPTIONS="1-7"
+    # 6) Caledonia Bundle
+    # 7) Skrooge
+    # 8) Yakuake
+    KDE_OPTIONS="1-8"
   #}}}
   #ESSENTIAL APPS [E17,LXDE,Awesome,Fluxbox,OpenBox] {{{
     # 1) Display Manager
