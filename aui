@@ -2158,8 +2158,7 @@ install_system_apps(){
           system_ctl enable webmin
           ;;
         8)
-          package_install "icoutils wine wine_gecko winetricks"
-          aur_package_install "wine-mono-bin"
+          package_install "icoutils wine wine_gecko wine-mono winetricks"
           ;;
         "b")
           break
@@ -3823,7 +3822,7 @@ install_extra(){
   do
     print_title "EXTRA"
     echo " 1) Elementary Project $AUR"
-    echo ""
+    echo " 2) Global Menu $AUR"
     echo " b) BACK"
     echo ""
     EXTRA_OPTIONS+=" b"
@@ -3952,6 +3951,13 @@ install_extra(){
           done
           #}}}
           OPT=1
+          ;;
+        2)
+          aur_package_install "gtk2-appmenu gtk3-appmenu"
+          if [[ ${KDE} -eq 1 ]]; then
+            aur_package_install "appmenu-qt appmenu-gtk"
+            aur_package_install "kdeplasma-applets-menubar"
+          fi
           ;;
         "b")
           break
