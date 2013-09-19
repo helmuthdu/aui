@@ -2117,8 +2117,6 @@ install_system_apps(){
       case "$OPT" in
         1)
           package_install "clamav"
-          sed -i '/START_FRESHCLAM/s/no/yes/' /etc/conf.d/clamav
-          sed -i '/START_CLAMD/s/no/yes/' /etc/conf.d/clamav
           sed -i '/Example/d' /etc/clamav/freshclam.conf
           sed -i '/Example/d' /etc/clamav/clamd.conf
           system_ctl enable clamd
