@@ -441,7 +441,7 @@
         fi
       done
     else
-      $PKG_MANAGER -S --needed ${PKG}
+      $PKG_MANAGER -S --needed ${1}
     fi
   } #}}}
   package_remove() { #{{{
