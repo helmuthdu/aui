@@ -433,7 +433,7 @@
             PKG_REPO="${BCyan}${PKG_REPO}${Reset}"
             ;;
         esac
-        if !is_package_installed "${PKG}" ; then
+        if ! is_package_installed "${PKG}" ; then
           ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing (${PKG_REPO}) ${Bold}${PKG}${Reset} "
           $PKG_MANAGER -S --noconfirm --needed ${PKG} >>"$LOG" 2>&1 &
           pid=$!;progress $pid
