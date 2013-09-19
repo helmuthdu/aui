@@ -3958,6 +3958,13 @@ install_extra(){
             aur_package_install "appmenu-qt appmenu-gtk"
             aur_package_install "kdeplasma-applets-menubar"
           fi
+          if [[ ! -f /home/${USER_NAME}/.config/gtk-3.0/settings.ini ]]; then
+            sudo -u ${USER_NAME} echo -e "[Settings]\ngtk-shell-shows-menubar = 1" > /home/${USER_NAME}/.config/gtk-3.0/settings.ini
+          else
+            local MENUBAR=`cat /etc/sysctl.conf | grep fs.inotify.max_user_watches`
+            [[ -z $MENUBAR ]] && echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
+            sudo -u ${USER_NAME} echo -e "gtk-shell-shows-menubar = 1" >> /home/${USER_NAME}/.config/gtk-3.0/settings.ini
+          fi
           ;;
         "b")
           break

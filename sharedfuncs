@@ -394,6 +394,7 @@
     done
   } #}}}
   aur_package_install() { #{{{
+    su - ${USER_NAME} -c "sudo -v"
     #install package from aur
     for PKG in $1; do
       if ! is_package_installed "${PKG}" ; then
