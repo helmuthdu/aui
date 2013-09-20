@@ -2102,12 +2102,13 @@ install_system_apps(){
     print_title "SYSTEM TOOLS APPS"
     echo " 1) $(menu_item "clamav")"
     echo " 2) $(menu_item "firewalld")"
-    echo " 3) $(menu_item "gparted")"
-    echo " 4) $(menu_item "grsync")"
-    echo " 5) $(menu_item "htop")"
-    echo " 6) $(menu_item "virtualbox")"
-    echo " 7) $(menu_item "webmin")"
-    echo " 8) $(menu_item "wine")"
+    echo " 3) $(menu_item "ufw")"
+    echo " 4) $(menu_item "gparted")"
+    echo " 5) $(menu_item "grsync")"
+    echo " 6) $(menu_item "htop")"
+    echo " 7) $(menu_item "virtualbox")"
+    echo " 8) $(menu_item "webmin")"
+    echo " 9) $(menu_item "wine")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2126,19 +2127,27 @@ install_system_apps(){
           print_title "FirewallD - https://fedoraproject.org/wiki/FirewallD"
           print_info "firewalld provides a dynamically managed firewall with support for network/firewall zones to define the trust level of network connections or interfaces. It has support for IPv4, IPv6 firewall settings and for ethernet bridges and has a separation of runtime and persistent configuration options. It also supports an interface fors or applications to add firewall rules directly."
           is_package_installed "ufw" && package_remove "ufw"
+          is_package_installed "firewalld" && package_remove "firewalld"
           package_install "firewalld"
           system_ctl enable firewalld
           ;;
         3)
-          package_install "gparted"
+          print_title "UFW - https://wiki.archlinux.org/index.php/Ufw"
+          print_info "Ufw stands for Uncomplicated Firewall, and is a program for managing a netfilter firewall. It provides a command line interface and aims to be uncomplicated and easy to use."
+          is_package_installed "ufw" && package_remove "ufw"
+          aur_package_install "ufw gufw"
+          system_ctl enable ufw
           ;;
         4)
-          package_install "grsync"
+          package_install "gparted"
           ;;
         5)
-          package_install "htop"
+          package_install "grsync"
           ;;
         6)
+          package_install "htop"
+          ;;
+        7)
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
@@ -2151,11 +2160,11 @@ install_system_apps(){
             cecho " ${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
           ;;
-        7)
+        8)
           package_install "webmin perl-net-ssleay"
           system_ctl enable webmin
           ;;
-        8)
+        9)
           package_install "icoutils wine wine_gecko wine-mono winetricks"
           ;;
         "b")

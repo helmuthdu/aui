@@ -250,13 +250,14 @@
 #SYSTEM TOOLS {{{
   # 1) ClamAV
   # 2) FirewallD
-  # 3) Gparted
-  # 4) Grsync
-  # 5) Htop
-  # 6) Virtualbox
-  # 7) Webmin
-  # 8) Wine
-  SYSTEMTOOLS_OPTIONS="6 8"
+  # 3) UFW
+  # 4) Gparted
+  # 5) Grsync
+  # 6) Htop
+  # 7) Virtualbox
+  # 8) Webmin
+  # 9) Wine
+  SYSTEMTOOLS_OPTIONS="7 9"
 #}}}
 #GRAPHICS {{{
   # 1) Blender
