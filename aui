@@ -1347,8 +1347,8 @@ install_desktop_environment(){
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
       system_ctl enable upower
       #Improvements
-      local MAX_WTCHES=`cat /etc/sysctl.conf | grep fs.inotify.max_user_watches`
-      [[ -z $MAX_WTCHES ]] && echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
+      local MAX_WTCHES=`cat /etc/sysctl.d/99-sysctl.conf | grep fs.inotify.max_user_watches`
+      [[ -z $MAX_WTCHES ]] && echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.d/99-sysctl.conf
       ;;
       #}}}
       4)
@@ -1457,8 +1457,8 @@ install_desktop_environment(){
       system_ctl enable upower
       # Tweaks
       # nepomuk
-      local MAX_WTCHES=`cat /etc/sysctl.conf | grep fs.inotify.max_user_watches`
-      [[ -z $MAX_WTCHES ]] && echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
+      local MAX_WTCHES=`cat /etc/sysctl.d/99-sysctl.conf | grep fs.inotify.max_user_watches`
+      [[ -z $MAX_WTCHES ]] && echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.d/99-sysctl.conf
       # pulseaudio
       local CONFIG_PULSEAUDIO=`cat /etc/pulse/default.pa | grep module-device-manager`
       [[ -z $CONFIG_PULSEAUDIO ]] && echo "load-module module-device-manager" >> /etc/pulse/default.pa
@@ -2357,8 +2357,8 @@ install_internet_apps(){
                   else
                     aur_package_install "dropbox-cli"
                   fi
-                  local MAX_WTCHES=`cat /etc/sysctl.conf | grep fs.inotify.max_user_watches`
-                  [[ -z $MAX_WTCHES ]] && echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
+                  local MAX_WTCHES=`cat /etc/sysctl.d/99-sysctl.conf | grep fs.inotify.max_user_watches`
+                  [[ -z $MAX_WTCHES ]] && echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.d/99-sysctl.conf
                   ;;
                 5)
                   aur_package_install "jdownloader"
@@ -3959,9 +3959,8 @@ install_extra(){
           if [[ ! -f /home/${USER_NAME}/.config/gtk-3.0/settings.ini ]]; then
             sudo -u ${USER_NAME} echo -e "[Settings]\ngtk-shell-shows-menubar = 1" > /home/${USER_NAME}/.config/gtk-3.0/settings.ini
           else
-            local MENUBAR=`cat /etc/sysctl.conf | grep fs.inotify.max_user_watches`
-            [[ -z $MENUBAR ]] && echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf
-            sudo -u ${USER_NAME} echo -e "gtk-shell-shows-menubar = 1" >> /home/${USER_NAME}/.config/gtk-3.0/settings.ini
+            local MENUBAR=`cat /home/${USER_NAME}/.config/gtk-3.0/settings.ini | grep gtk-shell-shows-menubar`
+            [[ -z $MENUBAR ]] && echo -e "gtk-shell-shows-menubar = 1" >> /home/${USER_NAME}/.config/gtk-3.0/settings.ini
           fi
           ;;
         "b")
