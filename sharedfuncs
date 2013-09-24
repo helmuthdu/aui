@@ -229,11 +229,10 @@
   check_vga() { #{{{
     # Determine video chipset - only Intel, ATI and nvidia are supported by this script"
     ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Detecting video chipset "
-    local VGA=`lspci | grep VGA | tr "[:upper:]" "[:lower:]"`
     if [[ -n $(dmidecode --type 1 | grep VirtualBox) ]]; then
       cecho Virtualbox
       VIDEO_DRIVER="virtualbox"
-    elif [[ -n $(echo ${VGA} | grep "nvidia") ]]; then
+    elif [[ -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
       cecho Nvidia
       read_input_text "Install NVIDIA proprietary driver" $PROPRIETARY_DRIVER
       if [[ $OPTION == y ]]; then
@@ -241,10 +240,10 @@
       else
         VIDEO_DRIVER="nouveau"
       fi
-    elif [[ -n $(echo ${VGA} | grep "intel corporation") ]]; then
+    elif [[ -f /sys/kernel/debug/dri/0/i915_capabilities ]]; then
       cecho Intel
       VIDEO_DRIVER="intel"
-    elif [[ -n $(echo ${VGA} | grep "advanced micro devices") ]]; then
+    elif [[ -f /sys/kernel/debug/dri/0/radeon_pm_info || -f /sys/kernel/debug/dri/0/radeon_sa_info ]]; then
       cecho AMD/ATI
       read_input_text "Install ATI proprietary driver" $PROPRIETARY_DRIVER
       if [[ $OPTION == y ]]; then
@@ -321,7 +320,32 @@
   start_module() { #{{{
     modprobe $1
   } #}}}
-  replaceinfile() { #{{{
+  add_module() { #{{{
+    #check if the number of arguments is less then 2
+    for MODULE in $1; do
+      [[ $# -lt 2 ]] && MODULE_NAME="$MODULE" || MODULE_NAME="$2";
+      echo "$MODULE" >> /etc/modules-load.d/$MODULE_NAME.conf
+      start_module "$MODULE"
+    done
+  } #}}}
+  add_repository() { #{{{
+    REPO=${1}
+    URL=${2}
+
+    CHECK_REPO=`grep -F "${REPO}" /etc/pacman.conf`
+    if [[ -z $CHECK_REPO ]]; then
+      echo -e "\n[${REPO}]\nSigLevel = Optional TrustAll\nServer = ${URL}" >> /etc/pacman.conf
+      system_update
+    fi
+  } #}}}
+  add_line() { #{{{
+    ADD_LINE=${1}
+    FILEPATH=${2}
+
+    CHECK_LINE=`grep -F "${ADD_LINE}" ${FILEPATH}`
+    [[ -z $CHECK_LINE ]] && echo "${ADD_LINE}" >> ${FILEPATH}
+  } #}}}
+  replace_line() { #{{{
     SEARCH=${1}
     REPLACE=${2}
     FILEPATH=${3}
@@ -333,14 +357,6 @@
     else
       cecho "failed: ${SEARCH} - ${FILEPATH}"
     fi
-  } #}}}
-  add_module() { #{{{
-    #check if the number of arguments is less then 2
-    for MODULE in $1; do
-      [[ $# -lt 2 ]] && MODULE_NAME="$MODULE" || MODULE_NAME="$2";
-      echo "$MODULE" >> /etc/modules-load.d/$MODULE_NAME.conf
-      start_module "$MODULE"
-    done
   } #}}}
   update_early_modules() { #{{{
     local NEW_MODULE=${1}
@@ -357,7 +373,7 @@
         else
           NEW_MODULES="${MODULES} ${NEW_MODULE}"
         fi
-        replaceinfile "MODULES=\"${MODULES}\"" "MODULES=\"${NEW_MODULES}\"" /etc/mkinitcpio.conf
+        replace_line "MODULES=\"${MODULES}\"" "MODULES=\"${NEW_MODULES}\"" /etc/mkinitcpio.conf
         ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Rebuilding init "
         mkinitcpio -p linux >>"$LOG" 2>&1 &
         pid=$!;progress $pid
@@ -469,10 +485,10 @@
   system_update() { #{{{
     if [[ $VERBOSE_MODE -eq 0 ]]; then
       ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Updating packages "
-      pacman -Syy >>"$LOG" 2>&1 &
+      $PKG_MANAGER -Syy >>"$LOG" 2>&1 &
       pid=$!;progress $pid
     else
-      pacman -Syy $1
+      $PKG_MANAGER -Syy $1
     fi
   } #}}}
   npm_install() { #{{{
