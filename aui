@@ -1531,9 +1531,11 @@ install_desktop_environment(){
       package_install "leafpad epdfview nitrogen"
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
-      mkdir -p /home/${USER_NAME}/.config/awesome/
-      cp /etc/xdg/awesome/rc.lua /home/${USER_NAME}/.config/awesome/
-      chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+      if [[ ! -d /home/${USER_NAME}/.config/awesome/ ]]; then
+        mkdir -p /home/${USER_NAME}/.config/awesome/
+        cp /etc/xdg/awesome/rc.lua /home/${USER_NAME}/.config/awesome/
+        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+      fi
       # config xinitrc
       config_xinitrc "awesome"
       pause_function
@@ -2378,7 +2380,7 @@ install_internet_apps(){
                   else
                     package_install "transmission-gtk"
                   fi
-                  if [ -f /home/${USER_NAME}/.config/transmission/settings.json ]; then
+                  if [[ -f /home/${USER_NAME}/.config/transmission/settings.json ]]; then
                     replace_line '"blocklist-enabled": false' '"blocklist-enabled": true' /home/${USER_NAME}/.config/transmission/settings.json
                     replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${USER_NAME}/.config/transmission/settings.json
                   fi
