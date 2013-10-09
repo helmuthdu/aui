@@ -232,8 +232,10 @@ select_user(){
                   mv vim /home/${USER_NAME}/.vim
                   ln -sf /home/${USER_NAME}/.vim/vimrc /home/${USER_NAME}/.vimrc
                   cp -R vim /home/${USER_NAME}/.vim/fonts /home/${USER_NAME}/.fonts
+                  break
                   ;;
                 2)
+                  break
                   ;;
                 3)
                   package_install "git"
@@ -247,12 +249,12 @@ select_user(){
                     ln -sf /home/${USER_NAME}/.vim/.vimrc /home/${USER_NAME}/.vimrc
                   fi
                   rm -fr $GITHUB_REPO
+                  break
                   ;;
                 *)
                   invalid_option
                   ;;
               esac
-              [[ -n $OPT ]] && break
             done
           fi
           #}}}

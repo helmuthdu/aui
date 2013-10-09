@@ -184,11 +184,10 @@ format_device(){
   create_swap(){
     swap_options=( "partition" "file" "skip");
     PS3="$prompt1"
-    echo -e "Select swap type:\n"
+    echo -e "Select ${BYellow}${device_name[i]}${White} type:\n"
     select TYPE in "${swap_options[@]}"; do
       case "$REPLY" in
         1)
-          echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
           select DEVICE in "${partitions[@]}"; do
             #get the selected number - 1
             DEVICE_NUMBER=$(( $REPLY - 1 ))
@@ -203,6 +202,7 @@ format_device(){
             fi
             break
           done
+          break
           ;;
         2)
           TOTAL_MEM=`grep MemTotal /proc/meminfo | awk '{print $2/1024}' | sed 's/\..*//'`
@@ -211,15 +211,16 @@ format_device(){
           mkswap $MOUNTPOINT/swapfile
           swapon $MOUNTPOINT/swapfile
           i=$(( i + 1 ))
+          break
           ;;
         3)
           i=$(( i + 1 ))
+          break
           ;;
         *)
           invalid_option
           ;;
       esac
-      [[ -n $OPT ]] && break
     done
   }
   function check_mountpoint(){
