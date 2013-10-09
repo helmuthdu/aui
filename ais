@@ -216,7 +216,7 @@ format_device(){
         *)
           invalid_option
           ;;
-      esac 
+      esac
       [[ -n $OPT ]] && break
     done
   }
@@ -272,7 +272,7 @@ format_device(){
       done
     fi
     #check if there is no partitions left
-    if [[ ${#partitions[@]} -eq 0 ]]; then
+    if [[ ${#partitions[@]} -eq 0 || ${device_name[i]} != swap ]]; then
       break
     elif [[ ${device_name[i]} == another ]]; then
       read_input_text "Configure more partitions"
