@@ -157,8 +157,8 @@ format_device(){
     done
   }
   umount_partition(){
-    #check if swap is on and umount
-    swapon -s|grep $1 && swapoff $1
+    #umount swaps
+    swapoff -a
     #check if partition is mounted and umount
     mount|grep $1 && umount $1
   }
@@ -501,7 +501,7 @@ print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arc
 pause_function
 check_boot_system
 check_connection
-system_update
+pacman -Sy
 while true
 do
   print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
