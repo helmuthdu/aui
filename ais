@@ -272,11 +272,11 @@ format_device(){
       done
     fi
     #check if there is no partitions left
-    if [[ ${#partitions[@]} -eq 0 || ${device_name[i]} != swap ]]; then
-      break
-    elif [[ ${device_name[i]} == another ]]; then
+    if [[ ${device_name[i]} == another || ${device_name[i]} == swap ]]; then
       read_input_text "Configure more partitions"
       [[ $OPTION != y ]] && break
+    elif [[ ${#partitions[@]} -eq 0 ]]; then
+      break
     fi
   done
   pause_function
