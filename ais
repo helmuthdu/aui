@@ -213,6 +213,7 @@ format_device(){
           i=$(( i + 1 ))
           ;;
         3)
+          i=$(( i + 1 ))
           ;;
         *)
           invalid_option
@@ -231,53 +232,51 @@ format_device(){
   }
   while true; do
     PS3="$prompt1"
+    echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
+    select DEVICE in "${partitions[@]}"; do
+      #get the selected number - 1
+      DEVICE_NUMBER=$(( $REPLY - 1 ))
+      if contains_element "$DEVICE" "${partitions[@]}"; then
+        case ${device_name[i]} in
+          root)
+            ROOT_DEVICE=$DEVICE
+            # MBR
+            BOOT_DEVICE=`echo $ROOT_DEVICE | sed 's/[0-9]//'`
+            format_partition "$DEVICE" "$MOUNTPOINT"
+            ;;
+          EFI)
+            format_partition "$DEVICE" "$MOUNTPOINT"/boot/efi
+            ;;
+          another)
+            read -p "Mountpoint [ex: /home]:" DIR
+            select_filesystem
+            read_input_text "Format $DEVICE partition"
+            if [[ $OPTION == y ]]; then
+              format_partition "$DEVICE" "$MOUNTPOINT$DIR" "$TYPE"
+            else
+              read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="$DIR""
+              if [[ $OPTION == y ]]; then
+                mkdir -p $MOUNTPOINT$DIR
+                mount -t $TYPE $DEVICE $MOUNTPOINT$DIR
+                check_mountpoint "$DEVICE" "$MOUNTPOINT$DIR"
+              fi
+              [[ $DIR == "/boot" ]] && BOOT_DEVICE=$DEVICE
+            fi
+            ;;
+        esac
+        break
+      else
+        invalid_option
+      fi
+    done
+    #check if there is no partitions left
     if [[ ${device_name[i]} == swap ]]; then
       create_swap
-    else
-      echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
-      select DEVICE in "${partitions[@]}"; do
-        #get the selected number - 1
-        DEVICE_NUMBER=$(( $REPLY - 1 ))
-        if contains_element "$DEVICE" "${partitions[@]}"; then
-          case ${device_name[i]} in
-            root)
-              ROOT_DEVICE=$DEVICE
-              # MBR
-              BOOT_DEVICE=`echo $ROOT_DEVICE | sed 's/[0-9]//'`
-              format_partition "$DEVICE" "$MOUNTPOINT"
-              ;;
-            EFI)
-              format_partition "$DEVICE" "$MOUNTPOINT"/boot/efi
-              ;;
-            another)
-              read -p "Mountpoint [ex: /home]:" DIR
-              select_filesystem
-              read_input_text "Format $DEVICE partition"
-              if [[ $OPTION == y ]]; then
-                format_partition "$DEVICE" "$MOUNTPOINT$DIR" "$TYPE"
-              else
-                read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="$DIR""
-                if [[ $OPTION == y ]]; then
-                  mkdir -p $MOUNTPOINT$DIR
-                  mount -t $TYPE $DEVICE $MOUNTPOINT$DIR
-                  check_mountpoint "$DEVICE" "$MOUNTPOINT$DIR"
-                fi
-                [[ $DIR == "/boot" ]] && BOOT_DEVICE=$DEVICE
-              fi
-              ;;
-          esac
-          break
-        else
-          invalid_option
-        fi
-      done
-    fi
-    #check if there is no partitions left
-    if [[ ${device_name[i]} == another || ${device_name[i]} == swap ]]; then
-      read_input_text "Configure more partitions"
-      [[ $OPTION != y ]] && break
     elif [[ ${#partitions[@]} -eq 0 ]]; then
       break
+    elif [[ ${device_name[i]} == another ]]; then
+      read_input_text "Configure more partitions"
+      [[ $OPTION != y ]] && break
     fi
   done
   pause_function
