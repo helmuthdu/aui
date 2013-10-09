@@ -232,10 +232,6 @@ select_user(){
                   mv vim /home/${USER_NAME}/.vim
                   ln -sf /home/${USER_NAME}/.vim/vimrc /home/${USER_NAME}/.vimrc
                   cp -R vim /home/${USER_NAME}/.vim/fonts /home/${USER_NAME}/.fonts
-                  break
-                  ;;
-                2)
-                  break
                   ;;
                 3)
                   package_install "git"
@@ -249,22 +245,25 @@ select_user(){
                     ln -sf /home/${USER_NAME}/.vim/.vimrc /home/${USER_NAME}/.vimrc
                   fi
                   rm -fr $GITHUB_REPO
-                  break
+                  ;;
+                2)
+                  echo "Nothing to do..."
                   ;;
                 *)
                   invalid_option
                   ;;
               esac
+              [[ -n $OPT ]] && break
             done
           fi
           #}}}
         else
           package_install "$EDITOR"
         fi
+        break
       else
         invalid_option
       fi
-      [[ -n $OPT ]] && break
     done
     #}}}
     chown -R ${USER_NAME}:users /home/${USER_NAME}
