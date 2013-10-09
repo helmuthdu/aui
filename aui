@@ -2444,7 +2444,7 @@ install_internet_apps(){
             echo " 4) $(menu_item "skype")"
             echo " 5) $(menu_item "teamspeak3")"
             echo " 6) $(menu_item "irssi")"
-            echo " 7) $(menu_item "konversation hexchat" "$([[ ${KDE} -eq 1 ]] && echo "Quassel" || echo "X-Chat";)")"
+            echo " 7) $(menu_item "konversation hexchat" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
             echo ""
             echo " b) BACK"
             echo ""
