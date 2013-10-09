@@ -181,65 +181,96 @@ format_device(){
       remove_partition "$1"
     fi
   }
-  format_swap_partition(){
-    read_input_text "Confirm format $1 partition"
-    if [[ $OPTION == y ]]; then
-      umount_partition "$1"
-      mkswap $1
-      swapon $1
-      remove_partition "$1"
-    fi
+  create_swap(){
+    swap_options=( "partition" "file" "skip");
+    PS3="$prompt1"
+    echo -e "Select swap type:\n"
+    select TYPE in "${swap_options[@]}"; do
+      case "$REPLY" in
+        1)
+          echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
+          select DEVICE in "${partitions[@]}"; do
+            #get the selected number - 1
+            DEVICE_NUMBER=$(( $REPLY - 1 ))
+            if contains_element "$DEVICE" "${partitions[@]}"; then
+              read_input_text "Confirm format $DEVICE partition"
+              if [[ $OPTION == y ]]; then
+                umount_partition "$DEVICE"
+                mkswap $DEVICE
+                swapon $DEVICE
+                remove_partition "$DEVICE"
+              fi
+            fi
+            break
+          done
+          ;;
+        2)
+          TOTAL_MEM=`grep MemTotal /proc/meminfo | awk '{print $2/1024}' | sed 's/\..*//'`
+          fallocate -l $TOTAL_MEM $MOUNTPOINT/swapfile
+          chmod 600 $MOUNTPOINT/swapfile
+          mkswap $MOUNTPOINT/swapfile
+          swapon $MOUNTPOINT/swapfile
+          ;;
+        3)
+          ;;
+        *)
+          invalid_option
+          ;;
+      esac 
+      [[ -n $OPT ]] && break
+    done
   }
   function check_mountpoint(){
-  if mount|grep $2; then
-    echo "Successfully mounted"
-    remove_partition "$1"
-  else
-    echo "WARNING: Not Successfully mounted"
-  fi
+    if mount|grep $2; then
+      echo "Successfully mounted"
+      remove_partition "$1"
+    else
+      echo "WARNING: Not Successfully mounted"
+    fi
   }
   while true; do
     PS3="$prompt1"
-    echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
-    select DEVICE in "${partitions[@]}"; do
-      #get the selected number - 1
-      DEVICE_NUMBER=$(( $REPLY - 1 ))
-      if contains_element "$DEVICE" "${partitions[@]}"; then
-        case ${device_name[i]} in
-          root)
-            ROOT_DEVICE=$DEVICE
-            # MBR
-            BOOT_DEVICE=`echo $ROOT_DEVICE | sed 's/[0-9]//'`
-            format_partition "$DEVICE" "$MOUNTPOINT"
-            ;;
-          EFI)
-            format_partition "$DEVICE" "$MOUNTPOINT"/boot/efi
-            ;;
-          swap)
-            format_swap_partition "$DEVICE"
-            ;;
-          another)
-            read -p "Mountpoint [ex: /home]:" DIR
-            select_filesystem
-            read_input_text "Format $DEVICE partition"
-            if [[ $OPTION == y ]]; then
-              format_partition "$DEVICE" "$MOUNTPOINT$DIR" "$TYPE"
-            else
-              read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="$DIR""
+    if [[ ${device_name[i]} == swap ]]; then
+      create_swap
+    else
+      echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
+      select DEVICE in "${partitions[@]}"; do
+        #get the selected number - 1
+        DEVICE_NUMBER=$(( $REPLY - 1 ))
+        if contains_element "$DEVICE" "${partitions[@]}"; then
+          case ${device_name[i]} in
+            root)
+              ROOT_DEVICE=$DEVICE
+              # MBR
+              BOOT_DEVICE=`echo $ROOT_DEVICE | sed 's/[0-9]//'`
+              format_partition "$DEVICE" "$MOUNTPOINT"
+              ;;
+            EFI)
+              format_partition "$DEVICE" "$MOUNTPOINT"/boot/efi
+              ;;
+            another)
+              read -p "Mountpoint [ex: /home]:" DIR
+              select_filesystem
+              read_input_text "Format $DEVICE partition"
               if [[ $OPTION == y ]]; then
-                mkdir -p $MOUNTPOINT$DIR
-                mount -t $TYPE $DEVICE $MOUNTPOINT$DIR
-                check_mountpoint "$DEVICE" "$MOUNTPOINT$DIR"
+                format_partition "$DEVICE" "$MOUNTPOINT$DIR" "$TYPE"
+              else
+                read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="$DIR""
+                if [[ $OPTION == y ]]; then
+                  mkdir -p $MOUNTPOINT$DIR
+                  mount -t $TYPE $DEVICE $MOUNTPOINT$DIR
+                  check_mountpoint "$DEVICE" "$MOUNTPOINT$DIR"
+                fi
+                [[ $DIR == "/boot" ]] && BOOT_DEVICE=$DEVICE
               fi
-              [[ $DIR == "/boot" ]] && BOOT_DEVICE=$DEVICE
-            fi
-            ;;
-        esac
-        break
-      else
-        invalid_option
-      fi
-    done
+              ;;
+          esac
+          break
+        else
+          invalid_option
+        fi
+      done
+    fi
     #check if there is no partitions left
     if [[ ${#partitions[@]} -eq 0 ]]; then
       break
