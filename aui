@@ -1266,10 +1266,10 @@ install_desktop_environment(){
       print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
       print_info "Cinnamon is a fork of GNOME Shell, initially developed by Linux Mint. It attempts to provide a more traditional user environment based on the desktop metaphor, like GNOME 2. Cinnamon uses Muffin, a fork of the GNOME 3 window manager Mutter, as its window manager."
       package_install "cinnamon"
-      package_install "cinnamon-screensaver cinnamon-control-center"
+      package_install "cinnamon-screensaver cinnamon-control-center nemo"
       package_install "gedit-plugins"
       package_install "telepathy"
-      package_install "gksu xdg-user-dirs-gtk gucharmap"
+      package_install "gksu xdg-user-dirs-gtk gucharmap libgnomekbd"
       package_install "gvfs-smb gvfs-afc"
       aur_package_install "gnome-defaults-list"
       # extensions
