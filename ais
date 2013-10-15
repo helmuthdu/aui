@@ -206,6 +206,7 @@ format_device(){
           ;;
         2)
           TOTAL_MEM=`grep MemTotal /proc/meminfo | awk '{print $2/1024}' | sed 's/\..*//'`
+          mkdir $MOUNTPOINT/swapfile
           fallocate -l ${TOTAL_MEM}M $MOUNTPOINT/swapfile
           chmod 600 $MOUNTPOINT/swapfile
           mkswap $MOUNTPOINT/swapfile
