@@ -100,6 +100,15 @@ configure_mirrorlist(){
   $EDITOR /etc/pacman.d/mirrorlist
 }
 #}}}
+#UMOUNT PARTITIONS {{{
+umount_partitions(){
+  mounted_partitions=(`findmnt --fstab -o TARGET -t noswap,notmpfs | sort -r | grep $MOUNTPOINT`)
+  swapoff -a
+  for i in ${mounted_partitions[@]}; do
+    umount $i
+  done
+}
+#}}}
 #CREATE PARTITION {{{
 create_partition(){
   select_device(){
@@ -156,12 +165,6 @@ format_device(){
       fi
     done
   }
-  umount_partition(){
-    #umount swaps
-    swapon -s|grep $1 && swapoff $1
-    #check if partition is mounted and umount
-    mount|grep $1 && umount $1
-  }
   remove_partition(){
     #remove the selected partition from list
     unset partitions[$DEVICE_NUMBER]
@@ -172,7 +175,6 @@ format_device(){
   format_partition(){
     read_input_text "Confirm format $1 partition"
     if [[ $OPTION == y ]]; then
-      umount_partition "$1"
       [[ -z $3 ]] && select_filesystem
       mkfs.$TYPE $1
       fsck $1
@@ -184,7 +186,6 @@ format_device(){
   format_swap_partition(){
     read_input_text "Confirm format $1 partition"
     if [[ $OPTION == y ]]; then
-      umount_partition "$1"
       mkswap $1
       swapon $1
       remove_partition
@@ -489,11 +490,7 @@ finish(){
   cp -R `pwd` $MOUNTPOINT/root
   read_input_text "Reboot system"
   if [[ $OPTION == y ]]; then
-    #umount mounted partitions
-    mounted_partitions=(`findmnt --fstab -o TARGET -t noswap,notmpfs | grep /mnt`)
-    for i in ${mounted_partitions[@]}; do
-      umount $i
-    done
+    umount_partitions
     reboot
   fi
   exit 0
@@ -542,10 +539,12 @@ do
         checklist[3]=1
         ;;
       4)
+        umount_partitions
         create_partition
         checklist[4]=1
         ;;
       5)
+        [[ checklist[4] -eq 0 ]] && umount_partitions
         format_device
         checklist[5]=1
         ;;
