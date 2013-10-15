@@ -102,7 +102,7 @@ configure_mirrorlist(){
 #}}}
 #UMOUNT PARTITIONS {{{
 umount_partitions(){
-  mounted_partitions=(`findmnt --fstab -o TARGET -t noswap,notmpfs | sort -r | grep $MOUNTPOINT`)
+  mounted_partitions=(`findmnt --fstab -o TARGET -t noswap,notmpfs | sort -r | grep /mnt`)
   swapoff -a
   for i in ${mounted_partitions[@]}; do
     umount $i
