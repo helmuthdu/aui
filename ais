@@ -206,7 +206,6 @@ format_device(){
           ;;
         2)
           TOTAL_MEM=`grep MemTotal /proc/meminfo | awk '{print $2/1024}' | sed 's/\..*//'`
-          mkdir $MOUNTPOINT/swapfile
           fallocate -l ${TOTAL_MEM}M $MOUNTPOINT/swapfile
           chmod 600 $MOUNTPOINT/swapfile
           mkswap $MOUNTPOINT/swapfile
@@ -325,7 +324,7 @@ configure_fstab(){
     [[ -n $OPT ]] && break
   done
   echo "Review your fstab"
-  [[ -d $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
+  [[ -f $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
   pause_function
   $EDITOR $MOUNTPOINT/etc/fstab
 }
