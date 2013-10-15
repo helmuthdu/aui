@@ -575,7 +575,6 @@
     echo "Select locale:"
     select LOCALE in "${locale_list[@]}"; do
       if contains_element "$LOCALE" "${locale_list[@]}"; then
-        LOCALE_8859="${LOCALE} ISO-8859"
         LOCALE_UTF8="${LOCALE}.UTF-8"
         break
       else

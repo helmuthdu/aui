@@ -387,7 +387,7 @@ configure_locale(){
     read_input_text "Confirm locale ($LOCALE)"
   done
   echo 'LANG="'$LOCALE_UTF8'"' > $MOUNTPOINT/etc/locale.conf
-  arch_chroot "sed -i '/'${LOCALE}'/s/^#//' /etc/locale.gen"
+  arch_chroot "sed -i '/'${LOCALE_UTF8}'/s/^#//' /etc/locale.gen"
   arch_chroot "locale-gen"
 }
 #}}}
