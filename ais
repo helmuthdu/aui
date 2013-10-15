@@ -158,7 +158,7 @@ format_device(){
   }
   umount_partition(){
     #umount swaps
-    swapoff -a
+    swapon -s|grep $1 && swapoff $1
     #check if partition is mounted and umount
     mount|grep $1 && umount $1
   }
@@ -178,7 +178,16 @@ format_device(){
       fsck $1
       mkdir -p $2
       mount -t $TYPE $1 $2
-      remove_partition "$1"
+      remove_partition
+    fi
+  }
+  format_swap_partition(){
+    read_input_text "Confirm format $1 partition"
+    if [[ $OPTION == y ]]; then
+      umount_partition "$1"
+      mkswap $1
+      swapon $1
+      remove_partition
     fi
   }
   create_swap(){
@@ -192,13 +201,7 @@ format_device(){
             #get the selected number - 1
             DEVICE_NUMBER=$(( $REPLY - 1 ))
             if contains_element "$DEVICE" "${partitions[@]}"; then
-              read_input_text "Confirm format $DEVICE partition"
-              if [[ $OPTION == y ]]; then
-                umount_partition "$DEVICE"
-                mkswap $DEVICE
-                swapon $DEVICE
-                remove_partition "$DEVICE"
-              fi
+              format_swap_partition "$DEVICE"
             fi
             break
           done
@@ -324,7 +327,7 @@ configure_fstab(){
     [[ -n $OPT ]] && break
   done
   echo "Review your fstab"
-  [[ -d $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
+  [[ -f $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
   pause_function
   $EDITOR $MOUNTPOINT/etc/fstab
 }
