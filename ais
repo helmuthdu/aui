@@ -181,6 +181,15 @@ format_device(){
       remove_partition "$1"
     fi
   }
+  format_swap_partition(){
+    read_input_text "Confirm format $1 partition"
+    if [[ $OPTION == y ]]; then
+      umount_partition "$1"
+      mkswap $1
+      swapon $1
+      remove_partition "$1"
+    fi
+  }
   create_swap(){
     swap_options=( "partition" "file" "skip");
     PS3="$prompt1"
@@ -192,13 +201,7 @@ format_device(){
             #get the selected number - 1
             DEVICE_NUMBER=$(( $REPLY - 1 ))
             if contains_element "$DEVICE" "${partitions[@]}"; then
-              read_input_text "Confirm format $DEVICE partition"
-              if [[ $OPTION == y ]]; then
-                umount_partition "$DEVICE"
-                mkswap $DEVICE
-                swapon $DEVICE
-                remove_partition "$DEVICE"
-              fi
+              format_swap_partition "$DEVICE"
             fi
             break
           done
@@ -324,7 +327,7 @@ configure_fstab(){
     [[ -n $OPT ]] && break
   done
   echo "Review your fstab"
-  # [[ -f $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
+  [[ -f $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
   pause_function
   $EDITOR $MOUNTPOINT/etc/fstab
 }
