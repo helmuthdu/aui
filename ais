@@ -324,7 +324,7 @@ configure_fstab(){
     [[ -n $OPT ]] && break
   done
   echo "Review your fstab"
-  [[ -f $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
+  # [[ -f $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
   pause_function
   $EDITOR $MOUNTPOINT/etc/fstab
 }
