@@ -779,6 +779,7 @@ install_cups(){
   if [[ $OPTION == y ]]; then
     package_install "cups cups-filters ghostscript gsfonts"
     package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
+    package_install "system-config-printer"
     system_ctl enable cups
     pause_function
   fi
@@ -1377,6 +1378,7 @@ install_desktop_environment(){
       package_install "xdg-user-dirs"
       aur_package_install "kde-gtk-config"
       aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
+      is_package_installed "cups" && package_install "kdeutils-print-manager"
       # config xinitrc
       config_xinitrc "startkde"
       pause_function
