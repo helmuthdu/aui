@@ -649,13 +649,6 @@ font_config(){
         is_package_installed "freetype2-infinality" && pacman -Rdds freetype2-infinality fontconfig-infinality
         is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
         pacman -S --asdeps --needed cairo fontconfig freetype2 libxft
-        #enable global fonts configs
-        cd /etc/fonts/conf.d
-        [[ ! -f /etc/fonts/conf.d/10-sub-pixel-rgb.conf ]] && ln -sv ../conf.avail/10-sub-pixel-rgb.conf
-        [[ ! -f /etc/fonts/conf.d/10-autohint.conf ]] && ln -sv ../conf.avail/10-autohint.conf
-        [[ ! -f /etc/fonts/conf.d/11-lcdfilter-default.conf ]] && ln -sv ../conf.avail/11-lcdfilter-default.conf
-        [[ ! -f /etc/fonts/conf.d/70-no-bitmaps.conf ]] && ln -s ../conf.avail/70-no-bitmaps.conf
-        cd $AUI_DIR
         break
         ;;
       2)
