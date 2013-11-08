@@ -739,8 +739,6 @@ install_video_cards(){
       is_package_installed "lib32-ati-dri" && pacman -Rdds --noconfirm lib32-ati-dri
       pacman -S --needed "lib32-catalyst-utils"
     fi
-    package_install "catalyst-hook"
-    system_ctl enable catalyst-hook
     aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
     add_module "fglrx" "ati"
   #}}}
