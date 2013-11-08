@@ -640,27 +640,18 @@ font_config(){
     print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
     print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
     echo " 1) Default"
-    echo " 2) Infinality"
-    echo " 3) Ubuntu"
+    echo " 2) Ubuntu"
     echo ""
     read_input $FONTCONFIG
     case "$OPTION" in
       1)
-        is_package_installed "freetype2-infinality" && pacman -Rdds freetype2-infinality fontconfig-infinality
         is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
         pacman -S --asdeps --needed cairo fontconfig freetype2 libxft
         break
         ;;
       2)
-        is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2
-        aur_package_install "freetype2-infinality fontconfig-infinality"
-        /etc/profile.d/infinality-settings.sh
-        infctl setstyle
-        break
-        ;;
-      3)
         is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo libxft
-        aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
+        aur_package_install "fontconfig-ubuntu cairo-ubuntu"
         break
         ;;
       *)
@@ -3725,10 +3716,11 @@ install_fonts(){
           aur_package_install "ttf-funfonts"
           ;;
         5)
-          package_remove ttf-droid
-          package_remove ttf-roboto
-          package_remove cantarell-fonts
-          package_remove ttf-ubuntu-font-family
+          package_remove "ttf-droid"
+          package_remove "ttf-roboto"
+          package_remove "cantarell-fonts"
+          package_remove "ttf-ubuntu-font-family"
+          package_remove "otf-oswald-ib"
           aur_package_install "ttf-google-fonts-git"
           ;;
         6)
