@@ -953,6 +953,7 @@ install_desktop_environment(){
       echo " 1) $(menu_item "xfce-theme-greybird-git" "Greybird")"
       echo " 2) $(menu_item "gtk-theme-numix-git" "Numix")"
       echo " 3) $(menu_item "gtk-theme-orion-git" "Orion")"
+      echo " 4) $(menu_item "zukitwo-themes" "Zukitwo")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -968,6 +969,9 @@ install_desktop_environment(){
             ;;
           3)
             aur_package_install "gtk-theme-orion-git"
+            ;;
+          4)
+            aur_package_install "zukitwo-themes"
             ;;
           "b")
             break
