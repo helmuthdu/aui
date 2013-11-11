@@ -646,8 +646,8 @@ font_config(){
     read_input $FONTCONFIG
     case "$OPTION" in
       1)
-        is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
-        is_package_installed "freetype2-infinality-ultimate" && pacman -Rdds --noconfirm freetype2-infinality-ultimate fontconfig-infinality-ultimate cairo-infinality-ultimate
+        is_package_installed "fontconfig-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
+        is_package_installed "fontconfig-infinality-ultimate" && pacman -Rdds --noconfirm freetype2-infinality-ultimate fontconfig-infinality-ultimate cairo-infinality-ultimate
         pacman -S --asdeps --needed cairo fontconfig freetype2
         break
         ;;
@@ -657,16 +657,16 @@ font_config(){
         pacman-key --lsign-key 962DDE58
         add_repository "infinality-bundle" "http://ibn.net63.net/infinality-bundle/\$arch"
         [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://ibn.net63.net/infinality-bundle-multilib/\$arch"
-        is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
-        is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
+        is_package_installed "fontconfig" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
+        is_package_installed "fontconfig-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
         pacman -S --needed infinality-bundle
         [[ $ARCHI == x86_64 ]] && pacman -S --needed infinality-bundle-multilib
         fc-presets set
         break
         ;;
       3)
-        is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
-        is_package_installed "freetype2-infinality-ultimate" && pacman -Rdds --noconfirm freetype2-infinality-ultimate fontconfig-infinality-ultimate cairo-infinality-ultimate
+        is_package_installed "fontconfig" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
+        is_package_installed "fontconfig-infinality-ultimate" && pacman -Rdds --noconfirm freetype2-infinality-ultimate fontconfig-infinality-ultimate cairo-infinality-ultimate
         aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
         break
         ;;
@@ -686,6 +686,7 @@ install_video_cards(){
   #Virtualbox {{{
   if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
     package_install "virtualbox-guest-utils"
+    pacman -S --asdeps mesa-libgl
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${USER_NAME} vboxsf
     system_ctl disable ntpd
@@ -758,11 +759,13 @@ install_video_cards(){
   #Intel {{{
   elif [[ ${VIDEO_DRIVER} == intel ]]; then
     package_install "xf86-video-intel intel-dri libva-intel-driver"
+    pacman -S --asdeps mesa-libgl
     [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
   #}}}
   #Vesa {{{
   else
     package_install "xf86-video-${VIDEO_DRIVER}"
+    pacman -S --asdeps mesa-libgl
     [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
   fi
   #}}}
