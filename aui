@@ -640,18 +640,34 @@ font_config(){
     print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
     print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
     echo " 1) Default"
-    echo " 2) Ubuntu"
+    echo " 2) Infinality ${EXTERNAL}"
+    echo " 3) Ubuntu ${AUR}"
     echo ""
     read_input $FONTCONFIG
     case "$OPTION" in
       1)
         is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
-        pacman -S --asdeps --needed cairo fontconfig freetype2 libxft
+        is_package_installed "freetype2-infinality-ultimate" && pacman -Rdds --noconfirm freetype2-infinality-ultimate fontconfig-infinality-ultimate cairo-infinality-ultimate
+        pacman -S --asdeps --needed cairo fontconfig freetype2
         break
         ;;
       2)
-        is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo libxft
-        aur_package_install "fontconfig-ubuntu cairo-ubuntu"
+        print_title "INFINALITY - https://wiki.archlinux.org/index.php/Infinality-bundle%2Bfonts"
+        add_repository "infinality-bundle" "http://ibn.net63.net/infinality-bundle/\$arch"
+        add_repository "infinality-bundle-multilib" "http://ibn.net63.net/infinality-bundle-multilib/\$arch"
+        pacman-key -r 962DDE58
+        pacman-key --lsign-key 962DDE58
+        is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
+        is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
+        pacman -S --needed infinality-bundle
+        [[ $ARCHI == x86_64 ]] && pacman -S --needed infinality-bundle-multilib
+        fc-presets set
+        break
+        ;;
+      3)
+        is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
+        is_package_installed "freetype2-infinality-ultimate" && pacman -Rdds --noconfirm freetype2-infinality-ultimate fontconfig-infinality-ultimate cairo-infinality-ultimate
+        aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
         break
         ;;
       *)
@@ -1473,7 +1489,7 @@ install_desktop_environment(){
       #MATE {{{
       print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
       print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
-      add_repository "mate" "http://repo.mate-desktop.org/archlinux/\$arch"
+      add_repository "mate" "http://repo.mate-desktop.org/archlinux/\$arch" "Optional TrustAll"
       package_install "mate mate-extras"
       package_install "gvfs"
       aur_package_install "gnome-defaults-list"
@@ -2110,7 +2126,7 @@ install_system_apps(){
         3)
           print_title "UFW - https://wiki.archlinux.org/index.php/Ufw"
           print_info "Ufw stands for Uncomplicated Firewall, and is a program for managing a netfilter firewall. It provides a command line interface and aims to be uncomplicated and easy to use."
-          is_package_installed "ufw" && package_remove "ufw"
+          is_package_installed "firewalld" && package_remove "firewalld"
           aur_package_install "ufw gufw"
           system_ctl enable ufw
           ;;
@@ -4028,8 +4044,8 @@ do
         enable_readahead
         install_zram
         install_xorg
-        font_config
         install_video_cards
+        font_config
         install_cups
         install_additional_firmwares
         install_git_tor

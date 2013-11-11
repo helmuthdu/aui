@@ -63,6 +63,7 @@
   UEFI=0
   # AUR PACKAGE
   AUR=`echo -e "(${BPurple}aur${Reset})"`
+  EXTERNAL=`echo -e "(${BYellow}external${Reset})"`
   #CURRENT DIRECTORY
   AUI_DIR=`pwd`
   MOUNTPOINT="/mnt"
@@ -229,10 +230,11 @@
   check_vga() { #{{{
     # Determine video chipset - only Intel, ATI and nvidia are supported by this script"
     ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Detecting video chipset "
+    local VGA=`lspci | grep VGA | tr "[:upper:]" "[:lower:]"`
     if [[ -n $(dmidecode --type 1 | grep VirtualBox) ]]; then
       cecho Virtualbox
       VIDEO_DRIVER="virtualbox"
-    elif [[ -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
+    elif [[ -n $(echo ${VGA} | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
       cecho Nvidia
       read_input_text "Install NVIDIA proprietary driver" $PROPRIETARY_DRIVER
       if [[ $OPTION == y ]]; then
@@ -240,10 +242,7 @@
       else
         VIDEO_DRIVER="nouveau"
       fi
-    elif [[ -f /sys/kernel/debug/dri/0/i915_capabilities ]]; then
-      cecho Intel
-      VIDEO_DRIVER="intel"
-    elif [[ -f /sys/kernel/debug/dri/0/radeon_pm_info || -f /sys/kernel/debug/dri/0/radeon_sa_info ]]; then
+    elif [[ -n $(echo ${VGA} | grep "advanced micro devices") || -f /sys/kernel/debug/dri/0/radeon_pm_info || -f /sys/kernel/debug/dri/0/radeon_sa_info ]]; then
       cecho AMD/ATI
       read_input_text "Install ATI proprietary driver" $PROPRIETARY_DRIVER
       if [[ $OPTION == y ]]; then
@@ -251,6 +250,9 @@
       else
         VIDEO_DRIVER="ati"
       fi
+    elif [[ -n $(echo ${VGA} | grep "intel corporation") || -f /sys/kernel/debug/dri/0/i915_capabilities ]]; then
+      cecho Intel
+      VIDEO_DRIVER="intel"
     else
       cecho VESA
       VIDEO_DRIVER="vesa"
@@ -331,10 +333,11 @@
   add_repository() { #{{{
     REPO=${1}
     URL=${2}
+    [[ -n ${3} ]] && SIGLEVEL="\nSigLevel = ${3}"
 
     CHECK_REPO=`grep -F "${REPO}" /etc/pacman.conf`
     if [[ -z $CHECK_REPO ]]; then
-      echo -e "\n[${REPO}]\nSigLevel = Optional TrustAll\nServer = ${URL}" >> /etc/pacman.conf
+      echo -e "\n[${REPO}]${SIGLEVEL}\nServer = ${URL}" >> /etc/pacman.conf
       system_update
     fi
   } #}}}
@@ -485,10 +488,10 @@
   system_update() { #{{{
     if [[ $VERBOSE_MODE -eq 0 ]]; then
       ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Updating packages "
-      $PKG_MANAGER -Syy >>"$LOG" 2>&1 &
+      $PKG_MANAGER -Sy >>"$LOG" 2>&1 &
       pid=$!;progress $pid
     else
-      $PKG_MANAGER -Syy $1
+      $PKG_MANAGER -Sy $1
     fi
   } #}}}
   npm_install() { #{{{
