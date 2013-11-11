@@ -686,7 +686,7 @@ install_video_cards(){
   #Virtualbox {{{
   if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
     package_install "virtualbox-guest-utils"
-    pacman -S --asdeps mesa-libgl
+    package_install "mesa-libgl"
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${USER_NAME} vboxsf
     system_ctl disable ntpd
@@ -714,7 +714,7 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
     is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
     [[ -f /etc/X11/xorg.conf.d/20-nvidia.conf ]] && rm /etc/X11/xorg.conf.d/20-nvidia.conf
-    pacman -S --asdeps mesa-libgl
+    package_install "mesa-libgl"
     package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
     if [[ ${ARCHI} == x86_64 ]]; then
       is_package_installed "lib32-nvidia-utils" && pacman -Rdds --noconfirm lib32-nvidia-utils
@@ -746,7 +746,7 @@ install_video_cards(){
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
     is_package_installed "catalyst-dkms" && pacman -Rdds --noconfirm catalyst{-dkms,-utils} lib32-catalyst-utils
-    pacman -S --asdeps mesa-libgl
+    package_install "mesa-libgl"
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
     [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
     package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
@@ -759,13 +759,13 @@ install_video_cards(){
   #Intel {{{
   elif [[ ${VIDEO_DRIVER} == intel ]]; then
     package_install "xf86-video-intel intel-dri libva-intel-driver"
-    pacman -S --asdeps mesa-libgl
+    package_install "mesa-libgl"
     [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
   #}}}
   #Vesa {{{
   else
     package_install "xf86-video-${VIDEO_DRIVER}"
-    pacman -S --asdeps mesa-libgl
+    package_install "mesa-libgl"
     [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
   fi
   #}}}
