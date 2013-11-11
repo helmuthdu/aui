@@ -656,7 +656,7 @@ font_config(){
         pacman-key -r 962DDE58
         pacman-key --lsign-key 962DDE58
         add_repository "infinality-bundle" "http://ibn.net63.net/infinality-bundle/\$arch"
-        add_repository "infinality-bundle-multilib" "http://ibn.net63.net/infinality-bundle-multilib/\$arch"
+        [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://ibn.net63.net/infinality-bundle-multilib/\$arch"
         is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
         is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
         pacman -S --needed infinality-bundle
