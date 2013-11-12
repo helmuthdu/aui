@@ -933,7 +933,7 @@ install_desktop_environment(){
             aur_package_install "matrilineare-icon-theme"
             ;;
           8)
-            aur_package_install "moka-icon-theme-git"
+            aur_package_install "moka-icon-theme-git moka-extras-icon-theme-git moka-symbolic-icon-theme-git"
             ;;
           9)
             aur_package_install "nitrux-icon-theme"
@@ -1044,7 +1044,7 @@ install_desktop_environment(){
     do
       print_title "$1 THEMES"
       echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-xfce-icons inx-icon-theme matrilineare-icon-theme nitrux-icon-theme" "Icons Themes") $AUR"
-      echo " 2) $(menu_item "xfce-theme-greybird faience-themes gtk-theme-gnome-cupertino mediterraneannight-theme light-themes zukitwo-themes" "GTK Themes") $AUR"
+      echo " 2) $(menu_item "xfce-theme-greybird-git gtk-theme-numix-git gtk-theme-orion-git zukitwo-themes" "GTK Themes") $AUR"
       [[ $GNOME -eq 1 ]] && echo " 3) $(menu_item "gnome-shell-theme-default-mod" "Gnome Shell Themes") $AUR"
       [[ $CINNAMON -eq 1 ]] && echo " 3) $(menu_item "cinnamon-theme-ambience cinnamon-theme-baldr cinnamon-theme-google+ cinnamon-theme-eleganse cinnamon-theme-helios cinnamon-theme-elementary-luna cinnamon-theme-holo cinnamon-theme-gnome cinnamon-theme-loki" "Cinnamon themes") $AUR"
       echo ""
