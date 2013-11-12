@@ -902,7 +902,7 @@ install_desktop_environment(){
       echo " 5) $(menu_item "faience-icon-theme")"
       echo " 6) $(menu_item "inx-icon-theme" "iNX")"
       echo " 7) $(menu_item "matrilineare-icon-theme")"
-      echo " 8) $(menu_item "moka-icon-theme-git")"
+      echo " 8) $(menu_item "moka-extra-icon-theme-git")"
       echo " 9) $(menu_item "nitrux-icon-theme")"
       echo ""
       echo " b) BACK"
@@ -933,7 +933,8 @@ install_desktop_environment(){
             aur_package_install "matrilineare-icon-theme"
             ;;
           8)
-            aur_package_install "moka-icon-theme-git moka-extras-icon-theme-git moka-symbolic-icon-theme-git"
+            is_package_installed "moka-icon-theme-git" && package_remove "moka-icon-theme-git"
+            aur_package_install "moka-extras-icon-theme-git moka-symbolic-icon-theme-git"
             ;;
           9)
             aur_package_install "nitrux-icon-theme"
