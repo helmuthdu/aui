@@ -18,6 +18,7 @@ You can try it first with a `virtualbox`
 ### Without git
 - Upgrade your system: `pacman -Syu`
 - get the script: ` wget --no-check-certificate https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
+    - an alternate URL (for less typing) is ` wget --no-check-certificate http://bit.ly/NoUPC6 -O - | tax xz`
 
 ## How to use
 - aui mode: `cd <dir> && ./aui`
