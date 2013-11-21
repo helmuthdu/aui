@@ -439,7 +439,6 @@ configure_bootloader(){
       print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
       print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
       arch_chroot "modprobe dm-mod"
-      arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
       grub_install_mode=("[MBR|UEFI] Automatic" "Manual")
       PS3="$prompt1"
       echo -e "Grub Install:\n"
@@ -462,6 +461,7 @@ configure_bootloader(){
             ;;
         esac
       done
+      arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
       ;;
     Syslinux)
       print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
