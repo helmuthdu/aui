@@ -171,15 +171,16 @@
   # 9) Monodevelop
   #10) Netbeans
   #11) NodeJS
-  #12) OpenJDK
-  #13) Oracle JDK
-  #14) QT Creator
-  #15) Sublime Text
-  #16) Debuggers
-  #17) MySQL Workbench
-  #18) DBSchema
-  #19) Meld
-  DEVELOPMENT_OPTIONS="13 11 15 19"
+  #12) Ruby on Rails
+  #13) OpenJDK
+  #14) Oracle JDK
+  #15) QT Creator
+  #16) Sublime Text
+  #17) Debuggers
+  #18) MySQL Workbench
+  #19) DBSchema
+  #20) Meld
+  DEVELOPMENT_OPTIONS="11 14 20"
   #ECLIPSE {{{
     # 1) Eclipse Classic
     # 2) Eclipse IDE for C/C++ Developers

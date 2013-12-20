@@ -502,6 +502,12 @@
     #install packages using pacman
     npm install -g $1
   } #}}}
+  gem_install() { #{{{
+    #install packages using pacman
+    for PKG in ${1}; do
+      sudo -u ${USER_NAME} pacgem $PKG
+    done
+  } #}}}
   contains_element() { #{{{
     #check if an element exist in a string
     for e in "${@:2}"; do [[ $e == $1 ]] && break; done;

@@ -1600,14 +1600,15 @@ install_development_apps(){
     echo " 9) $(menu_item "monodevelop")"
     echo "10) $(menu_item "netbeans")"
     echo "11) $(menu_item "nodejs")"
-    echo "12) $(menu_item "jdk7-openjdk" "OpenJDK")"
-    echo "13) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "14) $(menu_item "qtcreator")"
-    echo "15) $(menu_item "sublime-text-dev" "Sublime Text") $AUR"
-    echo "16) $(menu_item "gdb" "Debuggers")"
-    echo "17) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-    echo "18) $(menu_item "dbschema") $AUR"
-    echo "19) $(menu_item "meld")"
+    echo "12) $(menu_item "ruby" "Ruby on Rails")"
+    echo "13) $(menu_item "jdk7-openjdk" "OpenJDK")"
+    echo "14) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "15) $(menu_item "qtcreator")"
+    echo "16) $(menu_item "sublime-text-dev" "Sublime Text") $AUR"
+    echo "17) $(menu_item "gdb" "Debuggers")"
+    echo "18) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
+    echo "19) $(menu_item "dbschema") $AUR"
+    echo "20) $(menu_item "meld")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1797,37 +1798,41 @@ install_development_apps(){
           OPT=11
           ;;
         12)
+          aur_package_install "ruby pacgem"
+          gem_install "rails haml"
+          ;;
+        13)
           package_remove "jdk"
           package_install "jdk7-openjdk icedtea-web-java7"
           ;;
-        13)
+        14)
           package_remove "jre7-openjdk"
           package_remove "jdk7-openjdk"
           aur_package_install "jdk"
           ;;
-        14)
+        15)
           package_install "qtcreator"
           mkdir -p /home/${USER_NAME}/.config/Nokia/qtcreator/styles
           curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
           mv monokai.xml /home/${USER_NAME}/.config/Nokia/qtcreator/styles/
           chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
           ;;
-        15)
+        16)
           aur_package_install "sublime-text-dev"
           ;;
-        16)
+        17)
           package_install "splint valgrind gdb" #C/C++
           aur_package_install "php-codesniffer php-tidy" #PHP
           aur_package_install "closure-compiler" #Javascript
           aur_package_install "tidyhtml" #HTML
           ;;
-        17)
+        18)
           aur_package_install "mysql-workbench-gpl"
           ;;
-        18)
+        19)
           aur_package_install "dbschema"
           ;;
-        19)
+        20)
           package_install "meld"
           ;;
         "b")
