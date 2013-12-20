@@ -406,6 +406,7 @@ install_bootloader(){
   bootloader=("Grub2" "Syslinux" "Skip")
   PS3="$prompt1"
   echo -e "Install bootloader:\n"
+  print_warning "Grub is broken [https://bugs.archlinux.org/task/37904]"
   select BOOTLOADER in "${bootloader[@]}"; do
     case "$REPLY" in
       1)
