@@ -640,8 +640,7 @@ font_config(){
     print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
     print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
     echo " 1) Default"
-    echo " 2) Infinality ${EXTERNAL}"
-    echo " 3) Ubuntu ${AUR}"
+    echo " 2) Ubuntu ${AUR}"
     echo ""
     read_input $FONTCONFIG
     case "$OPTION" in
@@ -652,19 +651,6 @@ font_config(){
         break
         ;;
       2)
-        print_title "INFINALITY - https://wiki.archlinux.org/index.php/Infinality-bundle%2Bfonts"
-        pacman-key -r 962DDE58
-        pacman-key --lsign-key 962DDE58
-        add_repository "infinality-bundle" "http://ibn.net63.net/infinality-bundle/\$arch"
-        [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://ibn.net63.net/infinality-bundle-multilib/\$arch"
-        is_package_installed "fontconfig" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
-        is_package_installed "fontconfig-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
-        pacman -S --needed infinality-bundle
-        [[ $ARCHI == x86_64 ]] && pacman -S --needed infinality-bundle-multilib
-        fc-presets set
-        break
-        ;;
-      3)
         is_package_installed "fontconfig" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
         is_package_installed "fontconfig-infinality-ultimate" && pacman -Rdds --noconfirm freetype2-infinality-ultimate fontconfig-infinality-ultimate cairo-infinality-ultimate
         aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
@@ -730,22 +716,19 @@ install_video_cards(){
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
     is_package_installed "ati-dri" && pacman package_remove "ati-dri"
     [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
-    package_install "linux-headers"
-    # Add repository
-    pacman-key --keyserver pgp.mit.edu --recv-keys 0xabed422d653c3094
-    pacman-key --lsign-key 0xabed422d653c3094
-    add_repository "catalyst" "http://catalyst.wirephire.com/repo/catalyst/\$arch"
-    pacman -S --needed catalyst catalyst-utils
     if [[ ${ARCHI} == x86_64 ]]; then
       is_package_installed "lib32-ati-dri" && pacman -Rdds --noconfirm lib32-ati-dri
-      pacman -S --needed "lib32-catalyst-utils"
     fi
+    package_install "linux-headers"
+    # Add repository
+    aur_package_install "catalyst-total"
     aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
     add_module "fglrx" "ati"
+    system_ctl enable catalyst-hook
   #}}}
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
-    is_package_installed "catalyst-dkms" && pacman -Rdds --noconfirm catalyst{-dkms,-utils} lib32-catalyst-utils
+    is_package_installed "catalyst-total" && pacman -Rdds --noconfirm catalyst-total
     package_install "mesa-libgl"
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
     [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
@@ -775,7 +758,7 @@ install_video_cards(){
 #CUPS {{{
 install_cups(){
   print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
-  print_info "CUPS is the standards-based, open source printing system developed by Apple Inc. for Mac OS® X and other UNIX®-like operating systems."
+  print_info "CUPS is the standards-based, open source printing system developed by Apple Inc. for Mac OS X and other UNIX-like operating systems."
   read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
   if [[ $OPTION == y ]]; then
     package_install "cups cups-filters ghostscript gsfonts"
@@ -891,19 +874,14 @@ install_git_tor(){
 #DESKTOP ENVIRONMENT {{{
 install_desktop_environment(){
   install_icon_theme() { #{{{
-    package_install "gtk-update-icon-cache"
     while true
     do
       print_title "GNOME ICONS"
-      echo " 1) $(menu_item "awoken-icons" "Awoken")"
-      echo " 2) $(menu_item "elementary-xfce-icons" "Elementary XFCE")"
-      echo " 3) $(menu_item "faenza-icon-theme")"
-      echo " 4) $(menu_item "faenza-cupertino-icon-theme" "Faenza-Cupertino")"
-      echo " 5) $(menu_item "faience-icon-theme")"
-      echo " 6) $(menu_item "inx-icon-theme" "iNX")"
-      echo " 7) $(menu_item "matrilineare-icon-theme")"
-      echo " 8) $(menu_item "moka-icon-theme-git")"
-      echo " 9) $(menu_item "nitrux-icon-theme")"
+      echo " 1) $(menu_item "faenza-icon-theme")"
+      echo " 2) $(menu_item "faience-icon-theme")"
+      echo " 3) $(menu_item "moka-icon-theme-git")"
+      echo " 4) $(menu_item "nitrux-icon-theme")"
+      echo " 5) $(menu_item "numix-icon-theme-git")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -912,31 +890,19 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            aur_package_install "awoken-icons"
-            ;;
-          2)
-            aur_package_install "elementary-xfce-icons"
-            ;;
-          3)
             package_install "faenza-icon-theme"
             ;;
-          4)
-            aur_package_install "faenza-cupertino-icon-theme"
-            ;;
-          5)
+          2)
             package_install "faience-icon-theme"
             ;;
-          6)
-            aur_package_install "inx-icon-theme"
+          3)
+            aur_package_install "moka-icon-theme-git moka-symbolic-icon-theme-git moka-extras-icon-theme-git"
             ;;
-          7)
-            aur_package_install "matrilineare-icon-theme"
-            ;;
-          8)
-            aur_package_install "moka-icon-theme-git"
-            ;;
-          9)
+          4)
             aur_package_install "nitrux-icon-theme"
+            ;;
+          5)
+            aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
             ;;
           "b")
             break
@@ -954,7 +920,7 @@ install_desktop_environment(){
     do
       print_title "GTK2/GTK3 THEMES"
       echo " 1) $(menu_item "xfce-theme-greybird-git" "Greybird")"
-      echo " 2) $(menu_item "gtk-theme-numix-git" "Numix")"
+      echo " 2) $(menu_item "numix-themes-git" "Numix")"
       echo " 3) $(menu_item "gtk-theme-orion-git" "Orion")"
       echo " 4) $(menu_item "zukitwo-themes" "Zukitwo")"
       echo ""
@@ -968,7 +934,7 @@ install_desktop_environment(){
             aur_package_install "xfce-theme-greybird-git"
             ;;
           2)
-            aur_package_install "gtk-theme-numix-git"
+            aur_package_install "numix-themes-git"
             ;;
           3)
             aur_package_install "gtk-theme-orion-git"
@@ -1045,8 +1011,6 @@ install_desktop_environment(){
       print_title "$1 THEMES"
       echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-xfce-icons inx-icon-theme matrilineare-icon-theme nitrux-icon-theme" "Icons Themes") $AUR"
       echo " 2) $(menu_item "xfce-theme-greybird-git gtk-theme-numix-git gtk-theme-orion-git zukitwo-themes" "GTK Themes") $AUR"
-      [[ $GNOME -eq 1 ]] && echo " 3) $(menu_item "gnome-shell-theme-default-mod" "Gnome Shell Themes") $AUR"
-      [[ $CINNAMON -eq 1 ]] && echo " 3) $(menu_item "cinnamon-theme-ambience cinnamon-theme-baldr cinnamon-theme-google+ cinnamon-theme-eleganse cinnamon-theme-helios cinnamon-theme-elementary-luna cinnamon-theme-holo cinnamon-theme-gnome cinnamon-theme-loki" "Cinnamon themes") $AUR"
       echo ""
       echo " d) DONE"
       echo ""
@@ -1061,106 +1025,6 @@ install_desktop_environment(){
           2)
             install_gtk_theme
             OPT=2
-            ;;
-          3)
-            if [[ $GNOME -eq 1 ]]; then
-              #GNOME SHELL THEMES {{{
-              while true
-              do
-                print_title "GNOME SHELL THEMES"
-                echo " 1) $(menu_item "gnome-shell-theme-default-mod")"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                GNOME_SHELL_THEMES+=" b"
-                read_input_options "$GNOME_SHELL_THEMES"
-                for OPT in ${OPTIONS[@]}; do
-                  case "$OPT" in
-                    1)
-                      aur_package_install "gnome-shell-theme-default-mod"
-                      ;;
-                    "b")
-                      break
-                      ;;
-                    *)
-                      invalid_option
-                      ;;
-                  esac
-                done
-                elihw
-              done
-              #}}}
-            elif [[ $CINNAMON -eq 1 ]]; then
-              #CINNAMON THEMES {{{
-              while true
-              do
-                print_title "CINNAMON THEMES"
-                echo " 1) $(menu_item "cinnamon-theme-ambience")"
-                echo " 2) $(menu_item "cinnamon-theme-baldr")"
-                echo " 3) $(menu_item "cinnamon-theme-eleganse")"
-                echo " 4) $(menu_item "cinnamon-theme-elementary-luna")"
-                echo " 5) $(menu_item "cinnamon-theme-gnome")"
-                echo " 6) $(menu_item "cinnamon-theme-faience")"
-                echo " 7) $(menu_item "cinnamon-theme-google+")"
-                echo " 8) $(menu_item "cinnamon-theme-helios")"
-                echo " 9) $(menu_item "cinnamon-theme-holo")"
-                echo "10) $(menu_item "cinnamon-theme-nadia")"
-                echo "11) $(menu_item "cinnamon-theme-loki")"
-                echo ""
-                echo " b) BACK"
-                echo ""
-                CINNAMON_THEMES+=" b"
-                read_input_options "$CINNAMON_THEMES"
-                for OPT in ${OPTIONS[@]}; do
-                  case "$OPT" in
-                    1)
-                      aur_package_install "cinnamon-theme-ambience"
-                      ;;
-                    2)
-                      aur_package_install "cinnamon-theme-baldr"
-                      ;;
-                    3)
-                      aur_package_install "cinnamon-theme-eleganse"
-                      ;;
-                    4)
-                      aur_package_install "cinnamon-theme-elementary-luna"
-                      ;;
-                    5)
-                      aur_package_install "cinnamon-theme-gnome"
-                      ;;
-                    6)
-                      aur_package_install "cinnamon-theme-faience"
-                      ;;
-                    7)
-                      aur_package_install "cinnamon-theme-google+"
-                      ;;
-                    8)
-                      aur_package_install "cinnamon-theme-helios"
-                      ;;
-                    9)
-                      aur_package_install "cinnamon-theme-holo"
-                      ;;
-                    10)
-                      aur_package_install "cinnamon-theme-nadia"
-                      ;;
-                    11)
-                      aur_package_install "cinnamon-theme-loki"
-                      ;;
-                    "b")
-                      break
-                      ;;
-                    *)
-                      invalid_option
-                      ;;
-                  esac
-                done
-                elihw
-              done
-              #}}}
-            else
-              invalid_option
-            fi
-            OPT=3
             ;;
           "d")
             break
@@ -1256,13 +1120,12 @@ install_desktop_environment(){
   print_info "A DE provide a complete GUI for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries.\n\nA window manager is one component of a system's graphical user interface."
   echo -e "Select your DE or WM:\n"
   echo " --- DE ---             --- WM ---"
-  echo " 1) Cinnamon            8) Awesome"
-  echo " 2) E17                 9) Fluxbox"
-  echo " 3) GNOME              10) OpenBox"
+  echo " 1) Cinnamon            7) Awesome"
+  echo " 2) E17                 8) Fluxbox"
+  echo " 3) GNOME               9) OpenBox"
   echo " 4) KDE"
   echo " 5) LXDE"
-  echo " 6) Mate"
-  echo " 7) XFCE"
+  echo " 6) XFCE"
   echo ""
   echo " b) BACK"
   read_input $DESKTOPENV
@@ -1333,14 +1196,11 @@ install_desktop_environment(){
       #GNOME {{{
       print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
-      package_install "gnome gnome-extra zeitgeist telepathy"
+      package_install "gnome gnome-extra telepathy"
       package_install "gedit-plugins gnome-tweak-tool gnome-power-manager gucharmap"
       package_install "gvfs-smb gvfs-afc gvfs-goa"
       package_install "deja-dup"
       aur_package_install "gnome-defaults-list"
-      # empathy theme
-      package_install "python2-distutils-extra"
-      aur_package_install "empathy-theme-ubuntu-adium-bzr"
       # config xinitrc
       config_xinitrc "gnome-session"
       GNOME=1
@@ -1493,24 +1353,6 @@ install_desktop_environment(){
       ;;
       #}}}
       6)
-      #MATE {{{
-      print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
-      print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
-      add_repository "mate" "http://repo.mate-desktop.org/archlinux/\$arch" "Optional TrustAll"
-      package_install "mate mate-extras"
-      package_install "gvfs"
-      aur_package_install "gnome-defaults-list"
-      # config xinitrc
-      config_xinitrc "mate-session"
-      pause_function
-      install_themes "MATE"
-      #D-Bus interface for user account query and manipulation
-      system_ctl enable accounts-daemon
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
-      ;;
-      #}}}
-      7)
       #XFCE {{{
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
@@ -1527,7 +1369,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-      8)
+      7)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
       print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
@@ -1551,7 +1393,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-      9)
+      8)
       #FLUXBOX {{{
       print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
       print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
@@ -1570,7 +1412,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-      10)
+      9)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -2185,16 +2027,15 @@ install_graphics_apps(){
     print_title "GRAPHICS APPS"
     echo " 1) $(menu_item "blender")"
     echo " 2) $(menu_item "gimp")"
-    echo " 3) $(menu_item "gradiator")"
-    echo " 4) $(menu_item "gthumb")"
-    echo " 5) $(menu_item "inkscape")"
-    echo " 6) $(menu_item "mcomix")"
-    echo " 7) $(menu_item "mypaint")"
-    echo " 8) $(menu_item "pencil") [Prototyping Tool] $AUR"
-    echo " 9) $(menu_item "scribus")"
-    echo "10) $(menu_item "shotwell")"
-    echo "11) $(menu_item "simple-scan")"
-    echo "12) $(menu_item "xnviewmp") $AUR"
+    echo " 3) $(menu_item "gthumb")"
+    echo " 4) $(menu_item "inkscape")"
+    echo " 5) $(menu_item "mcomix")"
+    echo " 6) $(menu_item "mypaint")"
+    echo " 7) $(menu_item "pencil") $AUR"
+    echo " 8) $(menu_item "scribus")"
+    echo " 9) $(menu_item "shotwell")"
+    echo "10) $(menu_item "simple-scan")"
+    echo "11) $(menu_item "xnviewmp") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2207,37 +2048,34 @@ install_graphics_apps(){
           ;;
         2)
           package_install "gimp"
-          aur_package_install "gimphelp-scriptfu gimp-paint-studio gimpfx-foundry"
+          aur_package_install "gimphelp-scriptfu gimpfx-foundry"
           ;;
         3)
-          aur_package_install "gradiator"
-          ;;
-        4)
           package_install "gthumb"
           ;;
-        5)
+        4)
           package_install "inkscape python2-numpy python-lxml"
           aur_package_install "sozi"
           ;;
-        6)
+        5)
           package_install "mcomix"
           ;;
-        7)
+        6)
           package_install "mypaint"
           ;;
-        8)
+        7)
           aur_package_install "pencil"
           ;;
-        9)
+        8)
           package_install "scribus"
           ;;
-        10)
+        9)
           package_install "shotwell"
           ;;
-        11)
+        10)
           package_install "simple-scan"
           ;;
-        12)
+        11)
           aur_package_install "xnviewmp"
           ;;
         "b")
@@ -3523,10 +3361,8 @@ install_web_server(){
   print_info "*Adminer is installed by default in all options"
   echo " 1) LAMP - APACHE, MariaDB & PHP"
   echo " 2) LAPP - APACHE, POSTGRESQL & PHP"
-  echo " 3) LAMA - APACHE, MariaDB & ASP.NET"
-  echo " 4) LAPA - APACHE, POSTGRESQL & ASP.NET"
-  echo " 5) LEMP - NGINX, MariaDB & PHP"
-  echo " 6) LEPP - NGINX, POSTGRESQL & PHP"
+  echo " 3) LEMP - NGINX, MariaDB & PHP"
+  echo " 4) LEPP - NGINX, POSTGRESQL & PHP"
   echo ""
   echo " b) BACK"
   echo ""
@@ -3613,44 +3449,6 @@ install_web_server(){
       create_sites_folder
       ;;
     3)
-      package_install "apache mariadb mono mod_mono xsp"
-      install_adminer
-      system_ctl enable httpd
-      /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-      system_ctl enable mysqld
-      systemctl start mysqld
-      /usr/bin/mysql_secure_installation
-      #ADD ASP.NET SUPPORT {{{
-        local MOD_MONO=`cat /etc/httpd/conf/httpd.conf | grep mod_mono`
-        if [[ -z $MOD_MONO ]]; then
-          echo -e '\n# ASP.NET Configuration\nInclude /etc/httpd/conf/mod_mono.conf' >> /etc/httpd/conf/httpd.conf
-        fi
-      #}}}
-      create_sites_folder
-      ;;
-    4)
-      package_install "apache postgresql mono mod_mono xsp"
-      install_adminer
-      systemd-tmpfiles --create postgresql.conf
-      mkdir -p /var/lib/postgres
-      chown -R postgres:postgres /var/lib/postgres
-      echo "Enter your new postgres account password:"
-      passwd postgres
-      if [[ ! -d /var/lib/postgres/data ]]; then
-        echo "Enter your postgres account password:"
-        su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
-      fi
-      system_ctl enable httpd
-      system_ctl enable postgresql
-      #ADD ASP.NET SUPPORT {{{
-        local MOD_MONO=`cat /etc/httpd/conf/httpd.conf | grep mod_mono`
-        if [[ -z $MOD_MONO ]]; then
-          echo -e '\n# ASP.NET Configuration\nInclude /etc/httpd/conf/mod_mono.conf' >> /etc/httpd/conf/httpd.conf
-        fi
-      #}}}
-      create_sites_folder
-      ;;
-    5)
       package_install "nginx mariadb php php-mcrypt php-fpm"
       install_adminer
       /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
@@ -3673,7 +3471,7 @@ install_web_server(){
       #}}}
       create_sites_folder
       ;;
-    6)
+    4)
       package_install "nginx postgresql php php-fpm php-pgsql"
       install_adminer
       systemd-tmpfiles --create postgresql.conf
@@ -3710,15 +3508,13 @@ install_fonts(){
   while true
   do
     print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
-    echo " 1) $(menu_item "ttf-anka-coder") $AUR"
-    echo " 2) $(menu_item "ttf-dejavu")"
-    echo " 3) $(menu_item "ttf-exljbris") $AUR"
-    echo " 4) $(menu_item "ttf-funfonts") $AUR"
-    echo " 5) $(menu_item "ttf-google-fonts-git") $AUR"
-    echo " 6) $(menu_item "ttf-liberation")"
-    echo " 7) $(menu_item "ttf-ms-fonts") $AUR"
-    echo " 8) $(menu_item "ttf-vista-fonts") $AUR"
-    echo " 9) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support)"
+    echo " 1) $(menu_item "ttf-dejavu")"
+    echo " 2) $(menu_item "ttf-funfonts") $AUR"
+    echo " 3) $(menu_item "ttf-google-fonts-git") $AUR"
+    echo " 4) $(menu_item "ttf-liberation")"
+    echo " 5) $(menu_item "ttf-ms-fonts") $AUR"
+    echo " 6) $(menu_item "ttf-vista-fonts") $AUR"
+    echo " 7) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support)"
     echo ""
     echo " b) BACK"
     echo ""
@@ -3727,18 +3523,12 @@ install_fonts(){
     for OPT in ${OPTIONS[@]}; do
       case "$OPT" in
         1)
-          aur_package_install "ttf-anka-coder"
-          ;;
-        2)
           package_install "ttf-dejavu"
           ;;
-        3)
-          aur_package_install "ttf-exljbris"
-          ;;
-        4)
+        2)
           aur_package_install "ttf-funfonts"
           ;;
-        5)
+        3)
           package_remove "ttf-droid"
           package_remove "ttf-roboto"
           package_remove "cantarell-fonts"
@@ -3746,16 +3536,16 @@ install_fonts(){
           package_remove "otf-oswald-ib"
           aur_package_install "ttf-google-fonts-git"
           ;;
-        6)
+        4)
           package_install "ttf-liberation"
           ;;
-        7)
+        5)
           aur_package_install "ttf-ms-fonts"
           ;;
-        8)
+        6)
           aur_package_install "ttf-vista-fonts"
           ;;
-        9)
+        7)
           package_install "wqy-microhei"
           ;;
         "b")
@@ -3827,8 +3617,7 @@ install_extra(){
   while true
   do
     print_title "EXTRA"
-    echo " 1) Elementary Project $AUR"
-    echo " 2) Global Menu $AUR"
+    echo " 1) Global Menu $AUR"
     echo " b) BACK"
     echo ""
     EXTRA_OPTIONS+=" b"
@@ -3836,129 +3625,6 @@ install_extra(){
     for OPT in ${OPTIONS[@]}; do
       case "$OPT" in
         1)
-          #ELEMENTARY PROJECT {{{
-          while true
-          do
-            print_title "ELEMENTARY PROJECT"
-            print_warning "\tsome of these programs still in alpha stage and may not work"
-            echo " 1) $(menu_item "audience-bzr") (media player)"
-            echo " 2) $(menu_item "cerbere-bzr") session manager"
-            echo " 3) $(menu_item "contractor-bzr") (sharing)"
-            echo " 4) $(menu_item "eidete-bzr") (screencasting)"
-            echo " 5) $(menu_item "dexter-contacts-bzr") (contacts manager)"
-            echo " 6) $(menu_item "feedler-bzr") (RSS feeds Reader)"
-            echo " 7) $(menu_item "pantheon-files-bzr") (file manager)"
-            echo " 8) $(menu_item "footnote-bzr") (note taking)"
-            echo " 9) $(menu_item "foto-bzr") (photo manager)"
-            echo "10) $(menu_item "gala-bzr") (compositing manager)"
-            echo "11) $(menu_item "geary-git") (email client)"
-            echo "12) $(menu_item "lingo-dictionary-bzr") (dictionary)"
-            echo "13) $(menu_item "maya-bzr") (calendar)"
-            echo "14) $(menu_item "midori") (web browser)"
-            echo "15) $(menu_item "noise-bzr") (audio player)"
-            echo "16) $(menu_item "scratch-bzr") (text editor)"
-            echo "17) $(menu_item "pantheon-dock-bzr") (dock)"
-            echo "18) $(menu_item "pantheon-terminal-bzr") (terminal)"
-            echo "19) $(menu_item "slingshot-bzr") (app launcher)"
-            echo "20) $(menu_item "snap-elementary-bzr") (photo booth)"
-            echo "21) $(menu_item "switchboard-bzr") (desktop settings hub)"
-            echo "22) $(menu_item "wingpanel-bzr") (indicators topbar)"
-            echo "23) $(menu_item "elementary-icons-bzr" "elementary icons")"
-            echo "24) $(menu_item "egtk-bzr" "elementary theme")"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            ELEMENTARY_OPTIONS+=" b"
-            read_input_options "$ELEMENTARY_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  aur_package_install "audience-bzr"
-                  ;;
-                2)
-                  aur_package_install "cerbere-bzr"
-                  ;;
-                3)
-                  aur_package_install "contractor-bzr"
-                  ;;
-                4)
-                  aur_package_install "eidete-bzr"
-                  ;;
-                5)
-                  aur_package_install "dexter-contacts-bzr"
-                  ;;
-                6)
-                  aur_package_install "feedler-bzr"
-                  ;;
-                7)
-                  aur_package_install "pantheon-files-bzr tumbler"
-                  ;;
-                8)
-                  aur_package_install "footnote-bzr"
-                  ;;
-                9)
-                  aur_package_install "foto-bzr"
-                  ;;
-                10)
-                  aur_package_install "gala-bzr"
-                  ;;
-                11)
-                  aur_package_install "geary-git"
-                  ;;
-                12)
-                  aur_package_install "lingo-dictionary-bzr"
-                  ;;
-                13)
-                  aur_package_install "maya-bzr"
-                  ;;
-                14)
-                  aur_package_install "midori"
-                  ;;
-                15)
-                  aur_package_install "noise-bzr"
-                  ;;
-                16)
-                  aur_package_install "scratch-bzr"
-                  ;;
-                17)
-                  aur_package_install "pantheon-dock-bzr"
-                  ;;
-                18)
-                  aur_package_install "pantheon-terminal-bzr"
-                  ;;
-                19)
-                  aur_package_install "slingshot-bzr"
-                  ;;
-                20)
-                  aur_package_install "snap-elementary-bzr"
-                  ;;
-                21)
-                  aur_package_install "switchboard-bzr"
-                  ;;
-                22)
-                  aur_package_install "wingpanel-bzr"
-                  ;;
-                23)
-                  aur_package_install "elementary-icons-bzr"
-                  gtk-update-icon-cache -f /usr/share/icons/elementary
-                  ;;
-                24)
-                  aur_package_install "egtk-bzr"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=1
-          ;;
-        2)
           aur_package_install "gtk2-appmenu gtk3-appmenu"
           if [[ ${KDE} -eq 1 ]]; then
             aur_package_install "appmenu-qt appmenu-gtk"

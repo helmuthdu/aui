@@ -55,8 +55,8 @@ select_editor(){
 #}}}
 #MIRRORLIST {{{
 configure_mirrorlist(){
-  local countries_code=("AU" "BY" "BE" "BR" "BG" "CA" "CL" "CN" "CO" "CZ" "DK" "EE" "FI" "FR" "DE" "GR" "HU" "IN" "IE" "IL" "IT" "JP" "KZ" "KR" "LV" "LU" "MK" "NL" "NC" "NZ" "NO" "PL" "PT" "RO" "RU" "RS" "SG" "SK" "ZA" "ES" "LK" "SE" "CH" "TW" "TR" "UA" "GB" "US" "UZ" "VN")
-  local countries_name=("Australia" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Latvia" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russian" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
+  local countries_code=("AU" "AT" "BY" "BE" "BR" "BG" "CA" "CL" "CN" "CO" "CZ" "DK" "EE" "FI" "FR" "DE" "GR" "HU" "IN" "IE" "IL" "IT" "JP" "KZ" "KR" "LV" "LU" "MK" "NL" "NC" "NZ" "NO" "PL" "PT" "RO" "RU" "RS" "SG" "SK" "ZA" "ES" "LK" "SE" "CH" "TW" "TR" "UA" "GB" "US" "UZ" "VN")
+  local countries_name=("Australia" "Austria" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Latvia" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russian" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
   country_list(){
     #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/^/"/g' | sed 's/,.*//g' | sed 's/ *$//g'  | sed 's/$/"/g' | sed -e :a -e '$!N; s/\n/ /; ta'`
     PS3="$prompt1"
@@ -439,7 +439,7 @@ configure_bootloader(){
       print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
       print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
       arch_chroot "modprobe dm-mod"
-      grub_install_mode=("[MBR|UEFI] Automatic" "Manual")
+      grub_install_mode=("Automatic" "Manual")
       PS3="$prompt1"
       echo -e "Grub Install:\n"
       select OPT in "${grub_install_mode[@]}"; do
@@ -448,7 +448,7 @@ configure_bootloader(){
             if [[ $UEFI -eq 1 ]]; then
               arch_chroot "mount -t efivarfs efivarfs /sys/firmware/efi/efivars && grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck && umount -R /sys/firmware/efi/efivars"
             else
-              arch_chroot "grub-install --recheck ${BOOT_DEVICE}"
+              arch_chroot "grub-install --target=i386-pc --recheck --debug ${BOOT_DEVICE}"
             fi
             break
             ;;
@@ -462,6 +462,7 @@ configure_bootloader(){
         esac
       done
       arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
+      pause_function
       ;;
     Syslinux)
       print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
@@ -473,10 +474,12 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             arch_chroot "syslinux-install_update -iam"
+            $EDITOR $MOUNTPOINT/boot/syslinux/syslinux.cfg
             break
             ;;
           2)
             arch_chroot "syslinux-install_update -i"
+            $EDITOR $MOUNTPOINT/boot/syslinux/syslinux.cfg
             break
             ;;
           3)

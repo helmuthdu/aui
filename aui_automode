@@ -61,7 +61,7 @@
     # 6) broadcom-wl
     # 7) bluez-firmware
     # 8) libmtp
-    # 9) libffado [Fireware Audio Devices]
+    # 9) libffado [Firmware Audio Devices]
     #10) libraw1394 [IEE1394 Driver]
     #11) aic94xx-firmware
     #12) bfa-firmware
@@ -117,19 +117,14 @@
   #}}}
   # 1) Icons Themes
   # 2) GTK2|GTK3 Themes
-  # 3) GNOME|CINNAMON Themes
   THEMES_OPTIONS="1 2"
   #ICONS THEMES {{{
-    # 1) Awoken
-    # 2) Elementary XFCE
-    # 3) Faenza
-    # 4) Faenza-Cupertino
-    # 5) Faience
-    # 6) iNX
-    # 7) Matrilineare
-    # 8) Moka
-    # 9) Nitrux
-    ICONS_THEMES="3 5"
+    # 1) Faenza
+    # 2) Faience
+    # 3) Moka
+    # 4) Nitrux
+    # 5) Numix
+    ICONS_THEMES="1-5"
   #}}}
   #GTK THEMES {{{
     # 1) Greybird
@@ -137,24 +132,6 @@
     # 3) Orion
     # 4) Zukitwo
     GTK_THEMES="1-4"
-  #}}}
-  #GNOME SHELL THEMES {{{
-    # 1) Default-Mod
-    GNOME_SHELL_THEMES="1"
-  #}}}
-  #CINNAMON THEMES {{{
-    # 1) Ambience
-    # 2) Baldr
-    # 3) Eleganse
-    # 4) Elementary-luna
-    # 5) Faience
-    # 6) Gnome
-    # 7) Google+
-    # 8) Helios
-    # 9) Holo
-    #10) Nadia
-    #11) Loki
-    CINNAMON_THEMES="5"
   #}}}
 #}}}
 #NETWORK MANAGER {{{
@@ -263,17 +240,16 @@
 #GRAPHICS {{{
   # 1) Blender
   # 2) Gimp
-  # 3) Gradiator
-  # 4) Gthumb
-  # 5) Inkscape
-  # 6) MComix
-  # 7) Mypaint
-  # 8) Pencil
-  # 9) Scribus
-  #10) Shotwell
-  #11) Simple Scan
-  #12) XnViewMP
-  GRAPHICS_OPTIONS="2-8 10"
+  # 3) Gthumb
+  # 4) Inkscape
+  # 5) MComix
+  # 6) Mypaint
+  # 7) Pencil
+  # 8) Scribus
+  # 9) Shotwell
+  #10) Simple Scan
+  #11) XnViewMP
+  GRAPHICS_OPTIONS="2-7 9"
 #}}}
 #INTERNET {{{
   # 1) Browser
@@ -302,7 +278,7 @@
     # 8) Spider Oak
     # 9) Steadyflow
     #10) Trasmission
-    DOWNLOAD_OPTIONS="4 5"
+    DOWNLOAD_OPTIONS="4 5 10"
   #}}}
   #EMAIL|RSS {{{
     # 1) Mozilla Thunderbird
@@ -357,7 +333,7 @@
     # 2) Easytag
     # 3) Audacity
     # 4) OcenAudio
-    AUDIO_EDITOR_OPTIONS="1"
+    AUDIO_EDITOR_OPTIONS="1 2"
   #}}}
 #}}}
 #VIDEO {{{
@@ -507,52 +483,21 @@
 #WEBSERVER {{{
   # 1) LAMP - APACHE, MariaDB & PHP
   # 2) LAPP - APACHE, POSTGRESQL & PHP
-  # 3) LAMA - APACHE, MariaDB & ASP.NET
-  # 4) LAPA - APACHE, POSTGRESQL & ASP.NET
-  # 5) LEMP - NGINX, MariaDB & PHP
-  # 6) LEPP - NGINX, POSTGRESQL & PHP
+  # 3) LEMP - NGINX, MariaDB & PHP
+  # 4) LEPP - NGINX, POSTGRESQL & PHP
   WEBSERVER=2
 #}}}
 #FONTS {{{
-  # 1) ttf-anka-coder
-  # 2) ttf-dejavu
-  # 3) ttf-exljbris
-  # 4) ttf-funfonts
-  # 5) ttf-google-webfonts
-  # 6) ttf-liberation
-  # 7) ttf-ms-fonts
-  # 8) ttf-vista-fonts
-  # 9) wqy-microhei
-  FONTS_OPTIONS="1-9"
+  # 1) ttf-dejavu
+  # 2) ttf-funfonts
+  # 3) ttf-google-webfonts
+  # 4) ttf-liberation
+  # 5) ttf-ms-fonts
+  # 6) ttf-vista-fonts
+  # 7) wqy-microhei
+  FONTS_OPTIONS="1-7"
 #}}}
 #EXTRA {{{
-  # 1) Elementary Project
+  # 1) Global Menu
   EXTRA_OPTIONS=""
-  #ELEMENTARY PROJECT {{{
-    # 1) Audience
-    # 2) Cerbere
-    # 3) Contractor
-    # 4) Eidete
-    # 5) Dexter
-    # 6) Feedler
-    # 7) Files
-    # 8) Footnote
-    # 9) Foto
-    #10) Gala
-    #11) Geary
-    #12) Lingo
-    #13) Maya
-    #14) Midori
-    #15) Noise
-    #16) Scratch
-    #17) Plank
-    #18) Pantheon Terminal
-    #19) Slingshot
-    #20) Snap
-    #21) Switchboard
-    #22) Wingpanel
-    #23) eICONS
-    #24) eGTK
-    ELEMENTARY_OPTIONS=""
-  #}}}
 #}}}

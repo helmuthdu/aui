@@ -520,7 +520,7 @@
   pause_function() { #{{{
     print_line
     if [[ $AUTOMATIC_MODE -eq 0 ]]; then
-      read -e -sn 1 -p "Press any key to continue..."
+      read -e -sn 1 -p "Press enter to continue..."
     fi
   } #}}}
   menu_item() { #{{{
