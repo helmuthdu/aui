@@ -1597,18 +1597,17 @@ install_development_apps(){
     echo " 6) $(menu_item "geany")"
     echo " 7) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
     echo " 8) $(menu_item "kdevelop")"
-    echo " 9) $(menu_item "lighttable") $AUR"
-    echo "10) $(menu_item "monodevelop")"
-    echo "11) $(menu_item "netbeans")"
-    echo "12) $(menu_item "nodejs")"
-    echo "13) $(menu_item "jdk7-openjdk" "OpenJDK")"
-    echo "14) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "15) $(menu_item "qtcreator")"
-    echo "16) $(menu_item "sublime-text" "Sublime Text") $AUR"
-    echo "17) $(menu_item "gdb" "Debuggers")"
-    echo "18) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-    echo "19) $(menu_item "dbschema") $AUR"
-    echo "20) $(menu_item "meld")"
+    echo " 9) $(menu_item "monodevelop")"
+    echo "10) $(menu_item "netbeans")"
+    echo "11) $(menu_item "nodejs")"
+    echo "12) $(menu_item "jdk7-openjdk" "OpenJDK")"
+    echo "13) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "14) $(menu_item "qtcreator")"
+    echo "15) $(menu_item "sublime-text-dev" "Sublime Text") $AUR"
+    echo "16) $(menu_item "gdb" "Debuggers")"
+    echo "17) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
+    echo "18) $(menu_item "dbschema") $AUR"
+    echo "19) $(menu_item "meld")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1717,15 +1716,12 @@ install_development_apps(){
           package_install "kdevelop"
           ;;
         9)
-          aur_package_install "lighttable"
-          ;;
-        10)
           package_install "monodevelop monodevelop-debugger-gdb"
           ;;
-        11)
+        10)
           package_install "netbeans"
           ;;
-        12)
+        11)
           package_install "nodejs"
           #NODEJS {{{
           while true
@@ -1800,38 +1796,38 @@ install_development_apps(){
           #}}}
           OPT=11
           ;;
-        13)
+        12)
           package_remove "jdk"
           package_install "jdk7-openjdk icedtea-web-java7"
           ;;
-        14)
+        13)
           package_remove "jre7-openjdk"
           package_remove "jdk7-openjdk"
           aur_package_install "jdk"
           ;;
-        15)
+        14)
           package_install "qtcreator"
           mkdir -p /home/${USER_NAME}/.config/Nokia/qtcreator/styles
           curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
           mv monokai.xml /home/${USER_NAME}/.config/Nokia/qtcreator/styles/
           chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
           ;;
-        16)
-          aur_package_install "sublime-text"
+        15)
+          aur_package_install "sublime-text-dev"
           ;;
-        17)
+        16)
           package_install "splint valgrind gdb" #C/C++
           aur_package_install "php-codesniffer php-tidy" #PHP
           aur_package_install "closure-compiler" #Javascript
           aur_package_install "tidyhtml" #HTML
           ;;
-        18)
+        17)
           aur_package_install "mysql-workbench-gpl"
           ;;
-        19)
+        18)
           aur_package_install "dbschema"
           ;;
-        20)
+        19)
           package_install "meld"
           ;;
         "b")
