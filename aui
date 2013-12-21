@@ -3529,8 +3529,7 @@ install_fonts(){
         3)
           package_remove "ttf-droid"
           package_remove "ttf-roboto"
-          pacman -Rdds --noconfirm "cantarell-fonts"
-          pacman -Rdds --noconfirm "ttf-ubuntu-font-family"
+          package_remove "ttf-ubuntu-font-family"
           package_remove "otf-oswald-ib"
           aur_package_install "ttf-google-fonts-git"
           ;;

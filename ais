@@ -463,7 +463,6 @@ configure_bootloader(){
         esac
       done
       arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
-      pause_function
       ;;
     Syslinux)
       print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
@@ -497,6 +496,7 @@ configure_bootloader(){
       done
       ;;
   esac
+  pause_function
 }
 #}}}
 #ROOT PASSWORD {{{
