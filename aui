@@ -1799,7 +1799,7 @@ install_development_apps(){
           OPT=11
           ;;
         12)
-          aur_package_install "ruby pacgem"
+          aur_package_install "ruby"
           gem_install "rails haml"
           ;;
         13)

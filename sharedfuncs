@@ -505,7 +505,7 @@
   gem_install() { #{{{
     #install packages using pacman
     for PKG in ${1}; do
-      sudo -u ${USER_NAME} pacgem $PKG
+      sudo -u ${USER_NAME} gem install -V $PKG
     done
   } #}}}
   contains_element() { #{{{
