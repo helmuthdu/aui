@@ -48,8 +48,7 @@
   PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA|ATI) driver
   #FONT CONFIGURATION {{{
     # 1) Default
-    # 2) Infinality
-    # 3) Ubuntu
+    # 2) Ubuntu
     FONTCONFIG=1
   #}}}
   #ADDITIONAL FIRMWARE {{{

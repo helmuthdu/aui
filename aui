@@ -723,15 +723,16 @@ install_video_cards(){
     # Add repository
     aur_package_install "catalyst-total"
     aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
-    add_module "fglrx" "ati"
+    system_ctl enable atieventsd
     system_ctl enable catalyst-hook
+    system_ctl enable temp-links-catalyst
   #}}}
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
     is_package_installed "catalyst-total" && pacman -Rdds --noconfirm catalyst-total
     package_install "mesa-libgl"
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
-    [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
+    [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/ati.conf
     package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
     if [[ ${ARCHI} == x86_64 ]]; then
       is_package_installed "lib32-catalyst-utils" && pacman -Rdds --noconfirm lib32-catalyst-utils
@@ -1144,7 +1145,7 @@ install_desktop_environment(){
       aur_package_install "cinnamon-applet-screenshot-record"
       aur_package_install "cinnamon-extension-coverflow-alt-tab"
       # config xinitrc
-      config_xinitrc "gnome-session-cinnamon"
+      config_xinitrc "cinnamon-session"
       #Tweaks
       sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-effect scale
       sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-time 250
@@ -2706,7 +2707,7 @@ install_video_apps(){
                   package_install "openshot"
                   ;;
                 7)
-                  package_install "pitivi"
+                  package_install "pitivi frei0r-plugins"
                   ;;
                 8)
                   aur_package_install "kazam-bzr"
@@ -3528,8 +3529,8 @@ install_fonts(){
         3)
           package_remove "ttf-droid"
           package_remove "ttf-roboto"
-          package_remove "cantarell-fonts"
-          package_remove "ttf-ubuntu-font-family"
+          pacman -Rdds --noconfirm "cantarell-fonts"
+          pacman -Rdds --noconfirm "ttf-ubuntu-font-family"
           package_remove "otf-oswald-ib"
           aur_package_install "ttf-google-fonts-git"
           ;;
