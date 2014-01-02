@@ -228,7 +228,7 @@ format_device(){
     done
   }
   function check_mountpoint(){
-    if mount|grep $2; then
+    if mount | grep $2; then
       echo "Successfully mounted"
       remove_partition "$1"
     else
@@ -403,10 +403,11 @@ configure_mkinitcpio(){
 install_bootloader(){
   print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
   print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
+  [[ $UEFI -eq 1 ]] && print_warning "\tUEFI Mode Detected" || print_warning "\tBIOS Mode Detected"
+  print_danger "\tGRUB is broken [https://bugs.archlinux.org/task/37904]"
   bootloader=("Grub2" "Syslinux" "Skip")
   PS3="$prompt1"
   echo -e "Install bootloader:\n"
-  print_warning "Grub is broken [https://bugs.archlinux.org/task/37904]"
   select BOOTLOADER in "${bootloader[@]}"; do
     case "$REPLY" in
       1)
@@ -447,7 +448,7 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             if [[ $UEFI -eq 1 ]]; then
-              arch_chroot "mount -t efivarfs efivarfs /sys/firmware/efi/efivars && grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck && umount -R /sys/firmware/efi/efivars"
+              arch_chroot "grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck"
             else
               arch_chroot "grub-install --target=i386-pc --recheck --debug ${BOOT_DEVICE}"
             fi
@@ -525,7 +526,7 @@ finish(){
 print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
 print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
 pause_function
-check_boot_system
+check_boot_type
 check_connection
 pacman -Sy
 while true

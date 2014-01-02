@@ -126,7 +126,7 @@
       fi
     done
   } #}}}
-  check_boot_system() { # {{{
+  check_boot_type() { # {{{
     if [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Inc.' ]] || [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Computer, Inc.' ]]; then
       modprobe -r -q efivars || true  # if MAC
     else
@@ -134,8 +134,8 @@
     fi
     if [[ -d "/sys/firmware/efi/" ]]; then
       ## Mount efivarfs if it is not already mounted
-      if [[ ! "$(mount | grep /sys/firmware/efi/efivars)" ]]; then
-          mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+      if [[ -z $(mount | grep /sys/firmware/efi/efivars) ]]; then
+        mount -t efivarfs efivarfs /sys/firmware/efi/efivars
       fi
       UEFI=1
       echo "UEFI Mode detected"
@@ -319,7 +319,10 @@
     echo -e "${Bold}$1${Reset}\n" | fold -sw $(( $T_COLS - 18 )) | sed 's/^/\t/'
   } #}}}
   print_warning() { #{{{
-    #Console width number
+    T_COLS=`tput cols`
+    echo -e "${BYellow}$1${Reset}\n" | fold -sw $(( $T_COLS - 1 ))
+  } #}}}
+  print_danger() { #{{{
     T_COLS=`tput cols`
     echo -e "${BRed}$1${Reset}\n" | fold -sw $(( $T_COLS - 1 ))
   } #}}}

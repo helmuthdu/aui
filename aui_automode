@@ -80,6 +80,9 @@
   #10) OpenBox
   DESKTOPENV=3
   #KDE {{{
+    # 1) Full
+    # 2) Minimal
+    KDE_INSTALL="1"
     # 1) Apper
     # 2) Choqok
     # 3) Digikam

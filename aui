@@ -398,7 +398,7 @@ install_powerpill (){
 automatic_mode(){
   print_title "AUTOMATIC MODE"
   print_info "Create a custom install with all options pre-selected.\nUse this option with care."
-  print_warning "\tUse this mode only if you already know all the option.\n\tYou won't be able to select anything later."
+  print_danger "\tUse this mode only if you already know all the option.\n\tYou won't be able to select anything later."
   read_input_text "Enable Automatic Mode"
   if [[ $OPTION == y ]]; then
     $EDITOR ${AUI_DIR}/aui_automode
@@ -1221,26 +1221,25 @@ install_desktop_environment(){
       #KDE {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
-      kde_install=("Full install" "Minimal install");
-      PS3="$prompt1"
-      echo -e "Select kde installation: \n"
-      select OPT in "${kde_install[@]}"; do
-        case "$REPLY" in
-          1)
-            package_install "kde phonon-gstreamer kde-l10n-$LOCALE_KDE kipi-plugins"
-            package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite kdenetwork-kopete kdebase-konqueror"
-            package_install "kde-telepathy telepathy"
-            break
-            ;;
-          2)
-            package_install "kdebase phonon-gstreamer kde-l10n-$LOCALE_KDE"
-            break
-            ;;
-          *)
-            invalid_option
-            ;;
-        esac
-      done
+      echo " 1) Full install"
+      echo " 2) Minimal install"
+      echo ""
+      read_input $KDE_INSTALL
+      case "$OPTION" in
+        1)
+          package_install "kde phonon-gstreamer kde-l10n-$LOCALE_KDE kipi-plugins"
+          package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite kdenetwork-kopete kdebase-konqueror"
+          package_install "kde-telepathy telepathy"
+          break
+          ;;
+        2)
+          package_install "kdebase phonon-gstreamer kde-l10n-$LOCALE_KDE"
+          break
+          ;;
+        *)
+          invalid_option
+          ;;
+      esac
       package_install "xdg-user-dirs"
       aur_package_install "kde-gtk-config"
       aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
@@ -3646,7 +3645,7 @@ install_extra(){
 #FINISH {{{
 finish(){
   print_title "WARNING: PACKAGES INSTALLED FROM AUR"
-  print_warning "List of packages not officially supported that may kill your cat:"
+  print_danger "List of packages not officially supported that may kill your cat:"
   pause_function
   AUR_PKG_LIST="${AUI_DIR}/aur_pkg_list.log"
   pacman -Qm | awk '{print $1}' > $AUR_PKG_LIST
@@ -3721,7 +3720,7 @@ do
         ;;
       2)
         if [[ checklist[1] -eq 0 ]]; then
-          print_warning "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
+          print_danger "\nWARNING: YOU MUST RUN THE BASIC SETUP FIRST"
           read_input_text "Are you sure you want to continue?"
           [[ $OPTION != y ]] && continue
         fi
@@ -3783,7 +3782,7 @@ do
         checklist[15]=1
         ;;
       16)
-        print_warning "\nWARNING: THIS OPTION WILL RECONFIGURE THINGS LIKE HOSTNAME, TIMEZONE, CLOCK..."
+        print_danger "\nWARNING: THIS OPTION WILL RECONFIGURE THINGS LIKE HOSTNAME, TIMEZONE, CLOCK..."
         read_input_text "Are you sure you want to continue?"
         [[ $OPTION != y ]] && continue
         reconfigure_system
