@@ -253,7 +253,14 @@ format_device(){
               format_partition "$DEVICE" "$MOUNTPOINT"
               ;;
             EFI)
-              format_partition "$DEVICE" "$MOUNTPOINT"/boot/efi
+              read_input_text "Format $DEVICE partition"
+              if [[ $OPTION == y ]]; then
+                format_partition "$DEVICE" "$MOUNTPOINT/boot/efi" "vfat"
+              else
+                mkdir -p "$MOUNTPOINT/boot/efi"
+                mount "$DEVICE" "$MOUNTPOINT/boot/efi"
+                check_mountpoint "$DEVICE" "$MOUNTPOINT/boot/efi"
+              fi
               ;;
             another)
               read -p "Mountpoint [ex: /home]:" DIR
@@ -536,7 +543,7 @@ do
   echo " 2) $(mainmenu_item "${checklist[2]}" "Select Editor")"
   echo " 3) $(mainmenu_item "${checklist[3]}" "Configure Mirrorlist")"
   echo " 4) $(mainmenu_item "${checklist[4]}" "Create Partition")"
-  echo " 5) $(mainmenu_item "${checklist[5]}" "Format Device")"
+  echo " 5) $(mainmenu_item "${checklist[5]}" "Select|Format Partiton")"
   echo " 6) $(mainmenu_item "${checklist[6]}" "Install Base System")"
   echo " 7) $(mainmenu_item "${checklist[7]}" "Configure Fstab")"
   echo " 8) $(mainmenu_item "${checklist[8]}" "Configure Hostname")"
