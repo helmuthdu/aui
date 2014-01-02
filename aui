@@ -1173,7 +1173,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-      2)
+    2)
       #E17 {{{
       print_title "E17 - http://wiki.archlinux.org/index.php/E17"
       print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
@@ -1193,7 +1193,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-      3)
+    3)
       #GNOME {{{
       print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
@@ -1217,7 +1217,7 @@ install_desktop_environment(){
       add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
       ;;
       #}}}
-      4)
+    4)
       #KDE {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
@@ -1326,7 +1326,7 @@ install_desktop_environment(){
       KDE=1
       ;;
       #}}}
-      5)
+    5)
       #LXDE {{{
       print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
       print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
@@ -1347,7 +1347,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-      6)
+    6)
       #XFCE {{{
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
@@ -1364,7 +1364,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-      7)
+    7)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
       print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
@@ -1388,7 +1388,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-      8)
+    8)
       #FLUXBOX {{{
       print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
       print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
@@ -1407,7 +1407,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-      9)
+    9)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -1429,11 +1429,12 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-      "b")
+    "b")
       break
       ;;
     *)
       invalid_option
+      install_desktop_environment
       ;;
   esac
   #MTP SUPPORT {{{
