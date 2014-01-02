@@ -143,7 +143,7 @@ create_partition(){
 format_device(){
   print_title "https://wiki.archlinux.org/index.php/Format_a_device"
   print_info "This step will select and format the selected partiton where the archlinux will be installed"
-  print_warning "\tAll data on the ROOT and SWAP partition will be LOST."
+  print_danger "\tAll data on the ROOT and SWAP partition will be LOST."
   i=0
   partitions=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd'`)
 
