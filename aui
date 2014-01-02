@@ -1226,18 +1226,13 @@ install_desktop_environment(){
       echo ""
       read_input $KDE_INSTALL
       case "$OPTION" in
-        1)
+        2)
+          package_install "kdebase phonon-gstreamer kde-l10n-$LOCALE_KDE"
+          ;;
+        *)
           package_install "kde phonon-gstreamer kde-l10n-$LOCALE_KDE kipi-plugins"
           package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite kdenetwork-kopete kdebase-konqueror"
           package_install "kde-telepathy telepathy"
-          break
-          ;;
-        2)
-          package_install "kdebase phonon-gstreamer kde-l10n-$LOCALE_KDE"
-          break
-          ;;
-        *)
-          invalid_option
           ;;
       esac
       package_install "xdg-user-dirs"
