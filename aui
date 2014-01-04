@@ -3339,20 +3339,69 @@ install_games(){
 #}}}
 #WEBSERVER {{{
 install_web_server(){
-  create_sites_folder(){ #{{{
-    [[ ! -f  /etc/httpd/conf/extra/httpd-userdir.conf.aui ]] && cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
-    replace_line 'public_html' 'Sites' /etc/httpd/conf/extra/httpd-userdir.conf
-    su - ${USER_NAME} -c "mkdir -p ~/Sites"
-    su - ${USER_NAME} -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
-    print_line
-    echo "The folder \"Sites\" has been created in your home"
-    echo "You can access your projects at \"http://localhost/~username\""
-    pause_function
-  } #}}}
   install_adminer(){ #{{{
     aur_package_install "adminer"
     local ADMINER=`cat /etc/httpd/conf/httpd.conf | grep Adminer`
     [[ -z $ADMINER ]] && echo -e '\n# Adminer Configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
+  } #}}}
+  install_mariadb(){ #{{{
+    package_install "mariadb"
+    /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+    system_ctl enable mysqld
+    systemctl start mysqld
+    /usr/bin/mysql_secure_installation
+  } #}}}
+  install_postgresql(){ #{{{
+    package_install "postgresql"
+    systemd-tmpfiles --create postgresql.conf
+    mkdir -p /var/lib/postgres
+    chown -R postgres:postgres /var/lib/postgres
+    echo "Enter your new postgres account password:"
+    passwd postgres
+    su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
+    system_ctl enable postgresql
+    system_ctl start postgresql
+    read_input_text "Install Postgis" $POSTGIS
+    [[ $OPTION == y ]] && install_postgis
+  } #}}}
+  install_postgis(){ #{{{
+    package_install "postgis"
+    sudo -u postgres createuser --superuser $USER_NAME
+    sudo -u postgres createdb $USER_NAME
+    sudo -u ${USER_NAME} psql -d postgres -c "UPDATE pg_database SET datistemplate=FALSE WHERE datname='template1';"
+    sudo -u ${USER_NAME} psql -d postgres -c "DROP DATABASE template1;"
+    sudo -u ${USER_NAME} psql -d postgres -c "CREATE DATABASE template1 WITH TEMPLATE = template0 ENCODING = 'UNICODE';"
+    sudo -u ${USER_NAME} psql -d postgres -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template1';"
+    sudo -u ${USER_NAME} psql -d postgres -c "\c template1"
+    sudo -u ${USER_NAME} psql -d postgres -c "VACUUM FREEZE;"
+    sudo -u ${USER_NAME} psql -d postgres -c "UPDATE pg_database SET datallowconn=FALSE WHERE datname='template1';"
+
+    POSTGIS_VERSION=`pacman -Qi postgis | sed '2!d' | awk '{print substr($3,0,3)}'`
+    POSTGIS_PATH=`pg_config --sharedir`/contrib/postgis-$POSTGIS_VERSION
+
+    sudo -u ${USER_NAME} psql -d postgres -c "UPDATE pg_database SET datistemplate=FALSE WHERE datname='template_postgis';"
+    sudo -u ${USER_NAME} dropdb template_postgis
+
+    sudo -u ${USER_NAME} createdb -E UTF8 template_postgis
+    sudo -u ${USER_NAME} createlang -d template_postgis plpgsql
+    sudo -u ${USER_NAME} psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis';"
+
+    #PostGIS:
+        sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/postgis.sql
+        sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/spatial_ref_sys.sql
+        #psql -d template_postgis -f $POSTGIS_PATH/postgis_comments.sql
+    #with raster support:
+        sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/rtpostgis.sql
+        #sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/raster_comments.sql
+    #with topology support:
+        #sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/topology.sql
+        #sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/topology_comments.sql
+
+    sudo -u ${USER_NAME} psql -d template_postgis -c "GRANT ALL ON geometry_columns TO PUBLIC;"
+    sudo -u ${USER_NAME} psql -d template_postgis -c "GRANT ALL ON geography_columns TO PUBLIC;"
+    sudo -u ${USER_NAME} psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
+
+    echo -e "GeoDB Template: createdb -T template_postgis -E UTF8 <db_name>"
   } #}}}
   configure_php(){ #{{{
     if [[ -f /etc/php/php.ini.pacnew ]]; then
@@ -3364,13 +3413,13 @@ install_web_server(){
     if [[ $1 == mariadb ]]; then
       sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
       sed -i '/mysql.so/s/^;//' /etc/php/php.ini
+      sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
     else
       sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
     fi
     sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
     sed -i '/gd.so/s/^;//' /etc/php/php.ini
     sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
-    sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
   } #}}}
   configure_php_apache(){ #{{{
     if [[ -f /etc/httpd/conf/httpd.conf.pacnew ]]; then
@@ -3391,9 +3440,19 @@ install_web_server(){
       mv -v /etc/nginx/nginx.conf.pacnew /etc/nginx/nginx.conf
       rm -v /etc/nginx/nginx.conf.aui
     fi
-    [[ -f /etc/nginx/nginx.conf.aui ]] && echo "/etc/nginx/nginx.conf.aui" || cp -v /etc/nginx/nginx.conf /etc/nginx/nginx.conf.aui
-    sed -i '/location \~ \\.php\$ {/,/\}/d' /etc/nginx/nginx.conf
-    sed -i -e '/pass the PHP/a\\t#\n\tlocation ~ \.php$ {\n\t\tfastcgi_pass\tunix:/var/run/php-fpm/php-fpm.sock;\n\t\tfastcgi_index\tindex.php;\n\t\troot\t\t/srv/http;\n\t\tinclude\t\tfastcgi.conf;\n\t}' /etc/nginx/nginx.conf
+    [[ -f /etc/nginx/nginx.conf.aui ]] && cp -v /etc/nginx/nginx.conf.aui /etc/nginx/nginx.conf || cp -v /etc/nginx/nginx.conf /etc/nginx/nginx.conf.aui
+    sed -i -e '/location ~ \.php$ {/,/}/d' /etc/nginx/nginx.conf
+    sed -i -e '/pass the PHP/a\        #\n        location ~ \.php$ {\n            fastcgi_pass   unix:/var/run/php-fpm/php-fpm.sock;\n            fastcgi_index  index.php;\n            root           /srv/http;\n            include        fastcgi.conf;\n        }' /etc/nginx/nginx.conf
+  } #}}}
+  create_sites_folder(){ #{{{
+    [[ ! -f  /etc/httpd/conf/extra/httpd-userdir.conf.aui ]] && cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
+    replace_line 'public_html' 'Sites' /etc/httpd/conf/extra/httpd-userdir.conf
+    su - ${USER_NAME} -c "mkdir -p ~/Sites"
+    su - ${USER_NAME} -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
+    print_line
+    echo "The folder \"Sites\" has been created in your home"
+    echo "You can access your projects at \"http://localhost/~username\""
+    pause_function
   } #}}}
   print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
   print_info "*Adminer is installed by default in all options"
@@ -3407,60 +3466,38 @@ install_web_server(){
   read_input $WEBSERVER
   case "$OPTION" in
     1)
-      package_install "apache mariadb php php-apache php-mcrypt php-gd"
+      package_install "apache php php-apache php-mcrypt php-gd"
+      install_mariadb
       install_adminer
       system_ctl enable httpd
-      /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-      system_ctl enable mysqld
-      systemctl start mysqld
-      /usr/bin/mysql_secure_installation
       configure_php_apache
       configure_php "mariadb"
       create_sites_folder
       ;;
     2)
-      package_install "apache postgresql php php-apache php-pgsql php-gd"
+      package_install "apache php php-apache php-pgsql php-gd"
+      install_postgresql
       install_adminer
-      systemd-tmpfiles --create postgresql.conf
-      mkdir -p /var/lib/postgres
-      chown -R postgres:postgres /var/lib/postgres
-      echo "Enter your new postgres account password:"
-      passwd postgres
-      su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
       system_ctl enable httpd
-      system_ctl enable postgresql
       configure_php_apache
       configure_php "postgresql"
       create_sites_folder
       ;;
     3)
-      package_install "nginx mariadb php php-mcrypt php-fpm"
-      install_adminer
-      /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-      system_ctl enable mysqld
-      systemctl start mysqld
-      /usr/bin/mysql_secure_installation
+      package_install "nginx php php-mcrypt php-fpm"
+      install_mariadb
       system_ctl enable nginx
       system_ctl enable php-fpm
       configure_php_nginx
       configure_php "mariadb"
-      create_sites_folder
       ;;
     4)
-      package_install "nginx postgresql php php-fpm php-pgsql"
-      install_adminer
-      systemd-tmpfiles --create postgresql.conf
-      mkdir -p /var/lib/postgres
-      chown -R postgres:postgres /var/lib/postgres
-      echo "Enter your new postgres account password:"
-      passwd postgres
-      su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
+      package_install "nginx php php-fpm php-pgsql"
+      install_postgresql
       system_ctl enable nginx
-      system_ctl enable postgresql
       system_ctl enable php-fpm
       configure_php_nginx
       configure_php "postgresql"
-      create_sites_folder
       ;;
   esac
 }
