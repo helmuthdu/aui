@@ -3354,6 +3354,47 @@ install_web_server(){
     local ADMINER=`cat /etc/httpd/conf/httpd.conf | grep Adminer`
     [[ -z $ADMINER ]] && echo -e '\n# Adminer Configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
   } #}}}
+  configure_php(){ #{{{
+    if [[ -f /etc/php/php.ini.pacnew ]]; then
+      mv -v /etc/php/php.ini /etc/php/php.ini.pacold
+      mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
+      rm -v /etc/php/php.ini.aui
+    fi
+    [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/php/php.ini /etc/php/php.ini.aui
+    if [[ $1 == mariadb ]]; then
+      sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
+      sed -i '/mysql.so/s/^;//' /etc/php/php.ini
+    else
+      sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
+    fi
+    sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
+    sed -i '/gd.so/s/^;//' /etc/php/php.ini
+    sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
+    sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
+  } #}}}
+  configure_php_apache(){ #{{{
+    if [[ -f /etc/httpd/conf/httpd.conf.pacnew ]]; then
+      mv -v /etc/httpd/conf/httpd.conf.pacnew /etc/httpd/conf/httpd.conf
+      rm -v /etc/httpd/conf/httpd.conf.aui
+    fi
+    [[ -f /etc/httpd/conf/httpd.conf.aui ]] && echo "/etc/httpd/conf/httpd.conf.aui" || cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
+    local MOD_PHP=`cat /etc/httpd/conf/httpd.conf | grep php5_module.conf`
+    if [[ -z $MOD_PHP ]]; then
+      echo -e 'application/x-httpd-php5		php php5' >> /etc/httpd/conf/mime.types
+      sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
+      echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
+      replace_line 'DirectoryIndex\ index.html' 'DirectoryIndex\ index.html\ index.php' /etc/httpd/conf/httpd.conf
+    fi
+  } #}}}
+  configure_php_nginx(){ #{{{
+    if [[ -f /etc/nginx/nginx.conf.pacnew ]]; then
+      mv -v /etc/nginx/nginx.conf.pacnew /etc/nginx/nginx.conf
+      rm -v /etc/nginx/nginx.conf.aui
+    fi
+    [[ -f /etc/nginx/nginx.conf.aui ]] && echo "/etc/nginx/nginx.conf.aui" || cp -v /etc/nginx/nginx.conf /etc/nginx/nginx.conf.aui
+    sed -i '/location \~ \\.php\$ {/,/\}/d' /etc/nginx/nginx.conf
+    sed -i -e '/pass the PHP/a\\t#\n\tlocation ~ \.php$ {\n\t\tfastcgi_pass\tunix:/var/run/php-fpm/php-fpm.sock;\n\t\tfastcgi_index\tindex.php;\n\t\troot\t\t/srv/http;\n\t\tinclude\t\tfastcgi.conf;\n\t}' /etc/nginx/nginx.conf
+  } #}}}
   print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
   print_info "*Adminer is installed by default in all options"
   echo " 1) LAMP - APACHE, MariaDB & PHP"
@@ -3373,34 +3414,8 @@ install_web_server(){
       system_ctl enable mysqld
       systemctl start mysqld
       /usr/bin/mysql_secure_installation
-      #ADD PHP SUPPORT {{{
-        if [[ -f /etc/httpd/conf/httpd.conf.pacnew ]]; then
-          mv -v /etc/httpd/conf/httpd.conf.pacnew /etc/httpd/conf/httpd.conf
-          rm -v /etc/httpd/conf/httpd.conf.aui
-        fi
-        [[ -f /etc/httpd/conf/httpd.conf.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-        local MOD_PHP=`cat /etc/httpd/conf/httpd.conf | grep php5_module.conf`
-        if [[ -z $MOD_PHP ]]; then
-          echo -e 'application/x-httpd-php5		php php5' >> /etc/httpd/conf/mime.types
-          sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
-          echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
-          replace_line 'DirectoryIndex\ index.html' 'DirectoryIndex\ index.html\ index.php' /etc/httpd/conf/httpd.conf
-        fi
-      #}}}
-      #CONFIGURE PHP.INI {{{
-        if [[ -f /etc/php/php.ini.pacnew ]]; then
-          mv -v /etc/php/php.ini /etc/php/php.ini.pacold
-          mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
-          rm -v /etc/php/php.ini.aui
-        fi
-        [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/php/php.ini /etc/php/php.ini.aui
-        sed -i '/mysqli.so/s/^;//' /etc/php/php.ini
-        sed -i '/mysql.so/s/^;//' /etc/php/php.ini
-        sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
-        sed -i '/gd.so/s/^;//' /etc/php/php.ini
-        sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
-        sed -i '/skip-networking/s/^/#/' /etc/mysql/my.cnf
-      #}}}
+      configure_php_apache
+      configure_php "mariadb"
       create_sites_folder
       ;;
     2)
@@ -3414,32 +3429,8 @@ install_web_server(){
       su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
       system_ctl enable httpd
       system_ctl enable postgresql
-      #ADD PHP SUPPORT {{{
-        if [[ -f /etc/httpd/conf/httpd.conf.pacnew ]]; then
-          mv -v /etc/httpd/conf/httpd.conf.pacnew /etc/httpd/conf/httpd.conf
-          rm -v /etc/httpd/conf/httpd.conf.aui
-        fi
-        [[ -f /etc/httpd/conf/httpd.conf.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-        local MOD_PHP=`cat /etc/httpd/conf/httpd.conf | grep php5_module.conf`
-        if [[ -z $MOD_PHP ]]; then
-          echo -e 'application/x-httpd-php5		php php5' >> /etc/httpd/conf/mime.types
-          sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
-          echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
-          replace_line 'DirectoryIndex\ index.html' 'DirectoryIndex\ index.html\ index.php' /etc/httpd/conf/httpd.conf
-        fi
-      #}}}
-      #CONFIGURE PHP.INI {{{
-        if [[ -f /etc/php/php.ini.pacnew ]]; then
-          mv -v /etc/php/php.ini /etc/php/php.ini.pacold
-          mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
-          rm -v /etc/php/php.ini.aui
-        fi
-        [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/php/php.ini /etc/php/php.ini.aui
-        sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
-        sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
-        sed -i '/gd.so/s/^;//' /etc/php/php.ini
-        sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
-      #}}}
+      configure_php_apache
+      configure_php "postgresql"
       create_sites_folder
       ;;
     3)
@@ -3451,18 +3442,8 @@ install_web_server(){
       /usr/bin/mysql_secure_installation
       system_ctl enable nginx
       system_ctl enable php-fpm
-      #CONFIGURE PHP.INI {{{
-        if [[ -f  /etc/php/php.ini.pacnew ]]; then
-          mv -v /etc/php/php.ini /etc/php/php.ini.pacold
-          mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
-          rm -v /etc/php/php.ini.aui
-        fi
-        [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/php/php.ini /etc/php/php.ini.aui
-        sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
-        sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
-        sed -i '/gd.so/s/^;//' /etc/php/php.ini
-        sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
-      #}}}
+      configure_php_nginx
+      configure_php "mariadb"
       create_sites_folder
       ;;
     4)
@@ -3477,18 +3458,8 @@ install_web_server(){
       system_ctl enable nginx
       system_ctl enable postgresql
       system_ctl enable php-fpm
-      #CONFIGURE PHP.INI {{{
-        if [[ -f  /etc/php/php.ini.pacnew ]]; then
-          mv -v /etc/php/php.ini /etc/php/php.ini.pacold
-          mv -v /etc/php/php.ini.pacnew /etc/php/php.ini
-          rm -v /etc/php/php.ini.aui
-        fi
-        [[ -f /etc/php/php.ini.aui ]] && echo "/etc/php/php.ini.aui" || cp -v /etc/php/php.ini /etc/php/php.ini.aui;
-        sed -i '/pgsql.so/s/^;//' /etc/php/php.ini
-        sed -i '/mcrypt.so/s/^;//' /etc/php/php.ini
-        sed -i '/gd.so/s/^;//' /etc/php/php.ini
-        sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
-      #}}}
+      configure_php_nginx
+      configure_php "postgresql"
       create_sites_folder
       ;;
   esac

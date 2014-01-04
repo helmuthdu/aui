@@ -176,7 +176,9 @@ format_device(){
     read_input_text "Confirm format $1 partition"
     if [[ $OPTION == y ]]; then
       [[ -z $3 ]] && select_filesystem
-      mkfs.$TYPE $1
+      mkfs.$TYPE $1 \
+        $([[ $TYPE == xfs || $TYPE == btrfs ]] && echo "-f") \
+        $([[ $TYPE == vfat ]] && echo "-F32")
       fsck $1
       mkdir -p $2
       mount -t $TYPE $1 $2
