@@ -2437,7 +2437,7 @@ install_audio_apps(){
             echo " 3) $(menu_item "banshee")"
             echo " 4) $(menu_item "clementine")"
             echo " 5) $(menu_item "deadbeef")"
-            echo " 6) $(menu_item "exaile") $AUR"
+            echo " 6) $(menu_item "guayadeque")"
             echo " 7) $(menu_item "musique") $AUR"
             echo " 8) $(menu_item "nuvolaplayer") $AUR"
             echo " 9) $(menu_item "rhythmbox")"
@@ -2446,7 +2446,6 @@ install_audio_apps(){
             echo "12) $(menu_item "tomahawk") $AUR"
             echo "13) $(menu_item "timidity++")"
             echo "14) $(menu_item "xnoise")"
-            echo "15) $(menu_item "guayadeque")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2470,7 +2469,7 @@ install_audio_apps(){
                   package_install "deadbeef"
                   ;;
                 6)
-                  aur_package_install "exaile"
+                  package_install "guayadeque"
                   ;;
                 7)
                   aur_package_install "musique"
@@ -2497,9 +2496,6 @@ install_audio_apps(){
                 14)
                   package_install "xnoise"
                   ;;
-                15)
-                  package_install "guayadeque"
-                ;;
                 "b")
                   break
                   ;;
