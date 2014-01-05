@@ -439,6 +439,7 @@ install_bootloader(){
         else
           print_warning "\tERROR: You are not booting using EFI.  Please choose another bootloader."
           invalid_option
+        fi
         break
         ;;
       4)
