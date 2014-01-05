@@ -2498,7 +2498,7 @@ install_audio_apps(){
                   package_install "xnoise"
                   ;;
                 15)
-                package_install "guayadeque"
+                  package_install "guayadeque"
                 ;;
                 "b")
                   break
@@ -2612,7 +2612,7 @@ install_video_apps(){
             echo " 7) $(menu_item "smplayer")"
             echo " 8) $(menu_item "vlc")"
             echo " 9) $(menu_item "xbmc")"
-            echo " 10) $(menu_item "mpv")"
+            echo "10) $(menu_item "mpv")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2652,7 +2652,8 @@ install_video_apps(){
                   add_user_to_group ${USER_NAME} xbmc
                   ;;
                 10)
-                  package_install "mpv"  
+                  package_install "mpv"
+                  ;;
                 "b")
                   break
                   ;;
