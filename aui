@@ -897,7 +897,7 @@ install_desktop_environment(){
             package_install "faience-icon-theme"
             ;;
           3)
-            aur_package_install "moka-icon-theme-git moka-symbolic-icon-theme-git moka-extras-icon-theme-git"
+            aur_package_install "moka-icon-theme-git"
             ;;
           4)
             aur_package_install "nitrux-icon-theme"
