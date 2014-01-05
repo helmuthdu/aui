@@ -353,6 +353,7 @@
     # 7) SMplayer
     # 8) VLC
     # 9) XBMC
+    #10) mpv
     VIDEO_PLAYER_OPTIONS="8 9"
   #}}}
   #EDITORS|TOOLS {{{
