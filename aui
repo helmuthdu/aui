@@ -2191,15 +2191,6 @@ install_internet_apps(){
                   ;;
                 4)
                   aur_package_install "dropbox"
-                  if is_package_installed "nautilus" ; then
-                    aur_package_install "nautilus-dropbox"
-                  elif is_package_installed "thunar" ; then
-                    aur_package_install "thunar-dropbox"
-                  elif is_package_installed "kdebase-dolphin" ; then
-                    aur_package_install "kfilebox"
-                  else
-                    aur_package_install "dropbox-cli"
-                  fi
                   add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
                   ;;
                 5)
