@@ -521,7 +521,7 @@ configure_bootloader(){
       gummiboot_install_mode=("Yes" "No")
       PS3="$prompt1"
       echo -e "Continue?\n"
-      select OFF in "$[gummiboot_install_mode[@])"; do
+      select OFF in "${gummiboot_install_mode[@]}"; do
         case "$REPLY" in
           1)
             arch_chroot "gummiboot install"
