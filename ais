@@ -525,6 +525,7 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             arch_chroot "gummiboot install"
+            ;;
           2)
             break
             ;;
