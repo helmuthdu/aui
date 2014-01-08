@@ -536,7 +536,6 @@ configure_bootloader(){
         esac
       done
       ;;
-  esac
   pause_function
 }
 #}}}
