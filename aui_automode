@@ -319,7 +319,7 @@
     # 3) Banshee
     # 4) Clementine
     # 5) Deadbeef
-    # 6) Exaile
+    # 6) Guayadeque
     # 7) Musique
     # 8) Nuvola
     # 9) Rhythmbox
@@ -328,7 +328,7 @@
     #12) Tomahawk
     #13) Timidity++
     #14) Xnoise
-    AUDIO_PLAYER_OPTIONS="9"
+    AUDIO_PLAYER_OPTIONS="4"
   #}}}
   #EDITORS|TOOLS {{{
     # 1) Soundconverter|Soundkonverter
@@ -353,6 +353,7 @@
     # 7) SMplayer
     # 8) VLC
     # 9) XBMC
+    #10) mpv
     VIDEO_PLAYER_OPTIONS="8 9"
   #}}}
   #EDITORS|TOOLS {{{
@@ -488,6 +489,7 @@
   # 3) LEMP - NGINX, MariaDB & PHP
   # 4) LEPP - NGINX, POSTGRESQL & PHP
   WEBSERVER=4
+  POSTGIS="n"
 #}}}
 #FONTS {{{
   # 1) ttf-dejavu
