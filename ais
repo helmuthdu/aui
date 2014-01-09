@@ -414,7 +414,7 @@ install_bootloader(){
   print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
   [[ $UEFI -eq 1 ]] && print_warning "\tUEFI Mode Detected" || print_warning "\tBIOS Mode Detected"
   print_danger "\tGRUB is broken [https://bugs.archlinux.org/task/37904]"
-  bootloader=("Grub2" "Syslinux" "Gummiboot (choose only if booting with EFI)" "Skip")
+  bootloader=("Grub2" "Syslinux" "Gummiboot" "Skip")
   PS3="$prompt1"
   echo -e "Install bootloader:\n"
   select BOOTLOADER in "${bootloader[@]}"; do
