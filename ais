@@ -139,7 +139,7 @@ create_partition(){
   done
 }
 #}}}
-#FORMAT DEVICE {{{
+#SELECT|FORMAT DEVICE {{{
 format_device(){
   print_title "https://wiki.archlinux.org/index.php/Format_a_device"
   print_info "This step will select and format the selected partiton where the archlinux will be installed"
@@ -255,13 +255,23 @@ format_device(){
               format_partition "$DEVICE" "$MOUNTPOINT"
               ;;
             EFI)
+              efi_options=("/boot/efi" "/boot")
+              PS3="$prompt1"
+              echo -e "Select EFI mountpoint:\n"
+              select EFIDIR in "${efi_options[@]}"; do
+                if contains_element "$EFIDIR" "${efi_options[@]}"; then
+                  break
+                else
+                  invalid_option
+                fi
+              done
               read_input_text "Format $DEVICE partition"
               if [[ $OPTION == y ]]; then
-                format_partition "$DEVICE" "$MOUNTPOINT/boot" "vfat"
+                format_partition "$DEVICE" "$MOUNTPOINT$EFIDIR" "vfat"
               else
-                mkdir -p "$MOUNTPOINT/boot"
-                mount "$DEVICE" "$MOUNTPOINT/boot"
-                check_mountpoint "$DEVICE" "$MOUNTPOINT/boot"
+                mkdir -p "$MOUNTPOINT$EFIDIR"
+                mount "$DEVICE" "$MOUNTPOINT$EFIDIR"
+                check_mountpoint "$DEVICE" "$MOUNTPOINT$EFIDIR"
               fi
               ;;
             another)
@@ -277,7 +287,6 @@ format_device(){
                   mount -t $TYPE $DEVICE $MOUNTPOINT$DIR
                   check_mountpoint "$DEVICE" "$MOUNTPOINT$DIR"
                 fi
-                [[ $DIR == "/boot" ]] && BOOT_DEVICE=$DEVICE
               fi
               ;;
           esac
@@ -412,8 +421,13 @@ configure_mkinitcpio(){
 install_bootloader(){
   print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
   print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
-  [[ $UEFI -eq 1 ]] && print_warning "\tUEFI Mode Detected" || print_warning "\tBIOS Mode Detected"
-  bootloader=("Grub2" "Syslinux" "Gummiboot" "Skip")
+  if [[ $UEFI -eq 1 ]]; then
+    print_warning "\tUEFI Mode Detected"
+    bootloader=("Grub2" "Syslinux" "Gummiboot" "Skip")
+  else
+    print_warning "\tBIOS Mode Detected"
+    bootloader=("Grub2" "Syslinux" "Skip")
+  fi
   PS3="$prompt1"
   echo -e "Install bootloader:\n"
   select BOOTLOADER in "${bootloader[@]}"; do
@@ -433,16 +447,10 @@ install_bootloader(){
         break
         ;;
       3)
-	    if [[ $UEFI -eq 1 ]]; then
-          pacstrap $MOUNTPOINT gummiboot
-        else
-          print_warning "\tERROR: You are not booting using EFI.  Please choose another bootloader."
-          invalid_option
-        fi
-        break
+        [[ $UEFI -eq 1 ]] && pacstrap $MOUNTPOINT gummiboot || break
         ;;
       4)
-        break
+        [[ $UEFI -eq 1 ]] && break || invalid_option
         ;;
       *)
         invalid_option
@@ -465,7 +473,7 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             if [[ $UEFI -eq 1 ]]; then
-              arch_chroot "grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=arch_grub --recheck"
+              arch_chroot "grub-install --target=x86_64-efi --efi-directory=$EFIDIR --bootloader-id=arch_grub --recheck"
             else
               arch_chroot "grub-install --target=i386-pc --recheck --debug ${BOOT_DEVICE}"
             fi
@@ -492,11 +500,13 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             arch_chroot "syslinux-install_update -iam"
+            sed -i "s/sda3/${ROOT_DEVICE}/" $MOUNTPOINT/boot/syslinux/syslinux.cfg
             $EDITOR $MOUNTPOINT/boot/syslinux/syslinux.cfg
             break
             ;;
           2)
             arch_chroot "syslinux-install_update -i"
+            sed -i "s/sda3/${ROOT_DEVICE}/" $MOUNTPOINT/boot/syslinux/syslinux.cfg
             $EDITOR $MOUNTPOINT/boot/syslinux/syslinux.cfg
             break
             ;;
@@ -510,16 +520,16 @@ configure_bootloader(){
           *)
             invalid_option
             ;;
-      esac
+        esac
       done
       ;;
     Gummiboot)
       print_title "GUMMIBOOT - https://wiki.archlinux.org/index.php/Gummiboot"
       print_info "Gummiboot is a UEFI boot manager written by Kay Sievers and Harald Hoyer. It is simple to configure, but can only start EFI executables, the Linux kernel EFISTUB, UEFI Shell, grub.efi, and such."
-      print_danger "\tGummiboot heavily suggests that /boot is mounted to the EFI partition, not /boot/efi, in order to simplify updating and configuration."
-      gummiboot_install_mode=("Yes" "No")
+      print_warning "\tGummiboot heavily suggests that /boot is mounted to the EFI partition, not /boot/efi, in order to simplify updating and configuration."
+      gummiboot_install_mode=("Automatic" "Manual")
       PS3="$prompt1"
-      echo -e "Continue?\n"
+      echo -e "Grummiboot install:\n"
       select OFF in "${gummiboot_install_mode[@]}"; do
         case "$REPLY" in
           1)
@@ -529,14 +539,15 @@ configure_bootloader(){
             break
             ;;
           2)
+            arch-chroot $MOUNTPOINT
             break
             ;;
           *)
             invalid_option
             ;;
         esac
-        done
-        ;;
+      done
+      ;;
   esac
   pause_function
 }

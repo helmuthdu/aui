@@ -61,6 +61,7 @@
   # ARCHITECTURE
   ARCHI=`uname -m`
   UEFI=0
+  EFIDIR="/boot/efi"
   # AUR PACKAGE
   AUR=`echo -e "(${BPurple}aur${Reset})"`
   EXTERNAL=`echo -e "(${BYellow}external${Reset})"`
