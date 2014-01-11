@@ -897,7 +897,8 @@ install_desktop_environment(){
             package_install "faience-icon-theme"
             ;;
           3)
-            aur_package_install "moka-icon-theme-git"
+            package_remove "moka-icon-theme-git"
+            aur_package_install "moka-icon-theme-gnome"
             ;;
           4)
             aur_package_install "nitrux-icon-theme"
@@ -2164,7 +2165,7 @@ install_internet_apps(){
           do
             print_title "DOWNLOAD|FILESHARE"
             echo " 1) $(menu_item "aerofs") $AUR"
-            echo " 2) $(menu_item "bittorrent-sync" "BitTorrent Sync") $AUR"
+            echo " 2) $(menu_item "btsync" "BitTorrent Sync") $AUR"
             echo " 3) $(menu_item "deluge")"
             echo " 4) $(menu_item "dropbox") $AUR"
             echo " 5) $(menu_item "jdownloader") $AUR"
@@ -2184,7 +2185,7 @@ install_internet_apps(){
                   aur_package_install "aerofs"
                   ;;
                 2)
-                  aur_package_install "bittorrent-sync"
+                  aur_package_install "btsync"
                   ;;
                 3)
                   package_install "deluge"

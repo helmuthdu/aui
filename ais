@@ -507,13 +507,13 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             arch_chroot "syslinux-install_update -iam"
-            sed -i "s/sda3/${ROOT_DEVICE}/" $MOUNTPOINT/boot/syslinux/syslinux.cfg
+            sed -i "s/sda3/$ROOT_DEVICE/g" $MOUNTPOINT/boot/syslinux/syslinux.cfg
             $EDITOR $MOUNTPOINT/boot/syslinux/syslinux.cfg
             break
             ;;
           2)
             arch_chroot "syslinux-install_update -i"
-            sed -i "s/sda3/${ROOT_DEVICE}/" $MOUNTPOINT/boot/syslinux/syslinux.cfg
+            sed -i "s/sda3/$ROOT_DEVICE/g" $MOUNTPOINT/boot/syslinux/syslinux.cfg
             $EDITOR $MOUNTPOINT/boot/syslinux/syslinux.cfg
             break
             ;;
