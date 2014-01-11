@@ -131,7 +131,14 @@ create_partition(){
   select OPT in "${partition_app[@]}"; do
     if contains_element "$OPT" "${partition_app[@]}"; then
       select_device
-      $OPT $DEVICE
+      case $OPT in
+        parted)
+          parted -a opt $DEVICE
+          ;;
+        *)
+          $OPT $DEVICE
+          ;;
+      esac
       break
     else
       invalid_option
@@ -311,7 +318,7 @@ format_device(){
 install_base_system(){
   print_title "INSTALL BASE SYSTEM"
   print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
-  pacstrap $MOUNTPOINT base base-devel btrfs-progs ntp
+  pacstrap $MOUNTPOINT base base-devel parted btrfs-progs ntp
   WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://'`
   if [[ -n $WIRELESS_DEV ]]; then
     pacstrap $MOUNTPOINT iw wireless_tools wpa_actiond wpa_supplicant dialog
