@@ -509,12 +509,16 @@ configure_bootloader(){
           1)
             arch_chroot "syslinux-install_update -iam"
             sed -i "s/sda3/$ROOT_DEVICE/g" $MOUNTPOINT/boot/syslinux/syslinux.cfg
+            pause_function
+            print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
             $EDITOR $MOUNTPOINT/boot/syslinux/syslinux.cfg
             break
             ;;
           2)
             arch_chroot "syslinux-install_update -i"
             sed -i "s/sda3/$ROOT_DEVICE/g" $MOUNTPOINT/boot/syslinux/syslinux.cfg
+            pause_function
+            print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
             $EDITOR $MOUNTPOINT/boot/syslinux/syslinux.cfg
             break
             ;;
@@ -541,8 +545,9 @@ configure_bootloader(){
       select OFF in "${gummiboot_install_mode[@]}"; do
         case "$REPLY" in
           1)
-            print_warning "\tPlease configure your .conf file according to the Beginners Guide (https://wiki.archlinux.org/index.php/Beginners%27_Guide#Gummiboot)"
             arch_chroot "gummiboot install"
+            print_warning "Please check your .conf file"
+            pause_function
             PARTUUID=`blkid /dev/$ROOT_DEVICE | sed 's/^.* PARTUUID=//' | awk '{print $1}' | sed 's/"//g'`
             echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=PARTUUID=$PARTUUID rw" >> $MOUNTPOINT/boot/loader/entries/arch.conf
             $EDITOR $MOUNTPOINT/boot/loader/entries/arch.conf
