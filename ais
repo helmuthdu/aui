@@ -440,21 +440,17 @@ install_bootloader(){
   select BOOTLOADER in "${bootloader[@]}"; do
     case "$REPLY" in
       1)
-        #make grub automatically detect others OS
-        if [[ $UEFI -eq 1 ]]; then
-          pacstrap $MOUNTPOINT grub efibootmgr
-        else
-          pacstrap $MOUNTPOINT grub
-        fi
-        pacstrap $MOUNTPOINT os-prober
+        pacstrap $MOUNTPOINT grub os-prober
+        [[ $UEFI -eq 1 ]] && pacstrap $MOUNTPOINT efibootmgr
         break
         ;;
       2)
         pacstrap $MOUNTPOINT syslinux
+        [[ $UEFI -eq 1 ]] && pacstrap $MOUNTPOINT efibootmgr
         break
         ;;
       3)
-        [[ $UEFI -eq 1 ]] && pacstrap $MOUNTPOINT gummiboot
+        [[ $UEFI -eq 1 ]] && pacstrap $MOUNTPOINT gummiboot efibootmgr
         break
         ;;
       4)
@@ -548,8 +544,8 @@ configure_bootloader(){
             arch_chroot "gummiboot install"
             print_warning "Please check your .conf file"
             pause_function
-            ROOT_UUID=`blkid -s PARTUUID /dev/$ROOT_DEVICE | awk '{print $2}' | sed 's/"//g'| sed 's/^.*=//'`
-            echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=PARTUUID=${ROOT_UUID} rw" >> $MOUNTPOINT/boot/loader/entries/arch.conf
+            ROOT_UUID=`blkid -s PARTUUID /dev/$ROOT_DEVICE | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
+            echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=PARTUUID=${ROOT_UUID} rw" > $MOUNTPOINT/boot/loader/entries/arch.conf
             $EDITOR $MOUNTPOINT/boot/loader/entries/arch.conf
             break
             ;;
