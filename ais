@@ -548,8 +548,8 @@ configure_bootloader(){
             arch_chroot "gummiboot install"
             print_warning "Please check your .conf file"
             pause_function
-            PARTUUID=`blkid /dev/$ROOT_DEVICE | sed 's/^.* PARTUUID=//' | awk '{print $1}' | sed 's/"//g'`
-            echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=PARTUUID=$PARTUUID rw" >> $MOUNTPOINT/boot/loader/entries/arch.conf
+            ROOT_UUID=`blkid -s PARTUUID /dev/$ROOT_DEVICE | awk '{print $2}' | sed 's/"//g'| sed 's/^.*=//'`
+            echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=PARTUUID=${ROOT_UUID} rw" >> $MOUNTPOINT/boot/loader/entries/arch.conf
             $EDITOR $MOUNTPOINT/boot/loader/entries/arch.conf
             break
             ;;
