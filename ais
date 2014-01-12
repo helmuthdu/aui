@@ -454,7 +454,7 @@ install_bootloader(){
         break
         ;;
       3)
-        [[ $UEFI -eq 1 ]] && pacstrap $MOUNTPOINT gummiboot || break
+        [[ $UEFI -eq 1 ]] && pacstrap $MOUNTPOINT gummiboot
         break
         ;;
       4)
