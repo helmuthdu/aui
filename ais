@@ -536,7 +536,7 @@ configure_bootloader(){
       print_warning "\tGummiboot heavily suggests that /boot is mounted to the EFI partition, not /boot/efi, in order to simplify updating and configuration."
       gummiboot_install_mode=("Automatic" "Manual")
       PS3="$prompt1"
-      echo -e "Grummiboot install:\n"
+      echo -e "Gummiboot install:\n"
       select OFF in "${gummiboot_install_mode[@]}"; do
         case "$REPLY" in
           1)
