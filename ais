@@ -61,9 +61,9 @@ configure_mirrorlist(){
     #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/^/"/g' | sed 's/,.*//g' | sed 's/ *$//g'  | sed 's/$/"/g' | sed -e :a -e '$!N; s/\n/ /; ta'`
     PS3="$prompt1"
     echo "Select your country:"
-    select OPT in "${countries_name[@]}"; do
-      if contains_element "$OPT" "${countries_name[@]}"; then
-        country=${countries_code[$(( $REPLY - 1 ))]}
+    select country_name in "${countries_name[@]}"; do
+      if contains_element "$country_name" "${countries_name[@]}"; then
+        contry_code=${countries_code[$(( $REPLY - 1 ))]}
         break
       else
         invalid_option
@@ -75,10 +75,10 @@ configure_mirrorlist(){
   OPTION=n
   while [[ $OPTION != y ]]; do
     country_list
-    read_input_text "Confirm country: $OPT"
+    read_input_text "Confirm country: $country_name"
   done
 
-  url="https://www.archlinux.org/mirrorlist/?country=${country}&use_mirror_status=on"
+  url="https://www.archlinux.org/mirrorlist/?country=${contry_code}&use_mirror_status=on"
 
   tmpfile=$(mktemp --suffix=-mirrorlist)
 
@@ -102,7 +102,7 @@ configure_mirrorlist(){
 #}}}
 #UMOUNT PARTITIONS {{{
 umount_partitions(){
-  mounted_partitions=(`lsblk | grep $MOUNTPOINT | awk '{print $7}' | sort -r`)
+  mounted_partitions=(`lsblk | grep ${MOUNTPOINT} | awk '{print $7}' | sort -r`)
   swapoff -a
   for i in ${mounted_partitions[@]}; do
     umount $i
@@ -114,9 +114,9 @@ create_partition(){
   select_device(){
     devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd'`);
     PS3="$prompt1"
-    echo -e "Select device:\n"
-    select DEVICE in "${devices_list[@]}"; do
-      if contains_element "$DEVICE" "${devices_list[@]}"; then
+    echo -e "Select partition:\n"
+    select device in "${devices_list[@]}"; do
+      if contains_element "${device}" "${devices_list[@]}"; then
         break
       else
         invalid_option
@@ -125,18 +125,18 @@ create_partition(){
   }
   print_title "https://wiki.archlinux.org/index.php/Partitioning"
   print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
-  partition_app=("cfdisk" "cgdisk" "gdisk" "parted");
+  apps_list=("cfdisk" "cgdisk" "gdisk" "parted");
   PS3="$prompt1"
   echo -e "Select partition program:"
   select OPT in "${partition_app[@]}"; do
-    if contains_element "$OPT" "${partition_app[@]}"; then
+    if contains_element "$OPT" "${apps_list[@]}"; then
       select_device
       case $OPT in
         parted)
-          parted -a opt $DEVICE
+          parted -a opt ${device}
           ;;
         *)
-          $OPT $DEVICE
+          $OPT ${device}
           ;;
       esac
       break
@@ -146,26 +146,26 @@ create_partition(){
   done
 }
 #}}}
-#SELECT|FORMAT DEVICE {{{
-format_device(){
-  print_title "https://wiki.archlinux.org/index.php/Format_a_device"
+#SELECT|FORMAT PARTITIONS {{{
+format_partitions(){
+  print_title "https://wiki.archlinux.org/index.php/Format_a_partition"
   print_info "This step will select and format the selected partiton where the archlinux will be installed"
   print_danger "\tAll data on the ROOT and SWAP partition will be LOST."
   i=0
-  partitions=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd'`)
+  partitions_list=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd'`)
 
   if [[ $UEFI -eq 1 ]]; then
-    device_name=("root" "EFI" "swap" "another")
+    partition_name=("root" "EFI" "swap" "another")
   else
-    device_name=("root" "swap" "another")
+    partition_name=("root" "swap" "another")
   fi
 
   select_filesystem(){
-    filesystem=( "btrfs" "ext2" "ext3" "ext4" "f2fs" "jfs" "nilfs2" "ntfs" "vfat" "xfs");
+    filesystems_list=( "btrfs" "ext2" "ext3" "ext4" "f2fs" "jfs" "nilfs2" "ntfs" "vfat" "xfs");
     PS3="$prompt1"
     echo -e "Select filesystem:\n"
-    select TYPE in "${filesystem[@]}"; do
-      if contains_element "$TYPE" "${filesystem[@]}"; then
+    select filesystem in "${filesystems_list[@]}"; do
+      if contains_element "${filesystem}" "${filesystems_list[@]}"; then
         break
       else
         invalid_option
@@ -174,21 +174,21 @@ format_device(){
   }
   remove_partition(){
     #remove the selected partition from list
-    unset partitions[$DEVICE_NUMBER]
-    partitions=(${partitions[@]})
+    unset partitions_list[${partition_number}]
+    partitions_list=(${partitions_list[@]})
     #increase i
-    [[ ${device_name[i]} != another ]] && i=$(( i + 1 ))
+    [[ ${partition_name[i]} != another ]] && i=$(( i + 1 ))
   }
   format_partition(){
     read_input_text "Confirm format $1 partition"
     if [[ $OPTION == y ]]; then
       [[ -z $3 ]] && select_filesystem
-      mkfs.$TYPE $1 \
-        $([[ $TYPE == xfs || $TYPE == btrfs ]] && echo "-f") \
-        $([[ $TYPE == vfat ]] && echo "-F32")
+      mkfs.${filesystem} $1 \
+        $([[ ${filesystem} == xfs || ${filesystem} == btrfs ]] && echo "-f") \
+        $([[ ${filesystem} == vfat ]] && echo "-F32")
       fsck $1
       mkdir -p $2
-      mount -t $TYPE $1 $2
+      mount -t ${filesystem} $1 $2
       remove_partition
     fi
   }
@@ -201,28 +201,28 @@ format_device(){
     fi
   }
   create_swap(){
-    swap_options=( "partition" "file" "skip");
+    swap_options=("partition" "file" "skip");
     PS3="$prompt1"
-    echo -e "Select ${BYellow}${device_name[i]}${White} type:\n"
-    select TYPE in "${swap_options[@]}"; do
+    echo -e "Select ${BYellow}${partition_name[i]}${White} filesystem:\n"
+    select OPT in "${swap_options[@]}"; do
       case "$REPLY" in
         1)
-          select DEVICE in "${partitions[@]}"; do
+          select partition in "${partitions_list[@]}"; do
             #get the selected number - 1
-            DEVICE_NUMBER=$(( $REPLY - 1 ))
-            if contains_element "$DEVICE" "${partitions[@]}"; then
-              format_swap_partition "$DEVICE"
+            partition_number=$(( $REPLY - 1 ))
+            if contains_element "${partition}" "${partitions_list[@]}"; then
+              format_swap_partition "${partition}"
             fi
             break
           done
           break
           ;;
         2)
-          TOTAL_MEM=`grep MemTotal /proc/meminfo | awk '{print $2/1024}' | sed 's/\..*//'`
-          fallocate -l ${TOTAL_MEM}M $MOUNTPOINT/swapfile
-          chmod 600 $MOUNTPOINT/swapfile
-          mkswap $MOUNTPOINT/swapfile
-          swapon $MOUNTPOINT/swapfile
+          total_memory=`grep MemTotal /proc/meminfo | awk '{print $2/1024}' | sed 's/\..*//'`
+          fallocate -l ${total_memory}M ${MOUNTPOINT}/swapfile
+          chmod 600 ${MOUNTPOINT}/swapfile
+          mkswap ${MOUNTPOINT}/swapfile
+          swapon ${MOUNTPOINT}/swapfile
           i=$(( i + 1 ))
           break
           ;;
@@ -246,53 +246,53 @@ format_device(){
   }
   while true; do
     PS3="$prompt1"
-    if [[ ${device_name[i]} == swap ]]; then
+    if [[ ${partition_name[i]} == swap ]]; then
       create_swap
     else
-      echo -e "Select ${BYellow}${device_name[i]}${White} partition:\n"
-      select DEVICE in "${partitions[@]}"; do
+      echo -e "Select ${BYellow}${partition_name[i]}${White} partition:\n"
+      select partition in "${partitions_list[@]}"; do
         #get the selected number - 1
-        DEVICE_NUMBER=$(( $REPLY - 1 ))
-        if contains_element "$DEVICE" "${partitions[@]}"; then
-          case ${device_name[i]} in
+        partition_number=$(( $REPLY - 1 ))
+        if contains_element "${partition}" "${partitions_list[@]}"; then
+          case ${partition_name[i]} in
             root)
-              ROOT_DEVICE=$DEVICE
+              ROOT_DISK=${partition}
               # MBR
-              BOOT_DEVICE=`echo $ROOT_DEVICE | sed 's/[0-9]//'`
-              format_partition "$DEVICE" "$MOUNTPOINT"
+              BOOT_DISK=`echo ${ROOT_DISK} | sed 's/[0-9]//'`
+              format_partition "${partition}" "${MOUNTPOINT}"
               ;;
             EFI)
               efi_options=("/boot/efi" "/boot")
               PS3="$prompt1"
               echo -e "Select EFI mountpoint:\n"
-              select EFIDIR in "${efi_options[@]}"; do
-                if contains_element "$EFIDIR" "${efi_options[@]}"; then
+              select EFI_DISK in "${efi_options[@]}"; do
+                if contains_element "${EFI_DISK}" "${efi_options[@]}"; then
                   break
                 else
                   invalid_option
                 fi
               done
-              read_input_text "Format $DEVICE partition"
+              read_input_text "Format ${partition} partition"
               if [[ $OPTION == y ]]; then
-                format_partition "$DEVICE" "$MOUNTPOINT$EFIDIR" "vfat"
+                format_partition "${partition}" "${MOUNTPOINT}${EFI_DISK}" "vfat"
               else
-                mkdir -p "$MOUNTPOINT$EFIDIR"
-                mount "$DEVICE" "$MOUNTPOINT$EFIDIR"
-                check_mountpoint "$DEVICE" "$MOUNTPOINT$EFIDIR"
+                mkdir -p "${MOUNTPOINT}${EFI_DISK}"
+                mount "${partition}" "${MOUNTPOINT}${EFI_DISK}"
+                check_mountpoint "${partition}" "${MOUNTPOINT}${EFI_DISK}"
               fi
               ;;
             another)
-              read -p "Mountpoint [ex: /home]:" DIR
+              read -p "Mountpoint [ex: /home]:" directory
               select_filesystem
-              read_input_text "Format $DEVICE partition"
+              read_input_text "Format ${partition} partition"
               if [[ $OPTION == y ]]; then
-                format_partition "$DEVICE" "$MOUNTPOINT$DIR" "$TYPE"
+                format_partition "${partition}" "${MOUNTPOINT}${directory}" "${filesystem}"
               else
-                read_input_text "Confirm type="$TYPE" dev="$DEVICE" dir="$DIR""
+                read_input_text "Confirm fs="${filesystem}" part="${partition}" dir="${directory}""
                 if [[ $OPTION == y ]]; then
-                  mkdir -p $MOUNTPOINT$DIR
-                  mount -t $TYPE $DEVICE $MOUNTPOINT$DIR
-                  check_mountpoint "$DEVICE" "$MOUNTPOINT$DIR"
+                  mkdir -p ${MOUNTPOINT}${directory}
+                  mount -t ${filesystem} ${partition} ${MOUNTPOINT}${directory}
+                  check_mountpoint "${partition}" "${MOUNTPOINT}${directory}"
                 fi
               fi
               ;;
@@ -304,9 +304,9 @@ format_device(){
       done
     fi
     #check if there is no partitions left
-    if [[ ${#partitions[@]} -eq 0 && ${device_name[i]} != swap ]]; then
+    if [[ ${#partitions_list[@]} -eq 0 && ${partition_name[i]} != swap ]]; then
       break
-    elif [[ ${device_name[i]} == another ]]; then
+    elif [[ ${partition_name[i]} == another ]]; then
       read_input_text "Configure more partitions"
       [[ $OPTION != y ]] && break
     fi
@@ -318,59 +318,69 @@ format_device(){
 install_base_system(){
   print_title "INSTALL BASE SYSTEM"
   print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
-  pacstrap $MOUNTPOINT base base-devel parted btrfs-progs ntp
+  pacstrap ${MOUNTPOINT} base base-devel parted btrfs-progs ntp
   WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://'`
   if [[ -n $WIRELESS_DEV ]]; then
-    pacstrap $MOUNTPOINT iw wireless_tools wpa_actiond wpa_supplicant dialog
+    pacstrap ${MOUNTPOINT} iw wireless_tools wpa_actiond wpa_supplicant dialog
   fi
 }
 #}}}
 #CONFIGURE KEYMAP {{{
 configure_keymap(){
   #ADD KEYMAP TO THE NEW SETUP
-  echo "KEYMAP=$KEYMAP" > $MOUNTPOINT/etc/vconsole.conf
+  echo "KEYMAP=$KEYMAP" > ${MOUNTPOINT}/etc/vconsole.conf
 }
 #}}}
 #CONFIGURE FSTAB {{{
 configure_fstab(){
   print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
-  print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific device or partition."
-  if [[ ! -f $MOUNTPOINT/etc/fstab.aui ]]; then
-    cp $MOUNTPOINT/etc/fstab $MOUNTPOINT/etc/fstab.aui
+  print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific partition or partition."
+  if [[ ! -f ${MOUNTPOINT}/etc/fstab.aui ]]; then
+    cp ${MOUNTPOINT}/etc/fstab ${MOUNTPOINT}/etc/fstab.aui
   else
-    cp $MOUNTPOINT/etc/fstab.aui $MOUNTPOINT/etc/fstab
+    cp ${MOUNTPOINT}/etc/fstab.aui ${MOUNTPOINT}/etc/fstab
   fi
-  FSTAB=("DEV" "UUID" "LABEL");
+  if [[ $UEFI -eq 1 ]]; then
+    fstab_list=("DEV" "PARTUUID" "LABEL");
+  else
+    fstab_list=("DEV" "UUID" "LABEL");
+  fi
+
   PS3="$prompt1"
   echo -e "Configure fstab based on:"
-  select OPT in "${FSTAB[@]}"; do
+  select OPT in "${fstab_list[@]}"; do
     case "$REPLY" in
-      1) genfstab -p $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
-      2) genfstab -U $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
-      3) genfstab -L $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
+      1) genfstab -p ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab ;;
+      2) if [[ $UEFI -eq 1 ]]; then
+          genfstab -t PARTUUID -p ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab
+         else
+          genfstab -U ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab
+         fi
+         ;;
+      3) genfstab -L ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab ;;
       *) invalid_option ;;
     esac
     [[ -n $OPT ]] && break
   done
   echo "Review your fstab"
-  [[ -f $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
+  [[ -f ${MOUNTPOINT}/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" ${MOUNTPOINT}/etc/fstab
   pause_function
-  $EDITOR $MOUNTPOINT/etc/fstab
+  $EDITOR ${MOUNTPOINT}/etc/fstab
 }
 #}}}
 #CONFIGURE HOSTNAME {{{
 configure_hostname(){
   print_title "HOSTNAME - https://wiki.archlinux.org/index.php/HOSTNAME"
   print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
-  read -p "Hostname [ex: archlinux]: " HN
-  echo "$HN" > $MOUNTPOINT/etc/hostname
-  if [[ ! -f $MOUNTPOINT/etc/hosts.aui ]]; then
-    cp $MOUNTPOINT/etc/hosts $MOUNTPOINT/etc/hosts.aui
+  read -p "Hostname [ex: archlinux]: " host_name
+  echo "$host_name" > ${MOUNTPOINT}/etc/hostname
+  if [[ ! -f ${MOUNTPOINT}/etc/hosts.aui ]]; then
+    cp ${MOUNTPOINT}/etc/hosts ${MOUNTPOINT}/etc/hosts.aui
   else
-    cp $MOUNTPOINT/etc/hosts.aui $MOUNTPOINT/etc/hosts
+    cp ${MOUNTPOINT}/etc/hosts.aui ${MOUNTPOINT}/etc/hosts
   fi
-  arch_chroot "sed -i '/127.0.0.1/s/$/ '${HN}'/' /etc/hosts"
-  arch_chroot "sed -i '/::1/s/$/ '${HN}'/' /etc/hosts"
+  arch_chroot "sed -i '/127.0.0.1/s/$/ '${host_name}'/' /etc/hosts"
+  arch_chroot "sed -i '/::1/s/$/ '${host_name}'/' /etc/hosts"
 }
 #}}}
 #CONFIGURE TIMEZONE {{{
@@ -380,7 +390,7 @@ configure_timezone(){
   OPTION=n
   while [[ $OPTION != y ]]; do
     settimezone
-    read_input_text "Confirm timezone ($ZONE/$SUBZONE)"
+    read_input_text "Confirm timezone (${ZONE}/${SUBZONE})"
   done
   arch_chroot "ln -s /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
 }
@@ -412,7 +422,7 @@ configure_locale(){
     setlocale
     read_input_text "Confirm locale ($LOCALE)"
   done
-  echo 'LANG="'$LOCALE_UTF8'"' > $MOUNTPOINT/etc/locale.conf
+  echo 'LANG="'$LOCALE_UTF8'"' > ${MOUNTPOINT}/etc/locale.conf
   arch_chroot "sed -i '/'${LOCALE_UTF8}'/s/^#//' /etc/locale.gen"
   arch_chroot "locale-gen"
 }
@@ -430,27 +440,25 @@ install_bootloader(){
   print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
   if [[ $UEFI -eq 1 ]]; then
     print_warning "\tUEFI Mode Detected"
-    bootloader=("Grub2" "Syslinux" "Gummiboot" "Skip")
+    bootloaders_list=("Grub2" "Syslinux" "Gummiboot" "Skip")
   else
     print_warning "\tBIOS Mode Detected"
-    bootloader=("Grub2" "Syslinux" "Skip")
+    bootloaders_list=("Grub2" "Syslinux" "Skip")
   fi
   PS3="$prompt1"
   echo -e "Install bootloader:\n"
-  select BOOTLOADER in "${bootloader[@]}"; do
+  select bootloader in "${bootloaders_list[@]}"; do
     case "$REPLY" in
       1)
-        pacstrap $MOUNTPOINT grub os-prober
-        [[ $UEFI -eq 1 ]] && pacstrap $MOUNTPOINT efibootmgr
+        pacstrap ${MOUNTPOINT} grub os-prober
         break
         ;;
       2)
-        pacstrap $MOUNTPOINT syslinux
-        [[ $UEFI -eq 1 ]] && pacstrap $MOUNTPOINT efibootmgr
+        pacstrap ${MOUNTPOINT} syslinux
         break
         ;;
       3)
-        [[ $UEFI -eq 1 ]] && pacstrap $MOUNTPOINT gummiboot efibootmgr
+        [[ $UEFI -eq 1 ]] && pacstrap ${MOUNTPOINT} gummiboot
         break
         ;;
       4)
@@ -460,16 +468,16 @@ install_bootloader(){
         invalid_option
         ;;
     esac
+    [[ $UEFI -eq 1 ]] && pacstrap ${MOUNTPOINT} efibootmgr
   done
 }
 #}}}
 #CONFIGURE BOOTLOADER {{{
 configure_bootloader(){
-  case $BOOTLOADER in
+  case $bootloader in
     Grub2)
       print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
       print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
-      arch_chroot "modprobe dm-mod"
       grub_install_mode=("Automatic" "Manual")
       PS3="$prompt1"
       echo -e "Grub Install:\n"
@@ -477,14 +485,14 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             if [[ $UEFI -eq 1 ]]; then
-              arch_chroot "grub-install --target=x86_64-efi --efi-directory=$EFIDIR --bootloader-id=arch_grub --recheck"
+              arch_chroot "grub-install --target=x86_64-efi --efi-directory=${EFI_DISK} --bootloader-id=arch_grub --recheck"
             else
-              arch_chroot "grub-install --target=i386-pc --recheck --debug ${BOOT_DEVICE}"
+              arch_chroot "grub-install --target=i386-pc --recheck --debug ${BOOT_DISK}"
             fi
             break
             ;;
           2)
-            arch-chroot $MOUNTPOINT
+            arch-chroot ${MOUNTPOINT}
             break
             ;;
           *)
@@ -504,25 +512,25 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             arch_chroot "syslinux-install_update -iam"
-            sed -i "s/sda3/$ROOT_DEVICE/g" $MOUNTPOINT/boot/syslinux/syslinux.cfg
+            sed -i "s/sda[0-9]/${ROOT_DISK}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             pause_function
             print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
-            $EDITOR $MOUNTPOINT/boot/syslinux/syslinux.cfg
+            $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             break
             ;;
           2)
             arch_chroot "syslinux-install_update -i"
-            sed -i "s/sda3/$ROOT_DEVICE/g" $MOUNTPOINT/boot/syslinux/syslinux.cfg
+            sed -i "s/sda[0-9]/${ROOT_DISK}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             pause_function
             print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
-            $EDITOR $MOUNTPOINT/boot/syslinux/syslinux.cfg
+            $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             break
             ;;
           3)
-            print_info "Your boot partition, on which you plan to install Syslinux, must contain a FAT, ext2, ext3, ext4, or Btrfs file system. You should install it on a mounted directory, not a /dev/sdXY device. You do not have to install it on the root directory of a file system, e.g., with device /dev/sda1 mounted on /boot you can install Syslinux in the syslinux directory"
+            print_info "Your boot partition, on which you plan to install Syslinux, must contain a FAT, ext2, ext3, ext4, or Btrfs file system. You should install it on a mounted directory, not a /dev/sdXY partition. You do not have to install it on the root directory of a file system, e.g., with partition /dev/sda1 mounted on /boot you can install Syslinux in the syslinux directory"
             echo -e $prompt3
             print_warning "mkdir /boot/syslinux\nextlinux --install /boot/syslinux "
-            arch-chroot $MOUNTPOINT
+            arch-chroot ${MOUNTPOINT}
             break
             ;;
           *)
@@ -538,19 +546,19 @@ configure_bootloader(){
       gummiboot_install_mode=("Automatic" "Manual")
       PS3="$prompt1"
       echo -e "Gummiboot install:\n"
-      select OFF in "${gummiboot_install_mode[@]}"; do
+      select OPT in "${gummiboot_install_mode[@]}"; do
         case "$REPLY" in
           1)
             arch_chroot "gummiboot install"
             print_warning "Please check your .conf file"
             pause_function
-            ROOT_UUID=`blkid -s PARTUUID /dev/$ROOT_DEVICE | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
-            echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=PARTUUID=${ROOT_UUID} rw" > $MOUNTPOINT/boot/loader/entries/arch.conf
-            $EDITOR $MOUNTPOINT/boot/loader/entries/arch.conf
+            # ROOT_UUID=`blkid -s PARTUUID /dev/${ROOT_DISK} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
+            echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=${ROOT_DISK} rw" > ${MOUNTPOINT}/boot/loader/entries/arch.conf
+            $EDITOR ${MOUNTPOINT}/boot/loader/entries/arch.conf
             break
             ;;
           2)
-            arch-chroot $MOUNTPOINT
+            arch-chroot ${MOUNTPOINT}
             break
             ;;
           *)
@@ -576,7 +584,7 @@ finish(){
   print_title "INSTALL COMPLETED"
   #COPY AUI TO ROOT FOLDER IN THE NEW SYSTEM
   print_warning "\nA copy of the AUI will be placed in /root directory of your new system"
-  cp -R `pwd` $MOUNTPOINT/root
+  cp -R `pwd` ${MOUNTPOINT}/root
   read_input_text "Reboot system"
   if [[ $OPTION == y ]]; then
     umount_partitions
@@ -589,7 +597,7 @@ finish(){
 print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
 print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
 pause_function
-check_boot_type
+check_boot_system
 check_connection
 pacman -Sy
 while true
@@ -634,7 +642,7 @@ do
         ;;
       5)
         [[ checklist[4] -eq 0 ]] && umount_partitions
-        format_device
+        format_partitions
         checklist[5]=1
         ;;
       6)
