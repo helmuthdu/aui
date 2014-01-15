@@ -438,6 +438,7 @@ configure_mkinitcpio(){
 install_bootloader(){
   print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
   print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
+  print_warning "\tROOT Partition: ${ROOT_DISK}"
   if [[ $UEFI -eq 1 ]]; then
     print_warning "\tUEFI Mode Detected"
     bootloaders_list=("Grub2" "Syslinux" "Gummiboot" "Skip")
@@ -513,16 +514,16 @@ configure_bootloader(){
           1)
             arch_chroot "syslinux-install_update -iam"
             sed -i "s/sda[0-9]/${ROOT_DISK}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
-            pause_function
             print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
+            pause_function
             $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             break
             ;;
           2)
             arch_chroot "syslinux-install_update -i"
             sed -i "s/sda[0-9]/${ROOT_DISK}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
-            pause_function
             print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
+            pause_function
             $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             break
             ;;
@@ -551,9 +552,9 @@ configure_bootloader(){
           1)
             arch_chroot "gummiboot install"
             print_warning "Please check your .conf file"
-            pause_function
             # ROOT_UUID=`blkid -s PARTUUID /dev/${ROOT_DISK} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
             echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=${ROOT_DISK} rw" > ${MOUNTPOINT}/boot/loader/entries/arch.conf
+            pause_function
             $EDITOR ${MOUNTPOINT}/boot/loader/entries/arch.conf
             break
             ;;
