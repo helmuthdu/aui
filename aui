@@ -1193,7 +1193,7 @@ install_desktop_environment(){
       #E17 {{{
       print_title "E17 - http://wiki.archlinux.org/index.php/E17"
       print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
-      package_install "enlightenment17"
+      package_install "enlightenment"
       package_install "gvfs"
       package_install "xdg-user-dirs"
       package_install "leafpad epdfview"
