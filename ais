@@ -256,9 +256,8 @@ format_partitions(){
         if contains_element "${partition}" "${partitions_list[@]}"; then
           case ${partition_name[i]} in
             root)
+              BOOT_DISK=`echo ${partition} | sed 's/[0-9]//'`
               ROOT_DISK=${partition}
-              # MBR
-              BOOT_DISK=`echo ${ROOT_DISK} | sed 's/[0-9]//'`
               format_partition "${partition}" "${MOUNTPOINT}"
               ;;
             EFI)
@@ -507,13 +506,14 @@ configure_bootloader(){
       print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
       print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
       syslinux_install_mode=("[MBR] Automatic" "[PARTITION] Automatic" "Manual")
+      ROOT_PART=`echo ${ROOT_DISK} | sed 's/\/dev\///'`
       PS3="$prompt1"
       echo -e "Syslinux Install:\n"
       select OPT in "${syslinux_install_mode[@]}"; do
         case "$REPLY" in
           1)
             arch_chroot "syslinux-install_update -iam"
-            sed -i "s/sda[0-9]/${ROOT_DISK}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
             pause_function
             $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
@@ -521,7 +521,7 @@ configure_bootloader(){
             ;;
           2)
             arch_chroot "syslinux-install_update -i"
-            sed -i "s/sda[0-9]/${ROOT_DISK}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
             pause_function
             $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
