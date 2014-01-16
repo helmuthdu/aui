@@ -166,10 +166,10 @@ language_selector(){
 select_user(){
   #CREATE NEW USER {{{
   create_new_user(){
-    read -p "Username: " USER_NAME
-    useradd -m -g users -G wheel -s /bin/bash ${USER_NAME}
-    chfn ${USER_NAME}
-    passwd ${USER_NAME}
+    read -p "Username: " username
+    useradd -m -g users -G wheel -s /bin/bash ${username}
+    chfn ${username}
+    passwd ${username}
     pause_function
     configure_user_account
   }
@@ -187,18 +187,18 @@ select_user(){
           package_install "git"
           git clone https://github.com/helmuthdu/dotfiles
           cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc ~/
-          cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc /home/${USER_NAME}/
+          cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc /home/${username}/
           rm -fr dotfiles
           ;;
         2)
-          cp /etc/skel/.bashrc /home/${USER_NAME}
+          cp /etc/skel/.bashrc /home/${username}
           ;;
         3)
           package_install "git"
           read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
           read -p "Enter your github repository [ex: aui]: " GITHUB_REPO
           git clone https://github.com/$GITHUB_USER/$GITHUB_REPO
-          cp -R $GITHUB_REPO/.* /home/${USER_NAME}/
+          cp -R $GITHUB_REPO/.* /home/${username}/
           rm -fr $GITHUB_REPO
           ;;
         *)
@@ -220,7 +220,7 @@ select_user(){
         elif [[ $EDITOR == vim ]]; then
           ! is_package_installed "gvim" && package_install "vim ctags"
           #VIMRC {{{
-          if [[ ! -f /home/${USER_NAME}/.vimrc ]]; then
+          if [[ ! -f /home/${username}/.vimrc ]]; then
             vimrc_list=("Default" "Vanilla" "Get from github");
             PS3="$prompt1"
             echo -e "Choose your .vimrc\n"
@@ -229,20 +229,20 @@ select_user(){
                 1)
                   package_install "git"
                   git clone https://github.com/helmuthdu/vim
-                  mv vim /home/${USER_NAME}/.vim
-                  ln -sf /home/${USER_NAME}/.vim/vimrc /home/${USER_NAME}/.vimrc
-                  cp -R vim /home/${USER_NAME}/.vim/fonts /home/${USER_NAME}/.fonts
+                  mv vim /home/${username}/.vim
+                  ln -sf /home/${username}/.vim/vimrc /home/${username}/.vimrc
+                  cp -R vim /home/${username}/.vim/fonts /home/${username}/.fonts
                   ;;
                 3)
                   package_install "git"
                   read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
                   read -p "Enter your github repository [ex: vim]: " GITHUB_REPO
                   git clone https://github.com/$GITHUB_USER/$GITHUB_REPO
-                  cp -R $GITHUB_REPO/.vim /home/${USER_NAME}/
+                  cp -R $GITHUB_REPO/.vim /home/${username}/
                   if [[ -f $GITHUB_REPO/vimrc ]]; then
-                    ln -sf /home/${USER_NAME}/.vim/vimrc /home/${USER_NAME}/.vimrc
+                    ln -sf /home/${username}/.vim/vimrc /home/${username}/.vimrc
                   else
-                    ln -sf /home/${USER_NAME}/.vim/.vimrc /home/${USER_NAME}/.vimrc
+                    ln -sf /home/${username}/.vim/.vimrc /home/${username}/.vimrc
                   fi
                   rm -fr $GITHUB_REPO
                   ;;
@@ -266,7 +266,7 @@ select_user(){
       fi
     done
     #}}}
-    chown -R ${USER_NAME}:users /home/${USER_NAME}
+    chown -R ${username}:users /home/${username}
   }
   #}}}
   print_title "SELECT/CREATE USER ACCOUNT - https://wiki.archlinux.org/index.php/Users_and_Groups"
@@ -282,13 +282,13 @@ select_user(){
     if [[ $OPT == "Create new user" ]]; then
       create_new_user
     elif contains_element "$OPT" "${users_list[@]}"; then
-      USER_NAME=$OPT
+      username=$OPT
     else
       invalid_option
     fi
     [[ -n $OPT ]] && break
   done
-  [[ ! -f /home/${USER_NAME}/.bashrc ]] && configure_user_account;
+  [[ ! -f /home/${username}/.bashrc ]] && configure_user_account;
 }
 #}}}
 #CONFIGURE SUDO {{{
@@ -567,9 +567,9 @@ install_samba(){
       mkdir -p ${USERSHARES_DIR}
       groupadd ${USERSHARES_GROUP}
       chown root:${USERSHARES_GROUP} ${USERSHARES_DIR}
-      chmod 01770 ${USERSHARES_DIR}
+      chmod 1770 ${USERSHARES_DIR}
       sed -i -e '/\[global\]/a\\n   usershare path = /var/lib/samba/usershares\n   usershare max shares = 100\n   usershare allow guests = yes\n   usershare owner only = False' /etc/samba/smb.conf
-      usermod -a -G ${USERSHARES_GROUP} ${USER_NAME}
+      usermod -a -G ${USERSHARES_GROUP} ${username}
       sed -i '/user_allow_other/s/^#//' /etc/fuse.conf
       modprobe fuse
     fi
@@ -646,13 +646,11 @@ font_config(){
     case "$OPTION" in
       1)
         is_package_installed "fontconfig-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
-        is_package_installed "fontconfig-infinality-ultimate" && pacman -Rdds --noconfirm freetype2-infinality-ultimate fontconfig-infinality-ultimate cairo-infinality-ultimate
         pacman -S --asdeps --needed cairo fontconfig freetype2
         break
         ;;
       2)
-        is_package_installed "fontconfig" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
-        is_package_installed "fontconfig-infinality-ultimate" && pacman -Rdds --noconfirm freetype2-infinality-ultimate fontconfig-infinality-ultimate cairo-infinality-ultimate
+        is_package_installed "fontconfig" && pacman -Rdds freetype2 fontconfig cairo
         aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
         break
         ;;
@@ -674,10 +672,26 @@ install_video_cards(){
     package_install "virtualbox-guest-utils"
     package_install "mesa-libgl"
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
-    add_user_to_group ${USER_NAME} vboxsf
+    add_user_to_group ${username} vboxsf
     system_ctl disable ntpd
     system_ctl enable vbo
     VBoxClient-all
+  #}}}
+  #Bumblebee {{{
+  elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
+    XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
+    [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
+    is_package_installed "nouveau-dri" && pacman -Rdds --noconfirm nouveau-dri
+    pacman -S --needed intel-dri xf86-video-intel bumblebee nvidia
+    package_install "pangox-compat" #fix nvidia-settings
+    package_install "libva-vdpau-driver"
+    if [[ ${ARCHI} == x86_64 ]]; then
+      is_package_installed "lib32-nouveau-dri" && pacman -Rdds --noconfirm lib32-nouveau-dri
+      pacman -S --needed lib32-nvidia-utils lib32-intel-dri
+    fi
+    replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
+    replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
+    mkinitcpio -p linux
   #}}}
   #NVIDIA {{{
   elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
@@ -860,7 +874,7 @@ install_git_tor(){
       chmod +x /usr/bin/proxy-wrapper
       echo -e '\nexport GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"' >> /etc/bash.bashrc
       export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
-      su - ${USER_NAME} -c 'export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"'
+      su - ${username} -c 'export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"'
     fi
     groupadd -g 42 privoxy
     useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
@@ -1148,21 +1162,21 @@ install_desktop_environment(){
       # config xinitrc
       config_xinitrc "cinnamon-session"
       #Tweaks
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-effect scale
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-time 250
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-close-transition easeInExpo
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-effect scale
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-time 350
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-map-transition easeOutBack
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-effect scale
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-time 150
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-maximize-transition easeInOutSine
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-effect scale
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-time 250
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-minimize-transition easeInOutSine
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-effect scale
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-time 150
-      sudo -u ${USER_NAME} gsettings set org.cinnamon desktop-effects-unmaximize-transition easeInOutSine
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-close-effect scale
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-close-time 250
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-close-transition easeInExpo
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-map-effect scale
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-map-time 350
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-map-transition easeOutBack
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-maximize-effect scale
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-maximize-time 150
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-maximize-transition easeInOutSine
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-minimize-effect scale
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-minimize-time 250
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-minimize-transition easeInOutSine
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-unmaximize-effect scale
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-unmaximize-time 150
+      sudo -u ${username} gsettings set org.cinnamon desktop-effects-unmaximize-transition easeInOutSine
       CINNAMON=1
       pause_function
       install_themes "CINNAMON"
@@ -1250,13 +1264,13 @@ install_desktop_environment(){
       tar zxvf Kawai.tar.gz
       rm Sweet.tar.gz
       rm Kawai.tar.gz
-      mkdir -p /home/${USER_NAME}/.kde4/share/apps/color-schemes
-      mv Sweet/*.colors /home/${USER_NAME}/.kde4/share/apps/color-schemes
-      mv Kawai/*.colors /home/${USER_NAME}/.kde4/share/apps/color-schemes
-      mkdir -p /home/${USER_NAME}/.kde4/share/apps/QtCurve
-      mv Sweet/Sweet.qtcurve /home/${USER_NAME}/.kde4/share/apps/QtCurve
-      mv Kawai/Kawai.qtcurve /home/${USER_NAME}/.kde4/share/apps/QtCurve
-      chown -R ${USER_NAME}:users /home/${USER_NAME}/.kde4
+      mkdir -p /home/${username}/.kde4/share/apps/color-schemes
+      mv Sweet/*.colors /home/${username}/.kde4/share/apps/color-schemes
+      mv Kawai/*.colors /home/${username}/.kde4/share/apps/color-schemes
+      mkdir -p /home/${username}/.kde4/share/apps/QtCurve
+      mv Sweet/Sweet.qtcurve /home/${username}/.kde4/share/apps/QtCurve
+      mv Kawai/Kawai.qtcurve /home/${username}/.kde4/share/apps/QtCurve
+      chown -R ${username}:users /home/${username}/.kde4
       rm -fr Kawai Sweet
       #}}}
       #KDE CUSTOMIZATION {{{
@@ -1336,9 +1350,9 @@ install_desktop_environment(){
       package_install "xdg-user-dirs"
       package_install "leafpad obconf epdfview"
       aur_package_install "gnome-defaults-list"
-      mkdir -p /home/${USER_NAME}/.config/openbox/
-      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${USER_NAME}/.config/openbox/
-      chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+      mkdir -p /home/${username}/.config/openbox/
+      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${username}/.config/openbox/
+      chown -R ${username}:users /home/${username}/.config
       # config xinitrc
       config_xinitrc "startlxde"
       pause_function
@@ -1375,10 +1389,10 @@ install_desktop_environment(){
       package_install "leafpad epdfview nitrogen"
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
-      if [[ ! -d /home/${USER_NAME}/.config/awesome/ ]]; then
-        mkdir -p /home/${USER_NAME}/.config/awesome/
-        cp /etc/xdg/awesome/rc.lua /home/${USER_NAME}/.config/awesome/
-        chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+      if [[ ! -d /home/${username}/.config/awesome/ ]]; then
+        mkdir -p /home/${username}/.config/awesome/
+        cp /etc/xdg/awesome/rc.lua /home/${username}/.config/awesome/
+        chown -R ${username}:users /home/${username}/.config
       fi
       # config xinitrc
       config_xinitrc "awesome"
@@ -1418,9 +1432,9 @@ install_desktop_environment(){
       package_install "leafpad epdfview nitrogen"
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
-      mkdir -p /home/${USER_NAME}/.config/openbox/
-      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${USER_NAME}/.config/openbox/
-      chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+      mkdir -p /home/${username}/.config/openbox/
+      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${username}/.config/openbox/
+      chown -R ${username}:users /home/${username}/.config
       # config xinitrc
       config_xinitrc "openbox-session"
       pause_function
@@ -1657,8 +1671,8 @@ install_development_apps(){
                   fi
                   aur_package_install "simple-mtpfs"
                   groupadd android
-                  add_user_to_group ${USER_NAME} android
-                  add_user_to_group ${USER_NAME} adbusers
+                  add_user_to_group ${username} android
+                  add_user_to_group ${username} adbusers
                   chgrp -R android /opt/android-sdk
                   chmod -R g+w /opt/android-sdk
                   find /opt/android-sdk -type d -exec chmod g+s {} \;
@@ -1809,10 +1823,10 @@ install_development_apps(){
           ;;
         15)
           package_install "qtcreator"
-          mkdir -p /home/${USER_NAME}/.config/Nokia/qtcreator/styles
+          mkdir -p /home/${username}/.config/Nokia/qtcreator/styles
           curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
-          mv monokai.xml /home/${USER_NAME}/.config/Nokia/qtcreator/styles/
-          chown -R ${USER_NAME}:users /home/${USER_NAME}/.config
+          mv monokai.xml /home/${username}/.config/Nokia/qtcreator/styles/
+          chown -R ${username}:users /home/${username}/.config
           ;;
         16)
           aur_package_install "sublime-text-dev"
@@ -1994,7 +2008,7 @@ install_system_apps(){
             aur_package_install "virtualbox-ext-oracle"
             add_module "vboxdrv vboxnetflt" "virtualbox-host"
             modprobe vboxdrv vboxnetflt
-            add_user_to_group ${USER_NAME} vboxusers
+            add_user_to_group ${username} vboxusers
           else
             cecho " ${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
@@ -2215,9 +2229,9 @@ install_internet_apps(){
                   else
                     package_install "transmission-gtk"
                   fi
-                  if [[ -f /home/${USER_NAME}/.config/transmission/settings.json ]]; then
-                    replace_line '"blocklist-enabled": false' '"blocklist-enabled": true' /home/${USER_NAME}/.config/transmission/settings.json
-                    replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${USER_NAME}/.config/transmission/settings.json
+                  if [[ -f /home/${username}/.config/transmission/settings.json ]]; then
+                    replace_line '"blocklist-enabled": false' '"blocklist-enabled": true' /home/${username}/.config/transmission/settings.json
+                    replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${username}/.config/transmission/settings.json
                   fi
 
                   ;;
@@ -2556,7 +2570,7 @@ install_audio_apps(){
             # transparent to most people on most music and is already quite high in quality.
             # The resulting bitrate should be in the 170-210kbps range, according to music
             # complexity.
-            sudo -u ${USER_NAME} gconftool-2 --type string --set /system/gstreamer/0.10/audio/profiles/mp3/pipeline "audio/x-raw-int,rate=44100,channels=2 ! lame name=enc preset=1001 ! id3v2mux"
+            sudo -u ${username} gconftool-2 --type string --set /system/gstreamer/0.10/audio/profiles/mp3/pipeline "audio/x-raw-int,rate=44100,channels=2 ! lame name=enc preset=1001 ! id3v2mux"
           fi
           ;;
         "b")
@@ -2637,7 +2651,7 @@ install_video_apps(){
                   ;;
                 9)
                   package_install "xbmc"
-                  add_user_to_group ${USER_NAME} xbmc
+                  add_user_to_group ${username} xbmc
                   ;;
                 10)
                   package_install "mpv"
@@ -2724,8 +2738,8 @@ install_video_apps(){
             aur_package_install "codecs64"
           fi
           aur_package_install "libaacs"
-          sudo -u ${USER_NAME} mkdir -p /home/${USER_NAME}/.config/aacs/ &&
-            cd /home/${USER_NAME}/.config/aacs/ &&
+          sudo -u ${username} mkdir -p /home/${username}/.config/aacs/ &&
+            cd /home/${username}/.config/aacs/ &&
             wget http://vlc-bluray.whoknowsmy.name/files/KEYDB.cfg
           ;;
         "b")
@@ -3076,7 +3090,7 @@ install_games(){
                   ;;
                 2)
                   aur_package_install "leagueoflegends"
-                  add_user_to_group ${USER_NAME} "lol"
+                  add_user_to_group ${username} "lol"
                   ;;
                 3)
                   aur_package_install "manaplus"
@@ -3362,40 +3376,40 @@ install_web_server(){
   } #}}}
   install_postgis(){ #{{{
     package_install "postgis"
-    sudo -u postgres createuser --superuser $USER_NAME
-    sudo -u postgres createdb $USER_NAME
-    sudo -u ${USER_NAME} psql -d postgres -c "UPDATE pg_database SET datistemplate=FALSE WHERE datname='template1';"
-    sudo -u ${USER_NAME} psql -d postgres -c "DROP DATABASE template1;"
-    sudo -u ${USER_NAME} psql -d postgres -c "CREATE DATABASE template1 WITH TEMPLATE = template0 ENCODING = 'UNICODE';"
-    sudo -u ${USER_NAME} psql -d postgres -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template1';"
-    sudo -u ${USER_NAME} psql -d postgres -c "\c template1"
-    sudo -u ${USER_NAME} psql -d postgres -c "VACUUM FREEZE;"
-    sudo -u ${USER_NAME} psql -d postgres -c "UPDATE pg_database SET datallowconn=FALSE WHERE datname='template1';"
+    sudo -u postgres createuser --superuser $username
+    sudo -u postgres createdb $username
+    sudo -u ${username} psql -d postgres -c "UPDATE pg_database SET datistemplate=FALSE WHERE datname='template1';"
+    sudo -u ${username} psql -d postgres -c "DROP DATABASE template1;"
+    sudo -u ${username} psql -d postgres -c "CREATE DATABASE template1 WITH TEMPLATE = template0 ENCODING = 'UNICODE';"
+    sudo -u ${username} psql -d postgres -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template1';"
+    sudo -u ${username} psql -d postgres -c "\c template1"
+    sudo -u ${username} psql -d postgres -c "VACUUM FREEZE;"
+    sudo -u ${username} psql -d postgres -c "UPDATE pg_database SET datallowconn=FALSE WHERE datname='template1';"
 
     POSTGIS_VERSION=`pacman -Qi postgis | sed '2!d' | awk '{print substr($3,0,3)}'`
     POSTGIS_PATH=`pg_config --sharedir`/contrib/postgis-$POSTGIS_VERSION
 
-    sudo -u ${USER_NAME} psql -d postgres -c "UPDATE pg_database SET datistemplate=FALSE WHERE datname='template_postgis';"
-    sudo -u ${USER_NAME} dropdb template_postgis
+    sudo -u ${username} psql -d postgres -c "UPDATE pg_database SET datistemplate=FALSE WHERE datname='template_postgis';"
+    sudo -u ${username} dropdb template_postgis
 
-    sudo -u ${USER_NAME} createdb -E UTF8 template_postgis
-    sudo -u ${USER_NAME} createlang -d template_postgis plpgsql
-    sudo -u ${USER_NAME} psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis';"
+    sudo -u ${username} createdb -E UTF8 template_postgis
+    sudo -u ${username} createlang -d template_postgis plpgsql
+    sudo -u ${username} psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis';"
 
     #PostGIS:
-        sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/postgis.sql
-        sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/spatial_ref_sys.sql
+        sudo -u ${username} psql -d template_postgis -f $POSTGIS_PATH/postgis.sql
+        sudo -u ${username} psql -d template_postgis -f $POSTGIS_PATH/spatial_ref_sys.sql
         #psql -d template_postgis -f $POSTGIS_PATH/postgis_comments.sql
     #with raster support:
-        sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/rtpostgis.sql
-        #sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/raster_comments.sql
+        sudo -u ${username} psql -d template_postgis -f $POSTGIS_PATH/rtpostgis.sql
+        #sudo -u ${username} psql -d template_postgis -f $POSTGIS_PATH/raster_comments.sql
     #with topology support:
-        #sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/topology.sql
-        #sudo -u ${USER_NAME} psql -d template_postgis -f $POSTGIS_PATH/topology_comments.sql
+        #sudo -u ${username} psql -d template_postgis -f $POSTGIS_PATH/topology.sql
+        #sudo -u ${username} psql -d template_postgis -f $POSTGIS_PATH/topology_comments.sql
 
-    sudo -u ${USER_NAME} psql -d template_postgis -c "GRANT ALL ON geometry_columns TO PUBLIC;"
-    sudo -u ${USER_NAME} psql -d template_postgis -c "GRANT ALL ON geography_columns TO PUBLIC;"
-    sudo -u ${USER_NAME} psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
+    sudo -u ${username} psql -d template_postgis -c "GRANT ALL ON geometry_columns TO PUBLIC;"
+    sudo -u ${username} psql -d template_postgis -c "GRANT ALL ON geography_columns TO PUBLIC;"
+    sudo -u ${username} psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
 
     echo -e "GeoDB Template: createdb -T template_postgis -E UTF8 <db_name>"
   } #}}}
@@ -3443,8 +3457,8 @@ install_web_server(){
   create_sites_folder(){ #{{{
     [[ ! -f  /etc/httpd/conf/extra/httpd-userdir.conf.aui ]] && cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
     replace_line 'public_html' 'Sites' /etc/httpd/conf/extra/httpd-userdir.conf
-    su - ${USER_NAME} -c "mkdir -p ~/Sites"
-    su - ${USER_NAME} -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
+    su - ${username} -c "mkdir -p ~/Sites"
+    su - ${username} -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
     print_line
     echo "The folder \"Sites\" has been created in your home"
     echo "You can access your projects at \"http://localhost/~username\""
@@ -3624,10 +3638,10 @@ install_extra(){
             aur_package_install "appmenu-qt appmenu-gtk"
             aur_package_install "kdeplasma-applets-menubar"
           fi
-          if [[ ! -f /home/${USER_NAME}/.config/gtk-3.0/settings.ini ]]; then
-            sudo -u ${USER_NAME} echo -e "[Settings]\ngtk-shell-shows-menubar = 1" > /home/${USER_NAME}/.config/gtk-3.0/settings.ini
+          if [[ ! -f /home/${username}/.config/gtk-3.0/settings.ini ]]; then
+            sudo -u ${username} echo -e "[Settings]\ngtk-shell-shows-menubar = 1" > /home/${username}/.config/gtk-3.0/settings.ini
           else
-            add_line "gtk-shell-shows-menubar = 1" "/home/${USER_NAME}/.config/gtk-3.0/settings.ini"
+            add_line "gtk-shell-shows-menubar = 1" "/home/${username}/.config/gtk-3.0/settings.ini"
           fi
           ;;
         "b")

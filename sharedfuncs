@@ -62,8 +62,8 @@
   ARCHI=`uname -m`
   UEFI=0
   EFI_DISK="/boot/efi"
-  ROOT_DISK="sda1"
-  BOOT_DISK="sda"
+  ROOT_DISK="/dev/sda1"
+  BOOT_DISK="/dev/sda"
   # AUR PACKAGE
   AUR=`echo -e "(${BPurple}aur${Reset})"`
   EXTERNAL=`echo -e "(${BYellow}external${Reset})"`
@@ -238,9 +238,14 @@
     # Determine video chipset - only Intel, ATI and nvidia are supported by this script"
     ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Detecting video chipset "
     local VGA=`lspci | grep VGA | tr "[:upper:]" "[:lower:]"`
+    local VGA_NUMBER=`lspci | grep VGA | wc -l`
+
     if [[ -n $(dmidecode --type 1 | grep VirtualBox) ]]; then
       cecho Virtualbox
       VIDEO_DRIVER="virtualbox"
+    elif [[ $VGA_NUMBER -eq 2 ]] && [[ -n $(echo ${VGA} | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
+      cecho Bumblebee
+      VIDEO_DRIVER="bumblebee"
     elif [[ -n $(echo ${VGA} | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
       cecho Nvidia
       read_input_text "Install NVIDIA proprietary driver" $PROPRIETARY_DRIVER
