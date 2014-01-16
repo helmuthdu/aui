@@ -416,7 +416,7 @@
   aui_download_packages() { #{{{
     for PKG in $1; do
       #exec command as user instead of root
-      su - ${USER_NAME} -c "
+      su - ${username} -c "
         [[ ! -d aui_packages ]] && mkdir aui_packages
         cd aui_packages
         curl -o $PKG.tar.gz https://aur.archlinux.org/packages/${PKG:0:2}/$PKG/$PKG.tar.gz
@@ -428,16 +428,16 @@
     done
   } #}}}
   aur_package_install() { #{{{
-    su - ${USER_NAME} -c "sudo -v"
+    su - ${username} -c "sudo -v"
     #install package from aur
     for PKG in $1; do
       if ! is_package_installed "${PKG}" ; then
         if [[ $AUTOMATIC_MODE -eq 1 ]]; then
           ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing ${AUR} ${Bold}${PKG}${Reset} "
-          su - ${USER_NAME} -c "${AUR_PKG_MANAGER} --noconfirm -S ${PKG}" >>"$LOG" 2>&1 &
+          su - ${username} -c "${AUR_PKG_MANAGER} --noconfirm -S ${PKG}" >>"$LOG" 2>&1 &
           pid=$!;progress $pid
         else
-          su - ${USER_NAME} -c "${AUR_PKG_MANAGER} -S ${PKG}"
+          su - ${username} -c "${AUR_PKG_MANAGER} -S ${PKG}"
         fi
       else
         if [[ $VERBOSE_MODE -eq 0 ]]; then
@@ -516,7 +516,7 @@
   gem_install() { #{{{
     #install packages using pacman
     for PKG in ${1}; do
-      sudo -u ${USER_NAME} gem install -V $PKG
+      sudo -u ${username} gem install -V $PKG
     done
   } #}}}
   contains_element() { #{{{
@@ -525,9 +525,9 @@
   } #}}}
   config_xinitrc() { #{{{
     #create a xinitrc file in home user directory
-    cp -fv /etc/skel/.xinitrc /home/${USER_NAME}/
-    echo -e "exec $1" >> /home/${USER_NAME}/.xinitrc
-    chown -R ${USER_NAME}:users /home/${USER_NAME}/.xinitrc
+    cp -fv /etc/skel/.xinitrc /home/${username}/
+    echo -e "exec $1" >> /home/${username}/.xinitrc
+    chown -R ${username}:users /home/${username}/.xinitrc
   } #}}}
   invalid_option() { #{{{
     print_line
