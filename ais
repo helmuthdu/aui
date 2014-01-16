@@ -128,7 +128,7 @@ create_partition(){
   apps_list=("cfdisk" "cgdisk" "gdisk" "parted");
   PS3="$prompt1"
   echo -e "Select partition program:"
-  select OPT in "${partition_app[@]}"; do
+  select OPT in "${apps_list[@]}"; do
     if contains_element "$OPT" "${apps_list[@]}"; then
       select_device
       case $OPT in
