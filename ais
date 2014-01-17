@@ -172,6 +172,7 @@ format_partitions(){
       fi
     done
   }
+
   disable_partition(){
     #remove the selected partition from list
     unset partitions_list[${partition_number}]
@@ -179,10 +180,11 @@ format_partitions(){
     #increase i
     [[ ${partition_name[i]} != another ]] && i=$(( i + 1 ))
   }
+
   format_partition(){
     read_input_text "Confirm format $1 partition"
     if [[ $OPTION == y ]]; then
-      [[ -z $3 ]] && select_filesystem
+      [[ -z $3 ]] && select_filesystem || filesystem=$3
       mkfs.${filesystem} $1 \
         $([[ ${filesystem} == xfs || ${filesystem} == btrfs ]] && echo "-f") \
         $([[ ${filesystem} == vfat ]] && echo "-F32")
@@ -192,6 +194,7 @@ format_partitions(){
       disable_partition
     fi
   }
+
   format_swap_partition(){
     read_input_text "Confirm format $1 partition"
     if [[ $OPTION == y ]]; then
@@ -200,6 +203,7 @@ format_partitions(){
       disable_partition
     fi
   }
+
   create_swap(){
     swap_options=("partition" "file" "skip");
     PS3="$prompt1"
@@ -236,7 +240,8 @@ format_partitions(){
       esac
     done
   }
-  function check_mountpoint(){
+
+  check_mountpoint(){
     if mount | grep $2; then
       echo "Successfully mounted"
       disable_partition "$1"
@@ -244,6 +249,20 @@ format_partitions(){
       echo "WARNING: Not Successfully mounted"
     fi
   }
+
+  set_efi_partition(){
+    efi_options=("/boot/efi" "/boot")
+    PS3="$prompt1"
+    echo -e "Select EFI mountpoint:\n"
+    select EFI_DISK in "${efi_options[@]}"; do
+      if contains_element "${EFI_DISK}" "${efi_options[@]}"; then
+        break
+      else
+        invalid_option
+      fi
+    done
+  }
+
   while true; do
     PS3="$prompt1"
     if [[ ${partition_name[i]} == swap ]]; then
@@ -261,19 +280,10 @@ format_partitions(){
               format_partition "${partition}" "${MOUNTPOINT}"
               ;;
             EFI)
-              efi_options=("/boot/efi" "/boot")
-              PS3="$prompt1"
-              echo -e "Select EFI mountpoint:\n"
-              select EFI_DISK in "${efi_options[@]}"; do
-                if contains_element "${EFI_DISK}" "${efi_options[@]}"; then
-                  break
-                else
-                  invalid_option
-                fi
-              done
+              set_efi_partition
               read_input_text "Format ${partition} partition"
               if [[ $OPTION == y ]]; then
-                format_partition "${partition}" "${MOUNTPOINT}${EFI_DISK}" "vfat"
+                format_partition "${partition}" "${MOUNTPOINT}${EFI_DISK}" vfat
               else
                 mkdir -p "${MOUNTPOINT}${EFI_DISK}"
                 mount -t vfat "${partition}" "${MOUNTPOINT}${EFI_DISK}"
