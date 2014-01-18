@@ -895,7 +895,7 @@ install_desktop_environment(){
       print_title "GNOME ICONS"
       echo " 1) $(menu_item "faenza-icon-theme")"
       echo " 2) $(menu_item "faience-icon-theme")"
-      echo " 3) $(menu_item "moka-icon-theme-git")"
+      echo " 3) $(menu_item "moka-icon-theme")"
       echo " 4) $(menu_item "nitrux-icon-theme")"
       echo " 5) $(menu_item "numix-icon-theme-git")"
       echo ""
@@ -913,7 +913,7 @@ install_desktop_environment(){
             ;;
           3)
             package_remove "moka-icon-theme-git"
-            aur_package_install "moka-icon-theme-gnome"
+            aur_package_install "moka-icon-theme"
             ;;
           4)
             aur_package_install "nitrux-icon-theme"
