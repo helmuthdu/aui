@@ -1868,8 +1868,8 @@ install_office_apps(){
     echo " 2) $(menu_item "goffice calligra" "$([[ ${KDE} -eq 1 ]] && echo "Caligra" || echo "Abiword + Gnumeric";)")"
     echo " 3) $(menu_item "texlive-core" "latex")"
     echo " 4) $(menu_item "calibre")"
-    echo " 5) $(menu_item "everpad") $AUR"
-    echo " 6) $(menu_item "gcstar")"
+    echo " 5) $(menu_item "gcstar")"
+    echo " 6) $(menu_item "geeknote-git") $AUR"
     echo " 7) $(menu_item "homebank")"
     echo " 8) $(menu_item "impressive")"
     echo " 9) $(menu_item "nitrotasks") $AUR"
@@ -1911,10 +1911,10 @@ install_office_apps(){
           package_install "calibre"
           ;;
         5)
-          package_install "everpad"
+          package_install "gcstar"
           ;;
         6)
-          package_install "gcstar"
+          package_install "geeknote-git"
           ;;
         7)
           package_install "homebank"
