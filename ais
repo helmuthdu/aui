@@ -276,6 +276,7 @@ format_partitions(){
           case ${partition_name[i]} in
             root)
               BOOT_DISK=`echo ${partition} | sed 's/[0-9]//'`
+              ROOT_PART=`echo ${partition} | sed 's/\/dev\///'`
               ROOT_DISK=${partition}
               format_partition "${partition}" "${MOUNTPOINT}"
               ;;
@@ -516,7 +517,6 @@ configure_bootloader(){
       print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
       print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
       syslinux_install_mode=("[MBR] Automatic" "[PARTITION] Automatic" "Manual")
-      ROOT_PART=`echo ${ROOT_DISK} | sed 's/\/dev\///'`
       PS3="$prompt1"
       echo -e "Syslinux Install:\n"
       select OPT in "${syslinux_install_mode[@]}"; do
@@ -562,10 +562,12 @@ configure_bootloader(){
           1)
             arch_chroot "gummiboot install"
             print_warning "Please check your .conf file"
-            # ROOT_UUID=`blkid -s PARTUUID /dev/${ROOT_DISK} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
-            echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=${ROOT_DISK} rw" > ${MOUNTPOINT}/boot/loader/entries/arch.conf
+            partuuid=`blkid -s PARTUUID ${ROOT_DISK} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
+            echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=PARTUUID=${partuuid} rw" > ${MOUNTPOINT}/boot/loader/entries/arch.conf
+            echo -e "default  arch\ntimeout  5" > /boot/loader/loader.conf
             pause_function
             $EDITOR ${MOUNTPOINT}/boot/loader/entries/arch.conf
+            $EDITOR ${MOUNTPOINT}/boot/loader/loader.conf
             break
             ;;
           2)
