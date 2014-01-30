@@ -1026,7 +1026,7 @@ install_desktop_environment(){
     while true
     do
       print_title "$1 THEMES"
-      echo " 1) $(menu_item "awoken-icons faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme elementary-xfce-icons inx-icon-theme matrilineare-icon-theme nitrux-icon-theme" "Icons Themes") $AUR"
+      echo " 1) $(menu_item "faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
       echo " 2) $(menu_item "xfce-theme-greybird-git gtk-theme-numix-git gtk-theme-orion-git zukitwo-themes" "GTK Themes") $AUR"
       echo ""
       echo " d) DONE"
@@ -1137,12 +1137,13 @@ install_desktop_environment(){
   print_info "A DE provide a complete GUI for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries.\n\nA window manager is one component of a system's graphical user interface."
   echo -e "Select your DE or WM:\n"
   echo " --- DE ---             --- WM ---"
-  echo " 1) Cinnamon            7) Awesome"
-  echo " 2) E17                 8) Fluxbox"
-  echo " 3) GNOME               9) OpenBox"
+  echo " 1) Cinnamon            8) Awesome"
+  echo " 2) E17                 9) Fluxbox"
+  echo " 3) GNOME              10) OpenBox"
   echo " 4) KDE"
   echo " 5) LXDE"
-  echo " 6) XFCE"
+  echo " 6) Mate"
+  echo " 7) XFCE"
   echo ""
   echo " b) BACK"
   read_input $DESKTOPENV
@@ -1364,6 +1365,23 @@ install_desktop_environment(){
       ;;
       #}}}
     6)
+      #MATE {{{
+      print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
+      print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
+      package_install "mate mate-extra"
+      package_install "gvfs"
+      aur_package_install "gnome-defaults-list"
+      # config xinitrc
+      config_xinitrc "mate-session"
+      pause_function
+      install_themes "MATE"
+      #D-Bus interface for user account query and manipulation
+      system_ctl enable accounts-daemon
+      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+      system_ctl enable upower
+      ;;
+      #}}}
+    7)
       #XFCE {{{
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
@@ -1380,7 +1398,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-    7)
+    8)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
       print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
@@ -1404,7 +1422,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-    8)
+    9)
       #FLUXBOX {{{
       print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
       print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
@@ -1423,7 +1441,7 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
-    9)
+    10)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -1619,7 +1637,7 @@ install_development_apps(){
     echo "16) $(menu_item "sublime-text-dev" "Sublime Text") $AUR"
     echo "17) $(menu_item "gdb" "Debuggers")"
     echo "18) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-    echo "19) $(menu_item "dbschema") $AUR"
+    echo "19) $(menu_item "navicat-premium" "Navicat Premium") $AUR"
     echo "20) $(menu_item "meld")"
     echo ""
     echo " b) BACK"
@@ -1842,7 +1860,7 @@ install_development_apps(){
           aur_package_install "mysql-workbench-gpl"
           ;;
         19)
-          aur_package_install "dbschema"
+          aur_package_install "navicat-premium"
           ;;
         20)
           package_install "meld"

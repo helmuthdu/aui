@@ -180,7 +180,7 @@
   #16) Sublime Text
   #17) Debuggers
   #18) MySQL Workbench
-  #19) DBSchema
+  #19) Navicat
   #20) Meld
   DEVELOPMENT_OPTIONS="11 14 20"
   #ECLIPSE {{{
