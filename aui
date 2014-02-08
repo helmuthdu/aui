@@ -913,7 +913,8 @@ install_desktop_environment(){
             ;;
           3)
             package_remove "moka-icon-theme-git"
-            aur_package_install "moka-icon-theme"
+            package_remove "moka-icon-theme"
+            aur_package_install "moka-icons-git"
             ;;
           4)
             aur_package_install "nitrux-icon-theme"

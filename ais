@@ -112,7 +112,7 @@ umount_partitions(){
 #CREATE PARTITION {{{
 create_partition(){
   select_device(){
-    devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd'`);
+    devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd'`);
     PS3="$prompt1"
     echo -e "Select partition:\n"
     select device in "${devices_list[@]}"; do
@@ -152,7 +152,7 @@ format_partitions(){
   print_info "This step will select and format the selected partiton where the archlinux will be installed"
   print_danger "\tAll data on the ROOT and SWAP partition will be LOST."
   i=0
-  partitions_list=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd'`)
+  partitions_list=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd\|vd'`)
 
   if [[ $UEFI -eq 1 ]]; then
     partition_name=("root" "EFI" "swap" "another")
