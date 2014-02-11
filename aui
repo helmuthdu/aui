@@ -576,8 +576,6 @@ install_samba(){
     # enable services
     system_ctl enable smbd
     system_ctl enable nmbd
-    # automatic mounting
-    system_ctl enable smbnetfs
     pause_function
   fi
 }
@@ -736,7 +734,7 @@ install_video_cards(){
     fi
     package_install "linux-headers"
     # Add repository
-    aur_package_install "catalyst-total"
+    aur_package_install "catalyst-test"
     aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
     system_ctl enable atieventsd
     system_ctl enable catalyst-hook
@@ -744,7 +742,7 @@ install_video_cards(){
   #}}}
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
-    is_package_installed "catalyst-total" && pacman -Rdds --noconfirm catalyst-total
+    is_package_installed "catalyst-test" && pacman -Rdds --noconfirm catalyst-test
     package_install "mesa-libgl"
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
     [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/ati.conf
