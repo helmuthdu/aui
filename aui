@@ -573,6 +573,8 @@ install_samba(){
       sed -i '/user_allow_other/s/^#//' /etc/fuse.conf
       modprobe fuse
     fi
+    echo "Enter your new samba account password:"
+    pdbedit -a -u ${username}
     # enable services
     system_ctl enable smbd
     system_ctl enable nmbd
