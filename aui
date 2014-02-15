@@ -1217,7 +1217,7 @@ install_desktop_environment(){
       package_install "gedit-plugins gnome-tweak-tool gnome-power-manager gucharmap"
       package_install "gvfs-smb gvfs-afc gvfs-goa"
       package_install "deja-dup"
-      aur_package_install "gnome-defaults-list"
+      aur_package_install "gnome-defaults-list nautilus-share"
       # config xinitrc
       config_xinitrc "gnome-session"
       GNOME=1
