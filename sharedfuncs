@@ -597,7 +597,7 @@
   }
   #}}}
   setlocale() { #{{{
-    local locale_list=(`cat /etc/locale.gen | grep _ | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
+    local locale_list=(`cat /etc/locale.gen | grep UTF-8 | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
     PS3="$prompt1"
     echo "Select locale:"
     select LOCALE in "${locale_list[@]}"; do
