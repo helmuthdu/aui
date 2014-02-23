@@ -1761,17 +1761,19 @@ install_development_apps(){
             print_title "NODEJS - http://nodejs.org"
             print_info "Node.js is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications. Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient, perfect for data-intensive real-time applications that run across distributed devices."
             echo " 1) backbone"
-            echo " 2) coffee-script"
-            echo " 3) express"
-            echo " 4) grunt"
-            echo " 5) jshint"
-            echo " 6) jslint"
-            echo " 7) less"
-            echo " 8) markdown"
-            echo " 9) mocha"
-            echo "10) stylus"
-            echo "11) uglify-js"
-            echo "12) underscore"
+            echo " 2) bower"
+            echo " 3) coffee-script"
+            echo " 4) express"
+            echo " 5) grunt"
+            echo " 6) jshint"
+            echo " 7) jslint"
+            echo " 8) less"
+            echo " 9) markdown"
+            echo "10) mocha"
+            echo "11) stylus"
+            echo "12) uglify-js"
+            echo "13) underscore"
+            echo "14) Yeoman"
             echo ""
             echo " b) BACK"
             echo ""
@@ -1783,37 +1785,43 @@ install_development_apps(){
                   npm_install "backbone"
                   ;;
                 2)
-                  npm_install "coffee-script"
+                  npm_install "bower"
                   ;;
                 3)
-                  npm_install "express"
+                  npm_install "coffee-script"
                   ;;
                 4)
-                  npm_install "grunt"
+                  npm_install "express"
                   ;;
                 5)
-                  npm_install "jshint"
+                  npm_install "grunt grunt-cli"
                   ;;
                 6)
-                  npm_install "jslint"
+                  npm_install "jshint"
                   ;;
                 7)
-                  npm_install "less"
+                  npm_install "jslint"
                   ;;
                 8)
-                  npm_install "markdown"
+                  npm_install "less"
                   ;;
                 9)
-                  npm_install "mocha"
+                  npm_install "markdown"
                   ;;
                 10)
-                  npm_install "stylus"
+                  npm_install "mocha"
                   ;;
                 11)
-                  npm_install "uglify-js"
+                  npm_install "stylus"
                   ;;
                 12)
+                  npm_install "uglify-js"
+                  ;;
+                13)
                   npm_install "underscore"
+                  ;;
+                14)
+                  npm_install "yo grunt-cli bower generator-angular"
                   ;;
                 "b")
                   break

@@ -198,18 +198,20 @@
   #}}}
   #NODEJS {{{
     # 1) backbone
-    # 2) coffee-script
-    # 3) express
-    # 4) grunt
-    # 5) jshint
-    # 6) jslint
-    # 7) less
-    # 8) markdown
-    # 9) mocha
-    # 10) stylus
-    # 11) uglify-js
-    # 12) underscore
-    NODEJS_OPTIONS="2 5 6 7 11"
+    # 2) bower
+    # 3) coffee-script
+    # 4) express
+    # 5) grunt
+    # 6) jshint
+    # 7) jslint
+    # 8) less
+    # 9) markdown
+    # 10) mocha
+    # 11) stylus
+    # 12) uglify-js
+    # 13) underscore
+    # 14) yeoman
+    NODEJS_OPTIONS="2 6 7 8 12 14"
   #}}}
 #}}}
 #OFFICE {{{
