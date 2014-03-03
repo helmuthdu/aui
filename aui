@@ -640,7 +640,8 @@ font_config(){
     print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
     print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
     echo " 1) Default"
-    echo " 2) Ubuntu ${AUR}"
+    echo " 2) Infinality [Recommended]"
+    echo " 3) Ubuntu ${AUR}"
     echo ""
     read_input $FONTCONFIG
     case "$OPTION" in
@@ -650,6 +651,18 @@ font_config(){
         break
         ;;
       2)
+        print_title "INFINALITY - https://wiki.archlinux.org/index.php/Infinality-bundle%2Bfonts"
+        add_repository "infinality-bundle" "http://ibn.net63.net/infinality-bundle/\$arch"
+        add_repository "infinality-bundle-multilib" "http://ibn.net63.net/infinality-bundle-multilib/\$arch"
+        pacman-key -r 962DDE58
+        pacman-key --lsign-key 962DDE58
+        is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
+        is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
+        pacman -S --needed infinality-bundle
+        [[ $ARCHI == x86_64 ]] && pacman -S --needed infinality-bundle-multilib
+        break
+        ;;
+      3)
         is_package_installed "fontconfig" && pacman -Rdds freetype2 fontconfig cairo
         aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
         break
