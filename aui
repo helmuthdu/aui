@@ -1488,6 +1488,9 @@ install_desktop_environment(){
     [[ ${KDE} -eq 1 ]] && package_install "kio-mtp" || package_install "gvfs-mtp"
   fi
   #}}}
+  #Fix p7FM {{{
+  [[ ${KDE} -eq 0 ]] && package_install "wxgtk"
+  #}}}
 }
 #}}}
 #CONNMAN/NETWORKMANAGER/WICD {{{
