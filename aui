@@ -2224,12 +2224,13 @@ install_internet_apps(){
             echo " 2) $(menu_item "btsync" "BitTorrent Sync") $AUR"
             echo " 3) $(menu_item "deluge")"
             echo " 4) $(menu_item "dropbox") $AUR"
-            echo " 5) $(menu_item "jdownloader") $AUR"
-            echo " 6) $(menu_item "qbittorrent") $AUR"
-            echo " 7) $(menu_item "sparkleshare")"
-            echo " 8) $(menu_item "spideroak") $AUR"
-            echo " 9) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
-            echo "10) $(menu_item "uget")"
+            echo " 5) $(menu_item "flareget") $AUR"
+            echo " 6) $(menu_item "jdownloader") $AUR"
+            echo " 7) $(menu_item "qbittorrent") $AUR"
+            echo " 8) $(menu_item "sparkleshare")"
+            echo " 9) $(menu_item "spideroak") $AUR"
+            echo "10) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+            echo "11) $(menu_item "uget")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2251,18 +2252,21 @@ install_internet_apps(){
                   add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
                   ;;
                 5)
-                  aur_package_install "jdownloader"
+                  aur_package_install "flareget"
                   ;;
                 6)
-                  aur_package_install "qbittorrent"
+                  aur_package_install "jdownloader"
                   ;;
                 7)
-                  package_install "sparkleshare"
+                  aur_package_install "qbittorrent"
                   ;;
                 8)
-                  aur_package_install "spideroak"
+                  package_install "sparkleshare"
                   ;;
                 9)
+                  aur_package_install "spideroak"
+                  ;;
+                10)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "transmission-qt"
                   else
@@ -2274,7 +2278,7 @@ install_internet_apps(){
                   fi
 
                   ;;
-                10)
+                11)
                   package_install "uget"
                   ;;
                 "b")

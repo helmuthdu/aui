@@ -277,13 +277,14 @@
     # 2) BitTorrent Sync
     # 3) Deluge
     # 4) Dropbox
-    # 5) Jdownloader
-    # 6) qBittorrent
-    # 7) Sparkleshare
-    # 8) Spider Oak
-    # 9) Trasmission
-    #10) uGet
-    DOWNLOAD_OPTIONS="4 5 9"
+    # 5) FlareGet
+    # 6) Jdownloader
+    # 7) qBittorrent
+    # 8) Sparkleshare
+    # 9) Spider Oak
+    #10) Trasmission
+    #11) uGet
+    DOWNLOAD_OPTIONS="4 10"
   #}}}
   #EMAIL|RSS {{{
     # 1) Mozilla Thunderbird
