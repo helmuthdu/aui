@@ -2228,8 +2228,8 @@ install_internet_apps(){
             echo " 6) $(menu_item "qbittorrent") $AUR"
             echo " 7) $(menu_item "sparkleshare")"
             echo " 8) $(menu_item "spideroak") $AUR"
-            echo " 9) $(menu_item "steadyflow-bzr") $AUR"
-            echo "10) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+            echo " 9) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+            echo "10) $(menu_item "uget")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2263,9 +2263,6 @@ install_internet_apps(){
                   aur_package_install "spideroak"
                   ;;
                 9)
-                  aur_package_install "steadyflow-bzr"
-                  ;;
-                10)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "transmission-qt"
                   else
@@ -2276,6 +2273,9 @@ install_internet_apps(){
                     replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${username}/.config/transmission/settings.json
                   fi
 
+                  ;;
+                10)
+                  package_install "uget"
                   ;;
                 "b")
                   break
@@ -2605,15 +2605,13 @@ install_audio_apps(){
         3)
           package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good \
                            gst-plugins-bad gst-plugins-ugly gst-libav"
-          if is_package_installed "amarok banshee clementine exaile rhythmbox xfburn" ; then
-            package_install "gstreamer0.10 gstreamer0.10-plugins"
-            [[ ${KDE} -eq 1 ]] && package_install "phonon-gstreamer"
-            # Use the 'standard' preset by default. This preset should generally be
-            # transparent to most people on most music and is already quite high in quality.
-            # The resulting bitrate should be in the 170-210kbps range, according to music
-            # complexity.
-            sudo -u ${username} gconftool-2 --type string --set /system/gstreamer/0.10/audio/profiles/mp3/pipeline "audio/x-raw-int,rate=44100,channels=2 ! lame name=enc preset=1001 ! id3v2mux"
-          fi
+          package_install "gstreamer0.10 gstreamer0.10-plugins"
+          [[ ${KDE} -eq 1 ]] && package_install "phonon-gstreamer"
+          # Use the 'standard' preset by default. This preset should generally be
+          # transparent to most people on most music and is already quite high in quality.
+          # The resulting bitrate should be in the 170-210kbps range, according to music
+          # complexity.
+          sudo -u ${username} gconftool-2 --type string --set /system/gstreamer/0.10/audio/profiles/mp3/pipeline "audio/x-raw-int,rate=44100,channels=2 ! lame name=enc preset=1001 ! id3v2mux"
           ;;
         "b")
           break

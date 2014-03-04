@@ -281,9 +281,9 @@
     # 6) qBittorrent
     # 7) Sparkleshare
     # 8) Spider Oak
-    # 9) Steadyflow
-    #10) Trasmission
-    DOWNLOAD_OPTIONS="4 5 10"
+    # 9) Trasmission
+    #10) uGet
+    DOWNLOAD_OPTIONS="4 5 9"
   #}}}
   #EMAIL|RSS {{{
     # 1) Mozilla Thunderbird
