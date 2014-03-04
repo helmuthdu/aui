@@ -53,19 +53,19 @@
     FONTCONFIG=2
   #}}}
   #ADDITIONAL FIRMWARE {{{
-    # 1) alsa-firmware
-    # 2) ipw2100
-    # 3) ipw2200
-    # 4) b43
-    # 5) b43legacy
-    # 6) broadcom-wl
-    # 7) bluez-firmware
-    # 8) libmtp
-    # 9) libffado [Firmware Audio Devices]
-    #10) libraw1394 [IEE1394 Driver]
-    #11) aic94xx-firmware
-    #12) bfa-firmware
-    FIRMWARE_OPTIONS="8"
+    # 1) aic94xx-firmware
+    # 2) alsa-firmware
+    # 3) b43
+    # 4) b43legacy
+    # 5) bfa-firmware
+    # 6) bluez-firmware
+    # 7) broadcom-wl
+    # 8) ipw2100
+    # 9) ipw2200
+    #10) libffado [Firmware Audio Devices]
+    #11) libmtp [Android Devices]
+    #12) libraw1394 [IEE1394 Driver]
+    FIRMWARE_OPTIONS="11"
   #}}}
 #}}}
 #DESKTOP ENVIRONMENT|WINDOW MANAGER {{{
@@ -153,13 +153,14 @@
   # 4) Docky
   # 5) Galculator
   # 6) Kupfer
-  # 7) Pyrenamer
-  # 8) Shutter
-  # 9) Springseed
-  #10) Stormcloud
-  #11) Synapse
-  #12) Terminator
-  #13) Zim
+  # 7) Pamac
+  # 8) Pyrenamer
+  # 9) Shutter
+  #10) Springseed
+  #11) Stormcloud
+  #12) Synapse
+  #13) Terminator
+  #14) Zim
   ACCESSORIES_OPTIONS=""
 #}}}
 #DEVELOPEMENT {{{

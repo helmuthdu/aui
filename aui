@@ -804,18 +804,18 @@ install_additional_firmwares(){
     while true
     do
       print_title "INSTALL ADDITIONAL FIRMWARES"
-      echo " 1) $(menu_item "alsa-firmware")"
-      echo " 2) $(menu_item "ipw2100-fw")"
-      echo " 3) $(menu_item "ipw2200-fw")"
-      echo " 4) $(menu_item "b43-firmware") $AUR"
-      echo " 5) $(menu_item "b43-firmware-legacy") $AUR"
-      echo " 6) $(menu_item "broadcom-wl") $AUR"
-      echo " 7) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
-      echo " 8) $(menu_item "libmtp") [Android Devices]"
-      echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
-      echo "10) $(menu_item "libraw1394") [IEEE1394 Driver]"
-      echo "11) $(menu_item "aic94xx-firmware") $AUR"
-      echo "12) $(menu_item "bfa-firmware") $AUR"
+      echo " 1) $(menu_item "aic94xx-firmware") $AUR"
+      echo " 2) $(menu_item "alsa-firmware")"
+      echo " 3) $(menu_item "b43-firmware") $AUR"
+      echo " 4) $(menu_item "b43-firmware-legacy") $AUR"
+      echo " 5) $(menu_item "bfa-firmware") $AUR"
+      echo " 6) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
+      echo " 7) $(menu_item "broadcom-wl") $AUR"
+      echo " 8) $(menu_item "ipw2100-fw")"
+      echo " 9) $(menu_item "ipw2200-fw")"
+      echo "10) $(menu_item "libffado") [Fireware Audio Devices]"
+      echo "11) $(menu_item "libmtp") [Android Devices]"
+      echo "12) $(menu_item "libraw1394") [IEEE1394 Driver]"
       echo ""
       echo " d) DONE"
       echo ""
@@ -824,41 +824,41 @@ install_additional_firmwares(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            package_install "alsa-firmware"
+            aur_package_install "aic94xx-firmware"
             ;;
           2)
-            package_install "ipw2100-fw"
+            package_install "alsa-firmware"
             ;;
           3)
-            package_install "ipw2200-fw"
-            ;;
-          4)
             aur_package_install "b43-firmware"
             ;;
-          5)
+          4)
             aur_package_install "b43-firmware-legacy"
             ;;
-          6)
-            aur_package_install "broadcom-wl"
+          5)
+            aur_package_install "bfa-firmware"
             ;;
-          7)
+          6)
             package_install "bluez-firmware"
             ;;
+          7)
+            aur_package_install "broadcom-wl"
+            ;;
           8)
+            package_install "ipw2100-fw"
+            ;;
+          9)
+            package_install "ipw2200-fw"
+            ;;
+          10)
+            package_install "libffado"
+            ;;
+          11)
             package_install "libmtp"
             aur_package_install "android-udev"
             ;;
-          9)
-            package_install "libffado"
-            ;;
-          10)
-            package_install "libraw1394"
-            ;;
-          11)
-            aur_package_install "aic94xx-firmware"
-            ;;
           12)
-            aur_package_install "bfa-firmware"
+            package_install "libraw1394"
             ;;
           "d")
             break
@@ -1564,13 +1564,14 @@ install_accessories_apps(){
     echo " 4) $(menu_item "docky") $AUR"
     echo " 5) $(menu_item "galculator") $AUR"
     echo " 6) $(menu_item "kupfer") $AUR"
-    echo " 7) $(menu_item "pyrenamer") $AUR"
-    echo " 8) $(menu_item "shutter") $AUR"
-    echo " 9) $(menu_item "springseed") $AUR"
-    echo "10) $(menu_item "stormcloud") $AUR"
-    echo "11) $(menu_item "synapse")"
-    echo "12) $(menu_item "terminator")"
-    echo "13) $(menu_item "zim")"
+    echo " 7) $(menu_item "pamac-aur" "Pamac") $AUR"
+    echo " 8) $(menu_item "pyrenamer") $AUR"
+    echo " 9) $(menu_item "shutter") $AUR"
+    echo "10) $(menu_item "springseed") $AUR"
+    echo "11) $(menu_item "stormcloud") $AUR"
+    echo "12) $(menu_item "synapse")"
+    echo "13) $(menu_item "terminator")"
+    echo "14) $(menu_item "zim")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1598,24 +1599,27 @@ install_accessories_apps(){
           aur_package_install "kupfer"
           ;;
         7)
-          aur_package_install "pyrenamer"
+          aur_package_install "pamac-aur"
           ;;
         8)
-          aur_package_install "shutter"
+          aur_package_install "pyrenamer"
           ;;
         9)
-          aur_package_install "springseed"
+          aur_package_install "shutter"
           ;;
         10)
-          aur_package_install "stormcloud"
+          aur_package_install "springseed"
           ;;
         11)
-          package_install "synapse"
+          aur_package_install "stormcloud"
           ;;
         12)
-          package_install "terminator"
+          package_install "synapse"
           ;;
         13)
+          package_install "terminator"
+          ;;
+        14)
           package_install "zim"
           ;;
         "b")
