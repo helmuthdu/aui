@@ -1386,6 +1386,7 @@ install_desktop_environment(){
       # config xinitrc
       config_xinitrc "mate-session"
       pause_function
+      install_display_manager
       install_themes "MATE"
       #D-Bus interface for user account query and manipulation
       system_ctl enable accounts-daemon
