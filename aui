@@ -2225,7 +2225,7 @@ install_internet_apps(){
             echo " 3) $(menu_item "deluge")"
             echo " 4) $(menu_item "dropbox") $AUR"
             echo " 5) $(menu_item "jdownloader") $AUR"
-            echo " 6) $(menu_item "nitroshare") $AUR"
+            echo " 6) $(menu_item "qbittorrent") $AUR"
             echo " 7) $(menu_item "sparkleshare")"
             echo " 8) $(menu_item "spideroak") $AUR"
             echo " 9) $(menu_item "steadyflow-bzr") $AUR"
@@ -2254,7 +2254,7 @@ install_internet_apps(){
                   aur_package_install "jdownloader"
                   ;;
                 6)
-                  aur_package_install "nitroshare"
+                  aur_package_install "qbittorrent"
                   ;;
                 7)
                   package_install "sparkleshare"
