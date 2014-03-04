@@ -210,14 +210,12 @@ select_user(){
     #}}}
     #EDITOR {{{
     print_title "DEFAULT EDITOR"
-    editors_list=("emacs" "joe" "nano" "vi" "vim" "zile");
+    editors_list=("emacs" "nano" "vi" "vim" "zile");
     PS3="$prompt1"
     echo -e "Select editor\n"
     select EDITOR in "${editors_list[@]}"; do
       if contains_element "$EDITOR" "${editors_list[@]}"; then
-        if [[ $EDITOR == joe ]]; then
-          ! is_package_installed "joe" && aui_download_packages "joe"
-        elif [[ $EDITOR == vim ]]; then
+        if [[ $EDITOR == vim ]]; then
           ! is_package_installed "gvim" && package_install "vim ctags"
           #VIMRC {{{
           if [[ ! -f /home/${username}/.vimrc ]]; then
@@ -3623,7 +3621,7 @@ reconfigure_system(){
   print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
   OPTION=n
   while [[ $OPTION != y ]]; do
-    setkeymap
+    getkeymap
     read_input_text "Confirm keymap: $KEYMAP"
   done
   localectl set-keymap ${KEYMAP}

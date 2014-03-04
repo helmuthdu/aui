@@ -31,7 +31,7 @@ select_keymap(){
   print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
   OPTION=n
   while [[ $OPTION != y ]]; do
-    setkeymap
+    getkeymap
     read_input_text "Confirm keymap: $KEYMAP"
   done
   loadkeys $KEYMAP
@@ -40,7 +40,7 @@ select_keymap(){
 #DEFAULT EDITOR {{{
 select_editor(){
   print_title "DEFAULT EDITOR"
-  editors_list=("emacs" "nano" "vi" "vim");
+  editors_list=("emacs" "nano" "vi" "vim" "zile");
   PS3="$prompt1"
   echo -e "Select editor\n"
   select EDITOR in "${editors_list[@]}"; do
@@ -339,6 +339,7 @@ install_base_system(){
 configure_keymap(){
   #ADD KEYMAP TO THE NEW SETUP
   echo "KEYMAP=$KEYMAP" > ${MOUNTPOINT}/etc/vconsole.conf
+  arch_chroot "setxkbmap -layout $KEYMAP"
 }
 #}}}
 #CONFIGURE FSTAB {{{

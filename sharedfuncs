@@ -583,7 +583,7 @@
     arch-chroot $MOUNTPOINT /bin/bash -c "${1}"
   }
   #}}}
-  setkeymap() { #{{{
+  getkeymap() { #{{{
     local keymaps=(`localectl list-keymaps`)
     PS3="(shift+pgup/pgdown) $prompt1"
     echo "Select keymap:"
