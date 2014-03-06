@@ -1490,7 +1490,7 @@ install_desktop_environment(){
   fi
   #}}}
   #Fix p7FM {{{
-  [[ ${KDE} -eq 0 ]] && package_install "wxgtk"
+  [[ ${KDE} -eq 0 ]] && package_install "wxgtk2.8"
   #}}}
 }
 #}}}
