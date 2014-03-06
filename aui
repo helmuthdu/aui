@@ -1168,7 +1168,7 @@ install_desktop_environment(){
       package_install "cinnamon-screensaver cinnamon-control-center nemo"
       package_install "gedit-plugins"
       package_install "gksu xdg-user-dirs-gtk gucharmap libgnomekbd"
-      package_install "gvfs-smb gvfs-afc"
+      package_install "gvfs-smb gvfs-afc lxpolkit"
       aur_package_install "gnome-defaults-list"
       # extensions
       aur_package_install "cinnamon-applet-screenshot-record"
@@ -1207,7 +1207,7 @@ install_desktop_environment(){
       print_title "E17 - http://wiki.archlinux.org/index.php/E17"
       print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
       package_install "enlightenment"
-      package_install "gvfs"
+      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
       package_install "xdg-user-dirs"
       package_install "leafpad epdfview"
       package_install "lxappearance"
@@ -1359,8 +1359,8 @@ install_desktop_environment(){
       #LXDE {{{
       print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
       print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
-      package_install "lxde"
-      package_install "gvfs upower"
+      package_install "lxde upower"
+      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
       package_install "xdg-user-dirs"
       package_install "leafpad obconf epdfview"
       aur_package_install "gnome-defaults-list"
@@ -1381,7 +1381,7 @@ install_desktop_environment(){
       print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
       print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
       package_install "mate mate-extra"
-      package_install "gvfs"
+      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
       aur_package_install "gnome-defaults-list"
       # config xinitrc
       config_xinitrc "mate-session"
@@ -1399,7 +1399,7 @@ install_desktop_environment(){
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
       package_install "xfce4 xfce4-goodies mupdf"
-      package_install "gvfs"
+      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
       package_install "xdg-user-dirs"
       aur_package_install "gnome-defaults-list"
       # config xinitrc
