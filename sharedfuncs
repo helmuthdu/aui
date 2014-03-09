@@ -61,6 +61,8 @@
   # ARCHITECTURE
   ARCHI=`uname -m`
   UEFI=0
+  LUKS=0
+  LVM=0
   EFI_DISK="/boot/efi"
   ROOT_DISK="/dev/sda1"
   BOOT_DISK="/dev/sda"

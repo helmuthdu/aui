@@ -111,6 +111,8 @@ umount_partitions(){
 #}}}
 #CREATE PARTITION SCHEME {{{
 create_partition_scheme(){
+  LUKS=0
+  LVM=0
   select_device(){
     devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd'`);
     PS3="$prompt1"
@@ -185,6 +187,7 @@ setup_luks(){
     if contains_element "$OPT" "${block_list[@]}"; then
       cryptsetup luksFormat $OPT
       cryptsetup open --type luks $OPT crypt
+      LUKS=1
       break
     elif [[ $OPT == "Cancel" ]]; then
       break
@@ -199,7 +202,7 @@ setup_lvm(){
   print_title "LVM - https://wiki.archlinux.org/index.php/LVM"
   print_info "LVM is a logical volume manager for the Linux kernel; it manages disk drives and similar mass-storage devices. "
   print_warning "Last partition will take 100% of free space left"
-  if [[ -n $(lsblk | grep crypt) ]]; then
+  if [[ $LUKS -eq 1 ]]; then
     pvcreate /dev/mapper/crypt
     vgcreate lvm /dev/mapper/crypt
   else
@@ -228,6 +231,7 @@ setup_lvm(){
     fi
     i=$(( i + 1 ))
   done
+  LVM=1
 }
 #}}}
 #SELECT|FORMAT PARTITIONS {{{
@@ -536,6 +540,8 @@ configure_locale(){
 configure_mkinitcpio(){
   print_title "MKINITCPIO - https://wiki.archlinux.org/index.php/Mkinitcpio"
   print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
+  [[ $LUKS -eq 1 ]] && sed -i '/^HOOK/s/block/block keymap encrypt/'/etc/mkinitcpio.conf
+  [[ $LVM -eq 1 ]] && sed -i '/^HOOK/s/filesystems/lvm2 filesystems/'/etc/mkinitcpio.conf
   arch_chroot "mkinitcpio -p linux"
 }
 #}}}
