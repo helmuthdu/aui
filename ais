@@ -189,6 +189,7 @@ setup_luks(){
       cryptsetup luksFormat $OPT
       cryptsetup open --type luks $OPT crypt
       LUKS=1
+      LUKS_DISK=${OPT}
       break
     elif [[ $OPT == "Cancel" ]]; then
       break
@@ -553,28 +554,24 @@ install_bootloader(){
   print_warning "\tROOT Partition: ${ROOT_DISK}"
   if [[ $UEFI -eq 1 ]]; then
     print_warning "\tUEFI Mode Detected"
-    bootloaders_list=("Grub2" "Syslinux" "Gummiboot" "Skip")
+    bootloaders_list=("Syslinux" "Gummiboot" "Skip")
   else
     print_warning "\tBIOS Mode Detected"
-    bootloaders_list=("Grub2" "Syslinux" "Skip")
+    bootloaders_list=("Syslinux" "Skip")
   fi
   PS3="$prompt1"
   echo -e "Install bootloader:\n"
   select bootloader in "${bootloaders_list[@]}"; do
     case "$REPLY" in
       1)
-        pacstrap ${MOUNTPOINT} grub os-prober
-        break
-        ;;
-      2)
         pacstrap ${MOUNTPOINT} syslinux
         break
         ;;
-      3)
+      2)
         [[ $UEFI -eq 1 ]] && pacstrap ${MOUNTPOINT} gummiboot
         break
         ;;
-      4)
+      3)
         [[ $UEFI -eq 1 ]] && break || invalid_option
         ;;
       *)
@@ -588,33 +585,6 @@ install_bootloader(){
 #CONFIGURE BOOTLOADER {{{
 configure_bootloader(){
   case $bootloader in
-    Grub2)
-      print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
-      print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
-      grub_install_mode=("Automatic" "Manual")
-      PS3="$prompt1"
-      echo -e "Grub Install:\n"
-      select OPT in "${grub_install_mode[@]}"; do
-        case "$REPLY" in
-          1)
-            if [[ $UEFI -eq 1 ]]; then
-              arch_chroot "grub-install --target=x86_64-efi --efi-directory=${EFI_DISK} --bootloader-id=arch_grub --recheck"
-            else
-              arch_chroot "grub-install --target=i386-pc --recheck --debug ${BOOT_DISK}"
-            fi
-            break
-            ;;
-          2)
-            arch-chroot ${MOUNTPOINT}
-            break
-            ;;
-          *)
-            invalid_option
-            ;;
-        esac
-      done
-      arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
-      ;;
     Syslinux)
       print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
       print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
@@ -625,7 +595,13 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             arch_chroot "syslinux-install_update -iam"
-            sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            if [[ $LUKS -eq 1 ]]; then
+              sed -i "s/APPEND root=.*/APPEND root=$ROOT_DISK cryptdevice=$LUKS_DISK:crypt ro/" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            elif [[ $LVM -eq 1 ]]; then
+              sed -i "s/APPEND root=.*/APPEND root=$ROOT_DISK rw/" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            else
+              sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            fi
             print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
             pause_function
             $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
@@ -633,7 +609,13 @@ configure_bootloader(){
             ;;
           2)
             arch_chroot "syslinux-install_update -i"
-            sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            if [[ $LUKS -eq 1 ]]; then
+              sed -i "s/APPEND root=.*/APPEND root=$ROOT_DISK cryptdevice=$LUKS_DISK:crypt ro/" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            elif [[ $LVM -eq 1 ]]; then
+              sed -i "s/APPEND root=.*/APPEND root=$ROOT_DISK rw/" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            else
+              sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            fi
             print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
             pause_function
             $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
