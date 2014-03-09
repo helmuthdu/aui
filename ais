@@ -146,6 +146,58 @@ create_partition(){
   done
 }
 #}}}
+#SETUP LUKS {{{
+setup_luks(){
+  print_title "LUKS - https://wiki.archlinux.org/index.php/LUKS"
+  print_info "The Linux Unified Key Setup or LUKS is a disk-encryption specification created by Clemens Fruhwirth and originally intended for Linux."
+  print_danger "Do not use this for boot partitions"
+  partitions_list=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd\|vd'`)
+  PS3="$prompt1"
+  echo -e "Select partition:"
+  select OPT in "${partitions_list[@]}" "Back"; do
+    if contains_element "$OPT" "${partitions_list[@]}"; then
+      cryptsetup luksFormat /dev/$OPT
+      cryptsetup open --type luks /dev/$OPT lvm
+    elif [[ $OPT == "Back" ]]; then
+      break
+    else
+      invalid_option
+    fi
+  done
+}
+#}}}
+#SETUP LVM {{{
+setup_lvm(){
+  print_title "LVM - https://wiki.archlinux.org/index.php/LVM"
+  print_info "LVM is a logical volume manager for the Linux kernel; it manages disk drives and similar mass-storage devices. "
+  pvcreate /dev/mapper/lvm
+  vgcreate storage /dev/mapper/lvm
+  partitions_layout_list=("root", "root|home", "root|swap|home", "root|home|media", "root|swap|home|media")
+  total_memory=`grep MemTotal /proc/meminfo | awk '{print ($2/1024)/1024}' | sed 's/\..*//'`
+  PS3="$prompt1"
+  echo -e "Select partition layout:"
+  select OPT in "${partitions_list[@]}" "Back"; do
+    case "$REPLY" in
+      1)
+        break
+        ;;
+      2)
+        break
+        ;;
+      3)
+        break
+        ;;
+      *)
+        invalid_option
+        ;;
+    esac
+  done
+  read -p ""
+  lvcreate -L 25G storage -n root
+  lvcreate -L 2G storage -n swap
+  lvcreate -l 100%FREE storage -n home
+}
+#}}}
 #SELECT|FORMAT PARTITIONS {{{
 format_partitions(){
   print_title "https://wiki.archlinux.org/index.php/Format_a_partition"

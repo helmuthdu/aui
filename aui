@@ -567,6 +567,7 @@ install_samba(){
       chown root:${USERSHARES_GROUP} ${USERSHARES_DIR}
       chmod 1770 ${USERSHARES_DIR}
       sed -i -e '/\[global\]/a\\n   usershare path = /var/lib/samba/usershare\n   usershare max shares = 100\n   usershare allow guests = yes\n   usershare owner only = False' /etc/samba/smb.conf
+      sed -i -e '/\[global\]/a\\n   socket options = IPTOS_LOWDELAY TCP_NODELAY SO_KEEPALIVE\n   write cache size = 2097152\n   use sendfile = yes\n' /etc/samba/smb.conf
       usermod -a -G ${USERSHARES_GROUP} ${username}
       sed -i '/user_allow_other/s/^#//' /etc/fuse.conf
       modprobe fuse
