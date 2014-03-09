@@ -189,7 +189,7 @@ setup_luks(){
       cryptsetup luksFormat $OPT
       cryptsetup open --type luks $OPT crypt
       LUKS=1
-      LUKS_DISK=${OPT}
+      LUKS_DISK=`echo ${OPT} | sed 's/\/dev\///'`
       break
     elif [[ $OPT == "Cancel" ]]; then
       break
@@ -542,8 +542,8 @@ configure_locale(){
 configure_mkinitcpio(){
   print_title "MKINITCPIO - https://wiki.archlinux.org/index.php/Mkinitcpio"
   print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
-  [[ $LUKS -eq 1 ]] && sed -i '/^HOOK/s/block/block keymap encrypt/' /etc/mkinitcpio.conf
-  [[ $LVM -eq 1 ]] && sed -i '/^HOOK/s/filesystems/lvm2 filesystems/' /etc/mkinitcpio.conf
+  [[ $LUKS -eq 1 ]] && sed -i '/^HOOK/s/block/block keymap encrypt/' ${MOUNTPOINT}/etc/mkinitcpio.conf
+  [[ $LVM -eq 1 ]] && sed -i '/^HOOK/s/filesystems/lvm2 filesystems/' ${MOUNTPOINT}/etc/mkinitcpio.conf
   arch_chroot "mkinitcpio -p linux"
 }
 #}}}
@@ -596,9 +596,9 @@ configure_bootloader(){
           1)
             arch_chroot "syslinux-install_update -iam"
             if [[ $LUKS -eq 1 ]]; then
-              sed -i "s/APPEND root=.*/APPEND root=$ROOT_DISK cryptdevice=$LUKS_DISK:crypt ro/" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+              sed -i "s/APPEND root=.*/APPEND root=\/dev\/mapper\/${ROOT_PART} cryptdevice=\/dev\/${LUKS_DISK}:crypt ro/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             elif [[ $LVM -eq 1 ]]; then
-              sed -i "s/APPEND root=.*/APPEND root=$ROOT_DISK rw/" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+              sed -i "s/sda[0-9]/\/dev\/mapper\/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             else
               sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             fi
