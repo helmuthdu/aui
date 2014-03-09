@@ -124,6 +124,7 @@ create_partition_scheme(){
         invalid_option
       fi
     done
+    BOOT_DISK=$device
   }
   print_title "https://wiki.archlinux.org/index.php/Partitioning"
   print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another."
@@ -373,8 +374,7 @@ format_partitions(){
         if contains_element "${partition}" "${partitions_list[@]}"; then
           case ${partition_name[i]} in
             root)
-              BOOT_DISK=`echo ${partition} | sed 's/[0-9]//'`
-              ROOT_PART=`echo ${partition} | sed 's/\/dev\///'`
+              ROOT_PART=`echo ${partition} | sed 's/\/dev\/mapper\///' | sed 's/\/dev\///'`
               ROOT_DISK=${partition}
               format_partition "${partition}" "${MOUNTPOINT}"
               ;;
@@ -391,6 +391,7 @@ format_partitions(){
               ;;
             another)
               read -p "Mountpoint [ex: /home]:" directory
+              [[ $directory == "/boot" ]] && BOOT_DISK=`echo ${partition} | sed 's/[0-9]//'`
               select_filesystem
               read_input_text "Format ${partition} partition"
               if [[ $OPTION == y ]]; then
