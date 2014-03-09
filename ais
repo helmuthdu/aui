@@ -541,8 +541,8 @@ configure_locale(){
 configure_mkinitcpio(){
   print_title "MKINITCPIO - https://wiki.archlinux.org/index.php/Mkinitcpio"
   print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
-  [[ $LUKS -eq 1 ]] && sed -i '/^HOOK/s/block/block keymap encrypt/'/etc/mkinitcpio.conf
-  [[ $LVM -eq 1 ]] && sed -i '/^HOOK/s/filesystems/lvm2 filesystems/'/etc/mkinitcpio.conf
+  [[ $LUKS -eq 1 ]] && sed -i '/^HOOK/s/block/block keymap encrypt/' /etc/mkinitcpio.conf
+  [[ $LVM -eq 1 ]] && sed -i '/^HOOK/s/filesystems/lvm2 filesystems/' /etc/mkinitcpio.conf
   arch_chroot "mkinitcpio -p linux"
 }
 #}}}
