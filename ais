@@ -172,19 +172,33 @@ setup_lvm(){
   print_info "LVM is a logical volume manager for the Linux kernel; it manages disk drives and similar mass-storage devices. "
   pvcreate /dev/mapper/lvm
   vgcreate storage /dev/mapper/lvm
-  partitions_layout_list=("root", "root|home", "root|swap|home", "root|home|media", "root|swap|home|media")
+  partition_layout_list=("root", "root|swap", "root|home", "root|swap|home")
   total_memory=`grep MemTotal /proc/meminfo | awk '{print ($2/1024)/1024}' | sed 's/\..*//'`
   PS3="$prompt1"
   echo -e "Select partition layout:"
-  select OPT in "${partitions_list[@]}" "Back"; do
+  select OPT in "${partition_layout_list[@]}" "Back"; do
     case "$REPLY" in
       1)
+        lvcreate -l 100%FREE storage -n root
         break
         ;;
       2)
+        lvcreate -L ${total_memory}G storage -n swap
+        lvcreate -l 100%FREE storage -n root
         break
         ;;
       3)
+        lvcreate -L 25G storage -n root
+        lvcreate -l 100%FREE storage -n home
+        break
+        ;;
+      4)
+        lvcreate -L 25G storage -n root
+        lvcreate -L ${total_memory}G storage -n swap
+        lvcreate -l 100%FREE storage -n home
+        break
+        ;;
+      5)
         break
         ;;
       *)
@@ -193,9 +207,6 @@ setup_lvm(){
     esac
   done
   read -p ""
-  lvcreate -L 25G storage -n root
-  lvcreate -L 2G storage -n swap
-  lvcreate -l 100%FREE storage -n home
 }
 #}}}
 #SELECT|FORMAT PARTITIONS {{{
