@@ -464,10 +464,10 @@ configure_fstab(){
       2) if [[ $UEFI -eq 1 ]]; then
           genfstab -t PARTUUID -p ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab
          else
-          genfstab -U ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab
+          genfstab -U -p ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab
          fi
          ;;
-      3) genfstab -L ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab ;;
+      3) genfstab -L -p ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab ;;
       *) invalid_option ;;
     esac
     [[ -n $OPT ]] && break
