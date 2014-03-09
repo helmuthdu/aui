@@ -109,8 +109,8 @@ umount_partitions(){
   done
 }
 #}}}
-#CREATE PARTITION {{{
-create_partition(){
+#CREATE PARTITION SCHEME {{{
+create_partition_scheme(){
   select_device(){
     devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd'`);
     PS3="$prompt1"
@@ -124,7 +124,34 @@ create_partition(){
     done
   }
   print_title "https://wiki.archlinux.org/index.php/Partitioning"
-  print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
+  print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another."
+  partition_layout=("Default" "LVM" "LVM+LUKS")
+  PS3="$prompt1"
+  echo -e "Select partition scheme:"
+  select OPT in "${partition_layout[@]}"; do
+    case "$REPLY" in
+      1)
+        create_partition
+        ;;
+      2)
+        create_partition
+        setup_lvm
+        ;;
+      3)
+        create_partition
+        setup_luks
+        setup_lvm
+        ;;
+      *)
+        invalid_option
+        ;;
+    esac
+    [[ -n $OPT ]] && break
+  done
+}
+#}}}
+#SETUP PARTITION{{{
+create_partition(){
   apps_list=("cfdisk" "cgdisk" "gdisk" "parted");
   PS3="$prompt1"
   echo -e "Select partition program:"
@@ -151,14 +178,14 @@ setup_luks(){
   print_title "LUKS - https://wiki.archlinux.org/index.php/LUKS"
   print_info "The Linux Unified Key Setup or LUKS is a disk-encryption specification created by Clemens Fruhwirth and originally intended for Linux."
   print_danger "Do not use this for boot partitions"
-  partitions_list=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd\|vd'`)
+  block_list=(`lsblk | grep 'part' | awk '{print "/dev/" substr($1,3)}'`)
   PS3="$prompt1"
   echo -e "Select partition:"
-  select OPT in "${partitions_list[@]}" "Back"; do
-    if contains_element "$OPT" "${partitions_list[@]}"; then
-      cryptsetup luksFormat /dev/$OPT
-      cryptsetup open --type luks /dev/$OPT lvm
-    elif [[ $OPT == "Back" ]]; then
+  select OPT in "${block_list[@]}"; do
+    if contains_element "$OPT" "${block_list[@]}"; then
+      cryptsetup luksFormat $OPT
+      cryptsetup open --type luks $OPT crypt
+    elif [[ $OPT == "Cancel" ]]; then
       break
     else
       invalid_option
@@ -170,43 +197,35 @@ setup_luks(){
 setup_lvm(){
   print_title "LVM - https://wiki.archlinux.org/index.php/LVM"
   print_info "LVM is a logical volume manager for the Linux kernel; it manages disk drives and similar mass-storage devices. "
-  pvcreate /dev/mapper/lvm
-  vgcreate storage /dev/mapper/lvm
-  partition_layout_list=("root", "root|swap", "root|home", "root|swap|home")
-  total_memory=`grep MemTotal /proc/meminfo | awk '{print ($2/1024)/1024}' | sed 's/\..*//'`
-  PS3="$prompt1"
-  echo -e "Select partition layout:"
-  select OPT in "${partition_layout_list[@]}" "Back"; do
-    case "$REPLY" in
-      1)
-        lvcreate -l 100%FREE storage -n root
-        break
-        ;;
-      2)
-        lvcreate -L ${total_memory}G storage -n swap
-        lvcreate -l 100%FREE storage -n root
-        break
-        ;;
-      3)
-        lvcreate -L 25G storage -n root
-        lvcreate -l 100%FREE storage -n home
-        break
-        ;;
-      4)
-        lvcreate -L 25G storage -n root
-        lvcreate -L ${total_memory}G storage -n swap
-        lvcreate -l 100%FREE storage -n home
-        break
-        ;;
-      5)
-        break
-        ;;
-      *)
+  print_warning "Last partition will take 100% of free space left"
+  if [[ -n $(lsblk | grep crypt) ]]; then
+    pvcreate /dev/mapper/crypt
+    vgcreate lvm /dev/mapper/crypt
+  else
+    block_list=(`lsblk | grep 'part' | awk '{print "/dev/" substr($1,3)}'`)
+    PS3="$prompt1"
+    echo -e "Select partition:"
+    select OPT in "${block_list[@]}"; do
+      if contains_element "$OPT" "${block_list[@]}"; then
+        pvcreate $OPT
+        vgcreate lvm $OPT
+      else
         invalid_option
-        ;;
-    esac
+      fi
+    done
+  fi
+  read -p "Enter number of partitions [ex: 2]: " number_partitions
+  i=1
+  while [[ $i -le $number_partitions ]]; do
+    read -p "Enter $iª partition name [ex: home]: " partition_name
+    if [[ $i -eq $number_partitions ]]; then
+      lvcreate -l 100%FREE lvm -n ${partition_name}
+    else
+      read -p "Enter $iª partition size [ex: 25G, 200M]: " partition_size
+      lvcreate -L ${partition_size} lvm -n ${partition_name}
+    fi
+    i=$(( i + 1 ))
   done
-  read -p ""
 }
 #}}}
 #SELECT|FORMAT PARTITIONS {{{
@@ -215,7 +234,17 @@ format_partitions(){
   print_info "This step will select and format the selected partiton where the archlinux will be installed"
   print_danger "\tAll data on the ROOT and SWAP partition will be LOST."
   i=0
-  partitions_list=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd\|vd'`)
+
+  block_list=(`lsblk | grep 'part\|lvm' | awk '{print substr($1,3)}'`)
+  partitions_list=()
+  for OPT in ${block_list[@]}; do
+    check_lvm=`echo $OPT | grep lvm`
+    if [[ -z $check_lvm ]]; then
+      partitions_list+=("/dev/$OPT")
+    else
+      partitions_list+=("/dev/mapper/$OPT")
+    fi
+  done
 
   if [[ $UEFI -eq 1 ]]; then
     partition_name=("root" "EFI" "swap" "another")
@@ -714,7 +743,7 @@ do
         ;;
       4)
         umount_partitions
-        create_partition
+        create_partition_scheme
         checklist[4]=1
         ;;
       5)
