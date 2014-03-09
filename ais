@@ -177,7 +177,7 @@ create_partition(){
 setup_luks(){
   print_title "LUKS - https://wiki.archlinux.org/index.php/LUKS"
   print_info "The Linux Unified Key Setup or LUKS is a disk-encryption specification created by Clemens Fruhwirth and originally intended for Linux."
-  print_danger "Do not use this for boot partitions"
+  print_danger "\tDo not use this for boot partitions"
   block_list=(`lsblk | grep 'part' | awk '{print "/dev/" substr($1,3)}'`)
   PS3="$prompt1"
   echo -e "Select partition:"
@@ -185,6 +185,7 @@ setup_luks(){
     if contains_element "$OPT" "${block_list[@]}"; then
       cryptsetup luksFormat $OPT
       cryptsetup open --type luks $OPT crypt
+      break
     elif [[ $OPT == "Cancel" ]]; then
       break
     else
@@ -209,6 +210,7 @@ setup_lvm(){
       if contains_element "$OPT" "${block_list[@]}"; then
         pvcreate $OPT
         vgcreate lvm $OPT
+        break
       else
         invalid_option
       fi
