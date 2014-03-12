@@ -191,14 +191,12 @@
   } #}}}
   check_connection(){ #{{{
     XPINGS=$(( $XPINGS + 1 ))
-    ping_gw() {
-      IP_ADDR=`ip r | grep default | cut -d ' ' -f 3`
-      [[ -z $IP_ADDR ]] && IP_ADDR="8.8.8.8"
-      ping -q -w 1 -c 1 ${IP_ADDR} > /dev/null && return 1 || return 0
+    connection_test() {
+      ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` &> /dev/null && return 1 || return 0
     }
     WIRED_DEV=`ip link | grep enp | awk '{print $2}'| sed 's/://' | sed '1!d'`
     WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://' | sed '1!d'`
-    if ping_gw; then
+    if connection_test; then
       print_warning "ERROR! Connection not Found."
       print_info "Network Setup"
       conn_type_list=("Wired Automatic" "Wired Manual" "Wireless" "Skip")
