@@ -651,8 +651,8 @@ font_config(){
         ;;
       2)
         print_title "INFINALITY - https://wiki.archlinux.org/index.php/Infinality-bundle%2Bfonts"
-        add_repository "infinality-bundle" "http://ibn.net63.net/infinality-bundle/\$arch"
-        [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://ibn.net63.net/infinality-bundle-multilib/\$arch"
+        add_repository "infinality-bundle" "Server = http://bohoomil.com/repo/\$arch"
+        [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "Server = http://bohoomil.com/repo/multilib/\$arch"
         pacman-key -r 962DDE58
         pacman-key --lsign-key 962DDE58
         is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
