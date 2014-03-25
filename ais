@@ -244,6 +244,13 @@ format_partitions(){
   i=0
 
   block_list=(`lsblk | grep 'part\|lvm' | awk '{print substr($1,3)}'`)
+
+  # check if there is no partition
+  if [[ ${#block_list[@]} -eq 0 ]]; then
+    echo "No partition founded"
+    exit 0
+  fi
+
   partitions_list=()
   for OPT in ${block_list[@]}; do
     check_lvm=`echo $OPT | grep lvm`
@@ -253,12 +260,6 @@ format_partitions(){
       partitions_list+=("/dev/mapper/$OPT")
     fi
   done
-
-  # check if there is no partition
-  if [[ ${#partitions_list[@]} -eq 0 ]]; then
-    echo "No partition founded"
-    exit 0
-  fi
 
   # partitions based on boot system
   if [[ $UEFI -eq 1 ]]; then
