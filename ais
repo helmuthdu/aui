@@ -255,7 +255,7 @@ format_partitions(){
   for OPT in ${block_list[@]}; do
     check_lvm=`echo $OPT | grep lvm`
     if [[ -z $check_lvm ]]; then
-      [[ $OPT == $LUKS_DISK && $LUKS -eq 1 ]] || partitions_list+=("/dev/$OPT")
+      partitions_list+=("/dev/$OPT")
     else
       partitions_list+=("/dev/mapper/$OPT")
     fi
