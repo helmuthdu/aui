@@ -155,7 +155,7 @@ create_partition_scheme(){
 #}}}
 #SETUP PARTITION{{{
 create_partition(){
-  apps_list=("cfdisk" "cgdisk" "gdisk" "parted");
+  apps_list=("cfdisk" "cgdisk" "fdisk" "gdisk" "parted");
   PS3="$prompt1"
   echo -e "Select partition program:"
   select OPT in "${apps_list[@]}"; do
@@ -248,12 +248,19 @@ format_partitions(){
   for OPT in ${block_list[@]}; do
     check_lvm=`echo $OPT | grep lvm`
     if [[ -z $check_lvm ]]; then
-      partitions_list+=("/dev/$OPT")
+      [[ $OPT != $LUKS_DISK ]] && partitions_list+=("/dev/$OPT")
     else
       partitions_list+=("/dev/mapper/$OPT")
     fi
   done
 
+  # check if there is no partition
+  if [[ ${#partitions_list[@]} -eq 0 ]]; then
+    echo "No partition founded"
+    exit 0
+  fi
+
+  # partitions based on boot system
   if [[ $UEFI -eq 1 ]]; then
     partition_name=("root" "EFI" "swap" "another")
   else
@@ -307,7 +314,7 @@ format_partitions(){
   create_swap(){
     swap_options=("partition" "file" "skip");
     PS3="$prompt1"
-    echo -e "Select ${BYellow}${partition_name[i]}${White} filesystem:\n"
+    echo -e "Select ${BYellow}${partition_name[i]}${Reset} filesystem:\n"
     select OPT in "${swap_options[@]}"; do
       case "$REPLY" in
         1)
@@ -368,7 +375,7 @@ format_partitions(){
     if [[ ${partition_name[i]} == swap ]]; then
       create_swap
     else
-      echo -e "Select ${BYellow}${partition_name[i]}${White} partition:\n"
+      echo -e "Select ${BYellow}${partition_name[i]}${Reset} partition:\n"
       select partition in "${partitions_list[@]}"; do
         #get the selected number - 1
         partition_number=$(( $REPLY - 1 ))
@@ -438,8 +445,7 @@ install_base_system(){
 #CONFIGURE KEYMAP {{{
 configure_keymap(){
   #ADD KEYMAP TO THE NEW SETUP
-  echo "KEYMAP=$KEYMAP" > ${MOUNTPOINT}/etc/vconsole.conf
-  arch_chroot "localectl set-keymap ${KEYMAP}"
+  arch_chroot "localectl set-keymap --no-convert ${KEYMAP}"
 }
 #}}}
 #CONFIGURE FSTAB {{{
