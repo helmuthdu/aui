@@ -88,7 +88,25 @@
   SPIN="/-\|"
   AUTOMATIC_MODE=0
 #}}}
-
+#COMMON FUNCTIONS {{{
+  error_msg() { #{{{
+    local MSG="${1}"
+    echo -e "${MSG}"
+    exit 1
+  } #}}}
+  cecho() { #{{{
+    echo -e "$1"
+    echo -e "$1" >>"$LOG"
+    tput sgr0;
+  } #}}}
+  ncecho() { #{{{
+    echo -ne "$1"
+    echo -ne "$1" >>"$LOG"
+    tput sgr0
+  } #}}}
+  spinny() { #{{{
+    echo -ne "\b${SPIN:i++%${#SPIN}:1}"
+  } #}}}
   progress() { #{{{
     ncecho "  ";
     while true; do
