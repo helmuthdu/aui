@@ -445,7 +445,7 @@ install_base_system(){
 #CONFIGURE KEYMAP {{{
 configure_keymap(){
   #ADD KEYMAP TO THE NEW SETUP
-  arch_chroot "localectl set-keymap --no-convert ${KEYMAP}"
+  echo "KEYMAP=$KEYMAP" > ${MOUNTPOINT}/etc/vconsole.conf
 }
 #}}}
 #CONFIGURE FSTAB {{{
