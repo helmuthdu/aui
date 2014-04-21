@@ -1642,24 +1642,26 @@ install_development_apps(){
     print_title "DEVELOPMENT APPS"
     echo " 1) $(menu_item "aptana-studio") $AUR"
     echo " 2) $(menu_item "bluefish")"
-    echo " 3) $(menu_item "eclipse")"
-    echo " 4) $(menu_item "emacs")"
-    echo " 5) $(menu_item "gvim")"
-    echo " 6) $(menu_item "geany")"
-    echo " 7) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
-    echo " 8) $(menu_item "kdevelop")"
-    echo " 9) $(menu_item "monodevelop")"
-    echo "10) $(menu_item "netbeans")"
-    echo "11) $(menu_item "nodejs")"
-    echo "12) $(menu_item "ruby" "Ruby on Rails")"
-    echo "13) $(menu_item "jdk7-openjdk" "OpenJDK")"
-    echo "14) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "15) $(menu_item "qtcreator")"
-    echo "16) $(menu_item "sublime-text-dev" "Sublime Text") $AUR"
-    echo "17) $(menu_item "gdb" "Debuggers")"
-    echo "18) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-    echo "19) $(menu_item "navicat-premium" "Navicat Premium") $AUR"
-    echo "20) $(menu_item "meld")"
+    echo " 3) $(menu_item "brackets") $AUR"
+    echo " 4) $(menu_item "eclipse")"
+    echo " 5) $(menu_item "emacs")"
+    echo " 6) $(menu_item "gvim")"
+    echo " 7) $(menu_item "geany")"
+    echo " 8) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
+    echo " 9) $(menu_item "kdevelop")"
+    echo "10) $(menu_item "lighttable") $AUR"
+    echo "11) $(menu_item "monodevelop")"
+    echo "12) $(menu_item "netbeans")"
+    echo "13) $(menu_item "nodejs")"
+    echo "14) $(menu_item "ruby" "Ruby on Rails")"
+    echo "15) $(menu_item "jdk7-openjdk" "OpenJDK")"
+    echo "16) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "17) $(menu_item "qtcreator")"
+    echo "18) $(menu_item "sublime-text-dev" "Sublime Text") $AUR"
+    echo "19) $(menu_item "gdb" "Debuggers")"
+    echo "20) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
+    echo "21) $(menu_item "navicat-premium" "Navicat Premium") $AUR"
+    echo "22) $(menu_item "meld")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1674,6 +1676,9 @@ install_development_apps(){
           package_install "bluefish"
           ;;
         3)
+          aur_package_install "brackets"
+          ;;
+        4)
           #ECLIPSE {{{
           while true
           do
@@ -1751,29 +1756,32 @@ install_development_apps(){
           #}}}
           OPT=3
           ;;
-        4)
+        5)
           package_install "emacs"
           ;;
-        5)
+        6)
           package_remove "vim"
           package_install "gvim ctags"
           ;;
-        6)
+        7)
           package_install "geany"
           ;;
-        7)
+        8)
           package_install "intellij-idea-community-edition"
           ;;
-        8)
+        9)
           package_install "kdevelop"
           ;;
-        9)
-          package_install "monodevelop monodevelop-debugger-gdb"
-          ;;
         10)
-          package_install "netbeans"
+          aur_package_install "lighttable"
           ;;
         11)
+          package_install "monodevelop monodevelop-debugger-gdb"
+          ;;
+        12)
+          package_install "netbeans"
+          ;;
+        13)
           package_install "nodejs"
           #NODEJS {{{
           while true
@@ -1856,42 +1864,42 @@ install_development_apps(){
           #}}}
           OPT=11
           ;;
-        12)
+        14)
           aur_package_install "ruby"
           gem_install "rails haml"
           ;;
-        13)
+        15)
           package_remove "jdk"
           package_install "jdk7-openjdk icedtea-web-java7"
           ;;
-        14)
+        16)
           package_remove "jre7-openjdk"
           package_remove "jdk7-openjdk"
           aur_package_install "jdk"
           ;;
-        15)
+        17)
           package_install "qtcreator"
           mkdir -p /home/${username}/.config/Nokia/qtcreator/styles
           curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
           mv monokai.xml /home/${username}/.config/Nokia/qtcreator/styles/
           chown -R ${username}:users /home/${username}/.config
           ;;
-        16)
+        18)
           aur_package_install "sublime-text-dev"
           ;;
-        17)
+        19)
           package_install "splint valgrind gdb" #C/C++
           aur_package_install "php-codesniffer php-tidy" #PHP
           aur_package_install "closure-compiler" #Javascript
           aur_package_install "tidyhtml" #HTML
           ;;
-        18)
+        20)
           aur_package_install "mysql-workbench-gpl"
           ;;
-        19)
+        21)
           aur_package_install "navicat-premium"
           ;;
-        20)
+        22)
           package_install "meld"
           ;;
         "b")
