@@ -390,8 +390,9 @@
   # 9) Racing
   #10) Simulation
   #11) Strategy
-  #12) PlayOnLinux
-  #13) Steam
+  #12) Terminal
+  #13) PlayOnLinux
+  #14) Steam
   GAMES_OPTIONS=""
   #ACTION {{{
     # 1) Astromenace
