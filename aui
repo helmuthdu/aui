@@ -1936,7 +1936,7 @@ install_office_apps(){
   do
     print_title "OFFICE APPS"
     echo " 1) $(menu_item "libreoffice-common" "LibreOffice")"
-    echo " 2) $(menu_item "goffice calligra" "$([[ ${KDE} -eq 1 ]] && echo "Caligra" || echo "Abiword + Gnumeric";)")"
+    echo " 2) $(menu_item "goffice calligra-libs" "$([[ ${KDE} -eq 1 ]] && echo "Caligra" || echo "Abiword + Gnumeric";)")"
     echo " 3) $(menu_item "texlive-core" "latex")"
     echo " 4) $(menu_item "calibre")"
     echo " 5) $(menu_item "gcstar")"
@@ -2362,13 +2362,13 @@ install_internet_apps(){
           while true
           do
             print_title "IM - INSTANT MESSAGING"
-            echo " 1) $(menu_item "emesene")"
-            echo " 2) $(menu_item "google-talkplugin") $AUR"
-            echo " 3) $(menu_item "pidgin")"
-            echo " 4) $(menu_item "skype")"
-            echo " 5) $(menu_item "teamspeak3")"
-            echo " 6) $(menu_item "irssi")"
-            echo " 7) $(menu_item "konversation hexchat" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
+            echo " 1) $(menu_item "google-talkplugin") $AUR"
+            echo " 2) $(menu_item "irssi")"
+            echo " 3) $(menu_item "konversation hexchat" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
+            echo " 4) $(menu_item "pidgin")"
+            echo " 5) $(menu_item "skype")"
+            echo " 6) $(menu_item "teamspeak3")"
+            echo " 7) $(menu_item "viber")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2377,31 +2377,29 @@ install_internet_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
-                  package_install "emesene"
-                  ;;
-                2)
                   aur_package_install "google-talkplugin"
                   ;;
-                3)
-                  package_install "pidgin"
-                  ;;
-                4)
-
-                  is_package_installed "ekiga" && package_remove "ekiga"
-                  package_install "skype"
-                  ;;
-                5)
-                  package_install "teamspeak3"
-                  ;;
-                6)
+                2)
                   package_install "irssi"
                   ;;
-                7)
+                3)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "konversation"
                   else
                     package_install "hexchat"
                   fi
+                  ;;
+                4)
+                  package_install "pidgin"
+                  ;;
+                5)
+                  package_install "skype"
+                  ;;
+                6)
+                  package_install "teamspeak3"
+                  ;;
+                7)
+                  aur_package_install "viber"
                   ;;
                 "b")
                   break

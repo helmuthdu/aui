@@ -296,14 +296,14 @@
     EMAIL_OPTIONS=""
   #}}}
   #IM|IRC {{{
-    # 1) Emesene
-    # 2) Google Talk-Plugin
-    # 3) Pidgin
-    # 4) Skype
-    # 5) Teamspeak
-    # 6) Irssi
-    # 7) HexChat|Konversation
-    IM_OPTIONS="4"
+    # 1) Google Talk-Plugin
+    # 2) Irssi
+    # 3) Konversation|HexChat
+    # 4) Pidgin
+    # 5) Skype
+    # 6) Teamspeak
+    # 7) Viber
+    IM_OPTIONS="5"
   #}}}
   #MAPPING {{{
     # 1) Google Earth
