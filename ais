@@ -558,6 +558,7 @@ configure_mkinitcpio(){
 install_bootloader(){
   print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
   print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
+  print_warning "NOTE: Automated Grub installation support has been removed, as it was unreliable and couldn't handle LUKS/LVM. If you need Grub, please switch to a new terminal with Ctrl-Alt-F2 and install manually. See: https://wiki.archlinux.org/index.php/GRUB#Installation"
   print_warning "\tROOT Partition: ${ROOT_DISK}"
   if [[ $UEFI -eq 1 ]]; then
     print_warning "\tUEFI Mode Detected"
