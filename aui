@@ -2368,7 +2368,7 @@ install_internet_apps(){
             echo " 4) $(menu_item "pidgin")"
             echo " 5) $(menu_item "skype")"
             echo " 6) $(menu_item "teamspeak3")"
-            echo " 7) $(menu_item "viber")"
+            echo " 7) $(menu_item "viber") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2746,14 +2746,16 @@ install_video_apps(){
           while true
           do
             print_title "VIDEO EDITORS|TOOLS"
-            echo " 1) $(menu_item "avidemux-gtk avidemux-qt" "Avidemux")"
-            echo " 2) $(menu_item "arista-transcoder" "Arista") $AUR"
-            echo " 3) $(menu_item "handbrake")"
-            echo " 4) $(menu_item "transmageddon")"
-            echo " 5) $(menu_item "kdeenlive")"
-            echo " 6) $(menu_item "openshot")"
-            echo " 7) $(menu_item "pitivi")"
-            echo " 8) $(menu_item "kazam-bzr") $AUR"
+            echo " 1) $(menu_item "arista-transcoder" "Arista") $AUR"
+            echo " 2) $(menu_item "avidemux-gtk avidemux-qt" "Avidemux")"
+            echo " 3) $(menu_item "filebot") $AUR"
+            echo " 4) $(menu_item "handbrake")"
+            echo " 5) $(menu_item "kazam-bzr") $AUR"
+            echo " 6) $(menu_item "kdeenlive")"
+            echo " 7) $(menu_item "lwks" "Lightworks") $AUR"
+            echo " 8) $(menu_item "openshot")"
+            echo " 9) $(menu_item "pitivi")"
+            echo "10) $(menu_item "transmageddon")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2762,32 +2764,38 @@ install_video_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
+                  aur_package_install "arista-transcoder"
+                  ;;
+                2)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "avidemux-qt"
                   else
                     package_install "avidemux-gtk"
                   fi
                   ;;
-                2)
-                  aur_package_install "arista-transcoder"
-                  ;;
                 3)
-                  package_install "handbrake"
+                  aur_package_install "filebot"
                   ;;
                 4)
-                  package_install "transmageddon"
+                  package_install "handbrake"
                   ;;
                 5)
-                  package_install "kdenlive"
+                  aur_package_install "kazam-bzr"
                   ;;
                 6)
-                  package_install "openshot"
+                  package_install "kdenlive"
                   ;;
                 7)
-                  package_install "pitivi frei0r-plugins"
+                  aur_package_install "lwks"
                   ;;
                 8)
-                  aur_package_install "kazam-bzr"
+                  package_install "openshot"
+                  ;;
+                9)
+                  package_install "pitivi frei0r-plugins"
+                  ;;
+                10)
+                  package_install "transmageddon"
                   ;;
                 "b")
                   break

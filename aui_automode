@@ -365,15 +365,17 @@
     VIDEO_PLAYER_OPTIONS="8 9"
   #}}}
   #EDITORS|TOOLS {{{
-    # 1) Avidemux
-    # 2) Arista
-    # 3) Handbrake
-    # 4) Transmageddon
-    # 5) Kdenlive
-    # 6) Openshot
-    # 7) Pitivi
-    # 8) Kazam
-    VIDEO_EDITOR_OPTIONS="2"
+    # 1) Arista
+    # 2) Avidemux
+    # 3) Filebot
+    # 4) Handbrake
+    # 5) Kazam
+    # 6) Kdenlive
+    # 7) Lightworks
+    # 8) Openshot
+    # 9) Pitivi
+    #10) Transmageddon
+    VIDEO_EDITOR_OPTIONS="1"
   #}}}
 #}}}
 #GAMES {{{
