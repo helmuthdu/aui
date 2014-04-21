@@ -492,6 +492,25 @@
     # 6) Zod
     STRATEGY=""
   #}}}
+  #TERMINAL {{{
+    #  1) Asciiquarium
+    #  2) Bastet
+    #  3) Bsd-games
+    #  4) Cmatrix
+    #  5) Cowsay
+    #  6) Fortune-mod
+    #  7) Funny-manpages
+    #  8) Greed
+    #  9) Moon-buggy
+    # 10) Myman
+    # 11) Nethack
+    # 12) Ninvaders
+    # 13) Ponysay
+    # 14) Robotfindskitten
+    # 15) Ski
+    # 16) Toilet
+    TERMINAL_GAMES=""
+  #}}}
 #}}}
 #WEBSERVER {{{
   # 1) LAMP - APACHE, MariaDB & PHP

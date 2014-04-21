@@ -2850,8 +2850,9 @@ install_games(){
     echo " 9) Racing"
     echo "10) Simulation"
     echo "11) Strategy"
-    echo "12) PlayOnLinux"
-    echo "13) Steam"
+    echo "12) Terminal"
+    echo "13) PlayOnLinux"
+    echo "14) Steam"
     echo ""
     echo " b) BACK"
     echo ""
@@ -3410,10 +3411,101 @@ install_games(){
           OPT=11
           ;;
         12)
-          aur_package_install "playonlinux"
+          #TERMINAL {{{
+          while true
+          do
+            print_title "TERMINAL"
+            echo " 1) $(menu_item "asciiquarium") $AUR"
+            echo " 2) $(menu_item "bastet") $AUR"
+            echo " 3) $(menu_item "bsd-games")"
+            echo " 4) $(menu_item "cmatrix")"
+            echo " 5) $(menu_item "cowsay")"
+            echo " 6) $(menu_item "fortune-mod")"
+            echo " 7) $(menu_item "funny-manpages") $AUR"
+            echo " 8) $(menu_item "greed") $AUR"
+            echo " 9) $(menu_item "moon-buggy") $AUR"
+            echo "10) $(menu_item "myman") $AUR"
+            echo "11) $(menu_item "nethack")"
+            echo "12) $(menu_item "ninvaders") $AUR"
+            echo "13) $(menu_item "ponysay")"
+            echo "14) $(menu_item "robotfindskitten") $AUR"
+            echo "15) $(menu_item "ski") $AUR"
+            echo "16) $(menu_item "toilet") $AUR"
+            echo ""
+            echo " b) BACK"
+            echo ""
+            TERMINAL_GAMES+=" b"
+            read_input_options "$TERMINAL_GAMES"
+            for OPT in ${OPTIONS[@]}; do
+              case "$OPT" in
+                1)
+                  aur_package_install "asciiquarium"
+                  ;;
+                2)
+                  aur_package_install "bastet"
+                  ;;
+                3)
+                  package_install "bsd-games"
+                  ;;
+                4)
+                  package_install "cmatrix"
+                  ;;
+                5)
+                  package_install "cowsay"
+                  ;;
+                6)
+                  package_install "fortune-mod"
+                  ;;
+                7)
+                  aur_package_install "funny-manpages"
+                  ;;
+                8)
+                  aur_package_install "greed"
+                  ;;
+                9)
+                  aur_package_install "moon-buggy"
+                  ;;
+                10)
+                  aur_package_install "myman"
+                  ;;
+                11)
+                  package_install "nethack"
+                  ;;
+                12)
+                  aur_package_install "ninvaders"
+                  ;;
+                13)
+                  package_install "ponysay"
+                  ;;
+                14)
+                  aur_package_install "robotfindskitten"
+                  ;;
+                15)
+                  aur_package_install "ski"
+                  ;;
+                16)
+                  aur_package_install "toilet"
+                  ;;
+                "b")
+                  break
+                  ;;
+                *)
+                  invalid_option
+                  ;;
+              esac
+            done
+            elihw
+          done
+          #}}}
+          OPT=12
           ;;
         13)
+          aur_package_install "playonlinux"
+          OPT=13
+          ;;
+        14)
           aur_package_install "steam"
+          OPT=14
           ;;
         "b")
           break
