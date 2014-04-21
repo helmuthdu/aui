@@ -210,14 +210,12 @@ select_user(){
     #}}}
     #EDITOR {{{
     print_title "DEFAULT EDITOR"
-    editors_list=("emacs" "joe" "nano" "vi" "vim" "zile");
+    editors_list=("emacs" "nano" "vi" "vim" "zile");
     PS3="$prompt1"
     echo -e "Select editor\n"
     select EDITOR in "${editors_list[@]}"; do
       if contains_element "$EDITOR" "${editors_list[@]}"; then
-        if [[ $EDITOR == joe ]]; then
-          ! is_package_installed "joe" && aui_download_packages "joe"
-        elif [[ $EDITOR == vim ]]; then
+        if [[ $EDITOR == vim ]]; then
           ! is_package_installed "gvim" && package_install "vim ctags"
           #VIMRC {{{
           if [[ ! -f /home/${username}/.vimrc ]]; then
@@ -313,7 +311,7 @@ configure_sudo(){
     echo 'Defaults passwd_tries=3, passwd_timeout=1' >> /etc/sudoers
     echo 'Defaults env_reset, always_set_home, set_home, set_logname' >> /etc/sudoers
     echo 'Defaults !env_editor, editor="/usr/bin/vim:/usr/bin/vi:/usr/bin/nano"' >> /etc/sudoers
-    echo 'Defaults timestamp_timeout=300' >> /etc/sudoers
+    echo 'Defaults timestamp_timeout=15' >> /etc/sudoers
     echo 'Defaults passprompt="[sudo] password for %u: "' >> /etc/sudoers
   fi
   #}}}
@@ -468,7 +466,7 @@ install_basic_setup(){
   package_install "zip unzip unrar p7zip"
   pause_function
   print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
-  print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers and hosts running on a local network with no specific configuration."
+  print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers services and hosts running on a local network with no specific configuration."
   package_install "avahi nss-mdns"
   is_package_installed "avahi" && system_ctl enable avahi-daemon
   is_package_installed "avahi" && system_ctl enable avahi-dnsconfd
@@ -569,6 +567,7 @@ install_samba(){
       chown root:${USERSHARES_GROUP} ${USERSHARES_DIR}
       chmod 1770 ${USERSHARES_DIR}
       sed -i -e '/\[global\]/a\\n   usershare path = /var/lib/samba/usershare\n   usershare max shares = 100\n   usershare allow guests = yes\n   usershare owner only = False' /etc/samba/smb.conf
+      sed -i -e '/\[global\]/a\\n   socket options = IPTOS_LOWDELAY TCP_NODELAY SO_KEEPALIVE\n   write cache size = 2097152\n   use sendfile = yes\n' /etc/samba/smb.conf
       usermod -a -G ${USERSHARES_GROUP} ${username}
       sed -i '/user_allow_other/s/^#//' /etc/fuse.conf
       modprobe fuse
@@ -640,7 +639,8 @@ font_config(){
     print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
     print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
     echo " 1) Default"
-    echo " 2) Ubuntu ${AUR}"
+    echo " 2) Infinality [Recommended]"
+    echo " 3) Ubuntu ${AUR}"
     echo ""
     read_input $FONTCONFIG
     case "$OPTION" in
@@ -650,6 +650,18 @@ font_config(){
         break
         ;;
       2)
+        print_title "INFINALITY - https://wiki.archlinux.org/index.php/Infinality-bundle%2Bfonts"
+        add_repository "infinality-bundle" "http://bohoomil.com/repo/\$arch"
+        [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://bohoomil.com/repo/multilib/\$arch"
+        pacman-key -r 962DDE58
+        pacman-key --lsign-key 962DDE58
+        is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
+        is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
+        pacman -S --needed infinality-bundle
+        [[ $ARCHI == x86_64 ]] && pacman -S --needed infinality-bundle-multilib
+        break
+        ;;
+      3)
         is_package_installed "fontconfig" && pacman -Rdds freetype2 fontconfig cairo
         aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
         break
@@ -793,18 +805,18 @@ install_additional_firmwares(){
     while true
     do
       print_title "INSTALL ADDITIONAL FIRMWARES"
-      echo " 1) $(menu_item "alsa-firmware")"
-      echo " 2) $(menu_item "ipw2100-fw")"
-      echo " 3) $(menu_item "ipw2200-fw")"
-      echo " 4) $(menu_item "b43-firmware") $AUR"
-      echo " 5) $(menu_item "b43-firmware-legacy") $AUR"
-      echo " 6) $(menu_item "broadcom-wl") $AUR"
-      echo " 7) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
-      echo " 8) $(menu_item "libmtp") [Android Devices]"
-      echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
-      echo "10) $(menu_item "libraw1394") [IEEE1394 Driver]"
-      echo "11) $(menu_item "aic94xx-firmware") $AUR"
-      echo "12) $(menu_item "bfa-firmware") $AUR"
+      echo " 1) $(menu_item "aic94xx-firmware") $AUR"
+      echo " 2) $(menu_item "alsa-firmware")"
+      echo " 3) $(menu_item "b43-firmware") $AUR"
+      echo " 4) $(menu_item "b43-firmware-legacy") $AUR"
+      echo " 5) $(menu_item "bfa-firmware") $AUR"
+      echo " 6) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
+      echo " 7) $(menu_item "broadcom-wl") $AUR"
+      echo " 8) $(menu_item "ipw2100-fw")"
+      echo " 9) $(menu_item "ipw2200-fw")"
+      echo "10) $(menu_item "libffado") [Fireware Audio Devices]"
+      echo "11) $(menu_item "libmtp") [Android Devices]"
+      echo "12) $(menu_item "libraw1394") [IEEE1394 Driver]"
       echo ""
       echo " d) DONE"
       echo ""
@@ -813,41 +825,41 @@ install_additional_firmwares(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            package_install "alsa-firmware"
+            aur_package_install "aic94xx-firmware"
             ;;
           2)
-            package_install "ipw2100-fw"
+            package_install "alsa-firmware"
             ;;
           3)
-            package_install "ipw2200-fw"
-            ;;
-          4)
             aur_package_install "b43-firmware"
             ;;
-          5)
+          4)
             aur_package_install "b43-firmware-legacy"
             ;;
-          6)
-            aur_package_install "broadcom-wl"
+          5)
+            aur_package_install "bfa-firmware"
             ;;
-          7)
+          6)
             package_install "bluez-firmware"
             ;;
+          7)
+            aur_package_install "broadcom-wl"
+            ;;
           8)
+            package_install "ipw2100-fw"
+            ;;
+          9)
+            package_install "ipw2200-fw"
+            ;;
+          10)
+            package_install "libffado"
+            ;;
+          11)
             package_install "libmtp"
             aur_package_install "android-udev"
             ;;
-          9)
-            package_install "libffado"
-            ;;
-          10)
-            package_install "libraw1394"
-            ;;
-          11)
-            aur_package_install "aic94xx-firmware"
-            ;;
           12)
-            aur_package_install "bfa-firmware"
+            package_install "libraw1394"
             ;;
           "d")
             break
@@ -1141,7 +1153,7 @@ install_desktop_environment(){
   echo " 1) Cinnamon            8) Awesome"
   echo " 2) E17                 9) Fluxbox"
   echo " 3) GNOME              10) OpenBox"
-  echo " 4) KDE"
+  echo " 4) KDE                11) Xmonad"
   echo " 5) LXDE"
   echo " 6) Mate"
   echo " 7) XFCE"
@@ -1157,7 +1169,7 @@ install_desktop_environment(){
       package_install "cinnamon-screensaver cinnamon-control-center nemo"
       package_install "gedit-plugins"
       package_install "gksu xdg-user-dirs-gtk gucharmap libgnomekbd"
-      package_install "gvfs-smb gvfs-afc"
+      package_install "gvfs-smb gvfs-afc lxpolkit"
       aur_package_install "gnome-defaults-list"
       # extensions
       aur_package_install "cinnamon-applet-screenshot-record"
@@ -1196,7 +1208,7 @@ install_desktop_environment(){
       print_title "E17 - http://wiki.archlinux.org/index.php/E17"
       print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
       package_install "enlightenment"
-      package_install "gvfs"
+      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
       package_install "xdg-user-dirs"
       package_install "leafpad epdfview"
       package_install "lxappearance"
@@ -1348,8 +1360,8 @@ install_desktop_environment(){
       #LXDE {{{
       print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
       print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
-      package_install "lxde"
-      package_install "gvfs upower"
+      package_install "lxde upower"
+      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
       package_install "xdg-user-dirs"
       package_install "leafpad obconf epdfview"
       aur_package_install "gnome-defaults-list"
@@ -1370,11 +1382,12 @@ install_desktop_environment(){
       print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
       print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
       package_install "mate mate-extra"
-      package_install "gvfs"
+      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
       aur_package_install "gnome-defaults-list"
       # config xinitrc
       config_xinitrc "mate-session"
       pause_function
+      install_display_manager
       install_themes "MATE"
       #D-Bus interface for user account query and manipulation
       system_ctl enable accounts-daemon
@@ -1387,7 +1400,7 @@ install_desktop_environment(){
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
       package_install "xfce4 xfce4-goodies mupdf"
-      package_install "gvfs"
+      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
       package_install "xdg-user-dirs"
       aur_package_install "gnome-defaults-list"
       # config xinitrc
@@ -1464,6 +1477,22 @@ install_desktop_environment(){
       system_ctl enable upower
       ;;
       #}}}
+    11)
+      #XMONAD {{{
+      print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
+      print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
+      package_install "xmonad xmonad-contrib"
+      package_install "xdg-user-dirs"
+      package_install "ttf-bitstream-vera ttf-dejavu"
+      # config xinitrc
+      config_xinitrc "xmonad"
+      pause_function
+      install_misc_apps "XMONAD"
+      install_themes "XMONAD"
+      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+      system_ctl enable upower
+      ;;
+      #}}}
     "b")
       break
       ;;
@@ -1476,6 +1505,9 @@ install_desktop_environment(){
   if is_package_installed "libmtp" ; then
     [[ ${KDE} -eq 1 ]] && package_install "kio-mtp" || package_install "gvfs-mtp"
   fi
+  #}}}
+  #Fix p7FM {{{
+  [[ ${KDE} -eq 0 ]] && package_install "wxgtk2.8"
   #}}}
 }
 #}}}
@@ -1548,14 +1580,15 @@ install_accessories_apps(){
     echo " 3) $(menu_item "conky-lua") $AUR"
     echo " 4) $(menu_item "docky") $AUR"
     echo " 5) $(menu_item "galculator") $AUR"
-    echo " 6) $(menu_item "terra-bzr") $AUR"
-    echo " 7) $(menu_item "kupfer") $AUR"
+    echo " 6) $(menu_item "kupfer") $AUR"
+    echo " 7) $(menu_item "pamac-aur" "Pamac") $AUR"
     echo " 8) $(menu_item "pyrenamer") $AUR"
     echo " 9) $(menu_item "shutter") $AUR"
-    echo "10) $(menu_item "stormcloud") $AUR"
-    echo "11) $(menu_item "synapse")"
-    echo "12) $(menu_item "terminator")"
-    echo "13) $(menu_item "zim")"
+    echo "10) $(menu_item "springseed") $AUR"
+    echo "11) $(menu_item "stormcloud") $AUR"
+    echo "12) $(menu_item "synapse")"
+    echo "13) $(menu_item "terminator")"
+    echo "14) $(menu_item "zim")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1580,10 +1613,10 @@ install_accessories_apps(){
           package_install "galculator"
           ;;
         6)
-          aur_package_install "terra-bzr"
+          aur_package_install "kupfer"
           ;;
         7)
-          aur_package_install "kupfer"
+          aur_package_install "pamac-aur"
           ;;
         8)
           aur_package_install "pyrenamer"
@@ -1592,15 +1625,18 @@ install_accessories_apps(){
           aur_package_install "shutter"
           ;;
         10)
-          aur_package_install "stormcloud"
+          aur_package_install "springseed"
           ;;
         11)
-          package_install "synapse"
+          aur_package_install "stormcloud"
           ;;
         12)
-          package_install "terminator"
+          package_install "synapse"
           ;;
         13)
+          package_install "terminator"
+          ;;
+        14)
           package_install "zim"
           ;;
         "b")
@@ -1622,24 +1658,26 @@ install_development_apps(){
     print_title "DEVELOPMENT APPS"
     echo " 1) $(menu_item "aptana-studio") $AUR"
     echo " 2) $(menu_item "bluefish")"
-    echo " 3) $(menu_item "eclipse")"
-    echo " 4) $(menu_item "emacs")"
-    echo " 5) $(menu_item "gvim")"
-    echo " 6) $(menu_item "geany")"
-    echo " 7) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
-    echo " 8) $(menu_item "kdevelop")"
-    echo " 9) $(menu_item "monodevelop")"
-    echo "10) $(menu_item "netbeans")"
-    echo "11) $(menu_item "nodejs")"
-    echo "12) $(menu_item "ruby" "Ruby on Rails")"
-    echo "13) $(menu_item "jdk7-openjdk" "OpenJDK")"
-    echo "14) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "15) $(menu_item "qtcreator")"
-    echo "16) $(menu_item "sublime-text-dev" "Sublime Text") $AUR"
-    echo "17) $(menu_item "gdb" "Debuggers")"
-    echo "18) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-    echo "19) $(menu_item "navicat-premium" "Navicat Premium") $AUR"
-    echo "20) $(menu_item "meld")"
+    echo " 3) $(menu_item "brackets") $AUR"
+    echo " 4) $(menu_item "eclipse")"
+    echo " 5) $(menu_item "emacs")"
+    echo " 6) $(menu_item "gvim")"
+    echo " 7) $(menu_item "geany")"
+    echo " 8) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
+    echo " 9) $(menu_item "kdevelop")"
+    echo "10) $(menu_item "lighttable") $AUR"
+    echo "11) $(menu_item "monodevelop")"
+    echo "12) $(menu_item "netbeans")"
+    echo "13) $(menu_item "nodejs")"
+    echo "14) $(menu_item "ruby" "Ruby on Rails")"
+    echo "15) $(menu_item "jdk7-openjdk" "OpenJDK")"
+    echo "16) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "17) $(menu_item "qtcreator")"
+    echo "18) $(menu_item "sublime-text-dev" "Sublime Text") $AUR"
+    echo "19) $(menu_item "gdb" "Debuggers")"
+    echo "20) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
+    echo "21) $(menu_item "navicat-premium" "Navicat Premium") $AUR"
+    echo "22) $(menu_item "meld")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1654,6 +1692,9 @@ install_development_apps(){
           package_install "bluefish"
           ;;
         3)
+          aur_package_install "brackets"
+          ;;
+        4)
           #ECLIPSE {{{
           while true
           do
@@ -1731,29 +1772,32 @@ install_development_apps(){
           #}}}
           OPT=3
           ;;
-        4)
+        5)
           package_install "emacs"
           ;;
-        5)
+        6)
           package_remove "vim"
           package_install "gvim ctags"
           ;;
-        6)
+        7)
           package_install "geany"
           ;;
-        7)
+        8)
           package_install "intellij-idea-community-edition"
           ;;
-        8)
+        9)
           package_install "kdevelop"
           ;;
-        9)
-          package_install "monodevelop monodevelop-debugger-gdb"
-          ;;
         10)
-          package_install "netbeans"
+          aur_package_install "lighttable"
           ;;
         11)
+          package_install "monodevelop monodevelop-debugger-gdb"
+          ;;
+        12)
+          package_install "netbeans"
+          ;;
+        13)
           package_install "nodejs"
           #NODEJS {{{
           while true
@@ -1761,17 +1805,19 @@ install_development_apps(){
             print_title "NODEJS - http://nodejs.org"
             print_info "Node.js is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications. Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient, perfect for data-intensive real-time applications that run across distributed devices."
             echo " 1) backbone"
-            echo " 2) coffee-script"
-            echo " 3) express"
-            echo " 4) grunt"
-            echo " 5) jshint"
-            echo " 6) jslint"
-            echo " 7) less"
-            echo " 8) markdown"
-            echo " 9) mocha"
-            echo "10) stylus"
-            echo "11) uglify-js"
-            echo "12) underscore"
+            echo " 2) bower"
+            echo " 3) coffee-script"
+            echo " 4) express"
+            echo " 5) grunt"
+            echo " 6) jshint"
+            echo " 7) jslint"
+            echo " 8) less"
+            echo " 9) markdown"
+            echo "10) mocha"
+            echo "11) stylus"
+            echo "12) uglify-js"
+            echo "13) underscore"
+            echo "14) Yeoman"
             echo ""
             echo " b) BACK"
             echo ""
@@ -1783,37 +1829,43 @@ install_development_apps(){
                   npm_install "backbone"
                   ;;
                 2)
-                  npm_install "coffee-script"
+                  npm_install "bower"
                   ;;
                 3)
-                  npm_install "express"
+                  npm_install "coffee-script"
                   ;;
                 4)
-                  npm_install "grunt"
+                  npm_install "express"
                   ;;
                 5)
-                  npm_install "jshint"
+                  npm_install "grunt grunt-cli"
                   ;;
                 6)
-                  npm_install "jslint"
+                  npm_install "jshint"
                   ;;
                 7)
-                  npm_install "less"
+                  npm_install "jslint"
                   ;;
                 8)
-                  npm_install "markdown"
+                  npm_install "less"
                   ;;
                 9)
-                  npm_install "mocha"
+                  npm_install "markdown"
                   ;;
                 10)
-                  npm_install "stylus"
+                  npm_install "mocha"
                   ;;
                 11)
-                  npm_install "uglify-js"
+                  npm_install "stylus"
                   ;;
                 12)
+                  npm_install "uglify-js"
+                  ;;
+                13)
                   npm_install "underscore"
+                  ;;
+                14)
+                  npm_install "yo grunt-cli bower generator-angular"
                   ;;
                 "b")
                   break
@@ -1828,42 +1880,42 @@ install_development_apps(){
           #}}}
           OPT=11
           ;;
-        12)
+        14)
           aur_package_install "ruby"
           gem_install "rails haml"
           ;;
-        13)
+        15)
           package_remove "jdk"
           package_install "jdk7-openjdk icedtea-web-java7"
           ;;
-        14)
+        16)
           package_remove "jre7-openjdk"
           package_remove "jdk7-openjdk"
           aur_package_install "jdk"
           ;;
-        15)
+        17)
           package_install "qtcreator"
           mkdir -p /home/${username}/.config/Nokia/qtcreator/styles
           curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
           mv monokai.xml /home/${username}/.config/Nokia/qtcreator/styles/
           chown -R ${username}:users /home/${username}/.config
           ;;
-        16)
+        18)
           aur_package_install "sublime-text-dev"
           ;;
-        17)
+        19)
           package_install "splint valgrind gdb" #C/C++
           aur_package_install "php-codesniffer php-tidy" #PHP
           aur_package_install "closure-compiler" #Javascript
           aur_package_install "tidyhtml" #HTML
           ;;
-        18)
+        20)
           aur_package_install "mysql-workbench-gpl"
           ;;
-        19)
+        21)
           aur_package_install "navicat-premium"
           ;;
-        20)
+        22)
           package_install "meld"
           ;;
         "b")
@@ -1884,7 +1936,7 @@ install_office_apps(){
   do
     print_title "OFFICE APPS"
     echo " 1) $(menu_item "libreoffice-common" "LibreOffice")"
-    echo " 2) $(menu_item "goffice calligra" "$([[ ${KDE} -eq 1 ]] && echo "Caligra" || echo "Abiword + Gnumeric";)")"
+    echo " 2) $(menu_item "goffice calligra-libs" "$([[ ${KDE} -eq 1 ]] && echo "Caligra" || echo "Abiword + Gnumeric";)")"
     echo " 3) $(menu_item "texlive-core" "latex")"
     echo " 4) $(menu_item "calibre")"
     echo " 5) $(menu_item "gcstar")"
@@ -2202,12 +2254,13 @@ install_internet_apps(){
             echo " 2) $(menu_item "btsync" "BitTorrent Sync") $AUR"
             echo " 3) $(menu_item "deluge")"
             echo " 4) $(menu_item "dropbox") $AUR"
-            echo " 5) $(menu_item "jdownloader") $AUR"
-            echo " 6) $(menu_item "nitroshare") $AUR"
-            echo " 7) $(menu_item "sparkleshare")"
-            echo " 8) $(menu_item "spideroak") $AUR"
-            echo " 9) $(menu_item "steadyflow-bzr") $AUR"
+            echo " 5) $(menu_item "flareget") $AUR"
+            echo " 6) $(menu_item "jdownloader") $AUR"
+            echo " 7) $(menu_item "qbittorrent") $AUR"
+            echo " 8) $(menu_item "sparkleshare")"
+            echo " 9) $(menu_item "spideroak") $AUR"
             echo "10) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+            echo "11) $(menu_item "uget")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2229,19 +2282,19 @@ install_internet_apps(){
                   add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
                   ;;
                 5)
-                  aur_package_install "jdownloader"
+                  aur_package_install "flareget"
                   ;;
                 6)
-                  aur_package_install "nitroshare"
+                  aur_package_install "jdownloader"
                   ;;
                 7)
-                  package_install "sparkleshare"
+                  aur_package_install "qbittorrent"
                   ;;
                 8)
-                  aur_package_install "spideroak"
+                  package_install "sparkleshare"
                   ;;
                 9)
-                  aur_package_install "steadyflow-bzr"
+                  aur_package_install "spideroak"
                   ;;
                 10)
                   if [[ ${KDE} -eq 1 ]]; then
@@ -2254,6 +2307,9 @@ install_internet_apps(){
                     replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${username}/.config/transmission/settings.json
                   fi
 
+                  ;;
+                11)
+                  package_install "uget"
                   ;;
                 "b")
                   break
@@ -2306,13 +2362,13 @@ install_internet_apps(){
           while true
           do
             print_title "IM - INSTANT MESSAGING"
-            echo " 1) $(menu_item "emesene")"
-            echo " 2) $(menu_item "google-talkplugin") $AUR"
-            echo " 3) $(menu_item "pidgin")"
-            echo " 4) $(menu_item "skype")"
-            echo " 5) $(menu_item "teamspeak3")"
-            echo " 6) $(menu_item "irssi")"
-            echo " 7) $(menu_item "konversation hexchat" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
+            echo " 1) $(menu_item "google-talkplugin") $AUR"
+            echo " 2) $(menu_item "irssi")"
+            echo " 3) $(menu_item "konversation hexchat" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
+            echo " 4) $(menu_item "pidgin")"
+            echo " 5) $(menu_item "skype")"
+            echo " 6) $(menu_item "teamspeak3")"
+            echo " 7) $(menu_item "viber") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2321,31 +2377,29 @@ install_internet_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
-                  package_install "emesene"
-                  ;;
-                2)
                   aur_package_install "google-talkplugin"
                   ;;
-                3)
-                  package_install "pidgin"
-                  ;;
-                4)
-
-                  is_package_installed "ekiga" && package_remove "ekiga"
-                  package_install "skype"
-                  ;;
-                5)
-                  package_install "teamspeak3"
-                  ;;
-                6)
+                2)
                   package_install "irssi"
                   ;;
-                7)
+                3)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "konversation"
                   else
                     package_install "hexchat"
                   fi
+                  ;;
+                4)
+                  package_install "pidgin"
+                  ;;
+                5)
+                  package_install "skype"
+                  ;;
+                6)
+                  package_install "teamspeak3"
+                  ;;
+                7)
+                  aur_package_install "viber"
                   ;;
                 "b")
                   break
@@ -2583,15 +2637,13 @@ install_audio_apps(){
         3)
           package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good \
                            gst-plugins-bad gst-plugins-ugly gst-libav"
-          if is_package_installed "amarok banshee clementine exaile rhythmbox xfburn" ; then
-            package_install "gstreamer0.10 gstreamer0.10-plugins"
-            [[ ${KDE} -eq 1 ]] && package_install "phonon-gstreamer"
-            # Use the 'standard' preset by default. This preset should generally be
-            # transparent to most people on most music and is already quite high in quality.
-            # The resulting bitrate should be in the 170-210kbps range, according to music
-            # complexity.
-            sudo -u ${username} gconftool-2 --type string --set /system/gstreamer/0.10/audio/profiles/mp3/pipeline "audio/x-raw-int,rate=44100,channels=2 ! lame name=enc preset=1001 ! id3v2mux"
-          fi
+          package_install "gstreamer0.10 gstreamer0.10-plugins"
+          [[ ${KDE} -eq 1 ]] && package_install "phonon-gstreamer"
+          # Use the 'standard' preset by default. This preset should generally be
+          # transparent to most people on most music and is already quite high in quality.
+          # The resulting bitrate should be in the 170-210kbps range, according to music
+          # complexity.
+          sudo -u ${username} gconftool-2 --type string --set /system/gstreamer/0.10/audio/profiles/mp3/pipeline "audio/x-raw-int,rate=44100,channels=2 ! lame name=enc preset=1001 ! id3v2mux"
           ;;
         "b")
           break
@@ -2694,14 +2746,16 @@ install_video_apps(){
           while true
           do
             print_title "VIDEO EDITORS|TOOLS"
-            echo " 1) $(menu_item "avidemux-gtk avidemux-qt" "Avidemux")"
-            echo " 2) $(menu_item "arista-transcoder" "Arista") $AUR"
-            echo " 3) $(menu_item "handbrake")"
-            echo " 4) $(menu_item "transmageddon")"
-            echo " 5) $(menu_item "kdeenlive")"
-            echo " 6) $(menu_item "openshot")"
-            echo " 7) $(menu_item "pitivi")"
-            echo " 8) $(menu_item "kazam-bzr") $AUR"
+            echo " 1) $(menu_item "arista-transcoder" "Arista") $AUR"
+            echo " 2) $(menu_item "avidemux-gtk avidemux-qt" "Avidemux")"
+            echo " 3) $(menu_item "filebot") $AUR"
+            echo " 4) $(menu_item "handbrake")"
+            echo " 5) $(menu_item "kazam-bzr") $AUR"
+            echo " 6) $(menu_item "kdeenlive")"
+            echo " 7) $(menu_item "lwks" "Lightworks") $AUR"
+            echo " 8) $(menu_item "openshot")"
+            echo " 9) $(menu_item "pitivi")"
+            echo "10) $(menu_item "transmageddon")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2710,32 +2764,38 @@ install_video_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
+                  aur_package_install "arista-transcoder"
+                  ;;
+                2)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "avidemux-qt"
                   else
                     package_install "avidemux-gtk"
                   fi
                   ;;
-                2)
-                  aur_package_install "arista-transcoder"
-                  ;;
                 3)
-                  package_install "handbrake"
+                  aur_package_install "filebot"
                   ;;
                 4)
-                  package_install "transmageddon"
+                  package_install "handbrake"
                   ;;
                 5)
-                  package_install "kdenlive"
+                  aur_package_install "kazam-bzr"
                   ;;
                 6)
-                  package_install "openshot"
+                  package_install "kdenlive"
                   ;;
                 7)
-                  package_install "pitivi frei0r-plugins"
+                  aur_package_install "lwks"
                   ;;
                 8)
-                  aur_package_install "kazam-bzr"
+                  package_install "openshot"
+                  ;;
+                9)
+                  package_install "pitivi frei0r-plugins"
+                  ;;
+                10)
+                  package_install "transmageddon"
                   ;;
                 "b")
                   break
@@ -2790,8 +2850,9 @@ install_games(){
     echo " 9) Racing"
     echo "10) Simulation"
     echo "11) Strategy"
-    echo "12) PlayOnLinux"
-    echo "13) Steam"
+    echo "12) Terminal"
+    echo "13) PlayOnLinux"
+    echo "14) Steam"
     echo ""
     echo " b) BACK"
     echo ""
@@ -3350,10 +3411,101 @@ install_games(){
           OPT=11
           ;;
         12)
-          aur_package_install "playonlinux"
+          #TERMINAL {{{
+          while true
+          do
+            print_title "TERMINAL"
+            echo " 1) $(menu_item "asciiquarium") $AUR"
+            echo " 2) $(menu_item "bastet") $AUR"
+            echo " 3) $(menu_item "bsd-games")"
+            echo " 4) $(menu_item "cmatrix")"
+            echo " 5) $(menu_item "cowsay")"
+            echo " 6) $(menu_item "fortune-mod")"
+            echo " 7) $(menu_item "funny-manpages") $AUR"
+            echo " 8) $(menu_item "greed") $AUR"
+            echo " 9) $(menu_item "moon-buggy") $AUR"
+            echo "10) $(menu_item "myman") $AUR"
+            echo "11) $(menu_item "nethack")"
+            echo "12) $(menu_item "ninvaders") $AUR"
+            echo "13) $(menu_item "ponysay")"
+            echo "14) $(menu_item "robotfindskitten") $AUR"
+            echo "15) $(menu_item "ski") $AUR"
+            echo "16) $(menu_item "toilet") $AUR"
+            echo ""
+            echo " b) BACK"
+            echo ""
+            TERMINAL_GAMES+=" b"
+            read_input_options "$TERMINAL_GAMES"
+            for OPT in ${OPTIONS[@]}; do
+              case "$OPT" in
+                1)
+                  aur_package_install "asciiquarium"
+                  ;;
+                2)
+                  aur_package_install "bastet"
+                  ;;
+                3)
+                  package_install "bsd-games"
+                  ;;
+                4)
+                  package_install "cmatrix"
+                  ;;
+                5)
+                  package_install "cowsay"
+                  ;;
+                6)
+                  package_install "fortune-mod"
+                  ;;
+                7)
+                  aur_package_install "funny-manpages"
+                  ;;
+                8)
+                  aur_package_install "greed"
+                  ;;
+                9)
+                  aur_package_install "moon-buggy"
+                  ;;
+                10)
+                  aur_package_install "myman"
+                  ;;
+                11)
+                  package_install "nethack"
+                  ;;
+                12)
+                  aur_package_install "ninvaders"
+                  ;;
+                13)
+                  package_install "ponysay"
+                  ;;
+                14)
+                  aur_package_install "robotfindskitten"
+                  ;;
+                15)
+                  aur_package_install "ski"
+                  ;;
+                16)
+                  aur_package_install "toilet"
+                  ;;
+                "b")
+                  break
+                  ;;
+                *)
+                  invalid_option
+                  ;;
+              esac
+            done
+            elihw
+          done
+          #}}}
+          OPT=12
           ;;
         13)
+          aur_package_install "playonlinux"
+          OPT=13
+          ;;
+        14)
           aur_package_install "steam"
+          OPT=14
           ;;
         "b")
           break
@@ -3602,7 +3754,7 @@ reconfigure_system(){
   print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
   OPTION=n
   while [[ $OPTION != y ]]; do
-    setkeymap
+    getkeymap
     read_input_text "Confirm keymap: $KEYMAP"
   done
   localectl set-keymap ${KEYMAP}

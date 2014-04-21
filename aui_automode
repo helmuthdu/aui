@@ -48,23 +48,24 @@
   PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA|ATI) driver
   #FONT CONFIGURATION {{{
     # 1) Default
-    # 2) Ubuntu
-    FONTCONFIG=1
+    # 2) Infinality
+    # 3) Ubuntu
+    FONTCONFIG=2
   #}}}
   #ADDITIONAL FIRMWARE {{{
-    # 1) alsa-firmware
-    # 2) ipw2100
-    # 3) ipw2200
-    # 4) b43
-    # 5) b43legacy
-    # 6) broadcom-wl
-    # 7) bluez-firmware
-    # 8) libmtp
-    # 9) libffado [Firmware Audio Devices]
-    #10) libraw1394 [IEE1394 Driver]
-    #11) aic94xx-firmware
-    #12) bfa-firmware
-    FIRMWARE_OPTIONS="8"
+    # 1) aic94xx-firmware
+    # 2) alsa-firmware
+    # 3) b43
+    # 4) b43legacy
+    # 5) bfa-firmware
+    # 6) bluez-firmware
+    # 7) broadcom-wl
+    # 8) ipw2100
+    # 9) ipw2200
+    #10) libffado [Firmware Audio Devices]
+    #11) libmtp [Android Devices]
+    #12) libraw1394 [IEE1394 Driver]
+    FIRMWARE_OPTIONS="11"
   #}}}
 #}}}
 #DESKTOP ENVIRONMENT|WINDOW MANAGER {{{
@@ -78,6 +79,7 @@
   # 8) Awesome
   # 9) Fluxbox
   #10) OpenBox
+  #11) Xmonad
   DESKTOPENV=3
   #KDE {{{
     # 1) Full
@@ -150,39 +152,42 @@
   # 2) Catfish
   # 3) Conky
   # 4) Docky
-  # 5) Galculator|Speedcrunch
-  # 6) Terra [Drop-down Terminal]
-  # 7) Kupfer
+  # 5) Galculator
+  # 6) Kupfer
+  # 7) Pamac
   # 8) Pyrenamer
   # 9) Shutter
-  #10) Stormcloud
-  #11) Synapse
-  #12) Terminator
-  #13) Zim
+  #10) Springseed
+  #11) Stormcloud
+  #12) Synapse
+  #13) Terminator
+  #14) Zim
   ACCESSORIES_OPTIONS=""
 #}}}
 #DEVELOPEMENT {{{
   # 1) Aptana Studio
   # 2) Bluefish
-  # 3) Eclipse
-  # 4) Emacs
-  # 5) Gvim
-  # 6) Geany
-  # 7) IntelliJ IDEA
-  # 8) Kdevelop
-  # 9) Monodevelop
-  #10) Netbeans
-  #11) NodeJS
-  #12) Ruby on Rails
-  #13) OpenJDK
-  #14) Oracle JDK
-  #15) QT Creator
-  #16) Sublime Text
-  #17) Debuggers
-  #18) MySQL Workbench
-  #19) Navicat
-  #20) Meld
-  DEVELOPMENT_OPTIONS="11 14 20"
+  # 3) Brackets
+  # 4) Eclipse
+  # 5) Emacs
+  # 6) Gvim
+  # 7) Geany
+  # 8) IntelliJ IDEA
+  # 9) Kdevelop
+  #10) LightTable
+  #11) Monodevelop
+  #12) Netbeans
+  #13) NodeJS
+  #14) Ruby on Rails
+  #15) OpenJDK
+  #16) Oracle JDK
+  #17) QT Creator
+  #18) Sublime Text
+  #19) Debuggers
+  #20) MySQL Workbench
+  #21) Navicat
+  #22) Meld
+  DEVELOPMENT_OPTIONS="13 16 22"
   #ECLIPSE {{{
     # 1) Eclipse Classic
     # 2) Eclipse IDE for C/C++ Developers
@@ -198,18 +203,20 @@
   #}}}
   #NODEJS {{{
     # 1) backbone
-    # 2) coffee-script
-    # 3) express
-    # 4) grunt
-    # 5) jshint
-    # 6) jslint
-    # 7) less
-    # 8) markdown
-    # 9) mocha
-    # 10) stylus
-    # 11) uglify-js
-    # 12) underscore
-    NODEJS_OPTIONS="2 5 6 7 11"
+    # 2) bower
+    # 3) coffee-script
+    # 4) express
+    # 5) grunt
+    # 6) jshint
+    # 7) jslint
+    # 8) less
+    # 9) markdown
+    # 10) mocha
+    # 11) stylus
+    # 12) uglify-js
+    # 13) underscore
+    # 14) yeoman
+    NODEJS_OPTIONS="2 6 7 8 12 14"
   #}}}
 #}}}
 #OFFICE {{{
@@ -274,13 +281,14 @@
     # 2) BitTorrent Sync
     # 3) Deluge
     # 4) Dropbox
-    # 5) Jdownloader
-    # 6) Nitroshare
-    # 7) Sparkleshare
-    # 8) Spider Oak
-    # 9) Steadyflow
+    # 5) FlareGet
+    # 6) Jdownloader
+    # 7) qBittorrent
+    # 8) Sparkleshare
+    # 9) Spider Oak
     #10) Trasmission
-    DOWNLOAD_OPTIONS="4 5 10"
+    #11) uGet
+    DOWNLOAD_OPTIONS="4 10"
   #}}}
   #EMAIL|RSS {{{
     # 1) Mozilla Thunderbird
@@ -288,14 +296,14 @@
     EMAIL_OPTIONS=""
   #}}}
   #IM|IRC {{{
-    # 1) Emesene
-    # 2) Google Talk-Plugin
-    # 3) Pidgin
-    # 4) Skype
-    # 5) Teamspeak
-    # 6) Irssi
-    # 7) HexChat|Konversation
-    IM_OPTIONS="4"
+    # 1) Google Talk-Plugin
+    # 2) Irssi
+    # 3) Konversation|HexChat
+    # 4) Pidgin
+    # 5) Skype
+    # 6) Teamspeak
+    # 7) Viber
+    IM_OPTIONS="5"
   #}}}
   #MAPPING {{{
     # 1) Google Earth
@@ -357,15 +365,17 @@
     VIDEO_PLAYER_OPTIONS="8 9"
   #}}}
   #EDITORS|TOOLS {{{
-    # 1) Avidemux
-    # 2) Arista
-    # 3) Handbrake
-    # 4) Transmageddon
-    # 5) Kdenlive
-    # 6) Openshot
-    # 7) Pitivi
-    # 8) Kazam
-    VIDEO_EDITOR_OPTIONS="2"
+    # 1) Arista
+    # 2) Avidemux
+    # 3) Filebot
+    # 4) Handbrake
+    # 5) Kazam
+    # 6) Kdenlive
+    # 7) Lightworks
+    # 8) Openshot
+    # 9) Pitivi
+    #10) Transmageddon
+    VIDEO_EDITOR_OPTIONS="1"
   #}}}
 #}}}
 #GAMES {{{
@@ -380,8 +390,9 @@
   # 9) Racing
   #10) Simulation
   #11) Strategy
-  #12) PlayOnLinux
-  #13) Steam
+  #12) Terminal
+  #13) PlayOnLinux
+  #14) Steam
   GAMES_OPTIONS=""
   #ACTION {{{
     # 1) Astromenace
@@ -481,6 +492,25 @@
     # 5) Wesnoth
     # 6) Zod
     STRATEGY=""
+  #}}}
+  #TERMINAL {{{
+    #  1) Asciiquarium
+    #  2) Bastet
+    #  3) Bsd-games
+    #  4) Cmatrix
+    #  5) Cowsay
+    #  6) Fortune-mod
+    #  7) Funny-manpages
+    #  8) Greed
+    #  9) Moon-buggy
+    # 10) Myman
+    # 11) Nethack
+    # 12) Ninvaders
+    # 13) Ponysay
+    # 14) Robotfindskitten
+    # 15) Ski
+    # 16) Toilet
+    TERMINAL_GAMES=""
   #}}}
 #}}}
 #WEBSERVER {{{
