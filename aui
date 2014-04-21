@@ -1153,7 +1153,7 @@ install_desktop_environment(){
   echo " 1) Cinnamon            8) Awesome"
   echo " 2) E17                 9) Fluxbox"
   echo " 3) GNOME              10) OpenBox"
-  echo " 4) KDE"
+  echo " 4) KDE                11) Xmonad"
   echo " 5) LXDE"
   echo " 6) Mate"
   echo " 7) XFCE"
@@ -1473,6 +1473,22 @@ install_desktop_environment(){
       pause_function
       install_misc_apps "OPENBOX"
       install_themes "OPENBOX"
+      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
+      system_ctl enable upower
+      ;;
+      #}}}
+    11)
+      #XMONAD {{{
+      print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
+      print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
+      package_install "xmonad xmonad-contrib"
+      package_install "xdg-user-dirs"
+      package_install "ttf-bitstream-vera ttf-dejavu"
+      # config xinitrc
+      config_xinitrc "xmonad"
+      pause_function
+      install_misc_apps "XMONAD"
+      install_themes "XMONAD"
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
       system_ctl enable upower
       ;;

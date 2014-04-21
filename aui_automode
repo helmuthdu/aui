@@ -79,6 +79,7 @@
   # 8) Awesome
   # 9) Fluxbox
   #10) OpenBox
+  #11) Xmonad
   DESKTOPENV=3
   #KDE {{{
     # 1) Full
