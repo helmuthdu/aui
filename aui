@@ -466,7 +466,7 @@ install_basic_setup(){
   package_install "zip unzip unrar p7zip"
   pause_function
   print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
-  print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers and hosts running on a local network with no specific configuration."
+  print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers services and hosts running on a local network with no specific configuration."
   package_install "avahi nss-mdns"
   is_package_installed "avahi" && system_ctl enable avahi-daemon
   is_package_installed "avahi" && system_ctl enable avahi-dnsconfd
