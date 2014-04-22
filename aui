@@ -3043,11 +3043,11 @@ install_games(){
             print_title "EMULATORS"
             echo " 1) $(menu_item "higan-gtk higan-qt" "BSNES")"
             echo " 2) $(menu_item "desmume") $AUR"
-            echo " 3) $(menu_item "dolphin-emu" "Dolphin") $AUR"
+            echo " 3) $(menu_item "dolphin-emu" "Dolphin")"
             echo " 4) $(menu_item "epsxe") $AUR"
             echo " 5) $(menu_item "project64") $AUR"
             echo " 6) $(menu_item "snesx9x")"
-            echo " 7) $(menu_item "vba-m-gtk" "VisualBoyAdvanced") $AUR"
+            echo " 7) $(menu_item "vbam-gtk" "VisualBoyAdvanced")"
             echo " 8) $(menu_item "wxmupen64plus") $AUR"
             echo " 9) $(menu_item "zsnes")"
             echo ""
@@ -3068,7 +3068,7 @@ install_games(){
                   aur_package_install "desmume"
                   ;;
                 3)
-                  aur_package_install "dolphin-emu"
+                  package_install "dolphin-emu"
                   ;;
                 4)
                   aur_package_install "epsxe"
@@ -3080,7 +3080,7 @@ install_games(){
                   package_install "snes9x-gtk"
                   ;;
                 7)
-                  aur_package_install "vba-m-gtk"
+                  package_install "vbam-gtk"
                   ;;
                 8)
                   aur_package_install "wxmupen64plus"
