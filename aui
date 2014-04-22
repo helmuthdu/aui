@@ -2050,7 +2050,7 @@ install_system_apps(){
           ;;
         2)
           print_title "FirewallD - https://fedoraproject.org/wiki/FirewallD"
-          print_info "firewalld provides a dynamically managed firewall with support for network/firewall zones to define the trust level of network connections or interfaces. It has support for IPv4, IPv6 firewall settings and for ethernet bridges and has a separation of runtime and persistent configuration options. It also supports an interface fors or applications to add firewall rules directly."
+          print_info "firewalld provides a dynamically managed firewall with support for network/firewall zones to define the trust level of network connections or interfaces. It has support for IPv4, IPv6 firewall settings and for ethernet bridges and has a separation of runtime and persistent configuration options. It also supports an interface for services or applications to add firewall rules directly."
           is_package_installed "ufw" && package_remove "ufw"
           is_package_installed "firewalld" && package_remove "firewalld"
           package_install "firewalld"
