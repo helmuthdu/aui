@@ -2082,7 +2082,7 @@ install_system_apps(){
             add_module "vboxdrv vboxnetflt" "virtualbox-host"
             modprobe vboxdrv vboxnetflt
           else
-            cecho " ${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
+            echo " ${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
           ;;
         8)
