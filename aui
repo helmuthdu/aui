@@ -611,7 +611,7 @@ install_zram (){
 install_tlp(){
   print_title "TLP - https://wiki.archlinux.org/index.php/Tlp"
   print_info "TLP is an advanced power management tool for Linux. It is a pure command line tool with automated background tasks and does not contain a GUI."
-  read_input_text "Install TLP " $TLP
+  read_input_text "Install TLP" $TLP
   if [[ $OPTION == y ]]; then
     aur_package_install "tlp"
     tlp start
@@ -648,6 +648,10 @@ font_config(){
     case "$OPTION" in
       1)
         is_package_installed "fontconfig-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
+        is_package_installed "fontconfig-infinality-ultimate" && pacman -Rdds --noconfirm fontconfig-infinality-ultimate freetype2-infinality-ultimate cairo-infinality-ultimate
+        if [[ $ARCHI == x86_64 ]]; then
+          is_package_installed "lib32-fontconfig-infinality-ultimate" && pacman -Rdds --noconfirm lib32-cairo-infinality-ultimate lib32-fontconfig-infinality-ultimate lib32-freetype2-infinality-ultimate
+        fi
         pacman -S --asdeps --needed cairo fontconfig freetype2
         break
         ;;
