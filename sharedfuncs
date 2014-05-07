@@ -507,10 +507,10 @@
   system_update() { #{{{
     if [[ $VERBOSE_MODE -eq 0 ]]; then
       ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Updating packages "
-      $PKG_MANAGER -Sy >>"$LOG" 2>&1 &
+      pacman -Sy >>"$LOG" 2>&1 &
       pid=$!;progress $pid
     else
-      $PKG_MANAGER -Sy $1
+      pacman -Sy $1
     fi
   } #}}}
   npm_install() { #{{{
