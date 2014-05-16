@@ -1157,7 +1157,7 @@ install_desktop_environment(){
   echo -e "Select your DE or WM:\n"
   echo " --- DE ---             --- WM ---"
   echo " 1) Cinnamon            8) Awesome"
-  echo " 2) E17                 9) Fluxbox"
+  echo " 2) Enlightenment       9) Fluxbox"
   echo " 3) GNOME              10) OpenBox"
   echo " 4) KDE                11) Xmonad"
   echo " 5) LXDE"
@@ -1209,8 +1209,8 @@ install_desktop_environment(){
       ;;
       #}}}
     2)
-      #E17 {{{
-      print_title "E17 - http://wiki.archlinux.org/index.php/E17"
+      #Enlightenment {{{
+      print_title "Enlightenment - http://wiki.archlinux.org/index.php/Enlightenment"
       print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
       package_install "enlightenment"
       package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
@@ -1222,8 +1222,8 @@ install_desktop_environment(){
       # config xinitrc
       config_xinitrc "enlightenment_start"
       pause_function
-      install_misc_apps "E17"
-      install_themes "E17"
+      install_misc_apps "Enlightenment"
+      install_themes "Enlightenment"
       #Abstraction for enumerating power devices, listening to device events and querying history and statistics
       system_ctl enable upower
       ;;
