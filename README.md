@@ -21,8 +21,8 @@ You can try it first with a `virtualbox`
     - super short `wget ow.ly/wnFgh -o aui.zip`
 
 ## How to use
-- aui mode: `cd <dir> && ./aui`
 - ais mode: `cd <dir> && ./ais`
+- aui mode: `cd <dir> && ./aui`
 
 ## Archlinux Install Script (ais)
 - Configure keymap
