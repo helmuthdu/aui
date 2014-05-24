@@ -166,14 +166,17 @@ language_selector(){
 select_user(){
   #CREATE NEW USER {{{
   create_new_user(){
-    print_danger "\nUsername MUST be in lowercase"
     read -p "Username: " username
     username=`echo $username | tr '[:upper:]' '[:lower:]'`
     useradd -m -g users -G wheel -s /bin/bash ${username}
     chfn ${username}
     passwd ${username}
     pause_function
-    configure_user_account
+    if $(grep ${username} /etc/shadow | grep ! &> /dev/null ); then
+      create_new_user
+    else
+      configure_user_account
+    fi
   }
   #}}}
   #CONFIGURE USER ACCOUNT {{{
