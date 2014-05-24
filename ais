@@ -562,28 +562,32 @@ configure_mkinitcpio(){
 install_bootloader(){
   print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
   print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
-  print_warning "NOTE: Automated Grub installation support has been removed, as it was unreliable and couldn't handle LUKS/LVM. If you need Grub, please switch to a new terminal with Ctrl-Alt-F2 and install manually. See: https://wiki.archlinux.org/index.php/GRUB#Installation"
   print_warning "\tROOT Partition: ${ROOT_DISK}"
+  print_warning "\tWARNING: There is no support for GRUB + LUKS/LVM."
   if [[ $UEFI -eq 1 ]]; then
     print_warning "\tUEFI Mode Detected"
-    bootloaders_list=("Syslinux" "Gummiboot" "Skip")
+    bootloaders_list=("Grub2" "Syslinux" "Gummiboot" "Skip")
   else
     print_warning "\tBIOS Mode Detected"
-    bootloaders_list=("Syslinux" "Skip")
+    bootloaders_list=("Grub2" "Syslinux" "Skip")
   fi
   PS3="$prompt1"
   echo -e "Install bootloader:\n"
   select bootloader in "${bootloaders_list[@]}"; do
     case "$REPLY" in
       1)
-        pacstrap ${MOUNTPOINT} syslinux
+        pacstrap ${MOUNTPOINT} grub os-prober
         break
         ;;
       2)
-        [[ $UEFI -eq 1 ]] && pacstrap ${MOUNTPOINT} gummiboot
+        pacstrap ${MOUNTPOINT} syslinux
         break
         ;;
       3)
+        [[ $UEFI -eq 1 ]] && pacstrap ${MOUNTPOINT} gummiboot
+        break
+        ;;
+      4)
         [[ $UEFI -eq 1 ]] && break || invalid_option
         ;;
       *)
@@ -597,6 +601,33 @@ install_bootloader(){
 #CONFIGURE BOOTLOADER {{{
 configure_bootloader(){
   case $bootloader in
+    Grub2)
+      print_title "GRUB2 - https://wiki.archlinux.org/index.php/GRUB2"
+      print_info "GRUB2 is the next generation of the GRand Unified Bootloader (GRUB).\nIn brief, the bootloader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the Linux kernel."
+      grub_install_mode=("Automatic" "Manual")
+      PS3="$prompt1"
+      echo -e "Grub Install:\n"
+      select OPT in "${grub_install_mode[@]}"; do
+        case "$REPLY" in
+          1)
+            if [[ $UEFI -eq 1 ]]; then
+              arch_chroot "grub-install --target=x86_64-efi --efi-directory=${EFI_DISK} --bootloader-id=arch_grub --recheck"
+            else
+              arch_chroot "grub-install --target=i386-pc --recheck --debug ${BOOT_DISK}"
+            fi
+            break
+            ;;
+          2)
+            arch-chroot ${MOUNTPOINT}
+            break
+            ;;
+          *)
+            invalid_option
+            ;;
+        esac
+      done
+      arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
+      ;;
     Syslinux)
       print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
       print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
