@@ -1209,7 +1209,7 @@ install_desktop_environment(){
       ;;
       #}}}
     2)
-      #Enlightenment {{{
+      #ENLIGHTENMENT {{{
       print_title "Enlightenment - http://wiki.archlinux.org/index.php/Enlightenment"
       print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
       package_install "enlightenment"
