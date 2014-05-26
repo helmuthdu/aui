@@ -695,8 +695,7 @@ install_video_cards(){
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${username} vboxsf
     system_ctl disable ntpd
-    system_ctl enable vbo
-    VBoxClient-all
+    system_ctl enable vboxservice
   #}}}
   #Bumblebee {{{
   elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
