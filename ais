@@ -238,7 +238,7 @@ setup_lvm(){
 #}}}
 #SELECT|FORMAT PARTITIONS {{{
 format_partitions(){
-  print_title "https://wiki.archlinux.org/index.php/Format_a_partition"
+  print_title "https://wiki.archlinux.org/index.php/File_Systems"
   print_info "This step will select and format the selected partiton where the archlinux will be installed"
   print_danger "\tAll data on the ROOT and SWAP partition will be LOST."
   i=0
@@ -247,7 +247,7 @@ format_partitions(){
 
   # check if there is no partition
   if [[ ${#block_list[@]} -eq 0 ]]; then
-    echo "No partition founded"
+    echo "No partition found"
     exit 0
   fi
 
