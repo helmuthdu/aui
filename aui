@@ -1264,10 +1264,10 @@ install_desktop_environment(){
       read_input $KDE_INSTALL
       case "$OPTION" in
         2)
-          package_install "kdebase phonon-gstreamer kde-l10n-$LOCALE_KDE"
+          package_install "kdebase kde-l10n-$LOCALE_KDE"
           ;;
         *)
-          package_install "kde phonon-gstreamer kde-l10n-$LOCALE_KDE kipi-plugins"
+          package_install "kde kde-l10n-$LOCALE_KDE kipi-plugins"
           package_remove "kdemultimedia-kscd kdemultimedia-juk kdebase-kwrite kdenetwork-kopete kdebase-konqueror"
           package_install "kde-telepathy telepathy"
           ;;
@@ -2645,7 +2645,7 @@ install_audio_apps(){
           package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good \
                            gst-plugins-bad gst-plugins-ugly gst-libav"
           package_install "gstreamer0.10 gstreamer0.10-plugins"
-          [[ ${KDE} -eq 1 ]] && package_install "phonon-gstreamer"
+          [[ ${KDE} -eq 1 ]] && package_install "phonon-qt4-gstreamer"
           # Use the 'standard' preset by default. This preset should generally be
           # transparent to most people on most music and is already quite high in quality.
           # The resulting bitrate should be in the 170-210kbps range, according to music
