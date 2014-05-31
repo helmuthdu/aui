@@ -664,6 +664,7 @@ font_config(){
         [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://bohoomil.com/repo/multilib/\$arch"
         pacman-key -r 962DDE58
         pacman-key --lsign-key 962DDE58
+        pacman-key --refresh-keys
         is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
         is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
         pacman -S --needed infinality-bundle
