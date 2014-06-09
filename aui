@@ -2140,7 +2140,6 @@ install_graphics_apps(){
           ;;
         2)
           package_install "gimp"
-          aur_package_install "gimphelp-scriptfu gimpfx-foundry"
           ;;
         3)
           package_install "gthumb"
