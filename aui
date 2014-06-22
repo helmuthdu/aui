@@ -2725,7 +2725,7 @@ install_video_apps(){
                 8)
                   package_install "vlc"
                   if [[ ${KDE} -eq 1 ]]; then
-                    package_install "phonon-vlc"
+                    package_install "phonon-qt4-vlc"
                   fi
                   ;;
                 9)
