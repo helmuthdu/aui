@@ -74,12 +74,13 @@
   # 3) GNOME
   # 4) KDE
   # 5) LXDE
-  # 6) Mate
-  # 7) XFCE
-  # 8) Awesome
-  # 9) Fluxbox
-  #10) OpenBox
-  #11) Xmonad
+  # 6) LXQT
+  # 7) Mate
+  # 8) XFCE
+  # 9) Awesome
+  #10) Fluxbox
+  #11) OpenBox
+  #12) Xmonad
   DESKTOPENV=3
   #KDE {{{
     # 1) Full

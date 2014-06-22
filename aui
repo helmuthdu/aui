@@ -660,9 +660,8 @@ font_config(){
         ;;
       2)
         print_title "INFINALITY - https://wiki.archlinux.org/index.php/Infinality-bundle%2Bfonts"
+        add_key "962DDE58"
         add_repository "infinality-bundle" "http://bohoomil.com/repo/\$arch"
-        pacman-key -r 962DDE58
-        pacman-key --lsign-key 962DDE58
         [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://bohoomil.com/repo/multilib/\$arch"
         is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
         is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
@@ -1158,13 +1157,14 @@ install_desktop_environment(){
   print_info "A DE provide a complete GUI for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries.\n\nA window manager is one component of a system's graphical user interface."
   echo -e "Select your DE or WM:\n"
   echo " --- DE ---             --- WM ---"
-  echo " 1) Cinnamon            8) Awesome"
-  echo " 2) Enlightenment       9) Fluxbox"
-  echo " 3) GNOME              10) OpenBox"
-  echo " 4) KDE                11) Xmonad"
+  echo " 1) Cinnamon            9) Awesome"
+  echo " 2) Enlightenment      10) Fluxbox"
+  echo " 3) GNOME              11) OpenBox"
+  echo " 4) KDE                12) Xmonad"
   echo " 5) LXDE"
-  echo " 6) Mate"
-  echo " 7) XFCE"
+  echo " 6) LXQT (Unstable)"
+  echo " 7) Mate"
+  echo " 8) XFCE"
   echo ""
   echo " b) BACK"
   read_input $DESKTOPENV
@@ -1206,8 +1206,6 @@ install_desktop_environment(){
       system_ctl enable gdm
       #D-Bus interface for user account query and manipulation
       system_ctl enable accounts-daemon
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
       ;;
       #}}}
     2)
@@ -1226,8 +1224,6 @@ install_desktop_environment(){
       pause_function
       install_misc_apps "Enlightenment"
       install_themes "Enlightenment"
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
       ;;
       #}}}
     3)
@@ -1248,8 +1244,6 @@ install_desktop_environment(){
       system_ctl enable gdm
       #D-Bus interface for user account query and manipulation
       system_ctl enable accounts-daemon
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
       #Improvements
       add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
       ;;
@@ -1351,8 +1345,6 @@ install_desktop_environment(){
       done
       #}}}
       system_ctl enable kdm
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
       # Tweaks
       # nepomuk
       add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
@@ -1367,7 +1359,7 @@ install_desktop_environment(){
       #LXDE {{{
       print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
       print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
-      package_install "lxde upower"
+      package_install "lxde"
       package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
       package_install "xdg-user-dirs"
       package_install "leafpad obconf epdfview"
@@ -1380,11 +1372,32 @@ install_desktop_environment(){
       pause_function
       install_misc_apps "LXDE"
       install_themes "LXDE"
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
       ;;
       #}}}
     6)
+      #LXQT {{{
+      print_title "LXQT - http://wiki.archlinux.org/index.php/lxqt"
+      print_info "LXQt is the Qt port and the upcoming version of LXDE, the Lightweight Desktop Environment. It is the product of the merge between the LXDE-Qt and the Razor-qt projects: A lightweight, modular, blazing-fast and user-friendly desktop environment."
+      add_key "26EBCC57"
+      add_repository "lxqt-git" "http://repo.stobbstechnical.com/\$arch"
+      package_install "lxqt-desktop-git pcmanfm-qt-git openbox lximage-qt-git qterminal-git oxygen-icons qtcurve"
+      package_install "gvfs gvfs-smb gvfs-afc"
+      package_install "xdg-user-dirs"
+      package_install "leafpad obconf epdfview"
+      aur_package_install "gnome-defaults-list"
+      mkdir -p /home/${username}/.config/lxqt
+      cp /etc/xdg/lxqt/* /home/${username}/.config/lxqt
+      mkdir -p /home/${username}/.config/openbox/
+      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${username}/.config/openbox/
+      chown -R ${username}:users /home/${username}/.config
+      # config xinitrc
+      config_xinitrc "startlxqt"
+      pause_function
+      install_misc_apps "LXQT"
+      install_themes "LXQT"
+      ;;
+      #}}}
+    7)
       #MATE {{{
       print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
       print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
@@ -1398,11 +1411,9 @@ install_desktop_environment(){
       install_themes "MATE"
       #D-Bus interface for user account query and manipulation
       system_ctl enable accounts-daemon
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
       ;;
       #}}}
-    7)
+    8)
       #XFCE {{{
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
@@ -1415,11 +1426,9 @@ install_desktop_environment(){
       pause_function
       install_display_manager
       install_themes "XFCE"
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
       ;;
       #}}}
-    8)
+    9)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
       print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
@@ -1439,11 +1448,9 @@ install_desktop_environment(){
       pause_function
       install_misc_apps "AWESOME"
       install_themes "AWESOME"
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
       ;;
       #}}}
-    9)
+    10)
       #FLUXBOX {{{
       print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
       print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
@@ -1458,11 +1465,9 @@ install_desktop_environment(){
       install_misc_apps "FLUXBOX"
       install_themes "FLUXBOX"
       pause_function
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
       ;;
       #}}}
-    10)
+    11)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -1480,11 +1485,9 @@ install_desktop_environment(){
       pause_function
       install_misc_apps "OPENBOX"
       install_themes "OPENBOX"
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
       ;;
       #}}}
-    11)
+    12)
       #XMONAD {{{
       print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
       print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
@@ -1496,8 +1499,6 @@ install_desktop_environment(){
       pause_function
       install_misc_apps "XMONAD"
       install_themes "XMONAD"
-      #Abstraction for enumerating power devices, listening to device events and querying history and statistics
-      system_ctl enable upower
       ;;
       #}}}
     "b")

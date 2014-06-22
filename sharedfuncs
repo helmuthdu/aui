@@ -360,6 +360,10 @@
       system_update
     fi
   } #}}}
+  add_key() { #{{{
+    pacman-key -r $1
+    pacman-key --lsign-key $1
+  } #}}}
   add_line() { #{{{
     ADD_LINE=${1}
     FILEPATH=${2}
