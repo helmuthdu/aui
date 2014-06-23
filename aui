@@ -1591,12 +1591,13 @@ install_accessories_apps(){
     echo " 6) $(menu_item "kupfer") $AUR"
     echo " 7) $(menu_item "pamac-aur" "Pamac") $AUR"
     echo " 8) $(menu_item "pyrenamer") $AUR"
-    echo " 9) $(menu_item "shutter") $AUR"
-    echo "10) $(menu_item "springseed") $AUR"
-    echo "11) $(menu_item "stormcloud") $AUR"
-    echo "12) $(menu_item "synapse")"
-    echo "13) $(menu_item "terminator")"
-    echo "14) $(menu_item "zim")"
+    echo " 9) $(menu_item "lastpass-pocket" "LastPass Pocket") $AUR"
+    echo "10) $(menu_item "shutter") $AUR"
+    echo "11) $(menu_item "springseed") $AUR"
+    echo "12) $(menu_item "stormcloud") $AUR"
+    echo "13) $(menu_item "synapse")"
+    echo "14) $(menu_item "terminator")"
+    echo "15) $(menu_item "zim")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1630,21 +1631,24 @@ install_accessories_apps(){
           aur_package_install "pyrenamer"
           ;;
         9)
-          aur_package_install "shutter"
+          aur_package_install "lastpass-pocket"
           ;;
         10)
-          aur_package_install "springseed"
+          aur_package_install "shutter"
           ;;
         11)
-          aur_package_install "stormcloud"
+          aur_package_install "springseed"
           ;;
         12)
-          package_install "synapse"
+          aur_package_install "stormcloud"
           ;;
         13)
-          package_install "terminator"
+          package_install "synapse"
           ;;
         14)
+          package_install "terminator"
+          ;;
+        15)
           package_install "zim"
           ;;
         "b")

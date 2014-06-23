@@ -157,12 +157,13 @@
   # 6) Kupfer
   # 7) Pamac
   # 8) Pyrenamer
-  # 9) Shutter
-  #10) Springseed
-  #11) Stormcloud
-  #12) Synapse
-  #13) Terminator
-  #14) Zim
+  # 9) LastPass Pocket
+  #10) Shutter
+  #11) Springseed
+  #12) Stormcloud
+  #13) Synapse
+  #14) Terminator
+  #15) Zim
   ACCESSORIES_OPTIONS=""
 #}}}
 #DEVELOPEMENT {{{
