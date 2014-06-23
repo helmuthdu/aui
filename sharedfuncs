@@ -352,7 +352,7 @@
   add_repository() { #{{{
     REPO=${1}
     URL=${2}
-    [[ -n ${3} ]] && SIGLEVEL="\nSigLevel = ${3}"
+    [[ -n ${3} ]] && SIGLEVEL="\nSigLevel = ${3}" || SIGLEVEL=""
 
     CHECK_REPO=`grep -F "${REPO}" /etc/pacman.conf`
     if [[ -z $CHECK_REPO ]]; then
