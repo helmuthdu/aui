@@ -414,20 +414,6 @@ automatic_mode(){
 #}}}
 #CUSTOM REPOSITORIES {{{
 add_custom_repositories(){
-  # ENABLE MULTILIB REPOSITORY {{{
-  # this option will avoid any problem with packages install
-  if [[ $ARCHI == x86_64 ]]; then
-    local MULTILIB=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
-    if [[ -z $MULTILIB ]]; then
-      echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
-      echo -e '\nMultilib repository added into pacman.conf file'
-    else
-      sed -i "${MULTILIB}s/^#//" /etc/pacman.conf
-      local MULTILIB=$(( $MULTILIB + 1 ))
-      sed -i "${MULTILIB}s/^#//" /etc/pacman.conf
-    fi
-  fi
-  #}}}
   print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
   read_input_text "Add custom repositories" $CUSTOMREPO
   if [[ $OPTION == y ]]; then
@@ -3857,6 +3843,7 @@ check_archlinux
 check_hostname
 check_connection
 check_pacman_blocked
+enable_x86_repo
 system_upgrade
 language_selector
 configure_sudo
