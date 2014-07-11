@@ -11,7 +11,7 @@ You can try it first with a `virtualbox`
 
 ## How to get it
 ### With git
-- Upgrade your system and install git: `pacman -Syu & pacman -S git`
+- Upgrade your system and install git: `pacman -Syu && pacman -S git`
 - get the script: `git clone git://github.com/helmuthdu/aui`
 
 ### Without git
