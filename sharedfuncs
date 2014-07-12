@@ -360,7 +360,7 @@
       system_update
     fi
   } #}}}
-  enable_x86_repo(){ #{{{
+  check_multilib(){ #{{{
     # this option will avoid any problem with packages install
     if [[ $ARCHI == x86_64 ]]; then
       local MULTILIB=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`

@@ -734,23 +734,28 @@ install_video_cards(){
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
     is_package_installed "ati-dri" && pacman package_remove "ati-dri"
     [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
+    [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
     if [[ ${ARCHI} == x86_64 ]]; then
       is_package_installed "lib32-ati-dri" && pacman -Rdds --noconfirm lib32-ati-dri
     fi
     package_install "linux-headers"
     # Add repository
     aur_package_install "catalyst-total"
-    aticonfig --initial --output=/etc/X11/xorg.conf.d/20-radeon.conf
+    aticonfig --initial
     system_ctl enable atieventsd
+    system_ctl start atieventsd
     system_ctl enable catalyst-hook
+    system_ctl start catalyst-hook
     system_ctl enable temp-links-catalyst
+    system_ctl start temp-links-catalyst
   #}}}
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
     is_package_installed "catalyst-total" && pacman -Rdds --noconfirm catalyst-total
     package_install "mesa-libgl"
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
-    [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/ati.conf
+    [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/catalyst.conf
+    [[ -f /etc/X11/xorg.conf ]] && rm /etc/X11/xorg.conf
     package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
     if [[ ${ARCHI} == x86_64 ]]; then
       is_package_installed "lib32-catalyst-utils" && pacman -Rdds --noconfirm lib32-catalyst-utils
@@ -1281,10 +1286,8 @@ install_desktop_environment(){
         echo " 2) $(menu_item "choqok")"
         echo " 3) $(menu_item "digikam")"
         echo " 4) $(menu_item "k3b")"
-        echo " 5) $(menu_item "rosa-icons") $AUR"
-        echo " 6) $(menu_item "caledonia-bundle") $AUR"
-        echo " 7) $(menu_item "skrooge")"
-        echo " 8) $(menu_item "yakuake")"
+        echo " 5) $(menu_item "skrooge")"
+        echo " 6) $(menu_item "yakuake")"
         echo ""
         echo " d) DONE"
         echo ""
@@ -1305,15 +1308,9 @@ install_desktop_environment(){
               package_install "k3b cdrdao dvd+rw-tools"
               ;;
             5)
-              aur_package_install "rosa-icons"
-              ;;
-            6)
-              aur_package_install "caledonia-bundle"
-              ;;
-            7)
               package_install "skrooge"
               ;;
-            8)
+            6)
               package_install "yakuake"
               aur_package_install "yakuake-skin-plasma-oxygen-panel"
               ;;
@@ -3843,7 +3840,7 @@ check_archlinux
 check_hostname
 check_connection
 check_pacman_blocked
-enable_x86_repo
+check_multilib
 system_upgrade
 language_selector
 configure_sudo

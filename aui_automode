@@ -90,11 +90,9 @@
     # 2) Choqok
     # 3) Digikam
     # 4) K3b
-    # 5) Rosa Icon
-    # 6) Caledonia Bundle
-    # 7) Skrooge
-    # 8) Yakuake
-    KDE_OPTIONS="1-8"
+    # 5) Skrooge
+    # 6) Yakuake
+    KDE_OPTIONS="1-6"
   #}}}
   #ESSENTIAL APPS [Enlightenment,LXDE,Awesome,Fluxbox,OpenBox] {{{
     # 1) Display Manager
