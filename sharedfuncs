@@ -78,7 +78,6 @@
   # LOG FILE
   LOG="${AUI_DIR}/`basename ${0}`_error.log"
   [[ -f $LOG ]] && rm -f $LOG
-  PKG_MANAGER="pacman"
   PKG=""
   PKG_FAIL="${AUI_DIR}/`basename ${0}`_pkg_fail_list.log"
   [[ -f $PKG_FAIL ]] && rm -f $PKG_FAIL
@@ -239,7 +238,7 @@
     fi
   } #}}}
   check_vga() { #{{{
-    # Determine video chipset - only Intel, ATI and nvidia are supported by this script"
+    # Determine video chipset - only Intel, ATI and nvidia are supported by this script
     ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Detecting video chipset "
     local VGA=`lspci | grep VGA | tr "[:upper:]" "[:lower:]"`
     local VGA_NUMBER=`lspci | grep VGA | wc -l`
@@ -344,7 +343,7 @@
   add_module() { #{{{
     #check if the number of arguments is less then 2
     for MODULE in $1; do
-      [[ $# -lt 2 ]] && MODULE_NAME="$MODULE" || MODULE_NAME="$2";
+      [[ $# -lt 2 ]] && MODULE_NAME="$MODULE" || MODULE_NAME="$2"
       echo "$MODULE" >> /etc/modules-load.d/$MODULE_NAME.conf
       start_module "$MODULE"
     done
@@ -491,14 +490,14 @@
         esac
         if ! is_package_installed "${PKG}" ; then
           ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing (${PKG_REPO}) ${Bold}${PKG}${Reset} "
-          $PKG_MANAGER -S --noconfirm --needed ${PKG} >>"$LOG" 2>&1 &
+          pacman -S --noconfirm --needed ${PKG} >>"$LOG" 2>&1 &
           pid=$!;progress $pid
         else
           cecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing (${PKG_REPO}) ${Bold}${PKG}${Reset} exists "
         fi
       done
     else
-      $PKG_MANAGER -S --needed ${1}
+      pacman -S --needed ${1}
     fi
   } #}}}
   package_remove() { #{{{
@@ -514,13 +513,6 @@
         fi
       fi
     done
-  } #}}}
-  system_upgrade() { #{{{
-    local MODIFY=`stat /var/lib/pacman/sync | egrep ^Modify | cut -d':' -f2 | cut -d' ' -f2`
-    local TODAY=`date +%Y-%m-%d`
-    if [[ ${MODIFY} != ${TODAY} ]]; then
-      pacman -Syu ${1}
-    fi
   } #}}}
   system_update() { #{{{
     if [[ $VERBOSE_MODE -eq 0 ]]; then

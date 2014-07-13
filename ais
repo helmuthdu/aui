@@ -752,17 +752,16 @@ do
   echo " 1) $(mainmenu_item "${checklist[1]}" "Select Keymap")"
   echo " 2) $(mainmenu_item "${checklist[2]}" "Select Editor")"
   echo " 3) $(mainmenu_item "${checklist[3]}" "Configure Mirrorlist")"
-  echo " 4) $(mainmenu_item "${checklist[4]}" "Create Partition")"
-  echo " 5) $(mainmenu_item "${checklist[5]}" "Select|Format Partiton")"
-  echo " 6) $(mainmenu_item "${checklist[6]}" "Install Base System")"
-  echo " 7) $(mainmenu_item "${checklist[7]}" "Configure Fstab")"
-  echo " 8) $(mainmenu_item "${checklist[8]}" "Configure Hostname")"
-  echo " 9) $(mainmenu_item "${checklist[9]}" "Configure Timezone")"
-  echo "10) $(mainmenu_item "${checklist[10]}" "Configure Hardware Clock")"
-  echo "11) $(mainmenu_item "${checklist[11]}" "Configure Locale")"
-  echo "12) $(mainmenu_item "${checklist[12]}" "Configure Mkinitcpio")"
-  echo "13) $(mainmenu_item "${checklist[13]}" "Install Bootloader")"
-  echo "14) $(mainmenu_item "${checklist[14]}" "Root Password")"
+  echo " 4) $(mainmenu_item "${checklist[4]}" "Partition Scheme")"
+  echo " 5) $(mainmenu_item "${checklist[5]}" "Install Base System")"
+  echo " 6) $(mainmenu_item "${checklist[6]}" "Configure Fstab")"
+  echo " 7) $(mainmenu_item "${checklist[7]}" "Configure Hostname")"
+  echo " 8) $(mainmenu_item "${checklist[8]}" "Configure Timezone")"
+  echo " 9) $(mainmenu_item "${checklist[9]}" "Configure Hardware Clock")"
+  echo "10) $(mainmenu_item "${checklist[10]}" "Configure Locale")"
+  echo "11) $(mainmenu_item "${checklist[11]}" "Configure Mkinitcpio")"
+  echo "12) $(mainmenu_item "${checklist[12]}" "Install Bootloader")"
+  echo "13) $(mainmenu_item "${checklist[13]}" "Root Password")"
   echo ""
   echo " d) Done"
   echo ""
@@ -784,50 +783,46 @@ do
       4)
         umount_partitions
         create_partition_scheme
-        checklist[4]=1
-        ;;
-      5)
-        [[ checklist[4] -eq 0 ]] && umount_partitions
         format_partitions
-        checklist[5]=1
+        checklist[4]=1
         ;;
       6)
         install_base_system
         configure_keymap
-        checklist[6]=1
+        checklist[5]=1
         ;;
       7)
         configure_fstab
-        checklist[7]=1
+        checklist[6]=1
         ;;
       8)
         configure_hostname
-        checklist[8]=1
+        checklist[7]=1
         ;;
       9)
         configure_timezone
-        checklist[9]=1
+        checklist[8]=1
         ;;
       10)
         configure_hardwareclock
-        checklist[10]=1
+        checklist[9]=1
         ;;
       11)
         configure_locale
-        checklist[11]=1
+        checklist[10]=1
         ;;
       12)
         configure_mkinitcpio
-        checklist[12]=1
+        checklist[11]=1
         ;;
       13)
         install_bootloader
         configure_bootloader
-        checklist[13]=1
+        checklist[12]=1
         ;;
       14)
         root_password
-        checklist[14]=1
+        checklist[13]=1
         ;;
       "d")
         finish

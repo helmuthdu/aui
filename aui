@@ -386,17 +386,6 @@ choose_aurhelper(){
   pause_function
 }
 #}}}
-#POWERPILL {{{
-install_powerpill (){
-  print_title "POWERPILL - https://wiki.archlinux.org/index.php/Powerpill"
-  print_info "Powerpill is a Pacman wrapper that uses parallel and segmented downloading to try to speed up downloads for Pacman."
-  read_input_text "Install Powerpill"
-  if [[ $OPTION == y ]]; then
-    aur_package_install "powerpill"
-  fi
-  is_package_installed "powerpill" && PKG_MANAGER="powerpill"
-}
-#}}}
 #AUTOMATIC MODE {{{
 automatic_mode(){
   print_title "AUTOMATIC MODE"
@@ -3841,12 +3830,11 @@ check_hostname
 check_connection
 check_pacman_blocked
 check_multilib
-system_upgrade
+system_update
 language_selector
 configure_sudo
 select_user
 choose_aurhelper
-install_powerpill
 automatic_mode
 
 if is_package_installed "kdebase-workspace"; then KDE=1; fi
