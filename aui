@@ -617,7 +617,7 @@ font_config(){
     print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
     print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
     echo " 1) Default"
-    echo " 2) Infinality [Recommended]"
+    echo " 2) Infinality"
     echo " 3) Ubuntu ${AUR}"
     echo ""
     read_input $FONTCONFIG
@@ -634,7 +634,7 @@ font_config(){
       2)
         print_title "INFINALITY - https://wiki.archlinux.org/index.php/Infinality-bundle%2Bfonts"
         add_key "962DDE58"
-        add_repository "infinality-bundle" "http://bohoomil.com/repo/\$arch"
+        add_repository "infinality-bundle" "http://bohoomil.com/repo/\$arch" "Never"
         [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://bohoomil.com/repo/multilib/\$arch"
         is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
         is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
@@ -1135,14 +1135,15 @@ install_desktop_environment(){
   print_info "A DE provide a complete GUI for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries.\n\nA window manager is one component of a system's graphical user interface."
   echo -e "Select your DE or WM:\n"
   echo " --- DE ---             --- WM ---"
-  echo " 1) Cinnamon            9) Awesome"
-  echo " 2) Enlightenment      10) Fluxbox"
-  echo " 3) GNOME              11) OpenBox"
-  echo " 4) KDE                12) Xmonad"
-  echo " 5) LXDE"
-  echo " 6) LXQT (Unstable)"
-  echo " 7) Mate"
-  echo " 8) XFCE"
+  echo " 1) Cinnamon           10) Awesome"
+  echo " 2) Deepin             11) Fluxbox"
+  echo " 3) Enlightenment      12) OpenBox"
+  echo " 4) GNOME              13) Xmonad"
+  echo " 5) KDE"
+  echo " 6) LXDE"
+  echo " 7) LXQT"
+  echo " 8) Mate"
+  echo " 9) XFCE"
   echo ""
   echo " b) BACK"
   read_input $DESKTOPENV
@@ -1187,6 +1188,25 @@ install_desktop_environment(){
       ;;
       #}}}
     2)
+      #DEEPIN {{{
+      print_title "DEEPIN - http://www.linuxdeepin.com"
+      print_info "The desktop interface and apps feature an intuitive and elegant design. Moving around, sharing and searching etc. has become simply a joyful experience."
+      add_repository "home_metakcahura_arch-deepin_Arch_Extra" "http://download.opensuse.org/repositories/home:/metakcahura:/arch-deepin/Arch_Extra/\$arch" "Never"
+      package_install "deepin"
+      package_install "gksu xdg-user-dirs-gtk"
+      package_install "gvfs-smb gvfs-afc"
+      aur_package_install "gnome-defaults-list"
+      # config xinitrc
+      config_xinitrc "startdde"
+      #Tweaks
+      pause_function
+      #Gnome Display Manager (a reimplementation of xdm)
+      system_ctl enable lightdm
+      #D-Bus interface for user account query and manipulation
+      system_ctl enable accounts-daemon
+      ;;
+      #}}}
+    3)
       #ENLIGHTENMENT {{{
       print_title "ENLIGHTENMENT - http://wiki.archlinux.org/index.php/Enlightenment"
       print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
@@ -1204,7 +1224,7 @@ install_desktop_environment(){
       install_themes "Enlightenment"
       ;;
       #}}}
-    3)
+    4)
       #GNOME {{{
       print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
@@ -1226,7 +1246,7 @@ install_desktop_environment(){
       add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
       ;;
       #}}}
-    4)
+    5)
       #KDE {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
@@ -1322,7 +1342,7 @@ install_desktop_environment(){
       KDE=1
       ;;
       #}}}
-    5)
+    6)
       #LXDE {{{
       print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
       print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
@@ -1341,12 +1361,12 @@ install_desktop_environment(){
       install_themes "LXDE"
       ;;
       #}}}
-    6)
+    7)
       #LXQT {{{
       print_title "LXQT - http://wiki.archlinux.org/index.php/lxqt"
       print_info "LXQt is the Qt port and the upcoming version of LXDE, the Lightweight Desktop Environment. It is the product of the merge between the LXDE-Qt and the Razor-qt projects: A lightweight, modular, blazing-fast and user-friendly desktop environment."
       add_key "26EBCC57"
-      add_repository "lxqt-git" "http://repo.stobbstechnical.com/\$arch"
+      add_repository "lxqt-git" "http://repo.stobbstechnical.com/\$arch" "Never"
       package_install "lxqt-desktop-git pcmanfm-qt-git openbox lximage-qt-git qterminal-git oxygen-icons qtcurve"
       package_install "gvfs gvfs-smb gvfs-afc"
       package_install "xdg-user-dirs"
@@ -1364,7 +1384,7 @@ install_desktop_environment(){
       install_themes "LXQT"
       ;;
       #}}}
-    7)
+    8)
       #MATE {{{
       print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
       print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
@@ -1380,7 +1400,7 @@ install_desktop_environment(){
       system_ctl enable accounts-daemon
       ;;
       #}}}
-    8)
+    9)
       #XFCE {{{
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
@@ -1395,7 +1415,7 @@ install_desktop_environment(){
       install_themes "XFCE"
       ;;
       #}}}
-    9)
+    10)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
       print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
@@ -1417,7 +1437,7 @@ install_desktop_environment(){
       install_themes "AWESOME"
       ;;
       #}}}
-    10)
+    11)
       #FLUXBOX {{{
       print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
       print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
@@ -1434,7 +1454,7 @@ install_desktop_environment(){
       pause_function
       ;;
       #}}}
-    11)
+    12)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -1454,7 +1474,7 @@ install_desktop_environment(){
       install_themes "OPENBOX"
       ;;
       #}}}
-    12)
+    13)
       #XMONAD {{{
       print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
       print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."

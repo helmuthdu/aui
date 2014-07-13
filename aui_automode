@@ -70,18 +70,19 @@
 #}}}
 #DESKTOP ENVIRONMENT|WINDOW MANAGER {{{
   # 1) Cinnamon
-  # 2) Enlightenment
-  # 3) GNOME
-  # 4) KDE
-  # 5) LXDE
-  # 6) LXQT
-  # 7) Mate
-  # 8) XFCE
-  # 9) Awesome
-  #10) Fluxbox
-  #11) OpenBox
-  #12) Xmonad
-  DESKTOPENV=3
+  # 2) Deepin
+  # 3) Enlightenment
+  # 4) GNOME
+  # 5) KDE
+  # 6) LXDE
+  # 7) LXQT
+  # 8) Mate
+  # 9) XFCE
+  #10) Awesome
+  #11) Fluxbox
+  #12) OpenBox
+  #13) Xmonad
+  DESKTOPENV=4
   #KDE {{{
     # 1) Full
     # 2) Minimal
@@ -187,7 +188,7 @@
   #20) MySQL Workbench
   #21) Navicat
   #22) Meld
-  DEVELOPMENT_OPTIONS="13 16 22"
+  DEVELOPMENT_OPTIONS="16 22"
   #ECLIPSE {{{
     # 1) Eclipse Classic
     # 2) Eclipse IDE for C/C++ Developers
