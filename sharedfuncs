@@ -150,6 +150,18 @@
     fi
   }
   #}}}
+  pacman_key(){ #{{{
+    if [[ ! -d /etc/pacman.d/gnupg ]]; then
+      print_title "PACMAN KEY - https://wiki.archlinux.org/index.php/pacman-key"
+      print_info "Pacman uses GnuPG keys in a web of trust model to determine if packages are authentic."
+      package_install "haveged"
+      haveged -w 1024
+      pacman-key --init
+      pacman-key --populate archlinux
+      pkill haveged
+      package_remove "haveged"
+    fi
+  } #}}}
   check_root() { #{{{
     if [[ "$(id -u)" != "0" ]]; then
       error_msg "ERROR! You must execute the script as the 'root' user."
@@ -376,6 +388,7 @@
   add_key() { #{{{
     pacman-key -r $1
     pacman-key --lsign-key $1
+    pacman-key --refresh-keys
   } #}}}
   add_line() { #{{{
     ADD_LINE=${1}

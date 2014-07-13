@@ -3830,6 +3830,7 @@ check_hostname
 check_connection
 check_pacman_blocked
 check_multilib
+pacman_key
 system_update
 language_selector
 configure_sudo
