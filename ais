@@ -786,41 +786,41 @@ do
         format_partitions
         checklist[4]=1
         ;;
-      6)
+      5)
         install_base_system
         configure_keymap
         checklist[5]=1
         ;;
-      7)
+      6)
         configure_fstab
         checklist[6]=1
         ;;
-      8)
+      7)
         configure_hostname
         checklist[7]=1
         ;;
-      9)
+      8)
         configure_timezone
         checklist[8]=1
         ;;
-      10)
+      9)
         configure_hardwareclock
         checklist[9]=1
         ;;
-      11)
+      10)
         configure_locale
         checklist[10]=1
         ;;
-      12)
+      11)
         configure_mkinitcpio
         checklist[11]=1
         ;;
-      13)
+      12)
         install_bootloader
         configure_bootloader
         checklist[12]=1
         ;;
-      14)
+      13)
         root_password
         checklist[13]=1
         ;;
