@@ -1677,6 +1677,7 @@ install_development_apps(){
     echo "20) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
     echo "21) $(menu_item "navicat-premium" "Navicat Premium") $AUR"
     echo "22) $(menu_item "meld")"
+    echo "23) $(menu_item "atom-editor" "Atom") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1921,6 +1922,8 @@ install_development_apps(){
         22)
           package_install "meld"
           ;;
+        23)
+          aur_package_install "atom-editor"
         "b")
           break
           ;;
