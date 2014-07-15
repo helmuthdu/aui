@@ -3048,7 +3048,7 @@ install_games(){
           do
             print_title "EMULATORS"
             echo " 1) $(menu_item "higan-gtk higan-qt" "BSNES")"
-            echo " 2) $(menu_item "desmume") $AUR"
+            echo " 2) $(menu_item "desmume")"
             echo " 3) $(menu_item "dolphin-emu" "Dolphin")"
             echo " 4) $(menu_item "epsxe") $AUR"
             echo " 5) $(menu_item "project64") $AUR"
@@ -3071,7 +3071,7 @@ install_games(){
                   fi
                   ;;
                 2)
-                  aur_package_install "desmume"
+                  package_install "desmume"
                   ;;
                 3)
                   package_install "dolphin-emu"
