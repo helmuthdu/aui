@@ -1817,6 +1817,7 @@ install_development_apps(){
             echo "12) uglify-js"
             echo "13) underscore"
             echo "14) Yeoman"
+            echo "15) jsbeautify
             echo ""
             echo " b) BACK"
             echo ""
@@ -1865,6 +1866,9 @@ install_development_apps(){
                   ;;
                 14)
                   npm_install "yo grunt-cli bower generator-angular"
+                  ;;
+                15) 
+                  npm_install "js-beautify"
                   ;;
                 "b")
                   break
