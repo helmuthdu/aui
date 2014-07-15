@@ -2686,8 +2686,8 @@ install_video_apps(){
             echo " 1) $(menu_item "audience-bzr") $AUR"
             echo " 2) $(menu_item "gnome-mplayer")"
             echo " 3) $(menu_item "parole")"
-            echo " 4) $(menu_item "minitube") $AUR"
-            echo " 5) $(menu_item "miro")"
+            echo " 4) $(menu_item "minitube")"
+            echo " 5) $(menu_item "miro") $AUR"
             echo " 6) $(menu_item "rosa-media-player") $AUR"
             echo " 7) $(menu_item "smplayer")"
             echo " 8) $(menu_item "vlc")"
@@ -2710,10 +2710,10 @@ install_video_apps(){
                   package_install "parole"
                   ;;
                 4)
-                  aur_package_install "minitube"
+                  package_install "minitube"
                   ;;
                 5)
-                  package_install "miro"
+                  aur_package_install "miro"
                   ;;
                 6)
                   aur_package_install "rosa-media-player"
