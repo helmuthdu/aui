@@ -1070,6 +1070,7 @@ install_desktop_environment(){
       echo "12) $(menu_item "xfburn")"
       echo "13) $(menu_item "xcompmgr")"
       echo "14) $(menu_item "zathura")"
+      echo "15) $(menu_item "speedtest-cli") $AUR"
       echo ""
       echo " d) DONE"
       echo ""
@@ -1120,6 +1121,8 @@ install_desktop_environment(){
           14)
             package_install "zathura"
             ;;
+          15)
+            aur_package_install "speedtest-cli"
           "d")
             break
             ;;
