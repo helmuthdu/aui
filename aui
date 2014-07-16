@@ -1923,6 +1923,7 @@ install_development_apps(){
           package_install "meld"
           ;;
         23)
+          add_key "26EBCC57"
           add_repository "atom-editor-git" "http://repo.stobbstechnical.com/x86_64/" "Never"
           package_install "atom-editor-git"
           ;;
