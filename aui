@@ -2702,6 +2702,7 @@ install_video_apps(){
             echo " 8) $(menu_item "vlc")"
             echo " 9) $(menu_item "xbmc")"
             echo "10) $(menu_item "mpv")"
+            echo "11) $(menu_item "livestreamer")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2742,6 +2743,9 @@ install_video_apps(){
                   ;;
                 10)
                   package_install "mpv"
+                  ;;
+                11)
+                  package_install "livestreamer"
                   ;;
                 "b")
                   break
