@@ -594,7 +594,7 @@ install_bootloader(){
         invalid_option
         ;;
     esac
-    [[ $UEFI -eq 1 ]] && pacstrap ${MOUNTPOINT} efibootmgr
+    [[ $UEFI -eq 1 ]] && pacstrap ${MOUNTPOINT} efibootmgr dosfstools
   done
 }
 #}}}
