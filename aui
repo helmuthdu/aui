@@ -1123,6 +1123,7 @@ install_desktop_environment(){
             ;;
           15)
             aur_package_install "speedtest-cli"
+            ;;
           "d")
             break
             ;;
