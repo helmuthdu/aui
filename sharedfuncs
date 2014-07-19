@@ -371,7 +371,6 @@
         local MULTILIB=$(( $MULTILIB + 1 ))
         sed -i "${MULTILIB}s/^#//" /etc/pacman.conf
       fi
-      pacman -Syy
     fi
   } #}}}
   add_key() { #{{{
@@ -528,13 +527,7 @@
     done
   } #}}}
   system_update() { #{{{
-    if [[ $VERBOSE_MODE -eq 0 ]]; then
-      ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Updating packages "
-      pacman -Sy >>"$LOG" 2>&1 &
-      pid=$!;progress $pid
-    else
-      pacman -Sy $1
-    fi
+    pacman -Syy
   } #}}}
   npm_install() { #{{{
     #install packages using pacman
