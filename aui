@@ -2293,12 +2293,15 @@ install_internet_apps(){
                   aur_package_install "jdownloader"
                   ;;
                 7)
-                  package_install "sparkleshare"
+                  aur_package_install "qbittorrent"
                   ;;
                 8)
-                  aur_package_install "spideroak"
+                  package_install "sparkleshare"
                   ;;
                 9)
+                  aur_package_install "spideroak"
+                  ;;
+                10)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "transmission-qt"
                   else
@@ -2308,9 +2311,6 @@ install_internet_apps(){
                     replace_line '"blocklist-enabled": false' '"blocklist-enabled": true' /home/${username}/.config/transmission/settings.json
                     replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${username}/.config/transmission/settings.json
                   fi
-                  ;;
-                10)
-                  aur_package_install "qbittorrent"
                   ;;
                 11)
                   package_install "uget"
