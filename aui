@@ -1693,7 +1693,7 @@ install_development_apps(){
           ;;
         2)
           add_key "26EBCC57"
-          add_repository "atom-editor-git" "http://repo.stobbstechnical.com/$arch" "Never"
+          add_repository "atom-editor-git" "http://repo.stobbstechnical.com/\$arch" "Never"
           package_install "atom-editor-git"
           ;;
         3)

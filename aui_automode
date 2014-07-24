@@ -290,7 +290,7 @@
     # 9) Trasmission
     #10) qBittorrent
     #11) uGet
-    #11) youtube-dl
+    #12) youtube-dl
     DOWNLOAD_OPTIONS="9"
   #}}}
   #EMAIL|RSS {{{
