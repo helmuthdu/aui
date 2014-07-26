@@ -1588,7 +1588,8 @@ install_accessories_apps(){
     echo "12) $(menu_item "stormcloud") $AUR"
     echo "13) $(menu_item "synapse")"
     echo "14) $(menu_item "terminator")"
-    echo "15) $(menu_item "zim")"
+    echo "15) $(menu_item "unified-remote-server" "Unified Remote")"
+    echo "16) $(menu_item "zim")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1640,6 +1641,10 @@ install_accessories_apps(){
           package_install "terminator"
           ;;
         15)
+          aur_package_install "unified-remote-server"
+          system_ctl enable urserver
+          ;;
+        16)
           package_install "zim"
           ;;
         "b")
