@@ -128,7 +128,8 @@ create_partition_scheme(){
   }
   print_title "https://wiki.archlinux.org/index.php/Partitioning"
   print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another."
-  partition_layout=("Default" "LVM" "LVM+LUKS")
+  print_warning "Maintain Current does not work with LUKS"
+  partition_layout=("Default" "LVM" "LVM+LUKS" "Maintain Current")
   PS3="$prompt1"
   echo -e "Select partition scheme:"
   select OPT in "${partition_layout[@]}"; do
@@ -144,6 +145,11 @@ create_partition_scheme(){
         create_partition
         setup_luks
         setup_lvm
+        ;;
+      4)
+        modprobe dm-mod
+        vgscan &> /dev/null
+        vgchange -ay &> /dev/null
         ;;
       *)
         invalid_option
