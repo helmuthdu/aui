@@ -171,12 +171,11 @@ select_user(){
     useradd -m -g users -G wheel -s /bin/bash ${username}
     chfn ${username}
     passwd ${username}
+    while [[ $? -ne 0 ]]; do
+      passwd ${username}
+    done
     pause_function
-    if $(grep ${username} /etc/shadow | grep ! &> /dev/null ); then
-      create_new_user
-    else
-      configure_user_account
-    fi
+    configure_user_account
   }
   #}}}
   #CONFIGURE USER ACCOUNT {{{
@@ -552,6 +551,9 @@ install_samba(){
     fi
     echo "Enter your new samba account password:"
     pdbedit -a -u ${username}
+    while [[ $? -ne 0 ]]; do
+      pdbedit -a -u ${username}
+    done
     # enable services
     system_ctl enable smbd
     system_ctl enable nmbd
