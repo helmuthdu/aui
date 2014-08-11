@@ -1163,32 +1163,12 @@ install_desktop_environment(){
       package_install "gksu xdg-user-dirs-gtk gucharmap"
       package_install "gvfs-smb gvfs-afc lxpolkit"
       aur_package_install "gnome-defaults-list"
-      # extensions
-      aur_package_install "cinnamon-applet-screenshot-record"
-      aur_package_install "cinnamon-extension-coverflow-alt-tab"
       # config xinitrc
       config_xinitrc "cinnamon-session"
-      #Tweaks
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-close-effect scale
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-close-time 250
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-close-transition easeInExpo
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-map-effect scale
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-map-time 350
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-map-transition easeOutBack
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-maximize-effect scale
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-maximize-time 150
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-maximize-transition easeInOutSine
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-minimize-effect scale
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-minimize-time 250
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-minimize-transition easeInOutSine
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-unmaximize-effect scale
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-unmaximize-time 150
-      sudo -u ${username} gsettings set org.cinnamon desktop-effects-unmaximize-transition easeInOutSine
       CINNAMON=1
       pause_function
+      install_display_manager
       install_themes "CINNAMON"
-      #Gnome Display Manager (a reimplementation of xdm)
-      system_ctl enable gdm
       #D-Bus interface for user account query and manipulation
       system_ctl enable accounts-daemon
       ;;
