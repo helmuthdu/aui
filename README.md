@@ -11,11 +11,10 @@ You can try it first with a `virtualbox`
 
 ## How to get it
 ### With git
-- Upgrade your system and install git: `pacman -Syu && pacman -S git`
+- Get list of packages and install git: `pacman -Sy && pacman -S git`
 - get the script: `git clone git://github.com/helmuthdu/aui`
 
 ### Without git
-- Upgrade your system: `pacman -Syu`
 - get the script: ` wget --no-check-certificate https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
     - an alternate URL (for less typing) is ` wget --no-check-certificate http://bit.ly/NoUPC6 -O - | tar xz`
     - super short `wget ow.ly/wnFgh -o aui.zip`
