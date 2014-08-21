@@ -1,4 +1,4 @@
-# Archlinux Ultimate Install Script
+# Archlinux U Install
 
 Install and configure archlinux has never been easier!
 
@@ -20,10 +20,10 @@ You can try it first with a `virtualbox`
     - super short `wget ow.ly/wnFgh -o aui.zip`
 
 ## How to use
-- ais mode: `cd <dir> && ./ais`
-- aui mode: `cd <dir> && ./aui`
+- FIFO [system base]: `cd <dir> && ./fifo`
+- LILO [the rest...]: `cd <dir> && ./lilo`
 
-## Archlinux Install Script (ais)
+## FIFO SCRIPT
 - Configure keymap
 - Select editor
 - Automatic configure mirrorlist
@@ -40,7 +40,7 @@ You can try it first with a `virtualbox`
 - Configure mirrorlist
 - Configure root password
 
-## Archlinux Ultimate Install (aui)
+## LILO SCRIPT
 - Backup all modified files
 - Install additional repositories
 - Create and configure new user
