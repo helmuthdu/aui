@@ -1159,10 +1159,6 @@ install_desktop_environment(){
       print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
       print_info "Cinnamon is a fork of GNOME Shell, initially developed by Linux Mint. It attempts to provide a more traditional user environment based on the desktop metaphor, like GNOME 2. Cinnamon uses Muffin, a fork of the GNOME 3 window manager Mutter, as its window manager."
       package_install "cinnamon"
-      package_install "gedit-plugins"
-      package_install "gksu xdg-user-dirs-gtk gucharmap"
-      package_install "gvfs-smb gvfs-afc lxpolkit"
-      aur_package_install "gnome-defaults-list"
       # config xinitrc
       config_xinitrc "cinnamon-session"
       CINNAMON=1
@@ -1179,9 +1175,6 @@ install_desktop_environment(){
       print_info "The desktop interface and apps feature an intuitive and elegant design. Moving around, sharing and searching etc. has become simply a joyful experience."
       add_repository "home_metakcahura_arch-deepin_Arch_Extra" "http://download.opensuse.org/repositories/home:/metakcahura:/arch-deepin/Arch_Extra/\$arch" "Never"
       package_install "deepin"
-      package_install "gksu xdg-user-dirs-gtk"
-      package_install "gvfs-smb gvfs-afc"
-      aur_package_install "gnome-defaults-list"
       # config xinitrc
       config_xinitrc "startdde"
       #Tweaks
@@ -1197,12 +1190,8 @@ install_desktop_environment(){
       print_title "ENLIGHTENMENT - http://wiki.archlinux.org/index.php/Enlightenment"
       print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
       package_install "enlightenment"
-      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
-      package_install "xdg-user-dirs"
       package_install "leafpad epdfview"
       package_install "lxappearance"
-      package_install "ttf-bitstream-vera ttf-dejavu"
-      aur_package_install "gnome-defaults-list"
       # config xinitrc
       config_xinitrc "enlightenment_start"
       pause_function
@@ -1215,10 +1204,9 @@ install_desktop_environment(){
       print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
       package_install "gnome gnome-extra telepathy"
-      package_install "gedit-plugins gnome-tweak-tool gnome-power-manager gucharmap"
-      package_install "gvfs-smb gvfs-afc gvfs-goa"
+      package_install "gedit-plugins gnome-tweak-tool gnome-power-manager gucharmap gvfs-goa"
       package_install "deja-dup"
-      aur_package_install "gnome-defaults-list nautilus-share"
+      aur_package_install "nautilus-share"
       # config xinitrc
       config_xinitrc "gnome-session"
       GNOME=1
@@ -1333,10 +1321,7 @@ install_desktop_environment(){
       print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
       print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
       package_install "lxde"
-      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
-      package_install "xdg-user-dirs"
       package_install "leafpad obconf epdfview"
-      aur_package_install "gnome-defaults-list"
       mkdir -p /home/${username}/.config/openbox/
       cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${username}/.config/openbox/
       chown -R ${username}:users /home/${username}/.config
@@ -1354,10 +1339,7 @@ install_desktop_environment(){
       add_key "26EBCC57"
       add_repository "lxqt-git" "http://repo.stobbstechnical.com/\$arch" "Never"
       package_install "lxqt-desktop-git pcmanfm-qt-git openbox lximage-qt-git qterminal-git oxygen-icons qtcurve"
-      package_install "gvfs gvfs-smb gvfs-afc"
-      package_install "xdg-user-dirs"
       package_install "leafpad obconf epdfview"
-      aur_package_install "gnome-defaults-list"
       mkdir -p /home/${username}/.config/lxqt
       cp /etc/xdg/lxqt/* /home/${username}/.config/lxqt
       mkdir -p /home/${username}/.config/openbox/
@@ -1368,6 +1350,7 @@ install_desktop_environment(){
       pause_function
       install_misc_apps "LXQT"
       install_themes "LXQT"
+      KDE=1
       ;;
       #}}}
     8)
@@ -1375,8 +1358,6 @@ install_desktop_environment(){
       print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
       print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
       package_install "mate mate-extra"
-      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
-      aur_package_install "gnome-defaults-list"
       # config xinitrc
       config_xinitrc "mate-session"
       pause_function
@@ -1391,9 +1372,6 @@ install_desktop_environment(){
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
       package_install "xfce4 xfce4-goodies mupdf"
-      package_install "gvfs gvfs-smb gvfs-afc lxpolkit"
-      package_install "xdg-user-dirs"
-      aur_package_install "gnome-defaults-list"
       # config xinitrc
       config_xinitrc "startxfce4"
       pause_function
@@ -1406,11 +1384,8 @@ install_desktop_environment(){
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
       print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
       package_install "awesome"
-      package_install "gvfs"
       package_install "lxappearance"
       package_install "leafpad epdfview nitrogen"
-      package_install "ttf-bitstream-vera ttf-dejavu"
-      aur_package_install "gnome-defaults-list"
       if [[ ! -d /home/${username}/.config/awesome/ ]]; then
         mkdir -p /home/${username}/.config/awesome/
         cp /etc/xdg/awesome/rc.lua /home/${username}/.config/awesome/
@@ -1429,10 +1404,7 @@ install_desktop_environment(){
       print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
       package_install "fluxbox menumaker"
       package_install "lxappearance"
-      package_install "xdg-user-dirs"
       package_install "leafpad epdfview"
-      package_install "ttf-bitstream-vera ttf-dejavu"
-      aur_package_install "gnome-defaults-list"
       # config xinitrc
       config_xinitrc "startfluxbox"
       install_misc_apps "FLUXBOX"
@@ -1446,10 +1418,7 @@ install_desktop_environment(){
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
       package_install "openbox obconf obmenu menumaker"
       package_install "lxappearance"
-      package_install "xdg-user-dirs"
       package_install "leafpad epdfview nitrogen"
-      package_install "ttf-bitstream-vera ttf-dejavu"
-      aur_package_install "gnome-defaults-list"
       mkdir -p /home/${username}/.config/openbox/
       cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${username}/.config/openbox/
       chown -R ${username}:users /home/${username}/.config
@@ -1465,8 +1434,6 @@ install_desktop_environment(){
       print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
       print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
       package_install "xmonad xmonad-contrib"
-      package_install "xdg-user-dirs"
-      package_install "ttf-bitstream-vera ttf-dejavu"
       # config xinitrc
       config_xinitrc "xmonad"
       pause_function
@@ -1487,9 +1454,15 @@ install_desktop_environment(){
     [[ ${KDE} -eq 1 ]] && package_install "kio-mtp" || package_install "gvfs-mtp"
   fi
   #}}}
-  #Fix p7FM {{{
-  [[ ${KDE} -eq 0 ]] && package_install "wxgtk2.8"
-  #}}}
+  if [[ ${KDE} -eq 0 ]]; then
+    package_install "gvfs gvfs-afc"
+    is_package_installed "samba" && package_install "gvfs-smb"
+    package_install "xdg-user-dirs"
+    aur_package_install "gnome-defaults-list"
+    package_install "ttf-bitstream-vera ttf-dejavu"
+    #Fix p7FM
+    package_install "wxgtk2.8"
+  fi
 }
 #}}}
 #CONNMAN/NETWORKMANAGER/WICD {{{
@@ -1531,7 +1504,7 @@ install_nm_wicd(){
     3)
       print_title "CONNMAN - https://wiki.archlinux.org/index.php/Connman"
       print_info "ConnMan is an alternative to NetworkManager and Wicd and was created by Intel and the Moblin project for use with embedded devices."
-      package_install "connman "
+      package_install "connman"
       # ConnMan daemon
       system_ctl enable connman
       pause_function
@@ -1936,7 +1909,7 @@ install_office_apps(){
     echo " 6) $(menu_item "homebank")"
     echo " 7) $(menu_item "impressive")"
     echo " 8) $(menu_item "texlive-core" "latex")"
-    echo " 9) $(menu_item "libreoffice-common" "LibreOffice")"
+    echo " 9) $(menu_item "libreoffice-fresh" "LibreOffice")"
     echo "10) $(menu_item "mediaelch") $AUR"
     echo "11) $(menu_item "ocrfeeder")"
     echo "12) $(menu_item "xmind") $AUR"
@@ -1984,7 +1957,7 @@ install_office_apps(){
           ;;
         9)
           print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
-          package_install "libreoffice-$LOCALE_LO libreoffice-common libreoffice-base libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer"
+          package_install "libreoffice libreoffice-$LOCALE_LO"
           aur_package_install "hunspell-$LOCALE_HS"
           aur_package_install "aspell-$LOCALE_AS"
           [[ ${KDE} -eq 1 ]] && package_install "libreoffice-kde4" || package_install "libreoffice-gnome"
@@ -3535,11 +3508,12 @@ install_web_server(){
     su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
     system_ctl enable postgresql
     system_ctl start postgresql
-    read_input_text "Install Postgis" $POSTGIS
-    [[ $OPTION == y ]] && install_postgis
+    read_input_text "Install Postgis + Pgrouting" $POSTGIS
+    [[ $OPTION == y ]] && install_gis_extension
   } #}}}
-  install_postgis(){ #{{{
+  install_gis_extension(){ #{{{
     package_install "postgis"
+    aur_package_install "pgrouting"
   } #}}}
   configure_php(){ #{{{
     if [[ -f /etc/php/php.ini.pacnew ]]; then
