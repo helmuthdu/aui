@@ -198,7 +198,7 @@
     if connection_test; then
       print_warning "ERROR! Connection not Found."
       print_info "Network Setup"
-      conn_type_list=("Wired Automatic" "Wired Manual" "Wireless" "Skip")
+      conn_type_list=("Wired Automatic" "Wired Manual" "Wireless" "Configure Proxy" "Skip")
       PS3="$prompt1"
       select CONNECTION_TYPE in "${conn_type_list[@]}"; do
         case "$REPLY" in
@@ -223,6 +223,16 @@
             break
             ;;
           4)
+            echo "Enter your proxy e.g. protocol://adress:port"
+            read_input $proxy
+            export http_proxy=$OPTION
+            export https_proxy=$OPTION
+            export ftp_proxy=$OPTION
+            echo "proxy = $OPTION" > ~/.curlrc
+            check_connection
+            break
+            ;;
+          5)
             break
             ;;
           *)
