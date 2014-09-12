@@ -225,10 +225,10 @@
           4)
             echo "Enter your proxy e.g. protocol://adress:port"
             read_input $proxy
-            export http_proxy=$OPTION
-            export https_proxy=$OPTION
-            export ftp_proxy=$OPTION
-            echo "proxy = $OPTION" > ~/.curlrc
+            export http_proxy=$proxy
+            export https_proxy=$proxy
+            export ftp_proxy=$proxy
+            echo "proxy = $proxy" > ~/.curlrc
             check_connection
             break
             ;;
