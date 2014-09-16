@@ -223,15 +223,11 @@
             break
             ;;
           4)
-            read "Enter your proxy e.g. protocol://adress:port: " OPTION
+            read -p "Enter your proxy e.g. protocol://adress:port: " OPTION
             export http_proxy=$OPTION
             export https_proxy=$OPTION
             export ftp_proxy=$OPTION
             echo "proxy = $OPTION" > ~/.curlrc
-<<<<<<< HEAD
-=======
-            check_connection
->>>>>>> ad1e98bd345f261b52dc398551f5c7635cd13a20
             break
             ;;
           5)
