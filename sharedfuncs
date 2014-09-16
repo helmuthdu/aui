@@ -44,7 +44,7 @@
   # PROMPT {{{
     prompt1="Enter your option: "
     prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
-    prompt3="You have to manual enter the following commands, then press ${BYellow}ctrl+d${Reset} or type ${BYellow}exit${Reset}:"
+    prompt3="You have to manually enter the following commands, then press ${BYellow}ctrl+d${Reset} or type ${BYellow}exit${Reset}:"
   #}}}
   # EDITOR {{{
     AUTOMATIC_MODE=0
@@ -198,7 +198,7 @@
     if connection_test; then
       print_warning "ERROR! Connection not Found."
       print_info "Network Setup"
-      conn_type_list=("Wired Automatic" "Wired Manual" "Wireless" "Skip")
+      conn_type_list=("Wired Automatic" "Wired Manual" "Wireless" "Configure Proxy" "Skip")
       PS3="$prompt1"
       select CONNECTION_TYPE in "${conn_type_list[@]}"; do
         case "$REPLY" in
@@ -223,6 +223,14 @@
             break
             ;;
           4)
+            read "Enter your proxy e.g. protocol://adress:port: " OPTION
+            export http_proxy=$OPTION
+            export https_proxy=$OPTION
+            export ftp_proxy=$OPTION
+            echo "proxy = $OPTION" > ~/.curlrc
+            break
+            ;;
+          5)
             break
             ;;
           *)
@@ -234,7 +242,7 @@
         print_warning "Can't establish connection. exiting..."
         exit 1
       fi
-      [[ $REPLY -ne 4 ]] && check_connection
+      [[ $REPLY -ne 5 ]] && check_connection
     fi
   } #}}}
   check_vga() { #{{{

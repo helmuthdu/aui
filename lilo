@@ -291,6 +291,10 @@ select_user(){
     [[ -n $OPT ]] && break
   done
   [[ ! -f /home/${username}/.bashrc ]] && configure_user_account;
+  if [ -n "$http_proxy" ]; then
+      echo "proxy = $http_proxy" > /home/${username}/.curlrc
+      chown ${username}:users /home/${username}/.curlrc
+  fi
 }
 #}}}
 #CONFIGURE SUDO {{{
