@@ -95,6 +95,10 @@ configure_mirrorlist(){
   else
     echo " Unable to update, could not download list."
   fi
+  # better repo should go first
+  cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.tmp
+  rankmirrors /etc/pacman.d/mirrorlist.tmp > /etc/pacman.d/mirrorlist
+  rm /etc/pacman.d/mirrorlist.tmp
   # allow global read access (required for non-root yaourt execution)
   chmod +r /etc/pacman.d/mirrorlist
   $EDITOR /etc/pacman.d/mirrorlist

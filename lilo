@@ -3505,6 +3505,9 @@ install_web_server(){
     chown -R postgres:postgres /var/lib/postgres
     echo "Enter your new postgres account password:"
     passwd postgres
+    while [[ $? -ne 0 ]]; do
+      passwd postgres
+    done
     su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
     system_ctl enable postgresql
     system_ctl start postgresql
