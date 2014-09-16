@@ -401,7 +401,7 @@
     ADD_LINE=${1}
     FILEPATH=${2}
 
-    CHECK_LINE=`grep -F "${ADD_LINE}" ${FILEPATH}`
+    CHECK_LINE=`grep -F "${ADD_LINE}" ${FILEPATH}` &> /dev/null;
     [[ -z $CHECK_LINE ]] && echo "${ADD_LINE}" >> ${FILEPATH}
   } #}}}
   replace_line() { #{{{
