@@ -1448,7 +1448,7 @@ install_desktop_environment(){
     14)
       #I3 {{{
       print_title "i3 - https://wiki.archlinux.org/index.php/I3"
-      print_title "i3 is a dynamic tiling window manager inspired by wmii that is primarily targeted at developers and advanced users. The stated goals for i3 include clear documentation, proper multi-monitor support, a tree structure for windows, and different modes like in vim."
+      print_info "i3 is a dynamic tiling window manager inspired by wmii that is primarily targeted at developers and advanced users. The stated goals for i3 include clear documentation, proper multi-monitor support, a tree structure for windows, and different modes like in vim."
       package_install "i3-wm i3status i3lock"
       package_install "dmenu"
       # config xinitrc
