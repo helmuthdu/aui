@@ -1149,7 +1149,7 @@ install_desktop_environment(){
   echo " 2) Deepin             11) Fluxbox"
   echo " 3) Enlightenment      12) OpenBox"
   echo " 4) GNOME              13) Xmonad"
-  echo " 5) KDE"
+  echo " 5) KDE                14) i3"
   echo " 6) LXDE"
   echo " 7) LXQT"
   echo " 8) Mate"
@@ -1443,6 +1443,19 @@ install_desktop_environment(){
       pause_function
       install_misc_apps "XMONAD"
       install_themes "XMONAD"
+      ;;
+      #}}}
+    14)
+      #I3 {{{
+      print_title "i3 - https://wiki.archlinux.org/index.php/I3"
+      print_info "i3 is a dynamic tiling window manager inspired by wmii that is primarily targeted at developers and advanced users. The stated goals for i3 include clear documentation, proper multi-monitor support, a tree structure for windows, and different modes like in vim."
+      package_install "i3"
+      package_install "dmenu"
+      # config xinitrc
+      config_xinitrc "i3"
+      pause_function
+      install_misc_apps "i3"
+      install_themes "i3"
       ;;
       #}}}
     "b")
