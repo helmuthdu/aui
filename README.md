@@ -1,4 +1,4 @@
-# Archlinux Ultimate Install Script
+# Archlinux U Install
 
 Install and configure archlinux has never been easier!
 
@@ -11,20 +11,19 @@ You can try it first with a `virtualbox`
 
 ## How to get it
 ### With git
-- Upgrade your system: `pacman -Syu`
-- Install git: `pacman -S git`
+- Get list of packages and install git: `pacman -Sy git`
 - get the script: `git clone git://github.com/helmuthdu/aui`
 
 ### Without git
-- Upgrade your system: `pacman -Syu`
 - get the script: ` wget --no-check-certificate https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
     - an alternate URL (for less typing) is ` wget --no-check-certificate http://bit.ly/NoUPC6 -O - | tar xz`
+    - super short `wget ow.ly/wnFgh -o aui.zip`
 
 ## How to use
-- aui mode: `cd <dir> && ./aui`
-- ais mode: `cd <dir> && ./ais`
+- FIFO [system base]: `cd <dir> && ./fifo`
+- LILO [the rest...]: `cd <dir> && ./lilo`
 
-## Archlinux Install Script (ais)
+## FIFO SCRIPT
 - Configure keymap
 - Select editor
 - Automatic configure mirrorlist
@@ -41,7 +40,7 @@ You can try it first with a `virtualbox`
 - Configure mirrorlist
 - Configure root password
 
-## Archlinux Ultimate Install (aui)
+## LILO SCRIPT
 - Backup all modified files
 - Install additional repositories
 - Create and configure new user
@@ -57,7 +56,7 @@ You can try it first with a `virtualbox`
 - Install CUPS
 - Install Additional wireless/bluetooth firmwares
 - Ensuring access to GIT through a firewall
-- Install DE or WM [Cinnamon, E17, FluxBox, GNOME, KDE, LXDE, OpenBox, XFCE]
+- Install DE or WM [Cinnamon, Enlightenment, FluxBox, GNOME, i3, KDE, LXDE, OpenBox, XFCE]
 - Install Developement tools [Vim, Emacs, Eclipse...]
 - Install Office apps [LibreOffice, GNOME-Office, Latex...]
 - Install System tools [Wine, Virtualbox, Grsync, Htop]
