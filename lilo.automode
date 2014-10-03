@@ -82,6 +82,7 @@
   #11) Fluxbox
   #12) OpenBox
   #13) Xmonad
+  #14) i3
   DESKTOPENV=4
   #KDE {{{
     # 1) Full
