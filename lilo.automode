@@ -124,19 +124,17 @@
   # 2) GTK2|GTK3 Themes
   THEMES_OPTIONS="1 2"
   #ICONS THEMES {{{
-    # 1) Faenza
-    # 2) Faience
-    # 3) Moka
-    # 4) Nitrux
-    # 5) Numix
-    ICONS_THEMES="1-5"
+    # 1) Moka
+    # 2) Nitrux
+    # 3) Numix
+    ICONS_THEMES="1-3"
   #}}}
   #GTK THEMES {{{
     # 1) Greybird
     # 2) Numix
-    # 3) Orion
+    # 3) Vertex
     # 4) Zukitwo
-    GTK_THEMES="1-4"
+    GTK_THEMES="1-3"
   #}}}
 #}}}
 #NETWORK MANAGER {{{
@@ -243,12 +241,13 @@
   # 2) FirewallD
   # 3) Gparted
   # 4) Grsync
-  # 5) Htop
-  # 6) UFW
-  # 7) Virtualbox
-  # 8) Webmin
-  # 9) Wine
-  SYSTEMTOOLS_OPTIONS="7 9"
+  # 5) Hosts Update
+  # 6) Htop
+  # 7) UFW
+  # 8) Virtualbox
+  # 9) Webmin
+  #10) Wine
+  SYSTEMTOOLS_OPTIONS="8 10"
 #}}}
 #GRAPHICS {{{
   # 1) Blender

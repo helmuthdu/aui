@@ -888,11 +888,9 @@ install_desktop_environment(){
     while true
     do
       print_title "GNOME ICONS"
-      echo " 1) $(menu_item "faenza-icon-theme")"
-      echo " 2) $(menu_item "faience-icon-theme")"
-      echo " 3) $(menu_item "moka-icon-theme")"
-      echo " 4) $(menu_item "nitrux-icon-theme")"
-      echo " 5) $(menu_item "numix-icon-theme-git")"
+      echo " 1) $(menu_item "moka-icons-git")"
+      echo " 2) $(menu_item "nitrux-icon-theme")"
+      echo " 3) $(menu_item "numix-icon-theme-git")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -901,20 +899,12 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            package_install "faenza-icon-theme"
-            ;;
-          2)
-            package_install "faience-icon-theme"
-            ;;
-          3)
-            package_remove "moka-icon-theme-git"
-            package_remove "moka-icon-theme"
             aur_package_install "moka-icons-git"
             ;;
-          4)
+          2)
             aur_package_install "nitrux-icon-theme"
             ;;
-          5)
+          3)
             aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
             ;;
           "b")
@@ -933,8 +923,8 @@ install_desktop_environment(){
     do
       print_title "GTK2/GTK3 THEMES"
       echo " 1) $(menu_item "xfce-theme-greybird-git" "Greybird")"
-      echo " 2) $(menu_item "numix-themes-git" "Numix")"
-      echo " 3) $(menu_item "gtk-theme-orion-git" "Orion")"
+      echo " 2) $(menu_item "numix-themes" "Numix")"
+      echo " 3) $(menu_item "vertex-themes" "Vertex")"
       echo " 4) $(menu_item "zukitwo-themes" "Zukitwo")"
       echo ""
       echo " b) BACK"
@@ -947,10 +937,10 @@ install_desktop_environment(){
             aur_package_install "xfce-theme-greybird-git"
             ;;
           2)
-            aur_package_install "numix-themes-git"
+            aur_package_install "numix-themes"
             ;;
           3)
-            aur_package_install "gtk-theme-orion-git"
+            aur_package_install "Vertex"
             ;;
           4)
             aur_package_install "zukitwo-themes"
@@ -1022,8 +1012,8 @@ install_desktop_environment(){
     while true
     do
       print_title "$1 THEMES"
-      echo " 1) $(menu_item "faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
-      echo " 2) $(menu_item "xfce-theme-greybird-git gtk-theme-numix-git gtk-theme-orion-git zukitwo-themes" "GTK Themes") $AUR"
+      echo " 1) $(menu_item "moka-icons-git nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
+      echo " 2) $(menu_item "xfce-theme-greybird-git numix-themes vertex-themes zukitwo-themes" "GTK Themes") $AUR"
       echo ""
       echo " d) DONE"
       echo ""
@@ -2002,11 +1992,12 @@ install_system_apps(){
     echo " 2) $(menu_item "firewalld")"
     echo " 3) $(menu_item "gparted")"
     echo " 4) $(menu_item "grsync")"
-    echo " 5) $(menu_item "htop")"
-    echo " 6) $(menu_item "ufw")"
-    echo " 7) $(menu_item "virtualbox")"
-    echo " 8) $(menu_item "webmin")"
-    echo " 9) $(menu_item "wine")"
+    echo " 5) $(menu_item "hosts-update") $AUR"
+    echo " 6) $(menu_item "htop")"
+    echo " 7) $(menu_item "ufw")"
+    echo " 8) $(menu_item "virtualbox")"
+    echo " 9) $(menu_item "webmin")"
+    echo "10) $(menu_item "wine")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2038,16 +2029,20 @@ install_system_apps(){
           package_install "grsync"
           ;;
         5)
-          package_install "htop"
+          aur_package_install "hosts-update"
+          hosts-update
           ;;
         6)
+          package_install "htop"
+          ;;
+        7)
           print_title "UFW - https://wiki.archlinux.org/index.php/Ufw"
           print_info "Ufw stands for Uncomplicated Firewall, and is a program for managing a netfilter firewall. It provides a command line interface and aims to be uncomplicated and easy to use."
           is_package_installed "firewalld" && package_remove "firewalld"
           aur_package_install "ufw gufw"
           system_ctl enable ufw
           ;;
-        7)
+        8)
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
@@ -2060,11 +2055,11 @@ install_system_apps(){
             cecho " ${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
           ;;
-        8)
+        9)
           package_install "webmin perl-net-ssleay"
           system_ctl enable webmin
           ;;
-        9)
+        10)
           package_install "icoutils wine wine_gecko wine-mono winetricks"
           ;;
         "b")
