@@ -2090,7 +2090,7 @@ install_graphics_apps(){
     echo " 4) $(menu_item "inkscape")"
     echo " 5) $(menu_item "mcomix")"
     echo " 6) $(menu_item "mypaint")"
-    echo " 7) $(menu_item "pencil") $AUR"
+    echo " 7) $(menu_item "pencil" "Pencil Prototyping Tool") $AUR"
     echo " 8) $(menu_item "scribus")"
     echo " 9) $(menu_item "shotwell")"
     echo "10) $(menu_item "simple-scan")"
