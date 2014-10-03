@@ -669,7 +669,7 @@ install_video_cards(){
   #Virtualbox {{{
   if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
     package_install "virtualbox-guest-utils"
-    package_install "mesa-libgl"
+    package_install "mesa-libgl mesa-dri"
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${username} vboxsf
     system_ctl disable ntpd
@@ -679,13 +679,11 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    is_package_installed "nouveau-dri" && pacman -Rdds --noconfirm nouveau-dri
-    pacman -S --needed intel-dri xf86-video-intel bumblebee nvidia
+    pacman -S --needed mesa-dri xf86-video-intel bumblebee nvidia
     package_install "pangox-compat" #fix nvidia-settings
     package_install "libva-vdpau-driver"
     if [[ ${ARCHI} == x86_64 ]]; then
-      is_package_installed "lib32-nouveau-dri" && pacman -Rdds --noconfirm lib32-nouveau-dri
-      pacman -S --needed lib32-nvidia-utils lib32-intel-dri
+      pacman -S --needed lib32-nvidia-utils lib32-mesa-dri
     fi
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
@@ -696,12 +694,10 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    is_package_installed "nouveau-dri" && pacman -Rdds --noconfirm nouveau-dri
     pacman -S --needed nvidia{,-utils}
     package_install "pangox-compat" #fix nvidia-settings
     package_install "libva-vdpau-driver"
     if [[ ${ARCHI} == x86_64 ]]; then
-      is_package_installed "lib32-nouveau-dri" && pacman -Rdds --noconfirm lib32-nouveau-dri
       pacman -S --needed "lib32-nvidia-utils"
     fi
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
@@ -714,10 +710,10 @@ install_video_cards(){
     is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
     [[ -f /etc/X11/xorg.conf.d/20-nvidia.conf ]] && rm /etc/X11/xorg.conf.d/20-nvidia.conf
     package_install "mesa-libgl"
-    package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-dri"
     if [[ ${ARCHI} == x86_64 ]]; then
       is_package_installed "lib32-nvidia-utils" && pacman -Rdds --noconfirm lib32-nvidia-utils
-      pacman -S --needed "lib32-${VIDEO_DRIVER}-dri"
+      pacman -S --needed "lib32-mesa-dri"
     fi
     replace_line '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
@@ -727,12 +723,8 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == catalyst ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    is_package_installed "ati-dri" && pacman package_remove "ati-dri"
     [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
-    if [[ ${ARCHI} == x86_64 ]]; then
-      is_package_installed "lib32-ati-dri" && pacman -Rdds --noconfirm lib32-ati-dri
-    fi
     package_install "linux-headers"
     # Add repository
     aur_package_install "catalyst-total"
@@ -751,24 +743,24 @@ install_video_cards(){
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
     [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/catalyst.conf
     [[ -f /etc/X11/xorg.conf ]] && rm /etc/X11/xorg.conf
-    package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-dri"
     if [[ ${ARCHI} == x86_64 ]]; then
       is_package_installed "lib32-catalyst-utils" && pacman -Rdds --noconfirm lib32-catalyst-utils
-      package_install "lib32-${VIDEO_DRIVER}-dri"
+      package_install "lib32-mesa-dri"
     fi
     add_module "radeon" "ati"
   #}}}
   #Intel {{{
   elif [[ ${VIDEO_DRIVER} == intel ]]; then
-    package_install "xf86-video-intel intel-dri libva-intel-driver"
+    package_install "xf86-video-intel mesa-dri libva-intel-driver"
     package_install "mesa-libgl"
-    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
+    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl lib32-mesa-dri"
   #}}}
   #Vesa {{{
   else
     package_install "xf86-video-${VIDEO_DRIVER}"
     package_install "mesa-libgl"
-    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
+    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl lib32-mesa-dri"
   fi
   #}}}
   pause_function

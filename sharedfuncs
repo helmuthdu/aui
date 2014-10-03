@@ -64,15 +64,16 @@
   LVM=0
   LUKS=0
   LUKS_DISK="sda2"
-  EFI_DISK="/boot/efi"
-  ROOT_DISK="/dev/sda1"
-  BOOT_DISK="/dev/sda"
+  # MOUNTPOINTS
+  EFI_MOUNTPOINT="/boot/efi"
+  ROOT_MOUNTPOINT="/dev/sda1"
+  BOOT_MOUNTPOINT="/dev/sda"
+  MOUNTPOINT="/mnt"
   # AUR PACKAGE
   AUR=`echo -e "(${BPurple}aur${Reset})"`
   EXTERNAL=`echo -e "(${BYellow}external${Reset})"`
   #CURRENT DIRECTORY
   AUI_DIR=`pwd`
-  MOUNTPOINT="/mnt"
   # VERBOSE MODE
   [[ $1 == -v || $1 == --verbose ]] && VERBOSE_MODE=1 || VERBOSE_MODE=0
   # LOG FILE
