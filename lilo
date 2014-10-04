@@ -607,7 +607,7 @@ install_xorg(){
   print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
   print_info "Xorg is the public, open-source implementation of the X window system version 11."
   echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
-  package_install "xorg-server xorg-server-utils xorg-xinit"
+  package_install "xorg-server xorg-server-utils xorg-server-xwayland xorg-xinit xorg-xkill"
   package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard"
   package_install "mesa"
   package_install "gamin"
@@ -668,8 +668,7 @@ install_video_cards(){
   check_vga
   #Virtualbox {{{
   if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
-    package_install "virtualbox-guest-utils"
-    package_install "mesa-libgl mesa-dri"
+    package_install "virtualbox-guest-utils mesa-libgl"
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${username} vboxsf
     system_ctl disable ntpd
@@ -679,12 +678,10 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    pacman -S --needed mesa-dri xf86-video-intel bumblebee nvidia
+    pacman -S --needed xf86-video-intel bumblebee nvidia
     package_install "pangox-compat" #fix nvidia-settings
     package_install "libva-vdpau-driver"
-    if [[ ${ARCHI} == x86_64 ]]; then
-      pacman -S --needed lib32-nvidia-utils lib32-mesa-dri
-    fi
+    [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -697,9 +694,7 @@ install_video_cards(){
     pacman -S --needed nvidia{,-utils}
     package_install "pangox-compat" #fix nvidia-settings
     package_install "libva-vdpau-driver"
-    if [[ ${ARCHI} == x86_64 ]]; then
-      pacman -S --needed "lib32-nvidia-utils"
-    fi
+    [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -709,11 +704,9 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
     is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
     [[ -f /etc/X11/xorg.conf.d/20-nvidia.conf ]] && rm /etc/X11/xorg.conf.d/20-nvidia.conf
-    package_install "mesa-libgl"
-    package_install "xf86-video-${VIDEO_DRIVER} mesa-dri"
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl"
     if [[ ${ARCHI} == x86_64 ]]; then
       is_package_installed "lib32-nvidia-utils" && pacman -Rdds --noconfirm lib32-nvidia-utils
-      pacman -S --needed "lib32-mesa-dri"
     fi
     replace_line '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
@@ -725,9 +718,9 @@ install_video_cards(){
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
     [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
-    package_install "linux-headers"
+    package_install "linux-headers acpid"
     # Add repository
-    aur_package_install "catalyst-total"
+    aur_package_install "catalyst-test"
     aticonfig --initial
     system_ctl enable atieventsd
     system_ctl start atieventsd
@@ -739,30 +732,23 @@ install_video_cards(){
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
     is_package_installed "catalyst-total" && pacman -Rdds --noconfirm catalyst-total
-    package_install "mesa-libgl"
+    is_package_installed "catalyst-test" && pacman -Rdds --noconfirm catalyst-test
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
     [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/catalyst.conf
     [[ -f /etc/X11/xorg.conf ]] && rm /etc/X11/xorg.conf
-    package_install "xf86-video-${VIDEO_DRIVER} mesa-dri"
-    if [[ ${ARCHI} == x86_64 ]]; then
-      is_package_installed "lib32-catalyst-utils" && pacman -Rdds --noconfirm lib32-catalyst-utils
-      package_install "lib32-mesa-dri"
-    fi
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl"
     add_module "radeon" "ati"
   #}}}
   #Intel {{{
   elif [[ ${VIDEO_DRIVER} == intel ]]; then
-    package_install "xf86-video-intel mesa-dri libva-intel-driver"
-    package_install "mesa-libgl"
-    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl lib32-mesa-dri"
+    package_install "xf86-video-${VIDEO_DRIVER} libva-intel-driver mesa-libgl"
   #}}}
   #Vesa {{{
   else
-    package_install "xf86-video-${VIDEO_DRIVER}"
-    package_install "mesa-libgl"
-    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl lib32-mesa-dri"
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl"
   fi
   #}}}
+  is_package_installed "mesa-libgl" && package_install "lib32-mesa-libgl"
   pause_function
 }
 #}}}
@@ -3546,8 +3532,8 @@ install_web_server(){
       rm -v /etc/httpd/conf/httpd.conf.aui
     fi
     [[ -f /etc/httpd/conf/httpd.conf.aui ]] && echo "/etc/httpd/conf/httpd.conf.aui" || cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-    local MOD_PHP=`cat /etc/httpd/conf/httpd.conf | grep php5_module.conf`
-    if [[ -z $MOD_PHP ]]; then
+    local IS_DISABLED=`cat /etc/httpd/conf/httpd.conf | grep php5_module.conf`
+    if [[ -z $IS_DISABLED ]]; then
       echo -e 'application/x-httpd-php5                php php5' >> /etc/httpd/conf/mime.types
       sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
       echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
@@ -3834,8 +3820,8 @@ do
         install_tlp
         enable_readahead
         install_zram
-        install_xorg
         install_video_cards
+        install_xorg
         font_config
         install_cups
         install_additional_firmwares
