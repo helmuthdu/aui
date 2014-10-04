@@ -353,7 +353,7 @@
     #check if the number of arguments is less then 2
     for MODULE in $1; do
       [[ $# -lt 2 ]] && MODULE_NAME="$MODULE" || MODULE_NAME="$2"
-      local IS_DISABLED=`cat /etc/modules-load.d/$MODULE_NAME.conf | grep $MODULE`
+      local IS_DISABLED=`cat /etc/modules-load.d/$MODULE_NAME.conf | grep $MODULE &> /dev/null`
       [[ -z $IS_DISABLED ]] && echo "$MODULE" >> /etc/modules-load.d/$MODULE_NAME.conf
       start_module "$MODULE"
     done
