@@ -198,7 +198,7 @@ setup_luks(){
   echo -e "Select partition:"
   select OPT in "${block_list[@]}"; do
     if contains_element "$OPT" "${block_list[@]}"; then
-      cryptsetup luksFormat $OPT
+      cryptsetup --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random --verify-passphrase luksFormat $OPT
       cryptsetup open --type luks $OPT crypt
       LUKS=1
       LUKS_DISK=`echo ${OPT} | sed 's/\/dev\///'`
