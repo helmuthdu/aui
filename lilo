@@ -1109,19 +1109,22 @@ install_desktop_environment(){
       elihw
     done
   } #}}}
+
   print_title "DESKTOP ENVIRONMENT|WINDOW MANAGER"
   print_info "A DE provide a complete GUI for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries.\n\nA window manager is one component of a system's graphical user interface."
+
   echo -e "Select your DE or WM:\n"
-  echo " --- DE ---             --- WM ---"
-  echo " 1) Cinnamon           10) Awesome"
-  echo " 2) Deepin             11) Fluxbox"
-  echo " 3) Enlightenment      12) OpenBox"
-  echo " 4) GNOME              13) Xmonad"
-  echo " 5) KDE                14) i3"
-  echo " 6) LXDE"
-  echo " 7) LXQT"
-  echo " 8) Mate"
-  echo " 9) XFCE"
+  echo " --- DE ---         --- WM ---"
+  echo " 1) Cinnamon        11) Awesome"
+  echo " 2) Deepin          12) Fluxbox"
+  echo " 3) Enlightenment   13) i3"
+  echo " 4) GNOME           14) OpenBox"
+  echo " 5) KDE4            15) Xmonad"
+  echo " 6) KDE5"
+  echo " 7) LXDE"
+  echo " 8) LXQT"
+  echo " 9) Mate"
+  echo "10) XFCE"
   echo ""
   echo " b) BACK"
   read_input $DESKTOPENV
@@ -1193,7 +1196,7 @@ install_desktop_environment(){
       ;;
       #}}}
     5)
-      #KDE {{{
+      #KDE4 {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
       echo " 1) Full install"
@@ -1289,6 +1292,73 @@ install_desktop_environment(){
       ;;
       #}}}
     6)
+      #KDE5 {{{
+      print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
+      print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
+      package_install "kf5 kf5-aids plasma-next sddm"
+      package_install "xdg-user-dirs"
+      aur_package_install "kde-gtk-config"
+      aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
+      is_package_installed "cups" && package_install "kdeutils-print-manager"
+      # config xinitrc
+      config_xinitrc "startkde"
+      pause_function
+      #KDE CUSTOMIZATION {{{
+      while true
+      do
+        print_title "KDE CUSTOMIZATION"
+        echo " 1) $(menu_item "apper")"
+        echo " 2) $(menu_item "choqok")"
+        echo " 3) $(menu_item "digikam")"
+        echo " 4) $(menu_item "k3b")"
+        echo " 5) $(menu_item "skrooge")"
+        echo " 6) $(menu_item "yakuake")"
+        echo ""
+        echo " d) DONE"
+        echo ""
+        KDE_OPTIONS+=" d"
+        read_input_options "$KDE_OPTIONS"
+        for OPT in ${OPTIONS[@]}; do
+          case "$OPT" in
+            1)
+              package_install "apper"
+              ;;
+            2)
+              package_install "choqok"
+              ;;
+            3)
+              package_install "digikam"
+              ;;
+            4)
+              package_install "k3b cdrdao dvd+rw-tools"
+              ;;
+            5)
+              package_install "skrooge"
+              ;;
+            6)
+              package_install "yakuake"
+              aur_package_install "yakuake-skin-plasma-oxygen-panel"
+              ;;
+            "d")
+              break
+              ;;
+            *)
+              invalid_option
+              ;;
+          esac
+        done
+        elihw
+      done
+      #}}}
+      system_ctl enable sddm
+      # tweaks
+      add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
+      # speed up application startup
+      mkdir -p ~/.compose-cache
+      KDE=1
+      ;;
+      #}}}
+    7)
       #LXDE {{{
       print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
       print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
@@ -1304,7 +1374,7 @@ install_desktop_environment(){
       install_themes "LXDE"
       ;;
       #}}}
-    7)
+    8)
       #LXQT {{{
       print_title "LXQT - http://wiki.archlinux.org/index.php/lxqt"
       print_info "LXQt is the Qt port and the upcoming version of LXDE, the Lightweight Desktop Environment. It is the product of the merge between the LXDE-Qt and the Razor-qt projects: A lightweight, modular, blazing-fast and user-friendly desktop environment."
@@ -1325,7 +1395,7 @@ install_desktop_environment(){
       KDE=1
       ;;
       #}}}
-    8)
+    9)
       #MATE {{{
       print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
       print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
@@ -1339,7 +1409,7 @@ install_desktop_environment(){
       system_ctl enable accounts-daemon
       ;;
       #}}}
-    9)
+    10)
       #XFCE {{{
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
@@ -1351,7 +1421,7 @@ install_desktop_environment(){
       install_themes "XFCE"
       ;;
       #}}}
-    10)
+    11)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
       print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
@@ -1370,7 +1440,7 @@ install_desktop_environment(){
       install_themes "AWESOME"
       ;;
       #}}}
-    11)
+    12)
       #FLUXBOX {{{
       print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
       print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
@@ -1384,7 +1454,20 @@ install_desktop_environment(){
       pause_function
       ;;
       #}}}
-    12)
+    13)
+      #I3 {{{
+      print_title "i3 - https://wiki.archlinux.org/index.php/I3"
+      print_info "i3 is a dynamic tiling window manager inspired by wmii that is primarily targeted at developers and advanced users. The stated goals for i3 include clear documentation, proper multi-monitor support, a tree structure for windows, and different modes like in vim."
+      package_install "i3"
+      package_install "dmenu"
+      # config xinitrc
+      config_xinitrc "i3"
+      pause_function
+      install_misc_apps "i3"
+      install_themes "i3"
+      ;;
+      #}}}
+    14)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -1401,7 +1484,7 @@ install_desktop_environment(){
       install_themes "OPENBOX"
       ;;
       #}}}
-    13)
+    15)
       #XMONAD {{{
       print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
       print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
@@ -1411,19 +1494,6 @@ install_desktop_environment(){
       pause_function
       install_misc_apps "XMONAD"
       install_themes "XMONAD"
-      ;;
-      #}}}
-    14)
-      #I3 {{{
-      print_title "i3 - https://wiki.archlinux.org/index.php/I3"
-      print_info "i3 is a dynamic tiling window manager inspired by wmii that is primarily targeted at developers and advanced users. The stated goals for i3 include clear documentation, proper multi-monitor support, a tree structure for windows, and different modes like in vim."
-      package_install "i3"
-      package_install "dmenu"
-      # config xinitrc
-      config_xinitrc "i3"
-      pause_function
-      install_misc_apps "i3"
-      install_themes "i3"
       ;;
       #}}}
     "b")
@@ -1439,6 +1509,7 @@ install_desktop_environment(){
     [[ ${KDE} -eq 1 ]] && package_install "kio-mtp" || package_install "gvfs-mtp"
   fi
   #}}}
+  #COMMON PKGS {{{
   if [[ ${KDE} -eq 0 ]]; then
     package_install "gvfs gvfs-afc"
     is_package_installed "samba" && package_install "gvfs-smb"
@@ -1448,6 +1519,7 @@ install_desktop_environment(){
     #Fix p7FM
     package_install "wxgtk2.8"
   fi
+  #}}}
 }
 #}}}
 #CONNMAN/NETWORKMANAGER/WICD {{{

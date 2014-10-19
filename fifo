@@ -449,7 +449,7 @@ install_base_system(){
   print_title "INSTALL BASE SYSTEM"
   print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
   pacstrap ${MOUNTPOINT} base base-devel parted btrfs-progs ntp
-  local PTABLE=`parted -l | grep "gpt" | awk '{print $3}'`
+  local PTABLE=`parted -l | grep "gpt"`
   [[ -n $PTABLE ]] && pacstrap gptfdisk
   local WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://' | sed '1!d'`
   if [[ -n $WIRELESS_DEV ]]; then
@@ -457,7 +457,7 @@ install_base_system(){
   fi
   local WIRED_DEV=`ip link | grep enp | awk '{print $2}'| sed 's/://' | sed '1!d'`
   if [[-n $WIRED_DEV ]]; then
-    arch_chroot "systemctl enable dhcpcd@${WIRED_DEV}.service"
+    arch_chroot "systemctl enable dhcpcd@${WIRED_DEV}"
   fi
 }
 #}}}

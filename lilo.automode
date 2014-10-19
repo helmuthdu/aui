@@ -73,16 +73,17 @@
   # 2) Deepin
   # 3) Enlightenment
   # 4) GNOME
-  # 5) KDE
-  # 6) LXDE
-  # 7) LXQT
-  # 8) Mate
-  # 9) XFCE
-  #10) Awesome
-  #11) Fluxbox
-  #12) OpenBox
-  #13) Xmonad
-  #14) i3
+  # 5) KDE4
+  # 6) KDE5
+  # 7) LXDE
+  # 8) LXQT
+  # 9) Mate
+  #10) XFCE
+  #11) Awesome
+  #12) Fluxbox
+  #13) i3
+  #14) OpenBox
+  #15) Xmonad
   DESKTOPENV=4
   #KDE {{{
     # 1) Full
