@@ -1213,7 +1213,6 @@ install_desktop_environment(){
           package_install "kde-telepathy telepathy"
           ;;
       esac
-      package_install "xdg-user-dirs"
       aur_package_install "kde-gtk-config"
       aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
       is_package_installed "cups" && package_install "kdeutils-print-manager"
@@ -1296,60 +1295,9 @@ install_desktop_environment(){
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
       package_install "kf5 kf5-aids plasma-next sddm"
-      package_install "xdg-user-dirs"
-      aur_package_install "kde-gtk-config"
-      aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
-      is_package_installed "cups" && package_install "kdeutils-print-manager"
       # config xinitrc
       config_xinitrc "startkde"
       pause_function
-      #KDE CUSTOMIZATION {{{
-      while true
-      do
-        print_title "KDE CUSTOMIZATION"
-        echo " 1) $(menu_item "apper")"
-        echo " 2) $(menu_item "choqok")"
-        echo " 3) $(menu_item "digikam")"
-        echo " 4) $(menu_item "k3b")"
-        echo " 5) $(menu_item "skrooge")"
-        echo " 6) $(menu_item "yakuake")"
-        echo ""
-        echo " d) DONE"
-        echo ""
-        KDE_OPTIONS+=" d"
-        read_input_options "$KDE_OPTIONS"
-        for OPT in ${OPTIONS[@]}; do
-          case "$OPT" in
-            1)
-              package_install "apper"
-              ;;
-            2)
-              package_install "choqok"
-              ;;
-            3)
-              package_install "digikam"
-              ;;
-            4)
-              package_install "k3b cdrdao dvd+rw-tools"
-              ;;
-            5)
-              package_install "skrooge"
-              ;;
-            6)
-              package_install "yakuake"
-              aur_package_install "yakuake-skin-plasma-oxygen-panel"
-              ;;
-            "d")
-              break
-              ;;
-            *)
-              invalid_option
-              ;;
-          esac
-        done
-        elihw
-      done
-      #}}}
       system_ctl enable sddm
       # tweaks
       add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
@@ -1510,15 +1458,15 @@ install_desktop_environment(){
   fi
   #}}}
   #COMMON PKGS {{{
-  if [[ ${KDE} -eq 0 ]]; then
-    package_install "gvfs gvfs-afc"
+    if [[ ${KDE} -eq 0 ]]; then
+      package_install "gvfs gvfs-afc"
+      package_install "xdg-user-dirs"
+      package_install "ttf-bitstream-vera ttf-dejavu"
+    fi
     is_package_installed "samba" && package_install "gvfs-smb"
-    package_install "xdg-user-dirs"
-    aur_package_install "gnome-defaults-list"
-    package_install "ttf-bitstream-vera ttf-dejavu"
     #Fix p7FM
     package_install "wxgtk2.8"
-  fi
+    aur_package_install "gnome-defaults-list"
   #}}}
 }
 #}}}
@@ -1537,7 +1485,7 @@ install_nm_wicd(){
       print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
       print_info "NetworkManager is a program for providing detection and configuration for systems to automatically connect to network. NetworkManager's functionality can be useful for both wireless and wired networks."
       if [[ ${KDE} -eq 1 ]]; then
-        package_install "networkmanager dnsmasq kdeplasma-applets-plasma-nm"
+        is_package_installed "plasma-next" && aur_package_install "plasma-nm" || package_install "networkmanager dnsmasq kdeplasma-applets-plasma-nm"
       else
         package_install "networkmanager dnsmasq network-manager-applet"
       fi
