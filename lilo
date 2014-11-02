@@ -911,7 +911,7 @@ install_desktop_environment(){
       echo " 1) $(menu_item "xfce-theme-greybird-git" "Greybird")"
       echo " 2) $(menu_item "numix-themes" "Numix")"
       echo " 3) $(menu_item "vertex-themes" "Vertex")"
-      echo " 4) $(menu_item "zukitwo-themes" "Zukitwo")"
+      echo " 4) $(menu_item "zuki-themes-git" "Zukitwo")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -929,7 +929,7 @@ install_desktop_environment(){
             aur_package_install "Vertex"
             ;;
           4)
-            aur_package_install "zukitwo-themes"
+            aur_package_install "zuki-themes-git"
             ;;
           "b")
             break
@@ -999,7 +999,7 @@ install_desktop_environment(){
     do
       print_title "$1 THEMES"
       echo " 1) $(menu_item "moka-icons-git nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
-      echo " 2) $(menu_item "xfce-theme-greybird-git numix-themes vertex-themes zukitwo-themes" "GTK Themes") $AUR"
+      echo " 2) $(menu_item "xfce-theme-greybird-git numix-themes vertex-themes zuki-themes-git" "GTK Themes") $AUR"
       echo ""
       echo " d) DONE"
       echo ""
