@@ -926,7 +926,7 @@ install_desktop_environment(){
             aur_package_install "numix-themes"
             ;;
           3)
-            aur_package_install "Vertex"
+            aur_package_install "vertex-themes"
             ;;
           4)
             aur_package_install "zuki-themes-git"
