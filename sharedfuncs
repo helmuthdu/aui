@@ -64,15 +64,16 @@
   LVM=0
   LUKS=0
   LUKS_DISK="sda2"
-  EFI_DISK="/boot/efi"
-  ROOT_DISK="/dev/sda1"
-  BOOT_DISK="/dev/sda"
+  # MOUNTPOINTS
+  EFI_MOUNTPOINT="/boot/efi"
+  ROOT_MOUNTPOINT="/dev/sda1"
+  BOOT_MOUNTPOINT="/dev/sda"
+  MOUNTPOINT="/mnt"
   # AUR PACKAGE
   AUR=`echo -e "(${BPurple}aur${Reset})"`
   EXTERNAL=`echo -e "(${BYellow}external${Reset})"`
   #CURRENT DIRECTORY
   AUI_DIR=`pwd`
-  MOUNTPOINT="/mnt"
   # VERBOSE MODE
   [[ $1 == -v || $1 == --verbose ]] && VERBOSE_MODE=1 || VERBOSE_MODE=0
   # LOG FILE
@@ -352,7 +353,8 @@
     #check if the number of arguments is less then 2
     for MODULE in $1; do
       [[ $# -lt 2 ]] && MODULE_NAME="$MODULE" || MODULE_NAME="$2"
-      echo "$MODULE" >> /etc/modules-load.d/$MODULE_NAME.conf
+      local IS_DISABLED=`cat /etc/modules-load.d/$MODULE_NAME.conf | grep $MODULE &> /dev/null`
+      [[ -z $IS_DISABLED ]] && echo "$MODULE" >> /etc/modules-load.d/$MODULE_NAME.conf
       start_module "$MODULE"
     done
   } #}}}
@@ -370,14 +372,14 @@
   check_multilib(){ #{{{
     # this option will avoid any problem with packages install
     if [[ $ARCHI == x86_64 ]]; then
-      local MULTILIB=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
-      if [[ -z $MULTILIB ]]; then
+      local HAS_MULTILIB=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
+      if [[ -z $HAS_MULTILIB ]]; then
         echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
         echo -e '\nMultilib repository added into pacman.conf file'
       else
-        sed -i "${MULTILIB}s/^#//" /etc/pacman.conf
-        local MULTILIB=$(( $MULTILIB + 1 ))
-        sed -i "${MULTILIB}s/^#//" /etc/pacman.conf
+        sed -i "${HAS_MULTILIB}s/^#//" /etc/pacman.conf
+        local HAS_MULTILIB=$(( $HAS_MULTILIB + 1 ))
+        sed -i "${HAS_MULTILIB}s/^#//" /etc/pacman.conf
       fi
     fi
   } #}}}

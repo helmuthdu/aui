@@ -113,23 +113,25 @@ umount_partitions(){
   done
 }
 #}}}
+#SELECT DEVICE {{{
+select_device(){
+  devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd'`);
+  PS3="$prompt1"
+  echo -e "Select partition:\n"
+  select device in "${devices_list[@]}"; do
+    if contains_element "${device}" "${devices_list[@]}"; then
+      break
+    else
+      invalid_option
+    fi
+  done
+  BOOT_MOUNTPOINT=$device
+}
+#}}}
 #CREATE PARTITION SCHEME {{{
 create_partition_scheme(){
   LUKS=0
   LVM=0
-  select_device(){
-    devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd'`);
-    PS3="$prompt1"
-    echo -e "Select partition:\n"
-    select device in "${devices_list[@]}"; do
-      if contains_element "${device}" "${devices_list[@]}"; then
-        break
-      else
-        invalid_option
-      fi
-    done
-    BOOT_DISK=$device
-  }
   print_title "https://wiki.archlinux.org/index.php/Partitioning"
   print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another."
   print_warning "Maintain Current does not work with LUKS"
@@ -196,7 +198,7 @@ setup_luks(){
   echo -e "Select partition:"
   select OPT in "${block_list[@]}"; do
     if contains_element "$OPT" "${block_list[@]}"; then
-      cryptsetup luksFormat $OPT
+      cryptsetup --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random --verify-passphrase luksFormat $OPT
       cryptsetup open --type luks $OPT crypt
       LUKS=1
       LUKS_DISK=`echo ${OPT} | sed 's/\/dev\///'`
@@ -372,8 +374,8 @@ format_partitions(){
     efi_options=("/boot/efi" "/boot")
     PS3="$prompt1"
     echo -e "Select EFI mountpoint:\n"
-    select EFI_DISK in "${efi_options[@]}"; do
-      if contains_element "${EFI_DISK}" "${efi_options[@]}"; then
+    select EFI_MOUNTPOINT in "${efi_options[@]}"; do
+      if contains_element "${EFI_MOUNTPOINT}" "${efi_options[@]}"; then
         break
       else
         invalid_option
@@ -394,23 +396,23 @@ format_partitions(){
           case ${partition_name[i]} in
             root)
               ROOT_PART=`echo ${partition} | sed 's/\/dev\/mapper\///' | sed 's/\/dev\///'`
-              ROOT_DISK=${partition}
+              ROOT_MOUNTPOINT=${partition}
               format_partition "${partition}" "${MOUNTPOINT}"
               ;;
             EFI)
               set_efi_partition
               read_input_text "Format ${partition} partition"
               if [[ $OPTION == y ]]; then
-                format_partition "${partition}" "${MOUNTPOINT}${EFI_DISK}" vfat
+                format_partition "${partition}" "${MOUNTPOINT}${EFI_MOUNTPOINT}" vfat
               else
-                mkdir -p "${MOUNTPOINT}${EFI_DISK}"
-                mount -t vfat "${partition}" "${MOUNTPOINT}${EFI_DISK}"
-                check_mountpoint "${partition}" "${MOUNTPOINT}${EFI_DISK}"
+                mkdir -p "${MOUNTPOINT}${EFI_MOUNTPOINT}"
+                mount -t vfat "${partition}" "${MOUNTPOINT}${EFI_MOUNTPOINT}"
+                check_mountpoint "${partition}" "${MOUNTPOINT}${EFI_MOUNTPOINT}"
               fi
               ;;
             another)
               read -p "Mountpoint [ex: /home]:" directory
-              [[ $directory == "/boot" ]] && BOOT_DISK=`echo ${partition} | sed 's/[0-9]//'`
+              [[ $directory == "/boot" ]] && BOOT_MOUNTPOINT=`echo ${partition} | sed 's/[0-9]//'`
               select_filesystem
               read_input_text "Format ${partition} partition"
               if [[ $OPTION == y ]]; then
@@ -447,7 +449,7 @@ install_base_system(){
   print_title "INSTALL BASE SYSTEM"
   print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
   pacstrap ${MOUNTPOINT} base base-devel parted btrfs-progs ntp
-  local PTABLE=`parted -l | grep "gpt" | awk '{print $3}'`
+  local PTABLE=`parted -l | grep "gpt"`
   [[ -n $PTABLE ]] && pacstrap gptfdisk
   local WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://' | sed '1!d'`
   if [[ -n $WIRELESS_DEV ]]; then
@@ -455,7 +457,7 @@ install_base_system(){
   fi
   local WIRED_DEV=`ip link | grep enp | awk '{print $2}'| sed 's/://' | sed '1!d'`
   if [[-n $WIRED_DEV ]]; then
-    arch_chroot "systemctl enable dhcpcd@${WIRED_DEV}.service"
+    arch_chroot "systemctl enable dhcpcd@${WIRED_DEV}"
   fi
 }
 #}}}
@@ -574,7 +576,7 @@ configure_mkinitcpio(){
 install_bootloader(){
   print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
   print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
-  print_warning "\tROOT Partition: ${ROOT_DISK}"
+  print_warning "\tROOT Partition: ${ROOT_MOUNTPOINT}"
   print_warning "\tWARNING: There is no support for GRUB + LUKS/LVM."
   if [[ $UEFI -eq 1 ]]; then
     print_warning "\tUEFI Mode Detected"
@@ -623,9 +625,9 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             if [[ $UEFI -eq 1 ]]; then
-              arch_chroot "grub-install --target=x86_64-efi --efi-directory=${EFI_DISK} --bootloader-id=arch_grub --recheck"
+              arch_chroot "grub-install --target=x86_64-efi --efi-directory=${EFI_MOUNTPOINT} --bootloader-id=arch_grub --recheck"
             else
-              arch_chroot "grub-install --target=i386-pc --recheck --debug ${BOOT_DISK}"
+              arch_chroot "grub-install --target=i386-pc --recheck --debug ${BOOT_MOUNTPOINT}"
             fi
             break
             ;;
@@ -699,9 +701,9 @@ configure_bootloader(){
       select OPT in "${gummiboot_install_mode[@]}"; do
         case "$REPLY" in
           1)
-            arch_chroot "gummiboot install"
+            arch_chroot "gummiboot --path=${EFI_MOUNTPOINT} install"
             print_warning "Please check your .conf file"
-            partuuid=`blkid -s PARTUUID ${ROOT_DISK} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
+            partuuid=`blkid -s PARTUUID ${ROOT_MOUNTPOINT} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
             if [[ $LUKS -eq 1 ]]; then
               echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\tcryptdevice=\/dev\/${LUKS_DISK}:luks root=\/dev\/mapper\/${ROOT_PART} rw" > ${MOUNTPOINT}/boot/loader/entries/arch.conf
             elif [[ $LVM -eq 1 ]]; then

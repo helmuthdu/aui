@@ -607,7 +607,7 @@ install_xorg(){
   print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
   print_info "Xorg is the public, open-source implementation of the X window system version 11."
   echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
-  package_install "xorg-server xorg-server-utils xorg-xinit"
+  package_install "xorg-server xorg-server-utils xorg-server-xwayland xorg-xinit xorg-xkill"
   package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard"
   package_install "mesa"
   package_install "gamin"
@@ -668,8 +668,7 @@ install_video_cards(){
   check_vga
   #Virtualbox {{{
   if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
-    package_install "virtualbox-guest-utils"
-    package_install "mesa-libgl"
+    package_install "virtualbox-guest-utils mesa-libgl"
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${username} vboxsf
     system_ctl disable ntpd
@@ -679,14 +678,10 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    is_package_installed "nouveau-dri" && pacman -Rdds --noconfirm nouveau-dri
-    pacman -S --needed intel-dri xf86-video-intel bumblebee nvidia
+    pacman -S --needed xf86-video-intel bumblebee nvidia
     package_install "pangox-compat" #fix nvidia-settings
     package_install "libva-vdpau-driver"
-    if [[ ${ARCHI} == x86_64 ]]; then
-      is_package_installed "lib32-nouveau-dri" && pacman -Rdds --noconfirm lib32-nouveau-dri
-      pacman -S --needed lib32-nvidia-utils lib32-intel-dri
-    fi
+    [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -696,14 +691,10 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    is_package_installed "nouveau-dri" && pacman -Rdds --noconfirm nouveau-dri
     pacman -S --needed nvidia{,-utils}
     package_install "pangox-compat" #fix nvidia-settings
     package_install "libva-vdpau-driver"
-    if [[ ${ARCHI} == x86_64 ]]; then
-      is_package_installed "lib32-nouveau-dri" && pacman -Rdds --noconfirm lib32-nouveau-dri
-      pacman -S --needed "lib32-nvidia-utils"
-    fi
+    [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -713,11 +704,9 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
     is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
     [[ -f /etc/X11/xorg.conf.d/20-nvidia.conf ]] && rm /etc/X11/xorg.conf.d/20-nvidia.conf
-    package_install "mesa-libgl"
-    package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl"
     if [[ ${ARCHI} == x86_64 ]]; then
       is_package_installed "lib32-nvidia-utils" && pacman -Rdds --noconfirm lib32-nvidia-utils
-      pacman -S --needed "lib32-${VIDEO_DRIVER}-dri"
     fi
     replace_line '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
@@ -727,15 +716,11 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == catalyst ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    is_package_installed "ati-dri" && pacman package_remove "ati-dri"
     [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
-    if [[ ${ARCHI} == x86_64 ]]; then
-      is_package_installed "lib32-ati-dri" && pacman -Rdds --noconfirm lib32-ati-dri
-    fi
-    package_install "linux-headers"
+    package_install "linux-headers acpid"
     # Add repository
-    aur_package_install "catalyst-total"
+    aur_package_install "catalyst-test"
     aticonfig --initial
     system_ctl enable atieventsd
     system_ctl start atieventsd
@@ -747,30 +732,23 @@ install_video_cards(){
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
     is_package_installed "catalyst-total" && pacman -Rdds --noconfirm catalyst-total
-    package_install "mesa-libgl"
+    is_package_installed "catalyst-test" && pacman -Rdds --noconfirm catalyst-test
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
     [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/catalyst.conf
     [[ -f /etc/X11/xorg.conf ]] && rm /etc/X11/xorg.conf
-    package_install "xf86-video-${VIDEO_DRIVER} ${VIDEO_DRIVER}-dri"
-    if [[ ${ARCHI} == x86_64 ]]; then
-      is_package_installed "lib32-catalyst-utils" && pacman -Rdds --noconfirm lib32-catalyst-utils
-      package_install "lib32-${VIDEO_DRIVER}-dri"
-    fi
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl"
     add_module "radeon" "ati"
   #}}}
   #Intel {{{
   elif [[ ${VIDEO_DRIVER} == intel ]]; then
-    package_install "xf86-video-intel intel-dri libva-intel-driver"
-    package_install "mesa-libgl"
-    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
+    package_install "xf86-video-${VIDEO_DRIVER} libva-intel-driver mesa-libgl"
   #}}}
   #Vesa {{{
   else
-    package_install "xf86-video-${VIDEO_DRIVER}"
-    package_install "mesa-libgl"
-    [[ ${ARCHI} == x86_64 ]] && package_install "lib32-mesa-libgl"
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl"
   fi
   #}}}
+  is_package_installed "mesa-libgl" && package_install "lib32-mesa-libgl"
   pause_function
 }
 #}}}
@@ -896,11 +874,9 @@ install_desktop_environment(){
     while true
     do
       print_title "GNOME ICONS"
-      echo " 1) $(menu_item "faenza-icon-theme")"
-      echo " 2) $(menu_item "faience-icon-theme")"
-      echo " 3) $(menu_item "moka-icon-theme")"
-      echo " 4) $(menu_item "nitrux-icon-theme")"
-      echo " 5) $(menu_item "numix-icon-theme-git")"
+      echo " 1) $(menu_item "moka-icons-git")"
+      echo " 2) $(menu_item "nitrux-icon-theme")"
+      echo " 3) $(menu_item "numix-icon-theme-git")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -909,20 +885,12 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            package_install "faenza-icon-theme"
-            ;;
-          2)
-            package_install "faience-icon-theme"
-            ;;
-          3)
-            package_remove "moka-icon-theme-git"
-            package_remove "moka-icon-theme"
             aur_package_install "moka-icons-git"
             ;;
-          4)
+          2)
             aur_package_install "nitrux-icon-theme"
             ;;
-          5)
+          3)
             aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
             ;;
           "b")
@@ -941,9 +909,9 @@ install_desktop_environment(){
     do
       print_title "GTK2/GTK3 THEMES"
       echo " 1) $(menu_item "xfce-theme-greybird-git" "Greybird")"
-      echo " 2) $(menu_item "numix-themes-git" "Numix")"
-      echo " 3) $(menu_item "gtk-theme-orion-git" "Orion")"
-      echo " 4) $(menu_item "zukitwo-themes" "Zukitwo")"
+      echo " 2) $(menu_item "numix-themes" "Numix")"
+      echo " 3) $(menu_item "vertex-themes" "Vertex")"
+      echo " 4) $(menu_item "zuki-themes-git" "Zukitwo")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -955,13 +923,13 @@ install_desktop_environment(){
             aur_package_install "xfce-theme-greybird-git"
             ;;
           2)
-            aur_package_install "numix-themes-git"
+            aur_package_install "numix-themes"
             ;;
           3)
-            aur_package_install "gtk-theme-orion-git"
+            aur_package_install "vertex-themes"
             ;;
           4)
-            aur_package_install "zukitwo-themes"
+            aur_package_install "zuki-themes-git"
             ;;
           "b")
             break
@@ -1030,8 +998,8 @@ install_desktop_environment(){
     while true
     do
       print_title "$1 THEMES"
-      echo " 1) $(menu_item "faenza-icon-theme faenza-cupertino-icon-theme faience-icon-theme nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
-      echo " 2) $(menu_item "xfce-theme-greybird-git gtk-theme-numix-git gtk-theme-orion-git zukitwo-themes" "GTK Themes") $AUR"
+      echo " 1) $(menu_item "moka-icons-git nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
+      echo " 2) $(menu_item "xfce-theme-greybird-git numix-themes vertex-themes zuki-themes-git" "GTK Themes") $AUR"
       echo ""
       echo " d) DONE"
       echo ""
@@ -1141,19 +1109,22 @@ install_desktop_environment(){
       elihw
     done
   } #}}}
+
   print_title "DESKTOP ENVIRONMENT|WINDOW MANAGER"
   print_info "A DE provide a complete GUI for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries.\n\nA window manager is one component of a system's graphical user interface."
+
   echo -e "Select your DE or WM:\n"
-  echo " --- DE ---             --- WM ---"
-  echo " 1) Cinnamon           10) Awesome"
-  echo " 2) Deepin             11) Fluxbox"
-  echo " 3) Enlightenment      12) OpenBox"
-  echo " 4) GNOME              13) Xmonad"
-  echo " 5) KDE                14) i3"
-  echo " 6) LXDE"
-  echo " 7) LXQT"
-  echo " 8) Mate"
-  echo " 9) XFCE"
+  echo " --- DE ---         --- WM ---"
+  echo " 1) Cinnamon        11) Awesome"
+  echo " 2) Deepin          12) Fluxbox"
+  echo " 3) Enlightenment   13) i3"
+  echo " 4) GNOME           14) OpenBox"
+  echo " 5) KDE4            15) Xmonad"
+  echo " 6) KDE5"
+  echo " 7) LXDE"
+  echo " 8) LXQT"
+  echo " 9) Mate"
+  echo "10) XFCE"
   echo ""
   echo " b) BACK"
   read_input $DESKTOPENV
@@ -1178,7 +1149,7 @@ install_desktop_environment(){
       print_title "DEEPIN - http://www.linuxdeepin.com"
       print_info "The desktop interface and apps feature an intuitive and elegant design. Moving around, sharing and searching etc. has become simply a joyful experience."
       add_repository "home_metakcahura_arch-deepin_Arch_Extra" "http://download.opensuse.org/repositories/home:/metakcahura:/arch-deepin/Arch_Extra/\$arch" "Never"
-      package_install "deepin"
+      package_install "deepin deepin-extra"
       # config xinitrc
       config_xinitrc "startdde"
       #Tweaks
@@ -1225,7 +1196,7 @@ install_desktop_environment(){
       ;;
       #}}}
     5)
-      #KDE {{{
+      #KDE4 {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
       echo " 1) Full install"
@@ -1242,7 +1213,6 @@ install_desktop_environment(){
           package_install "kde-telepathy telepathy"
           ;;
       esac
-      package_install "xdg-user-dirs"
       aur_package_install "kde-gtk-config"
       aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
       is_package_installed "cups" && package_install "kdeutils-print-manager"
@@ -1321,6 +1291,22 @@ install_desktop_environment(){
       ;;
       #}}}
     6)
+      #KDE5 {{{
+      print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
+      print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
+      package_install "kf5 kf5-aids plasma-next sddm"
+      # config xinitrc
+      config_xinitrc "startkde"
+      pause_function
+      system_ctl enable sddm
+      # tweaks
+      add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
+      # speed up application startup
+      mkdir -p ~/.compose-cache
+      KDE=1
+      ;;
+      #}}}
+    7)
       #LXDE {{{
       print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
       print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
@@ -1336,7 +1322,7 @@ install_desktop_environment(){
       install_themes "LXDE"
       ;;
       #}}}
-    7)
+    8)
       #LXQT {{{
       print_title "LXQT - http://wiki.archlinux.org/index.php/lxqt"
       print_info "LXQt is the Qt port and the upcoming version of LXDE, the Lightweight Desktop Environment. It is the product of the merge between the LXDE-Qt and the Razor-qt projects: A lightweight, modular, blazing-fast and user-friendly desktop environment."
@@ -1357,7 +1343,7 @@ install_desktop_environment(){
       KDE=1
       ;;
       #}}}
-    8)
+    9)
       #MATE {{{
       print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
       print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
@@ -1371,7 +1357,7 @@ install_desktop_environment(){
       system_ctl enable accounts-daemon
       ;;
       #}}}
-    9)
+    10)
       #XFCE {{{
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
@@ -1383,7 +1369,7 @@ install_desktop_environment(){
       install_themes "XFCE"
       ;;
       #}}}
-    10)
+    11)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
       print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
@@ -1402,7 +1388,7 @@ install_desktop_environment(){
       install_themes "AWESOME"
       ;;
       #}}}
-    11)
+    12)
       #FLUXBOX {{{
       print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
       print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
@@ -1416,7 +1402,20 @@ install_desktop_environment(){
       pause_function
       ;;
       #}}}
-    12)
+    13)
+      #I3 {{{
+      print_title "i3 - https://wiki.archlinux.org/index.php/I3"
+      print_info "i3 is a dynamic tiling window manager inspired by wmii that is primarily targeted at developers and advanced users. The stated goals for i3 include clear documentation, proper multi-monitor support, a tree structure for windows, and different modes like in vim."
+      package_install "i3"
+      package_install "dmenu"
+      # config xinitrc
+      config_xinitrc "i3"
+      pause_function
+      install_misc_apps "i3"
+      install_themes "i3"
+      ;;
+      #}}}
+    14)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -1433,7 +1432,7 @@ install_desktop_environment(){
       install_themes "OPENBOX"
       ;;
       #}}}
-    13)
+    15)
       #XMONAD {{{
       print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
       print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
@@ -1443,19 +1442,6 @@ install_desktop_environment(){
       pause_function
       install_misc_apps "XMONAD"
       install_themes "XMONAD"
-      ;;
-      #}}}
-    14)
-      #I3 {{{
-      print_title "i3 - https://wiki.archlinux.org/index.php/I3"
-      print_info "i3 is a dynamic tiling window manager inspired by wmii that is primarily targeted at developers and advanced users. The stated goals for i3 include clear documentation, proper multi-monitor support, a tree structure for windows, and different modes like in vim."
-      package_install "i3"
-      package_install "dmenu"
-      # config xinitrc
-      config_xinitrc "i3"
-      pause_function
-      install_misc_apps "i3"
-      install_themes "i3"
       ;;
       #}}}
     "b")
@@ -1471,15 +1457,17 @@ install_desktop_environment(){
     [[ ${KDE} -eq 1 ]] && package_install "kio-mtp" || package_install "gvfs-mtp"
   fi
   #}}}
-  if [[ ${KDE} -eq 0 ]]; then
-    package_install "gvfs gvfs-afc"
+  #COMMON PKGS {{{
+    if [[ ${KDE} -eq 0 ]]; then
+      package_install "gvfs gvfs-afc"
+      package_install "xdg-user-dirs"
+      package_install "ttf-bitstream-vera ttf-dejavu"
+    fi
     is_package_installed "samba" && package_install "gvfs-smb"
-    package_install "xdg-user-dirs"
-    aur_package_install "gnome-defaults-list"
-    package_install "ttf-bitstream-vera ttf-dejavu"
     #Fix p7FM
     package_install "wxgtk2.8"
-  fi
+    aur_package_install "gnome-defaults-list"
+  #}}}
 }
 #}}}
 #CONNMAN/NETWORKMANAGER/WICD {{{
@@ -1497,7 +1485,7 @@ install_nm_wicd(){
       print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
       print_info "NetworkManager is a program for providing detection and configuration for systems to automatically connect to network. NetworkManager's functionality can be useful for both wireless and wired networks."
       if [[ ${KDE} -eq 1 ]]; then
-        package_install "networkmanager dnsmasq kdeplasma-applets-plasma-nm"
+        is_package_installed "plasma-next" && aur_package_install "plasma-nm" || package_install "networkmanager dnsmasq kdeplasma-applets-plasma-nm"
       else
         package_install "networkmanager dnsmasq network-manager-applet"
       fi
@@ -2010,11 +1998,12 @@ install_system_apps(){
     echo " 2) $(menu_item "firewalld")"
     echo " 3) $(menu_item "gparted")"
     echo " 4) $(menu_item "grsync")"
-    echo " 5) $(menu_item "htop")"
-    echo " 6) $(menu_item "ufw")"
-    echo " 7) $(menu_item "virtualbox")"
-    echo " 8) $(menu_item "webmin")"
-    echo " 9) $(menu_item "wine")"
+    echo " 5) $(menu_item "hosts-update") $AUR"
+    echo " 6) $(menu_item "htop")"
+    echo " 7) $(menu_item "ufw")"
+    echo " 8) $(menu_item "virtualbox")"
+    echo " 9) $(menu_item "webmin")"
+    echo "10) $(menu_item "wine")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2046,16 +2035,20 @@ install_system_apps(){
           package_install "grsync"
           ;;
         5)
-          package_install "htop"
+          aur_package_install "hosts-update"
+          hosts-update
           ;;
         6)
+          package_install "htop"
+          ;;
+        7)
           print_title "UFW - https://wiki.archlinux.org/index.php/Ufw"
           print_info "Ufw stands for Uncomplicated Firewall, and is a program for managing a netfilter firewall. It provides a command line interface and aims to be uncomplicated and easy to use."
           is_package_installed "firewalld" && package_remove "firewalld"
           aur_package_install "ufw gufw"
           system_ctl enable ufw
           ;;
-        7)
+        8)
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
@@ -2068,11 +2061,11 @@ install_system_apps(){
             cecho " ${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
           ;;
-        8)
+        9)
           package_install "webmin perl-net-ssleay"
           system_ctl enable webmin
           ;;
-        9)
+        10)
           package_install "icoutils wine wine_gecko wine-mono winetricks"
           ;;
         "b")
@@ -2098,7 +2091,7 @@ install_graphics_apps(){
     echo " 4) $(menu_item "inkscape")"
     echo " 5) $(menu_item "mcomix")"
     echo " 6) $(menu_item "mypaint")"
-    echo " 7) $(menu_item "pencil") $AUR"
+    echo " 7) $(menu_item "pencil" "Pencil Prototyping Tool") $AUR"
     echo " 8) $(menu_item "scribus")"
     echo " 9) $(menu_item "shotwell")"
     echo "10) $(menu_item "simple-scan")"
@@ -3559,8 +3552,8 @@ install_web_server(){
       rm -v /etc/httpd/conf/httpd.conf.aui
     fi
     [[ -f /etc/httpd/conf/httpd.conf.aui ]] && echo "/etc/httpd/conf/httpd.conf.aui" || cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-    local MOD_PHP=`cat /etc/httpd/conf/httpd.conf | grep php5_module.conf`
-    if [[ -z $MOD_PHP ]]; then
+    local IS_DISABLED=`cat /etc/httpd/conf/httpd.conf | grep php5_module.conf`
+    if [[ -z $IS_DISABLED ]]; then
       echo -e 'application/x-httpd-php5                php php5' >> /etc/httpd/conf/mime.types
       sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
       echo -e '\n# Use for PHP 5.x:\nInclude conf/extra/php5_module.conf\n\nAddHandler php5-script php' >> /etc/httpd/conf/httpd.conf
@@ -3847,8 +3840,8 @@ do
         install_tlp
         enable_readahead
         install_zram
-        install_xorg
         install_video_cards
+        install_xorg
         font_config
         install_cups
         install_additional_firmwares

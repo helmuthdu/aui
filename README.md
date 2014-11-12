@@ -1,3 +1,5 @@
+### This project is looking for a new maintainer
+
 # Archlinux U Install
 
 Install and configure archlinux has never been easier!
