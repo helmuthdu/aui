@@ -748,7 +748,9 @@ install_video_cards(){
     package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl"
   fi
   #}}}
-  is_package_installed "mesa-libgl" && package_install "lib32-mesa-libgl"
+  if [[ ${ARCHI} == x86_64 ]]; then
+    is_package_installed "mesa-libgl" && package_install "lib32-mesa-libgl"
+  fi
   pause_function
 }
 #}}}
@@ -926,7 +928,7 @@ install_desktop_environment(){
             aur_package_install "numix-themes"
             ;;
           3)
-            aur_package_install "Vertex"
+            aur_package_install "vertex-themes"
             ;;
           4)
             aur_package_install "zuki-themes-git"
