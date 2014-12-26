@@ -349,7 +349,7 @@ choose_aurhelper(){
             exit 0
           fi
         fi
-        AUR_PKG_MANAGER="yaourt"
+        AUR_PKG_MANAGER="yaourt  --tmp /var/tmp/"
         ;;
       2)
         if ! is_package_installed "packer" ; then
