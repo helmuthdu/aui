@@ -462,7 +462,7 @@ install_basic_setup(){
   package_install "pulseaudio pulseaudio-alsa"
   [[ ${ARCHI} == x86_64 ]] && package_install "lib32-libpulse"
   # automatically switch to newly-connected devices
-  add_line "load-module module-switch-on-connect" "/etc/pulse/default.pa"
+  [[ $(grep -ci "load-module module-switch-on-connect" "/etc/pulse/default.pa") -eq 0 ]] && add_line "load-module module-switch-on-connect" "/etc/pulse/default.pa"
   pause_function
   print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/File_Systems"
   print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
