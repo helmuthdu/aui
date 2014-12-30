@@ -2680,13 +2680,13 @@ install_video_apps(){
                   package_install "livestreamer"
                   ;;
                 4)
-                  package_install "mpv"
-                  ;;
-                5)
                   package_install "minitube"
                   ;;
-                6)
+                5)
                   aur_package_install "miro"
+                  ;;
+                6)
+                  package_install "mpv"
                   ;;
                 7)
                   package_install "parole"
