@@ -461,7 +461,7 @@
         tar zxvf ${PKG}.tar.gz
         rm ${PKG}.tar.gz
         cd ${PKG}
-        makePKG -csi --noconfirm
+        makepkg -csi --noconfirm
       "
     done
   } #}}}
