@@ -104,13 +104,14 @@
     # 4) Gmrun
     # 5) PCManFM
     # 6) rxvt-unicode
-    # 7) Scrot
+    # 7) Squeeze
     # 8) Thunar
     # 9) Tint2
     #10) Volwheel
     #11) Xfburn
     #12) Xcompmgr
     #13) Zathura
+    #14) speedtest-cli
     MISCAPPS="1 3"
   #}}}
   #DISPLAY MANAGER {{{

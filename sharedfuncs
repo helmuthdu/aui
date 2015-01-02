@@ -82,6 +82,7 @@
   XPINGS=0 # CONNECTION CHECK
   SPIN="/-\|" #SPINNER POSITION
   AUTOMATIC_MODE=0
+  TRIM=0
 #}}}
 #COMMON FUNCTIONS {{{
   error_msg() { #{{{
@@ -127,7 +128,7 @@
       fi
     done
   } #}}}
-  check_boot_system() { # {{{
+  check_boot_system() { #{{{
     if [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Inc.' ]] || [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Computer, Inc.' ]]; then
       modprobe -r -q efivars || true  # if MAC
     else
@@ -144,6 +145,10 @@
       UEFI=0
       echo "BIOS Mode detected"
     fi
+  }
+  #}}}
+  check_trim() { #{{{
+    [[ -n $(hdparm -I /dev/sda | grep TRIM &> /dev/null) ]] && TRIM=1
   }
   #}}}
   check_root() { #{{{

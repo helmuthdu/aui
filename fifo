@@ -199,7 +199,7 @@ setup_luks(){
   select OPT in "${block_list[@]}"; do
     if contains_element "$OPT" "${block_list[@]}"; then
       cryptsetup --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random --verify-passphrase luksFormat $OPT
-      cryptsetup open --type luks $OPT crypt
+      cryptsetup open --type luks $([[ $TRIM -eq 1 ]] && echo "--allow-discards") $OPT crypt
       LUKS=1
       LUKS_DISK=`echo ${OPT} | sed 's/\/dev\///'`
       break
@@ -307,7 +307,9 @@ format_partitions(){
       [[ -z $3 ]] && select_filesystem || filesystem=$3
       mkfs.${filesystem} $1 \
         $([[ ${filesystem} == xfs || ${filesystem} == btrfs ]] && echo "-f") \
-        $([[ ${filesystem} == vfat ]] && echo "-F32")
+        $([[ ${filesystem} == vfat ]] && echo "-F32") \
+        $([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard") \
+        $([[ $TRIM -eq 1 && ${filesystem} == btrfs ]] && echo "-O discard")
       fsck $1
       mkdir -p $2
       mount -t ${filesystem} $1 $2
@@ -763,6 +765,7 @@ print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arc
 pause_function
 check_boot_system
 check_connection
+check_trim
 pacman -Sy
 while true
 do
