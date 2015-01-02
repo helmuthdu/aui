@@ -638,7 +638,7 @@
     echo "Select zone:"
     select ZONE in "${_zones[@]}"; do
       if contains_element "$ZONE" "${_zones[@]}"; then
-        local _subzones=(`timedatectl list-timezones | grep ${_zones} | sed 's/^.*\///'`)
+        local _subzones=(`timedatectl list-timezones | grep ${ZONE} | sed 's/^.*\///'`)
         PS3="$prompt1"
         echo "Select subzone:"
         select SUBZONE in "${_subzones[@]}"; do
