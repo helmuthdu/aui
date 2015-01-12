@@ -18,7 +18,7 @@
 #-------------------------------------------------------------------------------
 # Run this script after your first boot with archlinux (as root)
 
-#VARIABLES {{{
+#GLOBAL VARIABLES {{{
   checklist=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
   # COLORS {{{
     Bold=$(tput bold)
@@ -44,7 +44,7 @@
   # PROMPT {{{
     prompt1="Enter your option: "
     prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
-    prompt3="You have to manual enter the following commands, then press ${BYellow}ctrl+d${Reset} or type ${BYellow}exit${Reset}:"
+    prompt3="You have to manually enter the following commands, then press ${BYellow}ctrl+d${Reset} or type ${BYellow}exit${Reset}:"
   #}}}
   # EDITOR {{{
     AUTOMATIC_MODE=0
@@ -54,41 +54,40 @@
       EDITOR="nano"
     fi
   #}}}
-  # DESKTOP ENVIRONMENT
-  CINNAMON=0
-  GNOME=0
-  KDE=0
-  # ARCHITECTURE
-  ARCHI=`uname -m`
+  # DESKTOP ENVIRONMENT{{{
+    CINNAMON=0
+    GNOME=0
+    KDE=0
+  #}}}
+  # MOUNTPOINTS {{{
+    EFI_MOUNTPOINT="/boot/efi"
+    ROOT_MOUNTPOINT="/dev/sda1"
+    BOOT_MOUNTPOINT="/dev/sda"
+    MOUNTPOINT="/mnt"
+  #}}}
+  ARCHI=`uname -m` # ARCHITECTURE
   UEFI=0
-  EFI_DISK="/boot/efi"
-  ROOT_DISK="/dev/sda1"
-  BOOT_DISK="/dev/sda"
-  # AUR PACKAGE
+  LVM=0
+  LUKS=0
+  LUKS_DISK="sda2"
   AUR=`echo -e "(${BPurple}aur${Reset})"`
   EXTERNAL=`echo -e "(${BYellow}external${Reset})"`
-  #CURRENT DIRECTORY
-  AUI_DIR=`pwd`
-  MOUNTPOINT="/mnt"
-  # VERBOSE MODE
-  [[ $1 == -v || $1 == --verbose ]] && VERBOSE_MODE=1 || VERBOSE_MODE=0
-  # LOG FILE
-  LOG="${AUI_DIR}/`basename ${0}`_error.log"
+  AUI_DIR=`pwd` #CURRENT DIRECTORY
+  [[ $1 == -v || $1 == --verbose ]] && VERBOSE_MODE=1 || VERBOSE_MODE=0 # VERBOSE MODE
+  LOG="${AUI_DIR}/`basename ${0}`_error.log" # LOG FILE
   [[ -f $LOG ]] && rm -f $LOG
-  PKG_MANAGER="pacman"
   PKG=""
   PKG_FAIL="${AUI_DIR}/`basename ${0}`_pkg_fail_list.log"
   [[ -f $PKG_FAIL ]] && rm -f $PKG_FAIL
-  # CONNECTION CHECK
-  XPINGS=0
-  #MISC
-  SPIN="/-\|"
+  XPINGS=0 # CONNECTION CHECK
+  SPIN="/-\|" #SPINNER POSITION
   AUTOMATIC_MODE=0
+  TRIM=0
 #}}}
 #COMMON FUNCTIONS {{{
   error_msg() { #{{{
-    local MSG="${1}"
-    echo -e "${MSG}"
+    local _msg="${1}"
+    echo -e "${_msg}"
     exit 1
   } #}}}
   cecho() { #{{{
@@ -107,7 +106,7 @@
   progress() { #{{{
     ncecho "  ";
     while true; do
-      kill -0 $pid 2> /dev/null;
+      kill -0 $pid &> /dev/null;
       if [[ $? == 0 ]]; then
         spinny
         sleep 0.25
@@ -129,7 +128,7 @@
       fi
     done
   } #}}}
-  check_boot_system() { # {{{
+  check_boot_system() { #{{{
     if [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Inc.' ]] || [[ "$(cat /sys/class/dmi/id/sys_vendor)" == 'Apple Computer, Inc.' ]]; then
       modprobe -r -q efivars || true  # if MAC
     else
@@ -146,6 +145,10 @@
       UEFI=0
       echo "BIOS Mode detected"
     fi
+  }
+  #}}}
+  check_trim() { #{{{
+    [[ -n $(hdparm -I /dev/sda | grep TRIM &> /dev/null) ]] && TRIM=1
   }
   #}}}
   check_root() { #{{{
@@ -174,33 +177,31 @@
     fi
   } #}}}
   check_domainname() { #{{{
-    DOMAINNAME=`echo ${HOSTNAME} | cut -d'.' -f2- | sed 's/ //g'`
+    local _domainname=`echo ${HOSTNAME} | cut -d'.' -f2- | sed 's/ //g'`
 
-    # Hmm, still no domain name. Keep looking...
-    if [[ "${DOMAINNAME}" == "" ]]; then
-      DOMAINNAME=`grep domain /etc/resolv.conf | sed 's/domain //g' | sed 's/ //g'`
+    # no domain name. Keep looking...
+    if [[ "${_domainname}" == "" ]]; then
+      _domainname=`grep domain /etc/resolv.conf | sed 's/domain //g' | sed 's/ //g'`
     fi
 
-    # OK, give up.
-    if [[ "${DOMAINNAME}" == "" ]]; then
+    # not founded...
+    if [[ "${_domainname}" == "" ]]; then
       error_msg "ERROR! Domain name is not configured."
     fi
   } #}}}
   check_connection(){ #{{{
     XPINGS=$(( $XPINGS + 1 ))
-    ping_gw() {
-      IP_ADDR=`ip r | grep default | cut -d ' ' -f 3`
-      [[ -z $IP_ADDR ]] && IP_ADDR="8.8.8.8"
-      ping -q -w 1 -c 1 ${IP_ADDR} > /dev/null && return 1 || return 0
+    connection_test() {
+      ping -q -w 1 -c 1 `ip r | grep default | awk 'NR==1 {print $3}'` &> /dev/null && return 1 || return 0
     }
-    WIRED_DEV=`ip link | grep enp | awk '{print $2}'| sed 's/://' | sed '1!d'`
+    WIRED_DEV=`ip link | grep "eno\|enp" | awk '{print $2}'| sed 's/://' | sed '1!d'`
     WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://' | sed '1!d'`
-    if ping_gw; then
+    if connection_test; then
       print_warning "ERROR! Connection not Found."
       print_info "Network Setup"
-      conn_type_list=("Wired Automatic" "Wired Manual" "Wireless" "Skip")
+      local _connection_opts=("Wired Automatic" "Wired Manual" "Wireless" "Configure Proxy" "Skip")
       PS3="$prompt1"
-      select CONNECTION_TYPE in "${conn_type_list[@]}"; do
+      select CONNECTION_TYPE in "${_connection_opts[@]}"; do
         case "$REPLY" in
           1)
             systemctl start dhcpcd@${WIRED_DEV}.service
@@ -223,6 +224,14 @@
             break
             ;;
           4)
+            read -p "Enter your proxy e.g. protocol://adress:port: " OPTION
+            export http_proxy=$OPTION
+            export https_proxy=$OPTION
+            export ftp_proxy=$OPTION
+            echo "proxy = $OPTION" > ~/.curlrc
+            break
+            ;;
+          5)
             break
             ;;
           *)
@@ -234,22 +243,22 @@
         print_warning "Can't establish connection. exiting..."
         exit 1
       fi
-      [[ $REPLY -ne 4 ]] && check_connection
+      [[ $REPLY -ne 5 ]] && check_connection
     fi
   } #}}}
   check_vga() { #{{{
-    # Determine video chipset - only Intel, ATI and nvidia are supported by this script"
+    # Determine video chipset - only Intel, ATI and nvidia are supported by this script
     ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Detecting video chipset "
-    local VGA=`lspci | grep VGA | tr "[:upper:]" "[:lower:]"`
-    local VGA_NUMBER=`lspci | grep VGA | wc -l`
+    local _vga=`lspci | grep VGA | tr "[:upper:]" "[:lower:]"`
+    local _vga_length=`lspci | grep VGA | wc -l`
 
     if [[ -n $(dmidecode --type 1 | grep VirtualBox) ]]; then
       cecho Virtualbox
       VIDEO_DRIVER="virtualbox"
-    elif [[ $VGA_NUMBER -eq 2 ]] && [[ -n $(echo ${VGA} | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
+    elif [[ $_vga_length -eq 2 ]] && [[ -n $(echo ${_vga} | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
       cecho Bumblebee
       VIDEO_DRIVER="bumblebee"
-    elif [[ -n $(echo ${VGA} | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
+    elif [[ -n $(echo ${_vga} | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
       cecho Nvidia
       read_input_text "Install NVIDIA proprietary driver" $PROPRIETARY_DRIVER
       if [[ $OPTION == y ]]; then
@@ -257,7 +266,7 @@
       else
         VIDEO_DRIVER="nouveau"
       fi
-    elif [[ -n $(echo ${VGA} | grep "advanced micro devices") || -f /sys/kernel/debug/dri/0/radeon_pm_info || -f /sys/kernel/debug/dri/0/radeon_sa_info ]]; then
+    elif [[ -n $(echo ${_vga} | grep "advanced micro devices") || -f /sys/kernel/debug/dri/0/radeon_pm_info || -f /sys/kernel/debug/dri/0/radeon_sa_info ]]; then
       cecho AMD/ATI
       read_input_text "Install ATI proprietary driver" $PROPRIETARY_DRIVER
       if [[ $OPTION == y ]]; then
@@ -265,7 +274,7 @@
       else
         VIDEO_DRIVER="ati"
       fi
-    elif [[ -n $(echo ${VGA} | grep "intel corporation") || -f /sys/kernel/debug/dri/0/i915_capabilities ]]; then
+    elif [[ -n $(echo ${_vga} | grep "intel corporation") || -f /sys/kernel/debug/dri/0/i915_capabilities ]]; then
       cecho Intel
       VIDEO_DRIVER="intel"
     else
@@ -341,60 +350,91 @@
     modprobe $1
   } #}}}
   add_module() { #{{{
-    #check if the number of arguments is less then 2
-    for MODULE in $1; do
-      [[ $# -lt 2 ]] && MODULE_NAME="$MODULE" || MODULE_NAME="$2";
-      echo "$MODULE" >> /etc/modules-load.d/$MODULE_NAME.conf
-      start_module "$MODULE"
+    for module in $1; do
+      #check if the name of the module can be the same of the module or the given name
+      [[ $# -lt 2 ]] && local _module_name="$module" || local _module_name="$2"
+      local _is_disabled=`cat /etc/modules-load.d/${_module_name}.conf | grep $module &> /dev/null`
+      [[ -z $_is_disabled ]] && echo "$module" >> /etc/modules-load.d/${_module_name}.conf
+      start_module "$module"
     done
   } #}}}
   add_repository() { #{{{
-    REPO=${1}
-    URL=${2}
-    [[ -n ${3} ]] && SIGLEVEL="\nSigLevel = ${3}"
+    local _repo=${1}
+    local _url=${2}
+    [[ -n ${3} ]] && local _siglevel="\nSigLevel = ${3}" || local _siglevel=""
 
-    CHECK_REPO=`grep -F "${REPO}" /etc/pacman.conf`
-    if [[ -z $CHECK_REPO ]]; then
-      echo -e "\n[${REPO}]${SIGLEVEL}\nServer = ${URL}" >> /etc/pacman.conf
+    local _check_repo=`grep -F "${_repo}" /etc/pacman.conf`
+    if [[ -z $_check_repo ]]; then
+      echo -e "\n[${_repo}]${_siglevel}\nServer = ${_url}" >> /etc/pacman.conf
       system_update
     fi
   } #}}}
+  check_multilib(){ #{{{
+    # this option will avoid any problem with packages install
+    if [[ $ARCHI == x86_64 ]]; then
+      local _has_multilib=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
+      if [[ -z $_has_multilib ]]; then
+        echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+        echo -e '\nMultilib repository added into pacman.conf file'
+      else
+        sed -i "${_has_multilib}s/^#//" /etc/pacman.conf
+        local _has_multilib=$(( ${_has_multilib} + 1 ))
+        sed -i "${_has_multilib}s/^#//" /etc/pacman.conf
+      fi
+    fi
+  } #}}}
+  add_key() { #{{{
+    pacman-key -r $1
+    pacman-key --lsign-key $1
+  } #}}}
+  pacman_key(){ #{{{
+    if [[ ! -d /etc/pacman.d/gnupg ]]; then
+      print_title "PACMAN KEY - https://wiki.archlinux.org/index.php/pacman-key"
+      print_info "Pacman uses GnuPG keys in a web of trust model to determine if packages are authentic."
+      package_install "haveged"
+      haveged -w 1024
+      pacman-key --init
+      pacman-key --populate archlinux
+      pkill haveged
+      package_remove "haveged"
+    fi
+  } #}}}
   add_line() { #{{{
-    ADD_LINE=${1}
-    FILEPATH=${2}
+    local _add_line=${1}
+    local _filepath=${2}
 
-    CHECK_LINE=`grep -F "${ADD_LINE}" ${FILEPATH}`
-    [[ -z $CHECK_LINE ]] && echo "${ADD_LINE}" >> ${FILEPATH}
+    local _has_line=`grep -ci "${_add_line}" ${_filepath} &> /dev/null`
+    [[ $_has_line -eq 0 ]] && echo "${_add_line}" >> ${_filepath}
   } #}}}
   replace_line() { #{{{
-    SEARCH=${1}
-    REPLACE=${2}
-    FILEPATH=${3}
-    FILEBASE=`basename ${3}`
+    local _search=${1}
+    local _replace=${2}
+    local _filepath=${3}
+    local _filebase=`basename ${3}`
 
-    sed -e "s/${SEARCH}/${REPLACE}/" ${FILEPATH} > /tmp/${FILEBASE} 2>"$LOG"
+    sed -e "s/${_search}/${_replace}/" ${_filepath} > /tmp/${_filebase} 2>"$LOG"
     if [[ ${?} -eq 0 ]]; then
-      mv /tmp/${FILEBASE} ${FILEPATH}
+      mv /tmp/${_filebase} ${_filepath}
     else
-      cecho "failed: ${SEARCH} - ${FILEPATH}"
+      cecho "failed: ${_search} - ${_filepath}"
     fi
   } #}}}
   update_early_modules() { #{{{
-    local NEW_MODULE=${1}
-    local OLD_ARRAY=`egrep ^MODULES= /etc/mkinitcpio.conf`
+    local _new_module=${1}
+    local _current_modules=`egrep ^MODULES= /etc/mkinitcpio.conf`
 
-    if [[ -n ${NEW_MODULE} ]]; then
+    if [[ -n ${_new_module} ]]; then
       # Determine if the new module is already listed.
-      _EXISTS=`echo ${OLD_ARRAY} | grep ${NEW_MODULE}`
+      local _exists=`echo ${_current_modules} | grep ${_new_module}`
       if [ $? -eq 1 ]; then
 
         source /etc/mkinitcpio.conf
         if [[ -z ${MODULES} ]]; then
-          NEW_MODULES="${NEW_MODULE}"
+          _new_moduleS="${_new_module}"
         else
-          NEW_MODULES="${MODULES} ${NEW_MODULE}"
+          _new_moduleS="${MODULES} ${_new_module}"
         fi
-        replace_line "MODULES=\"${MODULES}\"" "MODULES=\"${NEW_MODULES}\"" /etc/mkinitcpio.conf
+        replace_line "MODULES=\"${MODULES}\"" "MODULES=\"${_new_moduleS}\"" /etc/mkinitcpio.conf
         ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Rebuilding init "
         mkinitcpio -p linux >>"$LOG" 2>&1 &
         pid=$!;progress $pid
@@ -422,10 +462,10 @@
       su - ${username} -c "
         [[ ! -d aui_packages ]] && mkdir aui_packages
         cd aui_packages
-        curl -o $PKG.tar.gz https://aur.archlinux.org/packages/${PKG:0:2}/$PKG/$PKG.tar.gz
-        tar zxvf $PKG.tar.gz
-        rm $PKG.tar.gz
-        cd $PKG
+        curl -o ${PKG}.tar.gz https://aur.archlinux.org/packages/${PKG:0:2}/${PKG}/${PKG}.tar.gz
+        tar zxvf ${PKG}.tar.gz
+        rm ${PKG}.tar.gz
+        cd ${PKG}
         makepkg -csi --noconfirm
       "
     done
@@ -455,31 +495,31 @@
     #install packages using pacman
     if [[ $AUTOMATIC_MODE -eq 1 || $VERBOSE_MODE -eq 0 ]]; then
       for PKG in ${1}; do
-        PKG_REPO=`pacman -Sp --print-format %r ${PKG} | uniq | sed '1!d'`
-        case $PKG_REPO in
+        local _pkg_repo=`pacman -Sp --print-format %r ${PKG} | uniq | sed '1!d'`
+        case $_pkg_repo in
           "core")
-            PKG_REPO="${BRed}${PKG_REPO}${Reset}"
+            _pkg_repo="${BRed}${_pkg_repo}${Reset}"
             ;;
           "extra")
-            PKG_REPO="${BYellow}${PKG_REPO}${Reset}"
+            _pkg_repo="${BYellow}${_pkg_repo}${Reset}"
             ;;
           "community")
-            PKG_REPO="${BGreen}${PKG_REPO}${Reset}"
+            _pkg_repo="${BGreen}${_pkg_repo}${Reset}"
             ;;
           "multilib")
-            PKG_REPO="${BCyan}${PKG_REPO}${Reset}"
+            _pkg_repo="${BCyan}${_pkg_repo}${Reset}"
             ;;
         esac
         if ! is_package_installed "${PKG}" ; then
-          ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing (${PKG_REPO}) ${Bold}${PKG}${Reset} "
-          $PKG_MANAGER -S --noconfirm --needed ${PKG} >>"$LOG" 2>&1 &
+          ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing (${_pkg_repo}) ${Bold}${PKG}${Reset} "
+          pacman -S --noconfirm --needed ${PKG} >>"$LOG" 2>&1 &
           pid=$!;progress $pid
         else
-          cecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing (${PKG_REPO}) ${Bold}${PKG}${Reset} exists "
+          cecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing (${_pkg_repo}) ${Bold}${PKG}${Reset} exists "
         fi
       done
     else
-      $PKG_MANAGER -S --needed ${1}
+      pacman -S --needed ${1}
     fi
   } #}}}
   package_remove() { #{{{
@@ -496,21 +536,8 @@
       fi
     done
   } #}}}
-  system_upgrade() { #{{{
-    local MODIFY=`stat /var/lib/pacman/sync | egrep ^Modify | cut -d':' -f2 | cut -d' ' -f2`
-    local TODAY=`date +%Y-%m-%d`
-    if [[ ${MODIFY} != ${TODAY} ]]; then
-      pacman -Syu ${1}
-    fi
-  } #}}}
   system_update() { #{{{
-    if [[ $VERBOSE_MODE -eq 0 ]]; then
-      ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Updating packages "
-      $PKG_MANAGER -Sy >>"$LOG" 2>&1 &
-      pid=$!;progress $pid
-    else
-      $PKG_MANAGER -Sy $1
-    fi
+    pacman -Syy
   } #}}}
   npm_install() { #{{{
     #install packages using pacman
@@ -545,13 +572,13 @@
   } #}}}
   menu_item() { #{{{
     #check if the number of arguments is less then 2
-    [[ $# -lt 2 ]] && PACKAGE_NAME="$1" || PACKAGE_NAME="$2";
+    [[ $# -lt 2 ]] && _package_name="$1" || _package_name="$2";
     #list of chars to remove from the package name
-    CHARS_TO_REMOVE=("Ttf-" "-bzr" "-hg" "-svn" "-git" "-stable" "-icon-theme" "Gnome-shell-theme-" "Gnome-shell-extension-");
+    local _chars=("Ttf-" "-bzr" "-hg" "-svn" "-git" "-stable" "-icon-theme" "Gnome-shell-theme-" "Gnome-shell-extension-");
     #remove chars from package name
-    for CHARS in ${CHARS_TO_REMOVE[@]}; do PACKAGE_NAME=`echo ${PACKAGE_NAME^} | sed 's/'$CHARS'//'`; done
+    for char in ${_chars[@]}; do _package_name=`echo ${_package_name^} | sed 's/'$char'//'`; done
     #display checkbox and package name
-    echo -e "$(checkbox_package "$1") ${Bold}$PACKAGE_NAME${Reset}"
+    echo -e "$(checkbox_package "$1") ${Bold}${_package_name}${Reset}"
   } #}}}
   mainmenu_item() { #{{{
     echo -e "$(checkbox "$1") ${Bold}$2${Reset}"
@@ -560,22 +587,22 @@
     [[ $OPT == b || $OPT == d ]] && break;
   } #}}}
   add_user_to_group() { #{{{
-    local _USER=${1}
-    local _GROUP=${2}
+    local _user=${1}
+    local _group=${2}
 
-    if [[ -z ${_GROUP} ]]; then
+    if [[ -z ${_group} ]]; then
       error_msg "ERROR! 'add_user_to_group' was not given enough parameters."
     fi
 
-    ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Adding ${Bold}${_USER}${Reset} to ${Bold}${_GROUP}${Reset} "
-    gpasswd -a ${_USER} ${_GROUP} >>"$LOG" 2>&1 &
+    ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Adding ${Bold}${_user}${Reset} to ${Bold}${_group}${Reset} "
+    gpasswd -a ${_user} ${_group} >>"$LOG" 2>&1 &
     pid=$!;progress $pid
   } #}}}
   system_ctl() { #{{{
-    local ACTION=${1}
-    local OBJECT=${2}
-    ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} systemctl ${ACTION} ${OBJECT} "
-    systemctl ${ACTION} ${OBJECT} >> "$LOG" 2>&1
+    local _action=${1}
+    local _object=${2}
+    ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} systemctl ${_action} ${_object} "
+    systemctl ${_action} ${_object} >> "$LOG" 2>&1
     pid=$!;progress $pid
   }
   #}}}
@@ -584,11 +611,11 @@
   }
   #}}}
   getkeymap() { #{{{
-    local keymaps=(`localectl list-keymaps`)
+    local _keymaps=(`localectl list-keymaps`)
     PS3="(shift+pgup/pgdown) $prompt1"
     echo "Select keymap:"
-    select KEYMAP in "${keymaps[@]}"; do
-      if contains_element "$KEYMAP" "${keymaps[@]}"; then
+    select KEYMAP in "${_keymaps[@]}"; do
+      if contains_element "$KEYMAP" "${_keymaps[@]}"; then
         break
       else
         invalid_option
@@ -597,11 +624,11 @@
   }
   #}}}
   setlocale() { #{{{
-    local locale_list=(`cat /etc/locale.gen | grep UTF-8 | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
+    local _locale_list=(`cat /etc/locale.gen | grep UTF-8 | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
     PS3="$prompt1"
     echo "Select locale:"
-    select LOCALE in "${locale_list[@]}"; do
-      if contains_element "$LOCALE" "${locale_list[@]}"; then
+    select LOCALE in "${_locale_list[@]}"; do
+      if contains_element "$LOCALE" "${_locale_list[@]}"; then
         LOCALE_UTF8="${LOCALE}.UTF-8"
         break
       else
@@ -611,16 +638,16 @@
   }
   #}}}
   settimezone() { #{{{
-    local zone=(`timedatectl list-timezones | sed 's/\/.*$//' | uniq`);
+    local _zones=(`timedatectl list-timezones | sed 's/\/.*$//' | uniq`)
     PS3="$prompt1"
     echo "Select zone:"
-    select ZONE in "${zone[@]}"; do
-      if contains_element "$ZONE" "${zone[@]}"; then
-        local subzone=(`timedatectl list-timezones | grep ${ZONE} | sed 's/^.*\///'`)
+    select ZONE in "${_zones[@]}"; do
+      if contains_element "$ZONE" "${_zones[@]}"; then
+        local _subzones=(`timedatectl list-timezones | grep ${ZONE} | sed 's/^.*\///'`)
         PS3="$prompt1"
         echo "Select subzone:"
-        select SUBZONE in "${subzone[@]}"; do
-          if contains_element "$SUBZONE" "${subzone[@]}"; then
+        select SUBZONE in "${_subzones[@]}"; do
+          if contains_element "$SUBZONE" "${_subzones[@]}"; then
             break
           else
             invalid_option

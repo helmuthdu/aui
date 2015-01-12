@@ -95,6 +95,10 @@ configure_mirrorlist(){
   else
     echo " Unable to update, could not download list."
   fi
+  # better repo should go first
+  cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.tmp
+  rankmirrors /etc/pacman.d/mirrorlist.tmp > /etc/pacman.d/mirrorlist
+  rm /etc/pacman.d/mirrorlist.tmp
   # allow global read access (required for non-root yaourt execution)
   chmod +r /etc/pacman.d/mirrorlist
   $EDITOR /etc/pacman.d/mirrorlist
@@ -109,23 +113,61 @@ umount_partitions(){
   done
 }
 #}}}
-#CREATE PARTITION {{{
-create_partition(){
-  select_device(){
-    devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd'`);
-    PS3="$prompt1"
-    echo -e "Select partition:\n"
-    select device in "${devices_list[@]}"; do
-      if contains_element "${device}" "${devices_list[@]}"; then
-        break
-      else
-        invalid_option
-      fi
-    done
-  }
+#SELECT DEVICE {{{
+select_device(){
+  devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd'`);
+  PS3="$prompt1"
+  echo -e "Select partition:\n"
+  select device in "${devices_list[@]}"; do
+    if contains_element "${device}" "${devices_list[@]}"; then
+      break
+    else
+      invalid_option
+    fi
+  done
+  BOOT_MOUNTPOINT=$device
+}
+#}}}
+#CREATE PARTITION SCHEME {{{
+create_partition_scheme(){
+  LUKS=0
+  LVM=0
   print_title "https://wiki.archlinux.org/index.php/Partitioning"
-  print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another. Partition information is stored within a hard drive's Master Boot Record."
-  apps_list=("cfdisk" "cgdisk" "gdisk" "parted");
+  print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another."
+  print_warning "Maintain Current does not work with LUKS"
+  partition_layout=("Default" "LVM" "LVM+LUKS" "Maintain Current")
+  PS3="$prompt1"
+  echo -e "Select partition scheme:"
+  select OPT in "${partition_layout[@]}"; do
+    case "$REPLY" in
+      1)
+        create_partition
+        ;;
+      2)
+        create_partition
+        setup_lvm
+        ;;
+      3)
+        create_partition
+        setup_luks
+        setup_lvm
+        ;;
+      4)
+        modprobe dm-mod
+        vgscan &> /dev/null
+        vgchange -ay &> /dev/null
+        ;;
+      *)
+        invalid_option
+        ;;
+    esac
+    [[ -n $OPT ]] && break
+  done
+}
+#}}}
+#SETUP PARTITION{{{
+create_partition(){
+  apps_list=("cfdisk" "cgdisk" "fdisk" "gdisk" "parted");
   PS3="$prompt1"
   echo -e "Select partition program:"
   select OPT in "${apps_list[@]}"; do
@@ -146,14 +188,92 @@ create_partition(){
   done
 }
 #}}}
+#SETUP LUKS {{{
+setup_luks(){
+  print_title "LUKS - https://wiki.archlinux.org/index.php/LUKS"
+  print_info "The Linux Unified Key Setup or LUKS is a disk-encryption specification created by Clemens Fruhwirth and originally intended for Linux."
+  print_danger "\tDo not use this for boot partitions"
+  block_list=(`lsblk | grep 'part' | awk '{print "/dev/" substr($1,3)}'`)
+  PS3="$prompt1"
+  echo -e "Select partition:"
+  select OPT in "${block_list[@]}"; do
+    if contains_element "$OPT" "${block_list[@]}"; then
+      cryptsetup --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random --verify-passphrase luksFormat $OPT
+      cryptsetup open --type luks $([[ $TRIM -eq 1 ]] && echo "--allow-discards") $OPT crypt
+      LUKS=1
+      LUKS_DISK=`echo ${OPT} | sed 's/\/dev\///'`
+      break
+    elif [[ $OPT == "Cancel" ]]; then
+      break
+    else
+      invalid_option
+    fi
+  done
+}
+#}}}
+#SETUP LVM {{{
+setup_lvm(){
+  print_title "LVM - https://wiki.archlinux.org/index.php/LVM"
+  print_info "LVM is a logical volume manager for the Linux kernel; it manages disk drives and similar mass-storage devices. "
+  print_warning "Last partition will take 100% of free space left"
+  if [[ $LUKS -eq 1 ]]; then
+    pvcreate /dev/mapper/crypt
+    vgcreate lvm /dev/mapper/crypt
+  else
+    block_list=(`lsblk | grep 'part' | awk '{print "/dev/" substr($1,3)}'`)
+    PS3="$prompt1"
+    echo -e "Select partition:"
+    select OPT in "${block_list[@]}"; do
+      if contains_element "$OPT" "${block_list[@]}"; then
+        pvcreate $OPT
+        vgcreate lvm $OPT
+        break
+      else
+        invalid_option
+      fi
+    done
+  fi
+  read -p "Enter number of partitions [ex: 2]: " number_partitions
+  i=1
+  while [[ $i -le $number_partitions ]]; do
+    read -p "Enter $iª partition name [ex: home]: " partition_name
+    if [[ $i -eq $number_partitions ]]; then
+      lvcreate -l 100%FREE lvm -n ${partition_name}
+    else
+      read -p "Enter $iª partition size [ex: 25G, 200M]: " partition_size
+      lvcreate -L ${partition_size} lvm -n ${partition_name}
+    fi
+    i=$(( i + 1 ))
+  done
+  LVM=1
+}
+#}}}
 #SELECT|FORMAT PARTITIONS {{{
 format_partitions(){
-  print_title "https://wiki.archlinux.org/index.php/Format_a_partition"
+  print_title "https://wiki.archlinux.org/index.php/File_Systems"
   print_info "This step will select and format the selected partiton where the archlinux will be installed"
   print_danger "\tAll data on the ROOT and SWAP partition will be LOST."
   i=0
-  partitions_list=(`cat /proc/partitions | awk 'length($3)>1' | awk '{print "/dev/" $4}' | awk 'length($0)>8' | grep 'sd\|hd\|vd'`)
 
+  block_list=(`lsblk | grep 'part\|lvm' | awk '{print substr($1,3)}'`)
+
+  # check if there is no partition
+  if [[ ${#block_list[@]} -eq 0 ]]; then
+    echo "No partition found"
+    exit 0
+  fi
+
+  partitions_list=()
+  for OPT in ${block_list[@]}; do
+    check_lvm=`echo $OPT | grep lvm`
+    if [[ -z $check_lvm ]]; then
+      partitions_list+=("/dev/$OPT")
+    else
+      partitions_list+=("/dev/mapper/$OPT")
+    fi
+  done
+
+  # partitions based on boot system
   if [[ $UEFI -eq 1 ]]; then
     partition_name=("root" "EFI" "swap" "another")
   else
@@ -187,7 +307,9 @@ format_partitions(){
       [[ -z $3 ]] && select_filesystem || filesystem=$3
       mkfs.${filesystem} $1 \
         $([[ ${filesystem} == xfs || ${filesystem} == btrfs ]] && echo "-f") \
-        $([[ ${filesystem} == vfat ]] && echo "-F32")
+        $([[ ${filesystem} == vfat ]] && echo "-F32") \
+        $([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard") \
+        $([[ $TRIM -eq 1 && ${filesystem} == btrfs ]] && echo "-O discard")
       fsck $1
       mkdir -p $2
       mount -t ${filesystem} $1 $2
@@ -207,7 +329,7 @@ format_partitions(){
   create_swap(){
     swap_options=("partition" "file" "skip");
     PS3="$prompt1"
-    echo -e "Select ${BYellow}${partition_name[i]}${White} filesystem:\n"
+    echo -e "Select ${BYellow}${partition_name[i]}${Reset} filesystem:\n"
     select OPT in "${swap_options[@]}"; do
       case "$REPLY" in
         1)
@@ -254,8 +376,8 @@ format_partitions(){
     efi_options=("/boot/efi" "/boot")
     PS3="$prompt1"
     echo -e "Select EFI mountpoint:\n"
-    select EFI_DISK in "${efi_options[@]}"; do
-      if contains_element "${EFI_DISK}" "${efi_options[@]}"; then
+    select EFI_MOUNTPOINT in "${efi_options[@]}"; do
+      if contains_element "${EFI_MOUNTPOINT}" "${efi_options[@]}"; then
         break
       else
         invalid_option
@@ -268,31 +390,31 @@ format_partitions(){
     if [[ ${partition_name[i]} == swap ]]; then
       create_swap
     else
-      echo -e "Select ${BYellow}${partition_name[i]}${White} partition:\n"
+      echo -e "Select ${BYellow}${partition_name[i]}${Reset} partition:\n"
       select partition in "${partitions_list[@]}"; do
         #get the selected number - 1
         partition_number=$(( $REPLY - 1 ))
         if contains_element "${partition}" "${partitions_list[@]}"; then
           case ${partition_name[i]} in
             root)
-              BOOT_DISK=`echo ${partition} | sed 's/[0-9]//'`
-              ROOT_PART=`echo ${partition} | sed 's/\/dev\///'`
-              ROOT_DISK=${partition}
+              ROOT_PART=`echo ${partition} | sed 's/\/dev\/mapper\///' | sed 's/\/dev\///'`
+              ROOT_MOUNTPOINT=${partition}
               format_partition "${partition}" "${MOUNTPOINT}"
               ;;
             EFI)
               set_efi_partition
               read_input_text "Format ${partition} partition"
               if [[ $OPTION == y ]]; then
-                format_partition "${partition}" "${MOUNTPOINT}${EFI_DISK}" vfat
+                format_partition "${partition}" "${MOUNTPOINT}${EFI_MOUNTPOINT}" vfat
               else
-                mkdir -p "${MOUNTPOINT}${EFI_DISK}"
-                mount -t vfat "${partition}" "${MOUNTPOINT}${EFI_DISK}"
-                check_mountpoint "${partition}" "${MOUNTPOINT}${EFI_DISK}"
+                mkdir -p "${MOUNTPOINT}${EFI_MOUNTPOINT}"
+                mount -t vfat "${partition}" "${MOUNTPOINT}${EFI_MOUNTPOINT}"
+                check_mountpoint "${partition}" "${MOUNTPOINT}${EFI_MOUNTPOINT}"
               fi
               ;;
             another)
               read -p "Mountpoint [ex: /home]:" directory
+              [[ $directory == "/boot" ]] && BOOT_MOUNTPOINT=`echo ${partition} | sed 's/[0-9]//'`
               select_filesystem
               read_input_text "Format ${partition} partition"
               if [[ $OPTION == y ]]; then
@@ -329,9 +451,20 @@ install_base_system(){
   print_title "INSTALL BASE SYSTEM"
   print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
   pacstrap ${MOUNTPOINT} base base-devel parted btrfs-progs ntp
-  WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://'`
+  [[ $? -ne 0 ]] && error_msg "Installing base system to ${MOUNTPOINT} failed. Check error messages above."
+  local PTABLE=`parted -l | grep "gpt"`
+  [[ -n $PTABLE ]] && pacstrap ${MOUNTPOINT} gptfdisk
+  WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://' | sed '1!d'`
   if [[ -n $WIRELESS_DEV ]]; then
     pacstrap ${MOUNTPOINT} iw wireless_tools wpa_actiond wpa_supplicant dialog
+  fi
+  WIRED_DEV=`ip link | grep "eno\|enp" | awk '{print $2}'| sed 's/://' | sed '1!d'`
+  if [[-n $WIRED_DEV ]]; then
+    arch_chroot "systemctl enable dhcpcd@${WIRED_DEV}"
+  fi
+  if is_package_installed "espeakup"; then
+    pacstrap ${MOUNTPOINT} alsa-utils espeakup brltty
+    arch_chroot "systemctl enable espeakup"
   fi
 }
 #}}}
@@ -339,7 +472,6 @@ install_base_system(){
 configure_keymap(){
   #ADD KEYMAP TO THE NEW SETUP
   echo "KEYMAP=$KEYMAP" > ${MOUNTPOINT}/etc/vconsole.conf
-  arch_chroot "setxkbmap -layout $KEYMAP"
 }
 #}}}
 #CONFIGURE FSTAB {{{
@@ -365,10 +497,10 @@ configure_fstab(){
       2) if [[ $UEFI -eq 1 ]]; then
           genfstab -t PARTUUID -p ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab
          else
-          genfstab -U ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab
+          genfstab -U -p ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab
          fi
          ;;
-      3) genfstab -L ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab ;;
+      3) genfstab -L -p ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab ;;
       *) invalid_option ;;
     esac
     [[ -n $OPT ]] && break
@@ -442,6 +574,8 @@ configure_locale(){
 configure_mkinitcpio(){
   print_title "MKINITCPIO - https://wiki.archlinux.org/index.php/Mkinitcpio"
   print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
+  [[ $LUKS -eq 1 ]] && sed -i '/^HOOK/s/block/block keymap encrypt/' ${MOUNTPOINT}/etc/mkinitcpio.conf
+  [[ $LVM -eq 1 ]] && sed -i '/^HOOK/s/filesystems/lvm2 filesystems/' ${MOUNTPOINT}/etc/mkinitcpio.conf
   arch_chroot "mkinitcpio -p linux"
 }
 #}}}
@@ -449,7 +583,8 @@ configure_mkinitcpio(){
 install_bootloader(){
   print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
   print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
-  print_warning "\tROOT Partition: ${ROOT_DISK}"
+  print_warning "\tROOT Partition: ${ROOT_MOUNTPOINT}"
+  print_warning "\tWARNING: There is no support for GRUB + LUKS/LVM."
   if [[ $UEFI -eq 1 ]]; then
     print_warning "\tUEFI Mode Detected"
     bootloaders_list=("Grub2" "Syslinux" "Gummiboot" "Skip")
@@ -480,8 +615,8 @@ install_bootloader(){
         invalid_option
         ;;
     esac
-    [[ $UEFI -eq 1 ]] && pacstrap ${MOUNTPOINT} efibootmgr
   done
+  [[ $UEFI -eq 1 ]] && pacstrap ${MOUNTPOINT} efibootmgr dosfstools
 }
 #}}}
 #CONFIGURE BOOTLOADER {{{
@@ -497,9 +632,9 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             if [[ $UEFI -eq 1 ]]; then
-              arch_chroot "grub-install --target=x86_64-efi --efi-directory=${EFI_DISK} --bootloader-id=arch_grub --recheck"
+              arch_chroot "grub-install --target=x86_64-efi --efi-directory=${EFI_MOUNTPOINT} --bootloader-id=arch_grub --recheck"
             else
-              arch_chroot "grub-install --target=i386-pc --recheck --debug ${BOOT_DISK}"
+              arch_chroot "grub-install --target=i386-pc --recheck --debug ${BOOT_MOUNTPOINT}"
             fi
             break
             ;;
@@ -524,7 +659,13 @@ configure_bootloader(){
         case "$REPLY" in
           1)
             arch_chroot "syslinux-install_update -iam"
-            sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            if [[ $LUKS -eq 1 ]]; then
+              sed -i "s/APPEND root=.*/APPEND root=\/dev\/mapper\/${ROOT_PART} cryptdevice=\/dev\/${LUKS_DISK}:crypt ro/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            elif [[ $LVM -eq 1 ]]; then
+              sed -i "s/sda[0-9]/\/dev\/mapper\/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            else
+              sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            fi
             print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
             pause_function
             $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
@@ -532,7 +673,13 @@ configure_bootloader(){
             ;;
           2)
             arch_chroot "syslinux-install_update -i"
-            sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            if [[ $LUKS -eq 1 ]]; then
+              sed -i "s/APPEND root=.*/APPEND root=\/dev\/mapper\/${ROOT_PART} cryptdevice=\/dev\/${LUKS_DISK}:crypt ro/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            elif [[ $LVM -eq 1 ]]; then
+              sed -i "s/sda[0-9]/\/dev\/mapper\/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            else
+              sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
+            fi
             print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
             pause_function
             $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
@@ -561,10 +708,16 @@ configure_bootloader(){
       select OPT in "${gummiboot_install_mode[@]}"; do
         case "$REPLY" in
           1)
-            arch_chroot "gummiboot install"
+            arch_chroot "gummiboot --path=${EFI_MOUNTPOINT} install"
             print_warning "Please check your .conf file"
-            partuuid=`blkid -s PARTUUID ${ROOT_DISK} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
-            echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=PARTUUID=${partuuid} rw" > ${MOUNTPOINT}/boot/loader/entries/arch.conf
+            partuuid=`blkid -s PARTUUID ${ROOT_MOUNTPOINT} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
+            if [[ $LUKS -eq 1 ]]; then
+              echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\tcryptdevice=\/dev\/${LUKS_DISK}:luks root=\/dev\/mapper\/${ROOT_PART} rw" > ${MOUNTPOINT}/boot/loader/entries/arch.conf
+            elif [[ $LVM -eq 1 ]]; then
+              echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=\/dev\/mapper\/${ROOT_PART} rw" > ${MOUNTPOINT}/boot/loader/entries/arch.conf
+            else
+              echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=PARTUUID=${partuuid} rw" > ${MOUNTPOINT}/boot/loader/entries/arch.conf
+            fi
             echo -e "default  arch\ntimeout  5" > ${MOUNTPOINT}/boot/loader/loader.conf
             pause_function
             $EDITOR ${MOUNTPOINT}/boot/loader/entries/arch.conf
@@ -613,6 +766,7 @@ print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arc
 pause_function
 check_boot_system
 check_connection
+check_trim
 pacman -Sy
 while true
 do
@@ -620,17 +774,16 @@ do
   echo " 1) $(mainmenu_item "${checklist[1]}" "Select Keymap")"
   echo " 2) $(mainmenu_item "${checklist[2]}" "Select Editor")"
   echo " 3) $(mainmenu_item "${checklist[3]}" "Configure Mirrorlist")"
-  echo " 4) $(mainmenu_item "${checklist[4]}" "Create Partition")"
-  echo " 5) $(mainmenu_item "${checklist[5]}" "Select|Format Partiton")"
-  echo " 6) $(mainmenu_item "${checklist[6]}" "Install Base System")"
-  echo " 7) $(mainmenu_item "${checklist[7]}" "Configure Fstab")"
-  echo " 8) $(mainmenu_item "${checklist[8]}" "Configure Hostname")"
-  echo " 9) $(mainmenu_item "${checklist[9]}" "Configure Timezone")"
-  echo "10) $(mainmenu_item "${checklist[10]}" "Configure Hardware Clock")"
-  echo "11) $(mainmenu_item "${checklist[11]}" "Configure Locale")"
-  echo "12) $(mainmenu_item "${checklist[12]}" "Configure Mkinitcpio")"
-  echo "13) $(mainmenu_item "${checklist[13]}" "Install Bootloader")"
-  echo "14) $(mainmenu_item "${checklist[14]}" "Root Password")"
+  echo " 4) $(mainmenu_item "${checklist[4]}" "Partition Scheme")"
+  echo " 5) $(mainmenu_item "${checklist[5]}" "Install Base System")"
+  echo " 6) $(mainmenu_item "${checklist[6]}" "Configure Fstab")"
+  echo " 7) $(mainmenu_item "${checklist[7]}" "Configure Hostname")"
+  echo " 8) $(mainmenu_item "${checklist[8]}" "Configure Timezone")"
+  echo " 9) $(mainmenu_item "${checklist[9]}" "Configure Hardware Clock")"
+  echo "10) $(mainmenu_item "${checklist[10]}" "Configure Locale")"
+  echo "11) $(mainmenu_item "${checklist[11]}" "Configure Mkinitcpio")"
+  echo "12) $(mainmenu_item "${checklist[12]}" "Install Bootloader")"
+  echo "13) $(mainmenu_item "${checklist[13]}" "Root Password")"
   echo ""
   echo " d) Done"
   echo ""
@@ -651,51 +804,47 @@ do
         ;;
       4)
         umount_partitions
-        create_partition
+        create_partition_scheme
+        format_partitions
         checklist[4]=1
         ;;
       5)
-        [[ checklist[4] -eq 0 ]] && umount_partitions
-        format_partitions
+        install_base_system
+        configure_keymap
         checklist[5]=1
         ;;
       6)
-        install_base_system
-        configure_keymap
+        configure_fstab
         checklist[6]=1
         ;;
       7)
-        configure_fstab
+        configure_hostname
         checklist[7]=1
         ;;
       8)
-        configure_hostname
+        configure_timezone
         checklist[8]=1
         ;;
       9)
-        configure_timezone
+        configure_hardwareclock
         checklist[9]=1
         ;;
       10)
-        configure_hardwareclock
+        configure_locale
         checklist[10]=1
         ;;
       11)
-        configure_locale
+        configure_mkinitcpio
         checklist[11]=1
         ;;
       12)
-        configure_mkinitcpio
+        install_bootloader
+        configure_bootloader
         checklist[12]=1
         ;;
       13)
-        install_bootloader
-        configure_bootloader
-        checklist[13]=1
-        ;;
-      14)
         root_password
-        checklist[14]=1
+        checklist[13]=1
         ;;
       "d")
         finish
@@ -707,3 +856,4 @@ do
   done
 done
 #}}}
+
