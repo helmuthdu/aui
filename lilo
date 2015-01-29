@@ -872,7 +872,7 @@ install_desktop_environment(){
     while true
     do
       print_title "GNOME ICONS"
-      echo " 1) $(menu_item "moka-icons-git")"
+      echo " 1) $(menu_item "moka-icon-theme-git")"
       echo " 2) $(menu_item "nitrux-icon-theme")"
       echo " 3) $(menu_item "numix-icon-theme-git")"
       echo ""
@@ -883,7 +883,7 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            aur_package_install "moka-icons-git"
+            aur_package_install "moka-icon-theme-git"
             ;;
           2)
             aur_package_install "nitrux-icon-theme"
@@ -996,7 +996,7 @@ install_desktop_environment(){
     while true
     do
       print_title "$1 THEMES"
-      echo " 1) $(menu_item "moka-icons-git nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
+      echo " 1) $(menu_item "moka-icon-theme-git nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
       echo " 2) $(menu_item "xfce-theme-greybird-git numix-themes vertex-themes zuki-themes-git" "GTK Themes") $AUR"
       echo ""
       echo " d) DONE"
@@ -1113,8 +1113,8 @@ install_desktop_environment(){
   echo " 2) Deepin          12) Fluxbox"
   echo " 3) Enlightenment   13) i3"
   echo " 4) GNOME           14) OpenBox"
-  echo " 5) KDE4            15) Xmonad"
-  echo " 6) KDE5"
+  echo " 5) KDE Plasma 4    15) Xmonad"
+  echo " 6) KDE Plasma 5"
   echo " 7) LXDE"
   echo " 8) LXQT"
   echo " 9) Mate"
@@ -2185,7 +2185,7 @@ install_internet_apps(){
                   package_install "chromium"
                   ;;
                 3)
-                  package_install "firefox firefox-i18n-$LOCALE_FF firefox-adblock-plus flashplugin "
+                  package_install "firefox firefox-i18n-$LOCALE_FF firefox-adblock-plus flashplugin"
                   # speedup firefox load
                   package_install "upx"
                   upx --best /usr/lib/firefox/firefox
