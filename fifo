@@ -199,7 +199,7 @@ setup_luks(){
   select OPT in "${block_list[@]}"; do
     if contains_element "$OPT" "${block_list[@]}"; then
       cryptsetup --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random --verify-passphrase luksFormat $OPT
-      cryptsetup open --type luks $OPT crypt
+      cryptsetup open --type luks $([[ $TRIM -eq 1 ]] && echo "--allow-discards") $OPT crypt
       LUKS=1
       LUKS_DISK=`echo ${OPT} | sed 's/\/dev\///'`
       break
@@ -307,7 +307,9 @@ format_partitions(){
       [[ -z $3 ]] && select_filesystem || filesystem=$3
       mkfs.${filesystem} $1 \
         $([[ ${filesystem} == xfs || ${filesystem} == btrfs ]] && echo "-f") \
-        $([[ ${filesystem} == vfat ]] && echo "-F32")
+        $([[ ${filesystem} == vfat ]] && echo "-F32") \
+        $([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard") \
+        $([[ $TRIM -eq 1 && ${filesystem} == btrfs ]] && echo "-O discard")
       fsck $1
       mkdir -p $2
       mount -t ${filesystem} $1 $2
@@ -449,13 +451,14 @@ install_base_system(){
   print_title "INSTALL BASE SYSTEM"
   print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
   pacstrap ${MOUNTPOINT} base base-devel parted btrfs-progs ntp
+  [[ $? -ne 0 ]] && error_msg "Installing base system to ${MOUNTPOINT} failed. Check error messages above."
   local PTABLE=`parted -l | grep "gpt"`
   [[ -n $PTABLE ]] && pacstrap ${MOUNTPOINT} gptfdisk
-  local WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://' | sed '1!d'`
+  WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://' | sed '1!d'`
   if [[ -n $WIRELESS_DEV ]]; then
     pacstrap ${MOUNTPOINT} iw wireless_tools wpa_actiond wpa_supplicant dialog
   fi
-  local WIRED_DEV=`ip link | grep enp | awk '{print $2}'| sed 's/://' | sed '1!d'`
+  WIRED_DEV=`ip link | grep "eno\|enp" | awk '{print $2}'| sed 's/://' | sed '1!d'`
   if [[-n $WIRED_DEV ]]; then
     arch_chroot "systemctl enable dhcpcd@${WIRED_DEV}"
   fi
@@ -763,6 +766,7 @@ print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arc
 pause_function
 check_boot_system
 check_connection
+check_trim
 pacman -Sy
 while true
 do

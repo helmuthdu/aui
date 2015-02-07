@@ -679,8 +679,6 @@ install_video_cards(){
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
     pacman -S --needed xf86-video-intel bumblebee nvidia
-    package_install "pangox-compat" #fix nvidia-settings
-    package_install "libva-vdpau-driver"
     [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
@@ -692,8 +690,6 @@ install_video_cards(){
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
     pacman -S --needed nvidia{,-utils}
-    package_install "pangox-compat" #fix nvidia-settings
-    package_install "libva-vdpau-driver"
     [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
@@ -876,7 +872,7 @@ install_desktop_environment(){
     while true
     do
       print_title "GNOME ICONS"
-      echo " 1) $(menu_item "moka-icons-git")"
+      echo " 1) $(menu_item "moka-icon-theme-git")"
       echo " 2) $(menu_item "nitrux-icon-theme")"
       echo " 3) $(menu_item "numix-icon-theme-git")"
       echo ""
@@ -887,7 +883,7 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            aur_package_install "moka-icons-git"
+            aur_package_install "moka-icon-theme-git"
             ;;
           2)
             aur_package_install "nitrux-icon-theme"
@@ -1000,7 +996,7 @@ install_desktop_environment(){
     while true
     do
       print_title "$1 THEMES"
-      echo " 1) $(menu_item "moka-icons-git nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
+      echo " 1) $(menu_item "moka-icon-theme-git nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
       echo " 2) $(menu_item "xfce-theme-greybird-git numix-themes vertex-themes zuki-themes-git" "GTK Themes") $AUR"
       echo ""
       echo " d) DONE"
@@ -1038,15 +1034,14 @@ install_desktop_environment(){
       echo " 4) $(menu_item "gmrun")"
       echo " 5) $(menu_item "pcmanfm" "PCManFM")"
       echo " 6) $(menu_item "rxvt-unicode")"
-      echo " 7) $(menu_item "scrot")"
-      echo " 8) $(menu_item "squeeze-git") $AUR"
-      echo " 9) $(menu_item "thunar")"
-      echo "10) $(menu_item "tint2")"
-      echo "11) $(menu_item "volwheel")"
-      echo "12) $(menu_item "xfburn")"
-      echo "13) $(menu_item "xcompmgr")"
-      echo "14) $(menu_item "zathura")"
-      echo "15) $(menu_item "speedtest-cli") $AUR"
+      echo " 7) $(menu_item "squeeze-git") $AUR"
+      echo " 8) $(menu_item "thunar")"
+      echo " 9) $(menu_item "tint2")"
+      echo "10) $(menu_item "volwheel")"
+      echo "11) $(menu_item "xfburn")"
+      echo "12) $(menu_item "xcompmgr")"
+      echo "13) $(menu_item "zathura")"
+      echo "14) $(menu_item "speedtest-cli") $AUR"
       echo ""
       echo " d) DONE"
       echo ""
@@ -1074,30 +1069,27 @@ install_desktop_environment(){
             package_install "rxvt-unicode"
             ;;
           7)
-            package_install "scrot"
-            ;;
-          8)
             aur_package_install "squeeze-git"
             ;;
-          9)
+          8)
             package_install "thunar tumbler"
             ;;
-          10)
+          9)
             package_install "tint2"
             ;;
-          11)
+          10)
             package_install "volwheel"
             ;;
-          12)
+          11)
             package_install "xfburn"
             ;;
-          13)
+          12)
             package_install "xcompmgr transset-df"
             ;;
-          14)
+          13)
             package_install "zathura"
             ;;
-          15)
+          14)
             aur_package_install "speedtest-cli"
             ;;
           "d")
@@ -1121,16 +1113,16 @@ install_desktop_environment(){
   echo " 2) Deepin          12) Fluxbox"
   echo " 3) Enlightenment   13) i3"
   echo " 4) GNOME           14) OpenBox"
-  echo " 5) KDE4            15) Xmonad"
-  echo " 6) KDE5"
+  echo " 5) KDE Plasma 4    15) Xmonad"
+  echo " 6) KDE Plasma 5"
   echo " 7) LXDE"
   echo " 8) LXQT"
   echo " 9) Mate"
   echo "10) XFCE"
   echo ""
   echo " b) BACK"
-  read_input $DESKTOPENV
-  case "$OPTION" in
+  read_input "$DESKTOPENV"
+  case $OPTION in
     1)
       #CINNAMON {{{
       print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
@@ -2193,7 +2185,7 @@ install_internet_apps(){
                   package_install "chromium"
                   ;;
                 3)
-                  package_install "firefox firefox-i18n-$LOCALE_FF firefox-adblock-plus flashplugin "
+                  package_install "firefox firefox-i18n-$LOCALE_FF firefox-adblock-plus flashplugin"
                   # speedup firefox load
                   package_install "upx"
                   upx --best /usr/lib/firefox/firefox
@@ -2680,13 +2672,13 @@ install_video_apps(){
                   package_install "livestreamer"
                   ;;
                 4)
-                  package_install "mpv"
-                  ;;
-                5)
                   package_install "minitube"
                   ;;
-                6)
+                5)
                   aur_package_install "miro"
+                  ;;
+                6)
+                  package_install "mpv"
                   ;;
                 7)
                   package_install "parole"
