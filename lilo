@@ -478,7 +478,6 @@ install_ssh(){
   read_input_text "Install ssh" $SSH
   if [[ $OPTION == y ]]; then
     package_install "openssh"
-    aur_package_install "rssh"
     system_ctl enable sshd
     [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
     #CONFIGURE SSHD_CONF #{{{
@@ -906,10 +905,8 @@ install_desktop_environment(){
     while true
     do
       print_title "GTK2/GTK3 THEMES"
-      echo " 1) $(menu_item "xfce-theme-greybird-git" "Greybird")"
-      echo " 2) $(menu_item "numix-themes" "Numix")"
-      echo " 3) $(menu_item "vertex-themes" "Vertex")"
-      echo " 4) $(menu_item "zuki-themes-git" "Zukitwo")"
+      echo " 1) $(menu_item "numix-themes" "Numix")"
+      echo " 2) $(menu_item "zuki-themes-git" "Zukitwo")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -918,15 +915,9 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            aur_package_install "xfce-theme-greybird-git"
-            ;;
-          2)
             aur_package_install "numix-themes"
             ;;
-          3)
-            aur_package_install "vertex-themes"
-            ;;
-          4)
+          2)
             aur_package_install "zuki-themes-git"
             ;;
           "b")
@@ -997,7 +988,7 @@ install_desktop_environment(){
     do
       print_title "$1 THEMES"
       echo " 1) $(menu_item "moka-icons-git nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
-      echo " 2) $(menu_item "xfce-theme-greybird-git numix-themes vertex-themes zuki-themes-git" "GTK Themes") $AUR"
+      echo " 2) $(menu_item "numix-themes zuki-themes-git" "GTK Themes") $AUR"
       echo ""
       echo " d) DONE"
       echo ""
@@ -1862,7 +1853,7 @@ install_development_apps(){
           ;;
         18)
           package_remove "jdk"
-          package_install "jdk7-openjdk icedtea-web-java7"
+          package_install "jdk7-openjdk icedtea-web"
           ;;
         19)
           package_remove "jre7-openjdk"
