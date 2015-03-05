@@ -1,4 +1,4 @@
-### This project is looking for a new maintainer
+### Project no longer maintained
 
 # Archlinux U Install
 
