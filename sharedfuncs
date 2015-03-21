@@ -366,6 +366,7 @@
     local _check_repo=`grep -F "${_repo}" /etc/pacman.conf`
     if [[ -z $_check_repo ]]; then
       echo -e "\n[${_repo}]${_siglevel}\nServer = ${_url}" >> /etc/pacman.conf
+      ${EDITOR} /etc/pacman.conf
       system_update
     fi
   } #}}}

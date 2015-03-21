@@ -441,7 +441,7 @@ install_basic_setup(){
   package_install "bc rsync mlocate bash-completion pkgstats"
   print_title "NTPd - https://wiki.archlinux.org/index.php/NTPd"
   package_install "ntp"
-  is_package_installed "ntp" && timedatectl set-ntp true
+  is_package_installed "ntp" && ntpd -u ntp:ntp
   pause_function
   print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
   package_install "zip unzip unrar p7zip"
@@ -450,7 +450,6 @@ install_basic_setup(){
   print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers services and hosts running on a local network with no specific configuration."
   package_install "avahi nss-mdns"
   is_package_installed "avahi" && system_ctl enable avahi-daemon
-  is_package_installed "avahi" && system_ctl enable avahi-dnsconfd
   pause_function
   print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
   print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
@@ -461,12 +460,10 @@ install_basic_setup(){
   print_info "PulseAudio is the default sound server that serves as a proxy to sound applications using existing kernel sound components like ALSA or OSS"
   package_install "pulseaudio pulseaudio-alsa"
   [[ ${ARCHI} == x86_64 ]] && package_install "lib32-libpulse"
-  # automatically switch to newly-connected devices
-  add_line "load-module module-switch-on-connect" "/etc/pulse/default.pa"
   pause_function
   print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/File_Systems"
   print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
-  package_install "ntfs-3g dosfstools exfat-utils fuse fuse-exfat"
+  package_install "ntfs-3g dosfstools exfat-utils fuse fuse-exfat autofs"
   is_package_installed "fuse" && add_module "fuse"
   pause_function
 }
@@ -523,8 +520,9 @@ install_nfs(){
   read_input_text "Install nfs" $NFS
   if [[ $OPTION == y ]]; then
     package_install "nfs-utils"
-    system_ctl enable rpc-idmapd
-    system_ctl enable rpc-mountd
+    system_ctl enable rpcbind.service
+    system_ctl enable nfs-client.target
+    system_ctl enable remote-fs.target
     pause_function
   fi
 }
@@ -594,9 +592,12 @@ install_tlp(){
   print_info "TLP is an advanced power management tool for Linux. It is a pure command line tool with automated background tasks and does not contain a GUI."
   read_input_text "Install TLP" $TLP
   if [[ $OPTION == y ]]; then
-    aur_package_install "tlp"
-    tlp start
+    package_install "tlp"
+    system_ctl enable tlp.service
+    system_ctl enable tlp-sleep.service
+    system_ctl mask systemd-rfkill
     system_ctl enable tlp
+    tlp start
     pause_function
   fi
 }
@@ -713,9 +714,10 @@ install_video_cards(){
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
     [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
+    add_key "653C3094"
+    add_repository "xorg116" "http://catalyst.wirephire.com/repo/xorg116/\$arch" "Never"
     package_install "linux-headers acpid"
-    # Add repository
-    aur_package_install "catalyst-test"
+    aur_package_install "catalyst-total"
     aticonfig --initial
     system_ctl enable atieventsd
     system_ctl start atieventsd
@@ -727,7 +729,6 @@ install_video_cards(){
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
     is_package_installed "catalyst-total" && pacman -Rdds --noconfirm catalyst-total
-    is_package_installed "catalyst-test" && pacman -Rdds --noconfirm catalyst-test
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
     [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/catalyst.conf
     [[ -f /etc/X11/xorg.conf ]] && rm /etc/X11/xorg.conf
@@ -918,12 +919,6 @@ install_desktop_environment(){
             aur_package_install "numix-themes"
             ;;
           2)
-            aur_package_install "numix-themes"
-            ;;
-          3)
-            aur_package_install "vertex-themes"
-            ;;
-          4)
             aur_package_install "zuki-themes-git"
             ;;
           "b")
@@ -945,8 +940,7 @@ install_desktop_environment(){
       echo " 1) $(menu_item "entrance-git" "Entrance") $AUR"
       echo " 2) $(menu_item "gdm" "GDM")"
       echo " 3) $(menu_item "lightdm" "LightDM")"
-      echo " 4) $(menu_item "lxdm" "LXDM")"
-      echo " 5) $(menu_item "slim")"
+      echo " 4) $(menu_item "ssdm" "SSDM")"
       echo ""
       echo " b) BACK|SKIP"
       echo ""
@@ -971,12 +965,8 @@ install_desktop_environment(){
             system_ctl enable lightdm
             ;;
           4)
-            package_install "lxdm"
-            system_ctl enable lxdm
-            ;;
-          5)
-            package_install "slim"
-            system_ctl enable slim
+            package_install "ssdm"
+            system_ctl enable ssdm
             ;;
           "b")
             break
@@ -1025,20 +1015,19 @@ install_desktop_environment(){
     while true
     do
       print_title "$1 ESSENTIAL APPS"
-      echo " 1) $(menu_item "entrance-git gdm lightdm lxdm slim" "Display Manager") $AUR"
+      echo " 1) $(menu_item "entrance-git gdm lightdm ssdm" "Display Manager") $AUR"
       echo " 2) $(menu_item "dmenu")"
       echo " 3) $(menu_item "viewnior")"
       echo " 4) $(menu_item "gmrun")"
-      echo " 5) $(menu_item "pcmanfm" "PCManFM")"
-      echo " 6) $(menu_item "rxvt-unicode")"
-      echo " 7) $(menu_item "squeeze-git") $AUR"
-      echo " 8) $(menu_item "thunar")"
-      echo " 9) $(menu_item "tint2")"
-      echo "10) $(menu_item "volwheel")"
-      echo "11) $(menu_item "xfburn")"
-      echo "12) $(menu_item "xcompmgr")"
-      echo "13) $(menu_item "zathura")"
-      echo "14) $(menu_item "speedtest-cli") $AUR"
+      echo " 5) $(menu_item "rxvt-unicode")"
+      echo " 6) $(menu_item "squeeze-git") $AUR"
+      echo " 7) $(menu_item "thunar")"
+      echo " 8) $(menu_item "tint2")"
+      echo " 9) $(menu_item "volwheel")"
+      echo "10) $(menu_item "xfburn")"
+      echo "11) $(menu_item "xcompmgr")"
+      echo "12) $(menu_item "zathura")"
+      echo "13) $(menu_item "speedtest-cli") $AUR"
       echo ""
       echo " d) DONE"
       echo ""
@@ -1060,33 +1049,30 @@ install_desktop_environment(){
             package_install "gmrun"
             ;;
           5)
-            package_install "pcmanfm gvfs"
-            ;;
-          6)
             package_install "rxvt-unicode"
             ;;
-          7)
+          6)
             aur_package_install "squeeze-git"
             ;;
-          8)
+          7)
             package_install "thunar tumbler"
             ;;
-          9)
+          8)
             package_install "tint2"
             ;;
-          10)
+          9)
             package_install "volwheel"
             ;;
-          11)
+          10)
             package_install "xfburn"
             ;;
-          12)
+          11)
             package_install "xcompmgr transset-df"
             ;;
-          13)
+          12)
             package_install "zathura"
             ;;
-          14)
+          13)
             aur_package_install "speedtest-cli"
             ;;
           "d")
@@ -1106,16 +1092,15 @@ install_desktop_environment(){
 
   echo -e "Select your DE or WM:\n"
   echo " --- DE ---         --- WM ---"
-  echo " 1) Cinnamon        11) Awesome"
-  echo " 2) Deepin          12) Fluxbox"
-  echo " 3) Enlightenment   13) i3"
-  echo " 4) GNOME           14) OpenBox"
-  echo " 5) KDE4            15) Xmonad"
+  echo " 1) Cinnamon        10) Awesome"
+  echo " 2) Deepin          11) Fluxbox"
+  echo " 3) Enlightenment   12) i3"
+  echo " 4) GNOME           13) OpenBox"
+  echo " 5) KDE4            14) Xmonad"
   echo " 6) KDE5"
-  echo " 7) LXDE"
-  echo " 8) LXQT"
-  echo " 9) Mate"
-  echo "10) XFCE"
+  echo " 7) LXQT"
+  echo " 8) Mate"
+  echo " 9) XFCE"
   echo ""
   echo " b) BACK"
   read_input $DESKTOPENV
@@ -1131,8 +1116,6 @@ install_desktop_environment(){
       pause_function
       install_display_manager
       install_themes "CINNAMON"
-      #D-Bus interface for user account query and manipulation
-      system_ctl enable accounts-daemon
       ;;
       #}}}
     2)
@@ -1147,15 +1130,13 @@ install_desktop_environment(){
       pause_function
       #Gnome Display Manager (a reimplementation of xdm)
       system_ctl enable lightdm
-      #D-Bus interface for user account query and manipulation
-      system_ctl enable accounts-daemon
       ;;
       #}}}
     3)
       #ENLIGHTENMENT {{{
       print_title "ENLIGHTENMENT - http://wiki.archlinux.org/index.php/Enlightenment"
       print_info "Enlightenment, also known simply as E, is a stacking window manager for the X Window System which can be used alone or in conjunction with a desktop environment such as GNOME or KDE. Enlightenment is often used as a substitute for a full desktop environment."
-      package_install "enlightenment"
+      package_install "enlightenment terminology"
       package_install "leafpad epdfview"
       package_install "lxappearance"
       # config xinitrc
@@ -1180,10 +1161,6 @@ install_desktop_environment(){
       install_themes "GNOME"
       #Gnome Display Manager (a reimplementation of xdm)
       system_ctl enable gdm
-      #D-Bus interface for user account query and manipulation
-      system_ctl enable accounts-daemon
-      #Improvements
-      add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
       ;;
       #}}}
     5)
@@ -1205,26 +1182,26 @@ install_desktop_environment(){
           ;;
       esac
       aur_package_install "kde-gtk-config"
-      aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve-gtk2 qtcurve-kde4"
+      aur_package_install "oxygen-gtk2 oxygen-gtk3 qtcurve"
       is_package_installed "cups" && package_install "kdeutils-print-manager"
       # config xinitrc
       config_xinitrc "startkde"
       pause_function
       #QTCURVE THEMES #{{{
-      curl -o Sweet.tar.gz http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
-      curl -o Kawai.tar.gz http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
-      tar zxvf Sweet.tar.gz
-      tar zxvf Kawai.tar.gz
-      rm Sweet.tar.gz
-      rm Kawai.tar.gz
-      mkdir -p /home/${username}/.kde4/share/apps/color-schemes
-      mv Sweet/*.colors /home/${username}/.kde4/share/apps/color-schemes
-      mv Kawai/*.colors /home/${username}/.kde4/share/apps/color-schemes
-      mkdir -p /home/${username}/.kde4/share/apps/QtCurve
-      mv Sweet/Sweet.qtcurve /home/${username}/.kde4/share/apps/QtCurve
-      mv Kawai/Kawai.qtcurve /home/${username}/.kde4/share/apps/QtCurve
-      chown -R ${username}:users /home/${username}/.kde4
-      rm -fr Kawai Sweet
+        curl -o Sweet.tar.gz http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
+        curl -o Kawai.tar.gz http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
+        tar zxvf Sweet.tar.gz
+        tar zxvf Kawai.tar.gz
+        rm Sweet.tar.gz
+        rm Kawai.tar.gz
+        mkdir -p /home/${username}/.kde4/share/apps/color-schemes
+        mv Sweet/*.colors /home/${username}/.kde4/share/apps/color-schemes
+        mv Kawai/*.colors /home/${username}/.kde4/share/apps/color-schemes
+        mkdir -p /home/${username}/.kde4/share/apps/QtCurve
+        mv Sweet/Sweet.qtcurve /home/${username}/.kde4/share/apps/QtCurve
+        mv Kawai/Kawai.qtcurve /home/${username}/.kde4/share/apps/QtCurve
+        chown -R ${username}:users /home/${username}/.kde4
+        rm -fr Kawai Sweet
       #}}}
       #KDE CUSTOMIZATION {{{
       while true
@@ -1274,10 +1251,6 @@ install_desktop_environment(){
       done
       #}}}
       system_ctl enable kdm
-      # tweaks
-      add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
-      # speed up application startup
-      mkdir -p ~/.compose-cache
       KDE=1
       ;;
       #}}}
@@ -1285,42 +1258,20 @@ install_desktop_environment(){
       #KDE5 {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
-      package_install "kf5 kf5-aids plasma-next sddm"
+      package_install "kf5 kf5-aids plasma sddm"
       # config xinitrc
       config_xinitrc "startkde"
       pause_function
       system_ctl enable sddm
-      # tweaks
-      add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
-      # speed up application startup
-      mkdir -p ~/.compose-cache
       KDE=1
       ;;
       #}}}
     7)
-      #LXDE {{{
-      print_title "LXDE - http://wiki.archlinux.org/index.php/lxde"
-      print_info "LXDE is a free and open source desktop environment for Unix and other POSIX compliant platforms, such as Linux or BSD. The goal of the project is to provide a desktop environment that is fast and energy efficient."
-      package_install "lxde"
-      package_install "leafpad obconf epdfview"
-      mkdir -p /home/${username}/.config/openbox/
-      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${username}/.config/openbox/
-      chown -R ${username}:users /home/${username}/.config
-      # config xinitrc
-      config_xinitrc "startlxde"
-      pause_function
-      install_misc_apps "LXDE"
-      install_themes "LXDE"
-      ;;
-      #}}}
-    8)
       #LXQT {{{
       print_title "LXQT - http://wiki.archlinux.org/index.php/lxqt"
       print_info "LXQt is the Qt port and the upcoming version of LXDE, the Lightweight Desktop Environment. It is the product of the merge between the LXDE-Qt and the Razor-qt projects: A lightweight, modular, blazing-fast and user-friendly desktop environment."
-      add_key "26EBCC57"
-      add_repository "lxqt-git" "http://repo.stobbstechnical.com/\$arch" "Never"
-      package_install "lxqt-desktop-git pcmanfm-qt-git openbox lximage-qt-git qterminal-git oxygen-icons qtcurve"
-      package_install "leafpad obconf epdfview"
+      package_install "lxqt openbox oxygen-icons qtcurve"
+      package_install "leafpad epdfview"
       mkdir -p /home/${username}/.config/lxqt
       cp /etc/xdg/lxqt/* /home/${username}/.config/lxqt
       mkdir -p /home/${username}/.config/openbox/
@@ -1334,7 +1285,7 @@ install_desktop_environment(){
       KDE=1
       ;;
       #}}}
-    9)
+    8)
       #MATE {{{
       print_title "MATE - https://wiki.archlinux.org/index.php/Mate"
       print_info "The MATE Desktop Environment is a fork of GNOME 2 that aims to provide an attractive and intuitive desktop to Linux users using traditional metaphors."
@@ -1344,11 +1295,9 @@ install_desktop_environment(){
       pause_function
       install_display_manager
       install_themes "MATE"
-      #D-Bus interface for user account query and manipulation
-      system_ctl enable accounts-daemon
       ;;
       #}}}
-    10)
+    9)
       #XFCE {{{
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
@@ -1360,7 +1309,7 @@ install_desktop_environment(){
       install_themes "XFCE"
       ;;
       #}}}
-    11)
+    10)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
       print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
@@ -1379,7 +1328,7 @@ install_desktop_environment(){
       install_themes "AWESOME"
       ;;
       #}}}
-    12)
+    11)
       #FLUXBOX {{{
       print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
       print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
@@ -1393,7 +1342,7 @@ install_desktop_environment(){
       pause_function
       ;;
       #}}}
-    13)
+    12)
       #I3 {{{
       print_title "i3 - https://wiki.archlinux.org/index.php/I3"
       print_info "i3 is a dynamic tiling window manager inspired by wmii that is primarily targeted at developers and advanced users. The stated goals for i3 include clear documentation, proper multi-monitor support, a tree structure for windows, and different modes like in vim."
@@ -1406,7 +1355,7 @@ install_desktop_environment(){
       install_themes "i3"
       ;;
       #}}}
-    14)
+    13)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -1423,7 +1372,7 @@ install_desktop_environment(){
       install_themes "OPENBOX"
       ;;
       #}}}
-    15)
+    14)
       #XMONAD {{{
       print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
       print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
@@ -1443,21 +1392,29 @@ install_desktop_environment(){
       install_desktop_environment
       ;;
   esac
-  #MTP SUPPORT {{{
-  if is_package_installed "libmtp" ; then
-    [[ ${KDE} -eq 1 ]] && package_install "kio-mtp" || package_install "gvfs-mtp"
-  fi
-  #}}}
   #COMMON PKGS {{{
+    #MTP SUPPORT {{{
+    if is_package_installed "libmtp" ; then
+      [[ ${KDE} -eq 1 ]] && package_install "kio-mtp" || package_install "gvfs-mtp"
+    fi
+    #}}}
     if [[ ${KDE} -eq 0 ]]; then
       package_install "gvfs gvfs-afc"
       package_install "xdg-user-dirs"
       package_install "ttf-bitstream-vera ttf-dejavu"
+      is_package_installed "samba" && package_install "gvfs-smb"
     fi
-    is_package_installed "samba" && package_install "gvfs-smb"
     #Fix p7FM
     package_install "wxgtk2.8"
     aur_package_install "gnome-defaults-list"
+  #}}}
+  #COMMON CONFIG {{{
+    # speed up application startup
+    mkdir -p ~/.compose-cache
+    #D-Bus interface for user account query and manipulation
+    system_ctl enable accounts-daemon
+    #Improvements
+    add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
   #}}}
 }
 #}}}
@@ -1476,7 +1433,7 @@ install_nm_wicd(){
       print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
       print_info "NetworkManager is a program for providing detection and configuration for systems to automatically connect to network. NetworkManager's functionality can be useful for both wireless and wired networks."
       if [[ ${KDE} -eq 1 ]]; then
-        is_package_installed "plasma-next" && aur_package_install "plasma-nm" || package_install "networkmanager dnsmasq kdeplasma-applets-plasma-nm"
+        is_package_installed "plasma" && aur_package_install "plasma-nm" || package_install "networkmanager dnsmasq kdeplasma-applets-plasma-nm"
       else
         package_install "networkmanager dnsmasq network-manager-applet"
       fi
@@ -1527,20 +1484,19 @@ install_accessories_apps(){
     print_title "ACCESSORIES APPS"
     echo " 1) $(menu_item "cairo-dock")"
     echo " 2) $(menu_item "catfish")"
-    echo " 3) $(menu_item "conky-lua") $AUR"
-    echo " 4) $(menu_item "docky") $AUR"
-    echo " 5) $(menu_item "galculator") $AUR"
-    echo " 6) $(menu_item "kupfer") $AUR"
+    echo " 3) $(menu_item "compiz") $AUR"
+    echo " 4) $(menu_item "conky-lua") $AUR"
+    echo " 5) $(menu_item "docky") $AUR"
+    echo " 6) $(menu_item "galculator") $AUR"
     echo " 7) $(menu_item "pamac-aur" "Pamac") $AUR"
     echo " 8) $(menu_item "pyrenamer") $AUR"
     echo " 9) $(menu_item "lastpass-pocket" "LastPass Pocket") $AUR"
     echo "10) $(menu_item "shutter") $AUR"
     echo "11) $(menu_item "springseed") $AUR"
-    echo "12) $(menu_item "stormcloud") $AUR"
-    echo "13) $(menu_item "synapse")"
-    echo "14) $(menu_item "terminator")"
-    echo "15) $(menu_item "unified-remote-server" "Unified Remote")"
-    echo "16) $(menu_item "zim")"
+    echo "12) $(menu_item "synapse")"
+    echo "13) $(menu_item "terminator")"
+    echo "14) $(menu_item "unified-remote-server" "Unified Remote")"
+    echo "15) $(menu_item "zim")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1555,17 +1511,17 @@ install_accessories_apps(){
           package_install "catfish"
           ;;
         3)
-          aur_package_install "conky-lua"
+          aur_package_install "compiz"
           ;;
         4)
+          aur_package_install "conky-lua"
+          ;;
+        5)
           package_install "docky"
           aur_package_install "dockmanager"
           ;;
-        5)
-          package_install "galculator"
-          ;;
         6)
-          aur_package_install "kupfer"
+          package_install "galculator"
           ;;
         7)
           aur_package_install "pamac-aur"
@@ -1583,19 +1539,16 @@ install_accessories_apps(){
           aur_package_install "springseed"
           ;;
         12)
-          aur_package_install "stormcloud"
-          ;;
-        13)
           package_install "synapse"
           ;;
-        14)
+        13)
           package_install "terminator"
           ;;
-        15)
+        14)
           aur_package_install "unified-remote-server"
           system_ctl enable urserver
           ;;
-        16)
+        15)
           package_install "zim"
           ;;
         "b")
@@ -1635,7 +1588,7 @@ install_development_apps(){
     echo "18) $(menu_item "jdk7-openjdk" "OpenJDK")"
     echo "19) $(menu_item "jdk" "Oracle JDK") $AUR"
     echo "20) $(menu_item "qtcreator")"
-    echo "21) $(menu_item "ruby" "Ruby on Rails")"
+    echo "21) $(menu_item "ruby" "Ruby + RVM")"
     echo "22) $(menu_item "sublime-text-dev" "Sublime Text") $AUR"
     echo ""
     echo " b) BACK"
@@ -1875,7 +1828,9 @@ install_development_apps(){
           ;;
         21)
           aur_package_install "ruby"
-          gem_install "rails haml"
+          gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+          sudo -u ${username} curl -L get.rvm.io | sudo bash -s stable
+          usermod -a -G rvm ${username}
           ;;
         22)
           aur_package_install "sublime-text-dev"
@@ -1948,8 +1903,7 @@ install_office_apps(){
           if [[ $LOCALE == pt_BR ]]; then
             aur_package_install "abntex"
           fi
-          read_input_text "Install texmaker?"
-          [[ $OPTION == y ]] && aur_package_install "texmaker"
+          package_install "gummi"
           ;;
         9)
           print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
@@ -3919,4 +3873,3 @@ do
   done
 done
 #}}}
-
