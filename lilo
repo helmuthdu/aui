@@ -1891,7 +1891,6 @@ install_office_apps(){
           package_install "libreoffice libreoffice-$LOCALE_LO"
           aur_package_install "hunspell-$LOCALE_HS"
           aur_package_install "aspell-$LOCALE_AS"
-          [[ ${KDE} -eq 1 ]] && package_install "libreoffice-kde4" || package_install "libreoffice-gnome"
           ;;
         10)
           aur_package_install "mediaelch"

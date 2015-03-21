@@ -38,7 +38,7 @@
   CUPS="y"
   CUSTOMREPO="n"         # Add custom repositories
   FIRMWARE="y"           # Install custom firmwares
-  GITTOR="y"
+  GITTOR="n"
   NFS="n"
   READAHEAD="y"
   SAMBA="y"
@@ -127,7 +127,7 @@
     # 1) Moka
     # 2) Nitrux
     # 3) Numix
-    ICONS_THEMES="1-3"
+    ICONS_THEMES="3"
   #}}}
   #GTK THEMES {{{
     # 1) Numix
@@ -244,7 +244,7 @@
   # 8) Virtualbox
   # 9) Webmin
   #10) Wine
-  SYSTEMTOOLS_OPTIONS="8 10"
+  SYSTEMTOOLS_OPTIONS="10"
 #}}}
 #GRAPHICS {{{
   # 1) Blender

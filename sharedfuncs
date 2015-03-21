@@ -121,8 +121,6 @@
           cecho failed
           echo -e "$PKG" >> $PKG_FAIL
           tail -n 15 $LOG
-          read -p "ERROR! Continue install [y/N]?" OPTION
-          [[ $OPTION != y ]] && exit 1
         fi
         break
       fi
@@ -398,7 +396,7 @@
     local _add_line=${1}
     local _filepath=${2}
 
-    local _has_line=`grep -ci "${_add_line}" ${_filepath} &> /dev/null`
+    local _has_line=`grep -ci "${_add_line}" ${_filepath}`
     [[ $_has_line -eq 0 ]] && echo "${_add_line}" >> ${_filepath}
   } #}}}
   replace_line() { #{{{
