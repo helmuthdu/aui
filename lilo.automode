@@ -45,7 +45,7 @@
   SSH="y"
   TLP="n"                # Laptop Power Manager
   ZRAM="y"
-  PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA|ATI) driver
+  PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA) driver
   #FONT CONFIGURATION {{{
     # 1) Default
     # 2) Infinality
@@ -297,14 +297,13 @@
     EMAIL_OPTIONS=""
   #}}}
   #IM|IRC {{{
-    # 1) Google Talk-Plugin
-    # 2) HexChat|Konversation
-    # 3) Irssi
-    # 4) Pidgin
-    # 5) Skype
-    # 6) Teamspeak
-    # 7) Viber
-    IM_OPTIONS="5"
+    # 1) HexChat|Konversation
+    # 2) Irssi
+    # 3) Pidgin
+    # 4) Skype
+    # 5) Teamspeak
+    # 6) Viber
+    IM_OPTIONS="4"
   #}}}
   #MAPPING {{{
     # 1) Google Earth
@@ -362,7 +361,7 @@
     # 8) Popcorn Time
     # 9) SMplayer
     #10) VLC
-    #11) XBMC
+    #11) Kodi
     VIDEO_PLAYER_OPTIONS="10"
   #}}}
   #EDITORS|TOOLS {{{

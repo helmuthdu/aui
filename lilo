@@ -708,24 +708,6 @@ install_video_cards(){
     replace_line '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
   #}}}
-  #Catalyst [ATI] {{{
-  elif [[ ${VIDEO_DRIVER} == catalyst ]]; then
-    XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
-    [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    [[ -f /etc/modules-load.d/ati.conf ]] && rm /etc/modules-load.d/ati.conf
-    [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
-    add_key "653C3094"
-    add_repository "xorg116" "http://catalyst.wirephire.com/repo/xorg116/\$arch" "Never"
-    package_install "linux-headers acpid"
-    aur_package_install "catalyst-total"
-    aticonfig --initial
-    system_ctl enable atieventsd
-    system_ctl start atieventsd
-    system_ctl enable catalyst-hook
-    system_ctl start catalyst-hook
-    system_ctl enable temp-links-catalyst
-    system_ctl start temp-links-catalyst
-  #}}}
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
     is_package_installed "catalyst-total" && pacman -Rdds --noconfirm catalyst-total
@@ -872,7 +854,7 @@ install_desktop_environment(){
     while true
     do
       print_title "GNOME ICONS"
-      echo " 1) $(menu_item "moka-icons-git")"
+      echo " 1) $(menu_item "moka-icon-theme-git")"
       echo " 2) $(menu_item "nitrux-icon-theme")"
       echo " 3) $(menu_item "numix-icon-theme-git")"
       echo ""
@@ -883,7 +865,7 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            aur_package_install "moka-icons-git"
+            aur_package_install "moka-icon-theme-git"
             ;;
           2)
             aur_package_install "nitrux-icon-theme"
@@ -1128,7 +1110,6 @@ install_desktop_environment(){
       config_xinitrc "startdde"
       #Tweaks
       pause_function
-      #Gnome Display Manager (a reimplementation of xdm)
       system_ctl enable lightdm
       ;;
       #}}}
@@ -1403,10 +1384,10 @@ install_desktop_environment(){
       package_install "xdg-user-dirs"
       package_install "ttf-bitstream-vera ttf-dejavu"
       is_package_installed "samba" && package_install "gvfs-smb"
+      #aur_package_install "gnome-defaults-list"
     fi
     #Fix p7FM
     package_install "wxgtk2.8"
-    aur_package_install "gnome-defaults-list"
   #}}}
   #COMMON CONFIG {{{
     # speed up application startup
@@ -2284,13 +2265,12 @@ install_internet_apps(){
           while true
           do
             print_title "IM - INSTANT MESSAGING"
-            echo " 1) $(menu_item "google-talkplugin") $AUR"
-            echo " 2) $(menu_item "hexchat konversation" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
-            echo " 3) $(menu_item "irssi")"
-            echo " 4) $(menu_item "pidgin")"
-            echo " 5) $(menu_item "skype")"
-            echo " 6) $(menu_item "teamspeak3")"
-            echo " 7) $(menu_item "viber") $AUR"
+            echo " 1) $(menu_item "hexchat konversation" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
+            echo " 2) $(menu_item "irssi")"
+            echo " 3) $(menu_item "pidgin")"
+            echo " 4) $(menu_item "skype")"
+            echo " 5) $(menu_item "teamspeak3")"
+            echo " 6) $(menu_item "viber") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2299,28 +2279,25 @@ install_internet_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
-                  aur_package_install "google-talkplugin"
-                  ;;
-                2)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "konversation"
                   else
                     package_install "hexchat"
                   fi
                   ;;
-                3)
+                2)
                   package_install "irssi"
                   ;;
-                4)
+                3)
                   package_install "pidgin"
                   ;;
-                5)
+                4)
                   package_install "skype"
                   ;;
-                6)
+                5)
                   package_install "teamspeak3"
                   ;;
-                7)
+                6)
                   aur_package_install "viber"
                   ;;
                 "b")
@@ -2595,17 +2572,16 @@ install_video_apps(){
           while true
           do
             print_title "VIDEO PLAYERS"
-            echo " 1) $(menu_item "audience-bzr") $AUR"
-            echo " 2) $(menu_item "gnome-mplayer")"
-            echo " 3) $(menu_item "livestreamer")"
-            echo " 4) $(menu_item "minitube")"
-            echo " 5) $(menu_item "miro") $AUR"
-            echo " 6) $(menu_item "mpv")"
-            echo " 7) $(menu_item "parole")"
-            echo " 8) $(menu_item "popcorntime-bin") $AUR"
-            echo " 9) $(menu_item "smplayer")"
-            echo "10) $(menu_item "vlc")"
-            echo "11) $(menu_item "xbmc")"
+            echo " 1) $(menu_item "gnome-mplayer")"
+            echo " 2) $(menu_item "livestreamer")"
+            echo " 3) $(menu_item "minitube")"
+            echo " 4) $(menu_item "miro") $AUR"
+            echo " 5) $(menu_item "mpv")"
+            echo " 6) $(menu_item "parole")"
+            echo " 7) $(menu_item "popcorntime-bin") $AUR"
+            echo " 8) $(menu_item "smplayer")"
+            echo " 9) $(menu_item "vlc")"
+            echo "10) $(menu_item "kodi")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2614,39 +2590,36 @@ install_video_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
-                  aur_package_install "audience-bzr"
-                  ;;
-                2)
                   package_install "gnome-mplayer"
                   ;;
-                3)
+                2)
                   package_install "livestreamer"
                   ;;
-                4)
+                3)
                   package_install "minitube"
                   ;;
-                5)
+                4)
                   aur_package_install "miro"
                   ;;
-                6)
+                5)
                   package_install "mpv"
                   ;;
-                7)
+                6)
                   package_install "parole"
                   ;;
-                8)
+                7)
                   aur_package_install "popcorntime-bin"
                   ;;
-                9)
+                8)
                   package_install "smplayer smplayer-themes"
                   ;;
-                10)
+                9)
                   package_install "vlc"
                   [[ ${KDE} -eq 1 ]] && package_install "phonon-qt4-vlc"
                   ;;
-                11)
-                  package_install "xbmc"
-                  add_user_to_group ${username} xbmc
+                10)
+                  package_install "kodi"
+                  add_user_to_group ${username} kodi
                   ;;
                 "b")
                   break
