@@ -1392,9 +1392,9 @@ install_desktop_environment(){
   #COMMON CONFIG {{{
     # speed up application startup
     mkdir -p ~/.compose-cache
-    #D-Bus interface for user account query and manipulation
+    # D-Bus interface for user account query and manipulation
     system_ctl enable accounts-daemon
-    #Improvements
+    # Improvements
     add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
   #}}}
 }
@@ -2179,7 +2179,6 @@ install_internet_apps(){
                   ;;
                 4)
                   aur_package_install "dropbox"
-                  add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
                   ;;
                 5)
                   aur_package_install "flareget"
