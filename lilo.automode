@@ -340,8 +340,9 @@
   #EDITORS|TOOLS {{{
     # 1) Audacity
     # 2) Easytag
-    # 3) OcenAudio
-    # 4) Soundconverter|Soundkonverter
+    # 3) Google Music Manager
+    # 4) OcenAudio
+    # 5) Soundconverter|Soundkonverter
     AUDIO_EDITOR_OPTIONS="2"
   #}}}
 #}}}

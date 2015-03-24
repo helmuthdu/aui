@@ -520,7 +520,7 @@ install_nfs(){
   read_input_text "Install nfs" $NFS
   if [[ $OPTION == y ]]; then
     package_install "nfs-utils"
-    system_ctl enable rpcbind.service
+    system_ctl enable rpcbind
     system_ctl enable nfs-client.target
     system_ctl enable remote-fs.target
     pause_function
@@ -593,8 +593,8 @@ install_tlp(){
   read_input_text "Install TLP" $TLP
   if [[ $OPTION == y ]]; then
     package_install "tlp"
-    system_ctl enable tlp.service
-    system_ctl enable tlp-sleep.service
+    system_ctl enable tlp
+    system_ctl enable tlp-sleep
     system_ctl mask systemd-rfkill
     system_ctl enable tlp
     tlp start
@@ -741,7 +741,7 @@ install_cups(){
     package_install "cups cups-filters ghostscript gsfonts"
     package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
     package_install "system-config-printer"
-    system_ctl enable cups
+    system_ctl enable org.cups.cupsd
     pause_function
   fi
 }
@@ -1418,6 +1418,7 @@ install_nm_wicd(){
       else
         package_install "networkmanager dnsmasq network-manager-applet"
       fi
+      package_install "networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc"
       is_package_installed "ntp" && package_install "networkmanager-dispatcher-ntpd"
       # Network Management daemon
       system_ctl enable NetworkManager
@@ -2489,8 +2490,9 @@ install_audio_apps(){
             print_title "AUDIO EDITORS|TOOLS"
             echo " 1) $(menu_item "audacity")"
             echo " 2) $(menu_item "easytag")"
-            echo " 3) $(menu_item "ocenaudio") $AUR"
-            echo " 4) $(menu_item "soundconverter soundkonverter" "$([[ ${KDE} -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
+            echo " 3) $(menu_item "google-musicmanager" "Google Music Manager")"
+            echo " 4) $(menu_item "ocenaudio") $AUR"
+            echo " 5) $(menu_item "soundconverter soundkonverter" "$([[ ${KDE} -eq 1 ]] && echo "Soundkonverter" || echo "Soundconverter";)")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2505,9 +2507,12 @@ install_audio_apps(){
                   package_install "easytag"
                   ;;
                 3)
-                  aur_package_install "ocenaudio"
+                  aur_package_install "google-musicmanager"
                   ;;
                 4)
+                  aur_package_install "ocenaudio"
+                  ;;
+                5)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "soundkonverter"
                   else
