@@ -601,7 +601,7 @@ install_bootloader(){
         break
         ;;
       2)
-        pacstrap ${MOUNTPOINT} syslinux
+        pacstrap ${MOUNTPOINT} syslinux gptfdisk
         break
         ;;
       3)

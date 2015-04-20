@@ -1,4 +1,4 @@
-### This project is looking for a new maintainer
+### Project no longer maintained
 
 # Archlinux U Install
 
@@ -19,7 +19,7 @@ You can try it first with a `virtualbox`
 ### Without git
 - get the script: ` wget --no-check-certificate https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
     - an alternate URL (for less typing) is ` wget --no-check-certificate http://bit.ly/NoUPC6 -O - | tar xz`
-    - super short `wget ow.ly/wnFgh -o aui.zip`
+    - super short `wget ow.ly/wnFgh -O aui.zip`
 
 ## How to use
 - FIFO [system base]: `cd <dir> && ./fifo`

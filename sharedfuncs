@@ -121,8 +121,6 @@
           cecho failed
           echo -e "$PKG" >> $PKG_FAIL
           tail -n 15 $LOG
-          read -p "ERROR! Continue install [y/N]?" OPTION
-          [[ $OPTION != y ]] && exit 1
         fi
         break
       fi
@@ -268,12 +266,7 @@
       fi
     elif [[ -n $(echo ${_vga} | grep "advanced micro devices") || -f /sys/kernel/debug/dri/0/radeon_pm_info || -f /sys/kernel/debug/dri/0/radeon_sa_info ]]; then
       cecho AMD/ATI
-      read_input_text "Install ATI proprietary driver" $PROPRIETARY_DRIVER
-      if [[ $OPTION == y ]]; then
-        VIDEO_DRIVER="catalyst"
-      else
-        VIDEO_DRIVER="ati"
-      fi
+      VIDEO_DRIVER="ati"
     elif [[ -n $(echo ${_vga} | grep "intel corporation") || -f /sys/kernel/debug/dri/0/i915_capabilities ]]; then
       cecho Intel
       VIDEO_DRIVER="intel"
@@ -403,7 +396,7 @@
     local _add_line=${1}
     local _filepath=${2}
 
-    local _has_line=`grep -ci "${_add_line}" ${_filepath} &> /dev/null`
+    local _has_line=`grep -ci "${_add_line}" ${_filepath}`
     [[ $_has_line -eq 0 ]] && echo "${_add_line}" >> ${_filepath}
   } #}}}
   replace_line() { #{{{
@@ -555,7 +548,7 @@
   } #}}}
   config_xinitrc() { #{{{
     #create a xinitrc file in home user directory
-    cp -fv /etc/skel/.xinitrc /home/${username}/
+    cp -fv /etc/X11/xinit/xinitrc /home/${username}/.xinitrc
     echo -e "exec $1" >> /home/${username}/.xinitrc
     chown -R ${username}:users /home/${username}/.xinitrc
   } #}}}
