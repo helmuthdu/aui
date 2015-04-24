@@ -3445,10 +3445,103 @@ install_web_server(){
     read_input_text "Install Postgis + Pgrouting" $POSTGIS
     [[ $OPTION == y ]] && install_gis_extension
   } #}}}
+    
+
   install_gis_extension(){ #{{{
     package_install "postgis"
     aur_package_install "pgrouting"
   } #}}}
+  configure_phpmyadmin(){
+	  
+	  sed -i -e 's/open_basedir = /open_basedir = \/etc\/webapps\/:/g' /etc/php/php.ini
+	  
+	  local PHPMYADMIN_SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 46 | head -n 1)
+	  replace_line "$cfg['blowfish_secret'] = ''; /* YOU MUST FILL IN THIS FOR COOKIE AUTH! */" "$cfg['blowfish_secret'] = '$PHPMYADMIN_SECRET';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['controluser'] = 'pma';" "$cfg['Servers'][$i]['controluser'] = 'pma';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['controlpass'] = 'pmapass';" "$cfg['Servers'][$i]['controlpass'] = 'pmapass';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['pmadb'] = 'phpmyadmin';" "$cfg['Servers'][$i]['pmadb'] = 'phpmyadmin';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['pmadb'] = 'phpmyadmin';" "$cfg['Servers'][$i]['pmadb'] = 'phpmyadmin';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['bookmarktable'] = 'pma__bookmark';" "$cfg['Servers'][$i]['bookmarktable'] = 'pma__bookmark';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['relation'] = 'pma__relation';" "$cfg['Servers'][$i]['relation'] = 'pma__relation';';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['table_info'] = 'pma__table_info';" "$cfg['Servers'][$i]['table_info'] = 'pma__table_info';" /etc/webapps/phpmyadmin/config.inc.php
+
+	  replace_line "// $cfg['Servers'][$i]['table_coords'] = 'pma__table_coords';" "$cfg['Servers'][$i]['table_coords'] = 'pma__table_coords';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+
+	  replace_line "// $cfg['Servers'][$i]['pdf_pages'] = 'pma__pdf_pages';" "$cfg['Servers'][$i]['pdf_pages'] = 'pma__pdf_pages';" /etc/webapps/phpmyadmin/config.inc.php
+
+
+	  replace_line "// $cfg['Servers'][$i]['column_info'] = 'pma__column_info';" "$cfg['Servers'][$i]['column_info'] = 'pma__column_info';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+
+	  replace_line "// $cfg['Servers'][$i]['history'] = 'pma__history';" "$cfg['Servers'][$i]['history'] = 'pma__history';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['table_uiprefs'] = 'pma__table_uiprefs';" "$cfg['Servers'][$i]['table_uiprefs'] = 'pma__table_uiprefs';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['tracking'] = 'pma__tracking';" "$cfg['Servers'][$i]['tracking'] = 'pma__tracking';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['userconfig'] = 'pma__userconfig';" "$cfg['Servers'][$i]['userconfig'] = 'pma__userconfig';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['recent'] = 'pma__recent';" "$cfg['Servers'][$i]['recent'] = 'pma__recent';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['favorite'] = 'pma__favorite';" "$cfg['Servers'][$i]['favorite'] = 'pma__favorite';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['users'] = 'pma__users';" "$cfg['Servers'][$i]['users'] = 'pma__users';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['usergroups'] = 'pma__usergroups';" "$cfg['Servers'][$i]['usergroups'] = 'pma__usergroups';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['navigationhiding'] = 'pma__navigationhiding';" "$cfg['Servers'][$i]['navigationhiding'] = 'pma__navigationhiding';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['savedsearches'] = 'pma__savedsearches';" "$cfg['Servers'][$i]['savedsearches'] = 'pma__savedsearches';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  replace_line "// $cfg['Servers'][$i]['central_columns'] = 'pma__central_columns';" "$cfg['Servers'][$i]['central_columns'] = 'pma__central_columns';" /etc/webapps/phpmyadmin/config.inc.php
+	  
+	  local sql = "GRANT USAGE ON mysql.* TO 'pma'@'localhost' IDENTIFIED BY 'pmapass';
+GRANT SELECT (
+    Host, User, Select_priv, Insert_priv, Update_priv, Delete_priv,
+    Create_priv, Drop_priv, Reload_priv, Shutdown_priv, Process_priv,
+    File_priv, Grant_priv, References_priv, Index_priv, Alter_priv,
+    Show_db_priv, Super_priv, Create_tmp_table_priv, Lock_tables_priv,
+    Execute_priv, Repl_slave_priv, Repl_client_priv
+    ) ON mysql.user TO 'pma'@'localhost';
+GRANT SELECT ON mysql.db TO 'pma'@'localhost';
+GRANT SELECT ON mysql.host TO 'pma'@'localhost';
+GRANT SELECT (Host, Db, User, Table_name, Table_priv, Column_priv)
+    ON mysql.tables_priv TO 'pma'@'localhost';
+"
+
+	local grantsql = "GRANT SELECT, INSERT, UPDATE, DELETE ON phpmyadmin.* TO 'pma'@'localhost';"
+
+	   mysql -u root -p < /usr/share/webapps/phpMyAdmin/sql/create_tables.sql
+	   mysql -u root -p -e "'$sql'"
+	   mysql -u root -p -e "'$grantsql'"
+	   ln -s /usr/share/webapps/phpMyAdmin/ /srv/http/phpmyadmin
+  }
+  configure_phpmyadmin_apache(){ #{{{
+	  replace_line ';extension=bz2.so' 'extension=bz2.so' /etc/php/php.ini
+	  replace_line ';extension=mcrypt.so' 'extension=mcrypt.so' /etc/php/php.ini
+	  replace_line ';extension=zip.so' 'extension=zip.so' /etc/php/php.ini
+	  cat <<- EOF > /etc/httpd/conf/extra/phpmyadmin.conf
+Alias /phpmyadmin "/usr/share/webapps/phpMyAdmin"
+<Directory "/usr/share/webapps/phpMyAdmin">
+    DirectoryIndex index.php
+    AllowOverride All
+    Options FollowSymlinks
+    Require all granted
+</Directory>
+EOF
+echo -e '\n# PhpmyAdmin Configuration\nInclude conf/extra/phpmyadmin.conf' >> /etc/httpd/conf/httpd.conf
+
+echo -e '\n# PhpmyAdmin Configuration\n127.0.0.1	phpmyadmin.localhost' >> /etc/hosts
+	  
+  }
   configure_php(){ #{{{
     if [[ -f /etc/php/php.ini.pacnew ]]; then
       mv -v /etc/php/php.ini /etc/php/php.ini.pacold
@@ -3504,7 +3597,7 @@ install_web_server(){
   } #}}}
   print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
   print_info "*Adminer is installed by default in all options"
-  echo " 1) LAMP - APACHE, MariaDB & PHP"
+  echo " 1) LAMP - APACHE, MariaDB , PHP & PHPmyAdmin"
   echo " 2) LAPP - APACHE, POSTGRESQL & PHP"
   echo " 3) LEMP - NGINX, MariaDB & PHP"
   echo " 4) LEPP - NGINX, POSTGRESQL & PHP"
@@ -3514,12 +3607,14 @@ install_web_server(){
   read_input $WEBSERVER
   case "$OPTION" in
     1)
-      package_install "apache php php-apache php-mcrypt php-gd"
+      package_install "apache php php-apache php-mcrypt php-gd phpmyadmin"
       install_mariadb
       install_adminer
       system_ctl enable httpd
       configure_php_apache
       configure_php "mariadb"
+      configure_phpmyadmin
+      configure_phpmyadmin_apache
       create_sites_folder
       ;;
     2)
@@ -3532,12 +3627,13 @@ install_web_server(){
       create_sites_folder
       ;;
     3)
-      package_install "nginx php php-mcrypt php-fpm"
+      package_install "nginx php php-mcrypt php-fpm phpmyadmin"
       install_mariadb
       system_ctl enable nginx
       system_ctl enable php-fpm
       configure_php_nginx
       configure_php "mariadb"
+      configure_phpmyadmin
       ;;
     4)
       package_install "nginx php php-fpm php-pgsql"
