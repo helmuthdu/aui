@@ -3524,6 +3524,21 @@ GRANT SELECT (Host, Db, User, Table_name, Table_priv, Column_priv)
 	   mysql -u root -p -e "'$grantsql'"
 	   ln -s /usr/share/webapps/phpMyAdmin/ /srv/http/phpmyadmin
   }
+  configure_phpmyadmin_nginx(){ #{{{
+	  echo -e '\n# PhpmyAdmin Configuration\n server {
+         server_name     phpmyadmin.localhost;
+ 
+         root    /usr/share/webapps/phpMyAdmin;
+         index   index.php;
+ 
+         location ~ \.php$ {
+                 try_files      $uri =404;
+                 fastcgi_pass   unix:/run/php-fpm/php-fpm.sock;
+                 fastcgi_index  index.php;
+                 include        fastcgi.conf;
+         }
+ }' >> /etc/nginx/nginx.conf
+  }
   configure_phpmyadmin_apache(){ #{{{
 	  replace_line ';extension=bz2.so' 'extension=bz2.so' /etc/php/php.ini
 	  replace_line ';extension=mcrypt.so' 'extension=mcrypt.so' /etc/php/php.ini
@@ -3634,6 +3649,7 @@ echo -e '\n# PhpmyAdmin Configuration\n127.0.0.1	phpmyadmin.localhost' >> /etc/h
       configure_php_nginx
       configure_php "mariadb"
       configure_phpmyadmin
+      configure_phpmyadmin_nginx
       ;;
     4)
       package_install "nginx php php-fpm php-pgsql"
