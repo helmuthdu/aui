@@ -37,20 +37,20 @@
 #BASIC SETUP {{{
   CUPS="y"
   CUSTOMREPO="n"         # Add custom repositories
-  FIRMWARE="y"           # Install custom firmwares
+  FIRMWARE="n"           # Install custom firmwares
   GITTOR="n"
   NFS="n"
   READAHEAD="y"
-  SAMBA="y"
+  SAMBA="n"
   SSH="y"
   TLP="n"                # Laptop Power Manager
-  ZRAM="y"
+  ZRAM="n"
   PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA) driver
   #FONT CONFIGURATION {{{
     # 1) Default
     # 2) Infinality
     # 3) Ubuntu
-    FONTCONFIG=2
+    FONTCONFIG=1
   #}}}
   #ADDITIONAL FIRMWARE {{{
     # 1) aic94xx-firmware
@@ -65,7 +65,7 @@
     #10) libffado [Firmware Audio Devices]
     #11) libmtp [Android Devices]
     #12) libraw1394 [IEE1394 Driver]
-    FIRMWARE_OPTIONS="11"
+    FIRMWARE_OPTIONS=""
   #}}}
 #}}}
 #DESKTOP ENVIRONMENT|WINDOW MANAGER {{{
@@ -118,21 +118,21 @@
     # 3) LightDM
     # 4) SSDM
     # 5) Slim
-    DISPLAY_MANAGER="3"
+    DISPLAY_MANAGER="2"
   #}}}
   # 1) Icons Themes
   # 2) GTK2|GTK3 Themes
-  THEMES_OPTIONS="1 2"
+  THEMES_OPTIONS=""
   #ICONS THEMES {{{
     # 1) Moka
     # 2) Nitrux
     # 3) Numix
-    ICONS_THEMES="3"
+    ICONS_THEMES=""
   #}}}
   #GTK THEMES {{{
     # 1) Numix
     # 2) Zukitwo
-    GTK_THEMES="1-2"
+    GTK_THEMES=""
   #}}}
 #}}}
 #NETWORK MANAGER {{{
@@ -142,7 +142,7 @@
   # n) None
   NETWORKMANAGER=1
   #USB 3G MODEM SUPPORT
-  USBMODEM="y"
+  USBMODEM="n"
 #}}}
 #ACCESSORIES {{{
   # 1) Cairo Dock
@@ -197,7 +197,7 @@
     # 8) Vim-like editing plugin for Eclipse
     # 9) Git support plugin for Eclipse
     #10) Colortheme for Eclipse
-    ECLIPSE_OPTIONS="1"
+    ECLIPSE_OPTIONS=""
   #}}}
   #NODEJS {{{
     # 1) backbone
@@ -215,7 +215,7 @@
     #13) uglify-js
     #14) underscore
     #15) yeoman
-    NODEJS_OPTIONS="2 7 8 9 13 15"
+    NODEJS_OPTIONS=""
   #}}}
 #}}}
 #OFFICE {{{
@@ -231,7 +231,7 @@
   #10) MediaElch
   #11) OCRFeeder
   #12) Xmind
-  OFFICE_OPTIONS="9"
+  OFFICE_OPTIONS=""
 #}}}
 #SYSTEM TOOLS {{{
   # 1) ClamAV
@@ -244,7 +244,7 @@
   # 8) Virtualbox
   # 9) Webmin
   #10) Wine
-  SYSTEMTOOLS_OPTIONS="10"
+  SYSTEMTOOLS_OPTIONS=""
 #}}}
 #GRAPHICS {{{
   # 1) Blender
@@ -258,7 +258,7 @@
   # 9) Shotwell
   #10) Simple Scan
   #11) XnViewMP
-  GRAPHICS_OPTIONS="2-7 9"
+  GRAPHICS_OPTIONS=""
 #}}}
 #INTERNET {{{
   # 1) Browser
@@ -267,14 +267,14 @@
   # 4) Instant Messaging|IRC
   # 5) Mapping Tools
   # 6) VNC|Desktop Share
-  INTERNET_OPTIONS="1-6"
+  INTERNET_OPTIONS=""
   #BROWSER {{{
     # 1) Chrome
     # 2) Chromium
     # 3) Firefox
     # 4) Midori|Rekonq
     # 5) Opera
-    BROWSERS_OPTIONS="3"
+    BROWSERS_OPTIONS=""
   #}}}
   #DOWNLOAD|FILESHARE {{{
     # 1) AeroFS
@@ -303,7 +303,7 @@
     # 4) Skype
     # 5) Teamspeak
     # 6) Viber
-    IM_OPTIONS="4"
+    IM_OPTIONS=""
   #}}}
   #MAPPING {{{
     # 1) Google Earth
@@ -320,7 +320,7 @@
   # 1) Players
   # 2) Editors|Tools
   # 3) Codecs
-  AUDIO_OPTIONS="1-3"
+  AUDIO_OPTIONS=""
   #PLAYERS {{{
     # 1) Amarok
     # 2) Audacious
@@ -335,7 +335,7 @@
     #11) Spotify
     #12) Timidity++
     #13) Tomahawk
-    AUDIO_PLAYER_OPTIONS="4"
+    AUDIO_PLAYER_OPTIONS=""
   #}}}
   #EDITORS|TOOLS {{{
     # 1) Audacity
@@ -343,14 +343,14 @@
     # 3) Google Music Manager
     # 4) OcenAudio
     # 5) Soundconverter|Soundkonverter
-    AUDIO_EDITOR_OPTIONS="2"
+    AUDIO_EDITOR_OPTIONS=""
   #}}}
 #}}}
 #VIDEO {{{
   # 1) Players
   # 2) Editors|Tools
   # 3) Codecs
-  VIDEO_OPTIONS="1-3"
+  VIDEO_OPTIONS=""
   #PLAYERS {{{
     # 1) Audience
     # 2) Gnome Mplayer
@@ -363,7 +363,7 @@
     # 9) SMplayer
     #10) VLC
     #11) Kodi
-    VIDEO_PLAYER_OPTIONS="10"
+    VIDEO_PLAYER_OPTIONS=""
   #}}}
   #EDITORS|TOOLS {{{
     # 1) Arista
@@ -376,7 +376,7 @@
     # 8) Openshot
     # 9) Pitivi
     #10) Transmageddon
-    VIDEO_EDITOR_OPTIONS="1"
+    VIDEO_EDITOR_OPTIONS=""
   #}}}
 #}}}
 #GAMES {{{
@@ -519,7 +519,7 @@
   # 2) LAPP - APACHE, POSTGRESQL & PHP
   # 3) LEMP - NGINX, MariaDB & PHP
   # 4) LEPP - NGINX, POSTGRESQL & PHP
-  WEBSERVER=4
+  WEBSERVER=
   POSTGIS="n"
 #}}}
 #FONTS {{{
@@ -530,7 +530,7 @@
   # 5) ttf-ms-fonts
   # 6) ttf-vista-fonts
   # 7) wqy-microhei
-  FONTS_OPTIONS="1-7"
+  FONTS_OPTIONS="1 3 4"
 #}}}
 #EXTRA {{{
   # 1) Global Menu
