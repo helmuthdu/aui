@@ -623,7 +623,6 @@ install_bootloader(){
   print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
   print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
   print_warning "\tROOT Partition: ${ROOT_MOUNTPOINT}"
-  print_warning "\tWARNING: There is no support for GRUB + LUKS/LVM."
   if [[ $UEFI -eq 1 ]]; then
     print_warning "\tUEFI Mode Detected"
     bootloaders_list=("Grub2" "Syslinux" "Gummiboot" "Skip")
@@ -670,6 +669,9 @@ configure_bootloader(){
       select OPT in "${grub_install_mode[@]}"; do
         case "$REPLY" in
           1)
+            if [[ $LUKS -eq 1 ]]; then
+              sed -i -e 's/GRUB_CMDLINE_LINUX="\(.\+\)"/GRUB_CMDLINE_LINUX="\1 cryptdevice=\/dev\/'"${LUKS_DISK}"':crypt"/g' -e 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="cryptdevice=\/dev\/'"${LUKS_DISK}"':crypt"/g' ${MOUNTPOINT}/etc/default/grub
+            fi
             if [[ $UEFI -eq 1 ]]; then
               arch_chroot "grub-install --target=x86_64-efi --efi-directory=${EFI_MOUNTPOINT} --bootloader-id=arch_grub --recheck"
             else
