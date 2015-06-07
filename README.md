@@ -1,4 +1,5 @@
-### Project no longer maintained
+### forked from helmuthdu/aui
+i don't know what i'm gonna do with this :D
 
 # Archlinux U Install
 
