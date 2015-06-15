@@ -1282,7 +1282,7 @@ install_desktop_environment(){
       #XFCE {{{
       print_title "XFCE - https://wiki.archlinux.org/index.php/Xfce"
       print_info "Xfce is a free software desktop environment for Unix and Unix-like platforms, such as Linux, Solaris, and BSD. It aims to be fast and lightweight, while still being visually appealing and easy to use."
-      package_install "xfce4 xfce4-goodies xarchiver mupdf "
+      package_install "xfce4 xfce4-goodies xarchiver mupdf"
       # config xinitrc
       config_xinitrc "startxfce4"
       pause_function
