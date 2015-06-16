@@ -105,6 +105,45 @@ configure_mirrorlist(){
 }
 #}}}
 #UMOUNT PARTITIONS {{{
+setup_alt_dns(){
+  cat <<- EOF > /etc/resolv.conf.head
+# OpenDNS IPv4 nameservers
+nameserver 208.67.222.222
+nameserver 208.67.220.220
+# OpenDNS IPv6 nameservers
+nameserver 2620:0:ccc::2
+nameserver 2620:0:ccd::2
+
+# Google IPv4 nameservers
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+# Google IPv6 nameservers
+nameserver 2001:4860:4860::8888
+nameserver 2001:4860:4860::8844
+
+# Comodo nameservers 
+nameserver 8.26.56.26 
+nameserver 8.20.247.20
+
+# Basic Yandex.DNS - Quick and reliable DNS
+nameserver 77.88.8.8
+nameserver 77.88.8.1
+# Safe Yandex.DNS - Protection from virus and fraudulent content
+nameserver 77.88.8.88
+nameserver 77.88.8.2
+# Family Yandex.DNS - Without adult content
+nameserver 77.88.8.7
+nameserver 77.88.8.3
+
+# censurfridns.dk IPv4 nameservers
+nameserver 91.239.100.100
+nameserver 89.233.43.71 
+# censurfridns.dk IPv6 nameservers
+nameserver 2001:67c:28a4::   
+nameserver 2002:d596:2a92:1:71:53::
+EOF
+}
+#UMOUNT PARTITIONS {{{
 umount_partitions(){
   mounted_partitions=(`lsblk | grep ${MOUNTPOINT} | awk '{print $7}' | sort -r`)
   swapoff -a
@@ -199,7 +238,7 @@ setup_luks(){
   select OPT in "${block_list[@]}"; do
     if contains_element "$OPT" "${block_list[@]}"; then
       cryptsetup --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random --verify-passphrase luksFormat $OPT
-      cryptsetup open --type luks $OPT crypt
+      cryptsetup open --type luks $([[ $TRIM -eq 1 ]] && echo "--allow-discards") $OPT crypt
       LUKS=1
       LUKS_DISK=`echo ${OPT} | sed 's/\/dev\///'`
       break
@@ -307,7 +346,9 @@ format_partitions(){
       [[ -z $3 ]] && select_filesystem || filesystem=$3
       mkfs.${filesystem} $1 \
         $([[ ${filesystem} == xfs || ${filesystem} == btrfs ]] && echo "-f") \
-        $([[ ${filesystem} == vfat ]] && echo "-F32")
+        $([[ ${filesystem} == vfat ]] && echo "-F32") \
+        $([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard") \
+        $([[ $TRIM -eq 1 && ${filesystem} == btrfs ]] && echo "-O discard")
       fsck $1
       mkdir -p $2
       mount -t ${filesystem} $1 $2
@@ -449,13 +490,14 @@ install_base_system(){
   print_title "INSTALL BASE SYSTEM"
   print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
   pacstrap ${MOUNTPOINT} base base-devel parted btrfs-progs ntp
+  [[ $? -ne 0 ]] && error_msg "Installing base system to ${MOUNTPOINT} failed. Check error messages above."
   local PTABLE=`parted -l | grep "gpt"`
   [[ -n $PTABLE ]] && pacstrap ${MOUNTPOINT} gptfdisk
-  local WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://' | sed '1!d'`
+  WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://' | sed '1!d'`
   if [[ -n $WIRELESS_DEV ]]; then
     pacstrap ${MOUNTPOINT} iw wireless_tools wpa_actiond wpa_supplicant dialog
   fi
-  local WIRED_DEV=`ip link | grep enp | awk '{print $2}'| sed 's/://' | sed '1!d'`
+  WIRED_DEV=`ip link | grep "eno\|enp" | awk '{print $2}'| sed 's/://' | sed '1!d'`
   if [[-n $WIRED_DEV ]]; then
     arch_chroot "systemctl enable dhcpcd@${WIRED_DEV}"
   fi
@@ -581,7 +623,6 @@ install_bootloader(){
   print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
   print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
   print_warning "\tROOT Partition: ${ROOT_MOUNTPOINT}"
-  print_warning "\tWARNING: There is no support for GRUB + LUKS/LVM."
   if [[ $UEFI -eq 1 ]]; then
     print_warning "\tUEFI Mode Detected"
     bootloaders_list=("Grub2" "Syslinux" "Gummiboot" "Skip")
@@ -598,7 +639,7 @@ install_bootloader(){
         break
         ;;
       2)
-        pacstrap ${MOUNTPOINT} syslinux
+        pacstrap ${MOUNTPOINT} syslinux gptfdisk
         break
         ;;
       3)
@@ -628,6 +669,9 @@ configure_bootloader(){
       select OPT in "${grub_install_mode[@]}"; do
         case "$REPLY" in
           1)
+            if [[ $LUKS -eq 1 ]]; then
+              sed -i -e 's/GRUB_CMDLINE_LINUX="\(.\+\)"/GRUB_CMDLINE_LINUX="\1 cryptdevice=\/dev\/'"${LUKS_DISK}"':crypt"/g' -e 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="cryptdevice=\/dev\/'"${LUKS_DISK}"':crypt"/g' ${MOUNTPOINT}/etc/default/grub
+            fi
             if [[ $UEFI -eq 1 ]]; then
               arch_chroot "grub-install --target=x86_64-efi --efi-directory=${EFI_MOUNTPOINT} --bootloader-id=arch_grub --recheck"
             else
@@ -763,6 +807,7 @@ print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arc
 pause_function
 check_boot_system
 check_connection
+check_trim
 pacman -Sy
 while true
 do
@@ -807,6 +852,7 @@ do
       5)
         install_base_system
         configure_keymap
+        setup_alt_dns
         checklist[5]=1
         ;;
       6)
