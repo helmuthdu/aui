@@ -330,11 +330,12 @@
     # 6) Guayadeque
     # 7) Musique
     # 8) Nuvola
-    # 9) Radiotray
-    #10) Rhythmbox
-    #11) Spotify
-    #12) Timidity++
-    #13) Tomahawk
+    # 9) Pragha
+    #10) Radiotray
+    #11) Rhythmbox
+    #12) Spotify
+    #13) Timidity++
+    #14) Tomahawk
     AUDIO_PLAYER_OPTIONS="4"
   #}}}
   #EDITORS|TOOLS {{{
