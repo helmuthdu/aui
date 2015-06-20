@@ -2418,11 +2418,12 @@ install_audio_apps(){
             echo " 6) $(menu_item "guayadeque")"
             echo " 7) $(menu_item "musique") $AUR"
             echo " 8) $(menu_item "nuvolaplayer") $AUR"
-            echo " 9) $(menu_item "radiotray") $AUR"
-            echo "10) $(menu_item "rhythmbox")"
-            echo "11) $(menu_item "spotify") $AUR"
-            echo "12) $(menu_item "timidity++")"
-            echo "13) $(menu_item "tomahawk") $AUR"
+            echo " 9) $(menu_item "pragha")"
+            echo "10) $(menu_item "radiotray") $AUR"
+            echo "11) $(menu_item "rhythmbox")"
+            echo "12) $(menu_item "spotify") $AUR"
+            echo "13) $(menu_item "timidity++")"
+            echo "14) $(menu_item "tomahawk") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2455,19 +2456,22 @@ install_audio_apps(){
                   aur_package_install "nuvolaplayer"
                   ;;
                 9)
-                  aur_package_install "radiotray"
+                  package_install "pragha"
                   ;;
                 10)
-                  package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako pywebkitgtk"
+                  aur_package_install "radiotray"
                   ;;
                 11)
-                  aur_package_install "spotify"
+                  package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako pywebkitgtk"
                   ;;
                 12)
+                  aur_package_install "spotify"
+                  ;;
+                13)
                   aur_package_install "timidity++ fluidr3"
                   echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                   ;;
-                13)
+                14)
                   aur_package_install "tomahawk"
                   ;;
                 "b")
