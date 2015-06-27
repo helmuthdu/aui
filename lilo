@@ -1078,8 +1078,8 @@ install_desktop_environment(){
   echo " 2) Deepin          11) Fluxbox"
   echo " 3) Enlightenment   12) i3"
   echo " 4) GNOME           13) OpenBox"
-  echo " 5) KDE4            14) Xmonad"
-  echo " 6) KDE5"
+  echo " 5) KDE4            14) Dwm"
+  echo " 6) KDE5            15) Xmonad"
   echo " 7) LXQT"
   echo " 8) Mate"
   echo " 9) XFCE"
@@ -1354,6 +1354,18 @@ install_desktop_environment(){
       ;;
       #}}}
     14)
+     #DWM {{{
+      print_title "DWM - https://wiki.archlinux.org/index.php/Dwm"
+      print_info "dwm is a dynamic window manager for Xorg. It manages windows in tiled, stacked, and full-screen layouts, as well as many others with the help of optional patches. Layouts can be applied dynamically, optimizing the environment for the application in use and the task being performed. dwm is extremely lightweight and fast, written in C and with a stated design goal of remaining under 2000 source lines of code. It provides multihead support for xrandr and Xinerama."
+      package_install "dwm dmenu"
+      # config xinitrc
+      config_xinitrc "exec dwm"
+      pause_function
+      install_misc_apps "DWM"
+      install_themes "DWM"
+      ;;
+     #}}}
+    15)
       #XMONAD {{{
       print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
       print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
