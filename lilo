@@ -1359,7 +1359,7 @@ install_desktop_environment(){
       print_info "dwm is a dynamic window manager for Xorg. It manages windows in tiled, stacked, and full-screen layouts, as well as many others with the help of optional patches. Layouts can be applied dynamically, optimizing the environment for the application in use and the task being performed. dwm is extremely lightweight and fast, written in C and with a stated design goal of remaining under 2000 source lines of code. It provides multihead support for xrandr and Xinerama."
       package_install "dwm dmenu"
       # config xinitrc
-      config_xinitrc "exec dwm"
+      config_xinitrc "dwm"
       pause_function
       install_misc_apps "DWM"
       install_themes "DWM"
