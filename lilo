@@ -458,7 +458,7 @@ install_basic_setup(){
   pause_function
   print_title "PULSEAUDIO - https://wiki.archlinux.org/index.php/Pulseaudio"
   print_info "PulseAudio is the default sound server that serves as a proxy to sound applications using existing kernel sound components like ALSA or OSS"
-  package_install "pulseaudio pulseaudio-alsa"
+  package_install "pulseaudio pulseaudio-alsa pavucontrol"
   [[ ${ARCHI} == x86_64 ]] && package_install "lib32-libpulse"
   pause_function
   print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/File_Systems"
