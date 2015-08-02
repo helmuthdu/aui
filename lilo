@@ -714,7 +714,7 @@ install_video_cards(){
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
     [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/catalyst.conf
     [[ -f /etc/X11/xorg.conf ]] && rm /etc/X11/xorg.conf
-    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl"
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl mesa-vdpau"
     add_module "radeon" "ati"
   #}}}
   #Intel {{{
@@ -728,6 +728,7 @@ install_video_cards(){
   #}}}
   if [[ ${ARCHI} == x86_64 ]]; then
     is_package_installed "mesa-libgl" && package_install "lib32-mesa-libgl"
+    is_package_installed "mesa-vdpau" && package_install "lib32-mesa-vdpau"
   fi
   pause_function
 }

@@ -104,7 +104,7 @@ configure_mirrorlist(){
   $EDITOR /etc/pacman.d/mirrorlist
 }
 #}}}
-#UMOUNT PARTITIONS {{{
+#SETUP ALTERNATIVE DNS {{{
 setup_alt_dns(){
   cat <<- EOF > /etc/resolv.conf.head
 # OpenDNS IPv4 nameservers
@@ -121,8 +121,8 @@ nameserver 8.8.4.4
 nameserver 2001:4860:4860::8888
 nameserver 2001:4860:4860::8844
 
-# Comodo nameservers 
-nameserver 8.26.56.26 
+# Comodo nameservers
+nameserver 8.26.56.26
 nameserver 8.20.247.20
 
 # Basic Yandex.DNS - Quick and reliable DNS
@@ -137,12 +137,13 @@ nameserver 77.88.8.3
 
 # censurfridns.dk IPv4 nameservers
 nameserver 91.239.100.100
-nameserver 89.233.43.71 
+nameserver 89.233.43.71
 # censurfridns.dk IPv6 nameservers
-nameserver 2001:67c:28a4::   
+nameserver 2001:67c:28a4::
 nameserver 2002:d596:2a92:1:71:53::
 EOF
 }
+#}}}
 #UMOUNT PARTITIONS {{{
 umount_partitions(){
   mounted_partitions=(`lsblk | grep ${MOUNTPOINT} | awk '{print $7}' | sort -r`)
@@ -625,7 +626,7 @@ install_bootloader(){
   print_warning "\tROOT Partition: ${ROOT_MOUNTPOINT}"
   if [[ $UEFI -eq 1 ]]; then
     print_warning "\tUEFI Mode Detected"
-    bootloaders_list=("Grub2" "Syslinux" "Gummiboot" "Skip")
+    bootloaders_list=("Grub2" "Syslinux" "Systemd" "Skip")
   else
     print_warning "\tBIOS Mode Detected"
     bootloaders_list=("Grub2" "Syslinux" "Skip")
@@ -643,7 +644,6 @@ install_bootloader(){
         break
         ;;
       3)
-        [[ $UEFI -eq 1 ]] && pacstrap ${MOUNTPOINT} gummiboot
         break
         ;;
       4)
@@ -739,17 +739,17 @@ configure_bootloader(){
         esac
       done
       ;;
-    Gummiboot)
-      print_title "GUMMIBOOT - https://wiki.archlinux.org/index.php/Gummiboot"
-      print_info "Gummiboot is a UEFI boot manager written by Kay Sievers and Harald Hoyer. It is simple to configure, but can only start EFI executables, the Linux kernel EFISTUB, UEFI Shell, grub.efi, and such."
-      print_warning "\tGummiboot heavily suggests that /boot is mounted to the EFI partition, not /boot/efi, in order to simplify updating and configuration."
+    Systemd)
+      print_title "SYSTEMD-BOOT - https://wiki.archlinux.org/index.php/Systemd-boot"
+      print_info "systemd-boot (previously called gummiboot), is a simple UEFI boot manager which executes configured EFI images. The default entry is selected by a configured pattern (glob) or an on-screen menu. It is included with systemd since systemd 220-2."
+      print_warning "\tSystemd-boot heavily suggests that /boot is mounted to the EFI partition, not /boot/efi, in order to simplify updating and configuration."
       gummiboot_install_mode=("Automatic" "Manual")
       PS3="$prompt1"
       echo -e "Gummiboot install:\n"
       select OPT in "${gummiboot_install_mode[@]}"; do
         case "$REPLY" in
           1)
-            arch_chroot "gummiboot --path=${EFI_MOUNTPOINT} install"
+            arch_chroot "bootctl --path=${EFI_MOUNTPOINT} install"
             print_warning "Please check your .conf file"
             partuuid=`blkid -s PARTUUID ${ROOT_MOUNTPOINT} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
             if [[ $LUKS -eq 1 ]]; then
