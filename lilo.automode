@@ -73,28 +73,23 @@
   # 2) Deepin
   # 3) Enlightenment
   # 4) GNOME
-  # 5) KDE4
-  # 6) KDE5
-  # 7) LXQT
-  # 8) Mate
-  # 9) XFCE
-  #10) Awesome
-  #11) Fluxbox
-  #12) i3
-  #13) OpenBox
-  #14) Xmonad
+  # 5) KDE
+  # 6) LXQT
+  # 7) Mate
+  # 8) XFCE
+  # 9) Awesome
+  #10) Fluxbox
+  #11) i3
+  #12) OpenBox
+  #13) Xmonad
   DESKTOPENV=4
   #KDE {{{
-    # 1) Full
-    # 2) Minimal
-    KDE_INSTALL="1"
-    # 1) Apper
-    # 2) Choqok
-    # 3) Digikam
-    # 4) K3b
-    # 5) Skrooge
-    # 6) Yakuake
-    KDE_OPTIONS="1-6"
+    # 1) Choqok
+    # 2) Digikam
+    # 3) K3b
+    # 4) Skrooge
+    # 5) Yakuake
+    KDE_OPTIONS="1-5"
   #}}}
   #ESSENTIAL APPS [Enlightenment,LXDE,Awesome,Fluxbox,OpenBox] {{{
     # 1) Display Manager

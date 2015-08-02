@@ -1156,6 +1156,65 @@ install_desktop_environment(){
       # config xinitrc
       config_xinitrc "startkde"
       pause_function
+      #QTCURVE THEMES {{{
+        curl -o Sweet.tar.gz http://kde-look.org/CONTENT/content-files/144205-Sweet.tar.gz
+        curl -o Kawai.tar.gz http://kde-look.org/CONTENT/content-files/141920-Kawai.tar.gz
+        tar zxvf Sweet.tar.gz
+        tar zxvf Kawai.tar.gz
+        rm Sweet.tar.gz
+        rm Kawai.tar.gz
+        mkdir -p /home/${username}/.kde4/share/apps/color-schemes
+        mv Sweet/*.colors /home/${username}/.kde4/share/apps/color-schemes
+        mv Kawai/*.colors /home/${username}/.kde4/share/apps/color-schemes
+        mkdir -p /home/${username}/.kde4/share/apps/QtCurve
+        mv Sweet/Sweet.qtcurve /home/${username}/.kde4/share/apps/QtCurve
+        mv Kawai/Kawai.qtcurve /home/${username}/.kde4/share/apps/QtCurve
+        chown -R ${username}:users /home/${username}/.kde4
+        rm -fr Kawai Sweet
+      #}}}
+      #KDE CUSTOMIZATION {{{
+      while true
+      do
+        print_title "KDE CUSTOMIZATION"
+        echo " 1) $(menu_item "choqok")"
+        echo " 2) $(menu_item "digikam")"
+        echo " 3) $(menu_item "k3b")"
+        echo " 4) $(menu_item "skrooge")"
+        echo " 5) $(menu_item "yakuake")"
+        echo ""
+        echo " d) DONE"
+        echo ""
+        KDE_OPTIONS+=" d"
+        read_input_options "$KDE_OPTIONS"
+        for OPT in ${OPTIONS[@]}; do
+          case "$OPT" in
+            1)
+              package_install "choqok"
+              ;;
+            2)
+              package_install "digikam"
+              ;;
+            3)
+              package_install "k3b cdrdao dvd+rw-tools"
+              ;;
+            4)
+              package_install "skrooge"
+              ;;
+            5)
+              package_install "yakuake"
+              aur_package_install "yakuake-skin-plasma-oxygen-panel"
+              ;;
+            "d")
+              break
+              ;;
+            *)
+              invalid_option
+              ;;
+          esac
+        done
+        elihw
+      done
+      #}}}
       system_ctl enable sddm
       KDE=1
       ;;
