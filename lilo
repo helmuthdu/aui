@@ -596,7 +596,6 @@ install_tlp(){
     system_ctl enable tlp
     system_ctl enable tlp-sleep
     system_ctl mask systemd-rfkill
-    system_ctl enable tlp
     tlp start
     pause_function
   fi
@@ -1555,9 +1554,7 @@ install_development_apps(){
           aur_package_install "aptana-studio"
           ;;
         2)
-          add_key "26EBCC57"
-          add_repository "atom-editor-git" "http://repo.stobbstechnical.com/\$arch" "Never"
-          package_install "atom-editor-git"
+          aur_package_install "atom-editor"
           ;;
         3)
           package_install "bluefish"
