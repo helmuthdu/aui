@@ -170,7 +170,7 @@
   #10) OpenJDK
   #11) OracleJDK
   #12) NodeJS
-  DEVELOPMENT_OPTIONS="19"
+  DEVELOPMENT_OPTIONS="11"
   #ECLIPSE {{{
     # 1) Eclipse Classic
     # 2) Eclipse IDE for C/C++ Developers
