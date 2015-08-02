@@ -1521,28 +1521,18 @@ install_development_apps(){
   while true
   do
     print_title "DEVELOPMENT APPS"
-    echo " 1) $(menu_item "aptana-studio") $AUR"
-    echo " 2) $(menu_item "atom-editor" "Atom")"
-    echo " 3) $(menu_item "bluefish")"
-    echo " 4) $(menu_item "brackets") $AUR"
-    echo " 5) $(menu_item "eclipse")"
-    echo " 6) $(menu_item "emacs")"
-    echo " 7) $(menu_item "geany")"
-    echo " 8) $(menu_item "gvim")"
-    echo " 9) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
-    echo "10) $(menu_item "kdevelop")"
-    echo "11) $(menu_item "lighttable") $AUR"
-    echo "12) $(menu_item "meld")"
-    echo "13) $(menu_item "monodevelop")"
-    echo "14) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-    echo "15) $(menu_item "navicat-premium" "Navicat Premium") $AUR"
-    echo "16) $(menu_item "netbeans")"
-    echo "17) $(menu_item "nodejs")"
-    echo "18) $(menu_item "jdk7-openjdk" "OpenJDK")"
-    echo "19) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "20) $(menu_item "qtcreator")"
-    echo "21) $(menu_item "ruby" "Ruby + RVM")"
-    echo "22) $(menu_item "sublime-text-dev" "Sublime Text") $AUR"
+    echo " 1) $(menu_item "atom-editor" "Atom")"
+    echo " 2) $(menu_item "emacs")"
+    echo " 3) $(menu_item "gvim")"
+    echo " 4) $(menu_item "meld")"
+    echo " 5) $(menu_item "android-studio" "Android Studio")"
+    echo " 6) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
+    echo " 7) $(menu_item "monodevelop")"
+    echo " 8) $(menu_item "qtcreator")"
+    echo " 9) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
+    echo "10) $(menu_item "jdk7-openjdk" "OpenJDK")"
+    echo "11) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "12) $(menu_item "nodejs")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1551,130 +1541,53 @@ install_development_apps(){
     for OPT in ${OPTIONS[@]}; do
       case "$OPT" in
         1)
-          aur_package_install "aptana-studio"
-          ;;
-        2)
           aur_package_install "atom-editor"
           ;;
-        3)
-          package_install "bluefish"
-          ;;
-        4)
-          aur_package_install "brackets"
-          ;;
-        5)
-          #ECLIPSE {{{
-          while true
-          do
-            print_title "ECLIPSE - https://wiki.archlinux.org/index.php/Eclipse"
-            print_info "Eclipse is an open source community project, which aims to provide a universal development platform."
-            echo " 1) $(menu_item "eclipse")"
-            echo " 2) $(menu_item "eclipse-cdt" "Eclipse IDE for C/C++ Developers")"
-            echo " 3) $(menu_item "eclipse-android" "Android Development Tools for Eclipse") $AUR"
-            echo " 4) $(menu_item "eclipse-wtp-wst" "Web Development Tools for Eclipse") $AUR"
-            echo " 5) $(menu_item "eclipse-pdt" "PHP Development Tools for Eclipse ") $AUR"
-            echo " 6) $(menu_item "eclipse-pydev" "Python Development Tools for Eclipse") $AUR"
-            echo " 7) $(menu_item "eclipse-aptana" "Aptana Studio plugin for Eclipse") $AUR"
-            echo " 8) $(menu_item "eclipse-vrapper" "Vim-like editing plugin for Eclipse ") $AUR"
-            echo " 9) $(menu_item "eclipse-egit" "Git support plugin for Eclipse") $AUR"
-            echo "10) $(menu_item "eclipse-eclipsecolortheme" "Eclipse Colortheme") $AUR"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            ECLIPSE_OPTIONS+=" b"
-            read_input_options "$ECLIPSE_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  package_install "eclipse"
-                  ;;
-                2)
-                  package_install "eclipse-cdt"
-                  ;;
-                3)
-                  aur_package_install "android-sdk android-apktool android-sdk-build-tools android-sdk-platform-tools android-udev eclipse-android libmtp"
-                  if [[ ${KDE} -eq 1 ]]; then
-                    package_install "kio-mtp"
-                  else
-                    package_install "gvfs-mtp"
-                  fi
-                  aur_package_install "simple-mtpfs"
-                  groupadd android
-                  add_user_to_group ${username} android
-                  add_user_to_group ${username} adbusers
-                  chgrp -R android /opt/android-sdk
-                  chmod -R g+w /opt/android-sdk
-                  find /opt/android-sdk -type d -exec chmod g+s {} \;
-                  ;;
-                4)
-                  aur_package_install "eclipse-wtp-wst"
-                  ;;
-                5)
-                  aur_package_install "eclipse-pdt"
-                  ;;
-                6)
-                  aur_package_install "eclipse-pydev"
-                  ;;
-                7)
-                  aur_package_install "eclipse-aptana"
-                  ;;
-                8)
-                  aur_package_install "eclipse-vrapper"
-                  ;;
-                9)
-                  aur_package_install "eclipse-egit"
-                  ;;
-                10)
-                  aur_package_install "eclipse-eclipsecolortheme"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=3
-          ;;
-        6)
+        2)
           package_install "emacs"
           ;;
-        7)
-          package_install "geany"
-          ;;
-        8)
+        3)
           package_remove "vim"
           package_install "gvim ctags"
           ;;
-        9)
-          package_install "intellij-idea-community-edition"
-          ;;
-        10)
-          package_install "kdevelop"
-          ;;
-        11)
-          aur_package_install "lighttable"
-          ;;
-        12)
+        4)
           package_install "meld"
           ;;
-        13)
+        5)
+          aur_package_install "android-sdk android-sdk-platform-tools android-sdk-build-tools android-platform"
+          groupadd sdkusers
+          gpasswd -a ${username} sdkusers
+          chown -R :sdkusers /opt/android-sdk/
+          chmod -R g+w /opt/android-sdk/
+          add_line "export ANDROID_HOME=/opt/android-sdk" "/home/${username}/.bashrc"
+          aur_package_install "android-studio"
+          ;;
+        6)
+          package_install "intellij-idea-community-edition"
+          ;;
+        7)
           package_install "monodevelop monodevelop-debugger-gdb"
           ;;
-        14)
+        8)
+          package_install "qtcreator"
+          mkdir -p /home/${username}/.config/Nokia/qtcreator/styles
+          curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
+          mv monokai.xml /home/${username}/.config/Nokia/qtcreator/styles/
+          chown -R ${username}:users /home/${username}/.config
+          ;;
+        9)
           aur_package_install "mysql-workbench-gpl"
           ;;
-        15)
-          aur_package_install "navicat-premium"
+        10)
+          package_remove "jdk"
+          package_install "jdk7-openjdk icedtea-web"
           ;;
-        16)
-          package_install "netbeans"
+        11)
+          package_remove "jre7-openjdk"
+          package_remove "jdk7-openjdk"
+          aur_package_install "jdk"
           ;;
-        17)
+        12)
           package_install "nodejs"
           #NODEJS {{{
           while true
@@ -1759,32 +1672,7 @@ install_development_apps(){
             elihw
           done
           #}}}
-          OPT=17
-          ;;
-        18)
-          package_remove "jdk"
-          package_install "jdk7-openjdk icedtea-web"
-          ;;
-        19)
-          package_remove "jre7-openjdk"
-          package_remove "jdk7-openjdk"
-          aur_package_install "jdk"
-          ;;
-        20)
-          package_install "qtcreator"
-          mkdir -p /home/${username}/.config/Nokia/qtcreator/styles
-          curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
-          mv monokai.xml /home/${username}/.config/Nokia/qtcreator/styles/
-          chown -R ${username}:users /home/${username}/.config
-          ;;
-        21)
-          aur_package_install "ruby"
-          gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-          sudo -u ${username} curl -L get.rvm.io | sudo bash -s stable
-          usermod -a -G rvm ${username}
-          ;;
-        22)
-          aur_package_install "sublime-text-dev"
+          OPT=12
           ;;
         "b")
           break

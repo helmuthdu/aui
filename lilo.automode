@@ -158,28 +158,18 @@
   ACCESSORIES_OPTIONS=""
 #}}}
 #DEVELOPEMENT {{{
-  # 1) Aptana Studio
-  # 2) Atom
-  # 3) Bluefish
-  # 4) Brackets
-  # 5) Eclipse
-  # 6) Emacs
-  # 7) Geany
-  # 8) Gvim
-  # 9) IntelliJ IDEA
-  #10) Kdevelop
-  #11) LightTable
-  #12) Meld
-  #13) Monodevelop
-  #14) MySQL Workbench
-  #15) Navicat
-  #16) Netbeans
-  #17) NodeJS
-  #18) OpenJDK
-  #19) OracleJDK
-  #20) QT Creator
-  #21) Ruby on Rails
-  #22) Sublime Text
+  # 1) Atom
+  # 2) Emacs
+  # 3) Gvim
+  # 4) Meld
+  # 5) Android Studio
+  # 6) IntelliJ IDEA
+  # 7) Monodevelop
+  # 8) QT Creator
+  # 9) MySQL Workbench
+  #10) OpenJDK
+  #11) OracleJDK
+  #12) NodeJS
   DEVELOPMENT_OPTIONS="19"
   #ECLIPSE {{{
     # 1) Eclipse Classic
