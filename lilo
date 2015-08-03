@@ -1521,7 +1521,7 @@ install_development_apps(){
   while true
   do
     print_title "DEVELOPMENT APPS"
-    echo " 1) $(menu_item "atom-editor" "Atom")"
+    echo " 1) $(menu_item "atom-editor-bin" "Atom") $AUR"
     echo " 2) $(menu_item "emacs")"
     echo " 3) $(menu_item "gvim")"
     echo " 4) $(menu_item "meld")"
@@ -1541,7 +1541,7 @@ install_development_apps(){
     for OPT in ${OPTIONS[@]}; do
       case "$OPT" in
         1)
-          aur_package_install "atom-editor"
+          aur_package_install "atom-editor-bin"
           ;;
         2)
           package_install "emacs"
