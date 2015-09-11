@@ -927,6 +927,7 @@ install_desktop_environment(){
       echo " 2) $(menu_item "gdm" "GDM")"
       echo " 3) $(menu_item "lightdm" "LightDM")"
       echo " 4) $(menu_item "ssdm" "SSDM")"
+      echo " 5) $(menu_item "slim" "Slim")"
       echo ""
       echo " b) BACK|SKIP"
       echo ""
@@ -953,6 +954,10 @@ install_desktop_environment(){
           4)
             package_install "ssdm"
             system_ctl enable ssdm
+            ;;
+          5)
+            package_install "slim"
+            system_ctl enable slim
             ;;
           "b")
             break
