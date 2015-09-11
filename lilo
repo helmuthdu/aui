@@ -444,7 +444,7 @@ install_basic_setup(){
   is_package_installed "ntp" && ntpd -u ntp:ntp
   pause_function
   print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
-  package_install "zip unzip unrar p7zip"
+  package_install "zip unzip unrar p7zip lzop cpio"
   pause_function
   print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
   print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers services and hosts running on a local network with no specific configuration."
