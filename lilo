@@ -444,7 +444,7 @@ install_basic_setup(){
   is_package_installed "ntp" && ntpd -u ntp:ntp
   pause_function
   print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
-  package_install "zip unzip unrar p7zip"
+  package_install "zip unzip unrar p7zip lzop cpio"
   pause_function
   print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
   print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers services and hosts running on a local network with no specific configuration."
@@ -461,9 +461,9 @@ install_basic_setup(){
   package_install "pulseaudio pulseaudio-alsa pavucontrol"
   [[ ${ARCHI} == x86_64 ]] && package_install "lib32-libpulse"
   pause_function
-  print_title "NTFS/FAT/exFAT - https://wiki.archlinux.org/index.php/File_Systems"
+  print_title "NTFS/FAT/exFAT/F2FS - https://wiki.archlinux.org/index.php/File_Systems"
   print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
-  package_install "ntfs-3g dosfstools exfat-utils fuse fuse-exfat autofs"
+  package_install "ntfs-3g dosfstools exfat-utils f2fs-tools fuse fuse-exfat autofs"
   is_package_installed "fuse" && add_module "fuse"
   pause_function
 }
@@ -927,6 +927,7 @@ install_desktop_environment(){
       echo " 2) $(menu_item "gdm" "GDM")"
       echo " 3) $(menu_item "lightdm" "LightDM")"
       echo " 4) $(menu_item "ssdm" "SSDM")"
+      echo " 5) $(menu_item "slim" "Slim")"
       echo ""
       echo " b) BACK|SKIP"
       echo ""
@@ -953,6 +954,10 @@ install_desktop_environment(){
           4)
             package_install "ssdm"
             system_ctl enable ssdm
+            ;;
+          5)
+            package_install "slim"
+            system_ctl enable slim
             ;;
           "b")
             break
@@ -1094,7 +1099,7 @@ install_desktop_environment(){
       #CINNAMON {{{
       print_title "CINNAMON - https://wiki.archlinux.org/index.php/Cinnamon"
       print_info "Cinnamon is a fork of GNOME Shell, initially developed by Linux Mint. It attempts to provide a more traditional user environment based on the desktop metaphor, like GNOME 2. Cinnamon uses Muffin, a fork of the GNOME 3 window manager Mutter, as its window manager."
-      package_install "cinnamon"
+      package_install "cinnamon nemo-fileroller nemo-preview"
       # config xinitrc
       config_xinitrc "cinnamon-session"
       CINNAMON=1
@@ -1450,6 +1455,7 @@ install_accessories_apps(){
     echo "13) $(menu_item "terminator")"
     echo "14) $(menu_item "unified-remote-server" "Unified Remote")"
     echo "15) $(menu_item "zim")"
+    echo "16) $(menu_item "plank")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1503,6 +1509,9 @@ install_accessories_apps(){
           ;;
         15)
           package_install "zim"
+          ;;
+        16)
+          package_install "plank"
           ;;
         "b")
           break
