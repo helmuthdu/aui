@@ -230,6 +230,7 @@
   # 8) Virtualbox
   # 9) Webmin
   #10) Wine
+  #11) Docker
   SYSTEMTOOLS_OPTIONS="10"
 #}}}
 #GRAPHICS {{{
