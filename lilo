@@ -1863,6 +1863,8 @@ install_system_apps(){
           ;;
         11)
           package_install "docker"
+	  groupadd docker
+	  gpasswd -a ${USER} docker
           ;;
         "b")
           break
