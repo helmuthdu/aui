@@ -947,7 +947,7 @@ install_desktop_environment(){
             if [[ ${KDE} -eq 1 ]]; then
               package_install "lightdm lightdm-kde-greeter"
             else
-              package_install "lightdm lightdm-gtk3-greeter"
+              package_install "lightdm lightdm-gtk-greeter"
             fi
             system_ctl enable lightdm
             ;;
