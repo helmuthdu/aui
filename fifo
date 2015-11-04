@@ -29,11 +29,8 @@ fi
 select_keymap(){
   print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
   print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
-  OPTION=n
-  while [[ $OPTION != y ]]; do
-    getkeymap
-    read_input_text "Confirm keymap: $KEYMAP"
-  done
+  echo "keymap list in /usr/share/kbd/keymaps"
+  read -p "Keymap: " KEYMAP
   loadkeys $KEYMAP
 }
 #}}}
@@ -490,7 +487,8 @@ format_partitions(){
 install_base_system(){
   print_title "INSTALL BASE SYSTEM"
   print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
-  pacstrap ${MOUNTPOINT} base base-devel parted btrfs-progs ntp
+  rm ${MOUNTPOINT}${EFI_MOUNTPOINT}/vmlinuz-linux
+  pacstrap ${MOUNTPOINT} base base-devel parted btrfs-progs f2fs-tools ntp
   [[ $? -ne 0 ]] && error_msg "Installing base system to ${MOUNTPOINT} failed. Check error messages above."
   local PTABLE=`parted -l | grep "gpt"`
   [[ -n $PTABLE ]] && pacstrap ${MOUNTPOINT} gptfdisk

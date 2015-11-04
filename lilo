@@ -458,13 +458,12 @@ install_basic_setup(){
   pause_function
   print_title "PULSEAUDIO - https://wiki.archlinux.org/index.php/Pulseaudio"
   print_info "PulseAudio is the default sound server that serves as a proxy to sound applications using existing kernel sound components like ALSA or OSS"
-  package_install "pulseaudio pulseaudio-alsa pavucontrol"
+  package_install "pulseaudio pulseaudio-alsa"
   [[ ${ARCHI} == x86_64 ]] && package_install "lib32-libpulse"
   pause_function
   print_title "NTFS/FAT/exFAT/F2FS - https://wiki.archlinux.org/index.php/File_Systems"
   print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
   package_install "ntfs-3g dosfstools exfat-utils f2fs-tools fuse fuse-exfat autofs"
-  is_package_installed "fuse" && add_module "fuse"
   pause_function
 }
 #}}}
@@ -1356,8 +1355,9 @@ install_desktop_environment(){
     fi
     #}}}
     if [[ ${KDE} -eq 0 ]]; then
-      package_install "gvfs gvfs-afc"
+      package_install "gvfs gvfs-afc gvfs-mtp gvfs-google"
       package_install "xdg-user-dirs"
+      package_install "pavucontrol"
       package_install "ttf-bitstream-vera ttf-dejavu"
       is_package_installed "samba" && package_install "gvfs-smb"
       #aur_package_install "gnome-defaults-list"
@@ -1366,12 +1366,8 @@ install_desktop_environment(){
     package_install "wxgtk2.8"
   #}}}
   #COMMON CONFIG {{{
-    # speed up application startup
-    mkdir -p ~/.compose-cache
     # D-Bus interface for user account query and manipulation
     system_ctl enable accounts-daemon
-    # Improvements
-    add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
   #}}}
 }
 #}}}
