@@ -17,8 +17,8 @@ You can try it first with a `virtualbox`
 - get the script: `git clone git://github.com/helmuthdu/aui`
 
 ### Without git
-- get the script: ` wget --no-check-certificate https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
-    - an alternate URL (for less typing) is ` wget --no-check-certificate http://bit.ly/NoUPC6 -O - | tar xz`
+- get the script: ` wget https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
+    - an alternate URL (for less typing) is ` wget http://bit.ly/NoUPC6 -O - | tar xz`
     - super short `wget ow.ly/wnFgh -O aui.zip`
 
 ## How to use
