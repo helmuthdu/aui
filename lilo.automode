@@ -323,6 +323,7 @@
     #12) Spotify
     #13) Timidity++
     #14) Tomahawk
+    #15) quodlibet
     AUDIO_PLAYER_OPTIONS="4"
   #}}}
   #EDITORS|TOOLS {{{
