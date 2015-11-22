@@ -2138,6 +2138,8 @@ install_internet_apps(){
             echo " 4) $(menu_item "skype")"
             echo " 5) $(menu_item "teamspeak3")"
             echo " 6) $(menu_item "viber") $AUR"
+            echo " 7) $(menu_item "telegram-desktop-bin") $AUR"
+            echo " 8) $(menu_item "qtox-git") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2166,6 +2168,12 @@ install_internet_apps(){
                   ;;
                 6)
                   aur_package_install "viber"
+                  ;;
+                7)
+                  aur_package_install "telegram-desktop-bin"
+                  ;;
+                8)
+                  aur_package_install "qtox-git"
                   ;;
                 "b")
                   break
