@@ -2300,6 +2300,7 @@ install_audio_apps(){
             echo "12) $(menu_item "spotify") $AUR"
             echo "13) $(menu_item "timidity++")"
             echo "14) $(menu_item "tomahawk") $AUR"
+            echo "15) $(menu_item "quodlibet")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2349,6 +2350,9 @@ install_audio_apps(){
                   ;;
                 14)
                   aur_package_install "tomahawk"
+                  ;;
+                15)
+                  package_install "quodlibet"
                   ;;
                 "b")
                   break
