@@ -290,6 +290,8 @@
     # 4) Skype
     # 5) Teamspeak
     # 6) Viber
+    # 7) Telegram Desktop
+    # 8) qTox
     IM_OPTIONS="4"
   #}}}
   #MAPPING {{{
