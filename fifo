@@ -60,7 +60,7 @@ configure_mirrorlist(){
     echo "Select your country:"
     select country_name in "${countries_name[@]}"; do
       if contains_element "$country_name" "${countries_name[@]}"; then
-        contry_code=${countries_code[$(( $REPLY - 1 ))]}
+        country_code=${countries_code[$(( $REPLY - 1 ))]}
         break
       else
         invalid_option
@@ -75,7 +75,7 @@ configure_mirrorlist(){
     read_input_text "Confirm country: $country_name"
   done
 
-  url="https://www.archlinux.org/mirrorlist/?country=${contry_code}&use_mirror_status=on"
+  url="https://www.archlinux.org/mirrorlist/?country=${country_code}&use_mirror_status=on"
 
   tmpfile=$(mktemp --suffix=-mirrorlist)
 
@@ -172,10 +172,11 @@ create_partition_scheme(){
   print_title "https://wiki.archlinux.org/index.php/Partitioning"
   print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another."
   print_warning "Maintain Current does not work with LUKS"
-  partition_layout=("Default" "LVM" "LVM+LUKS" "Maintain Current")
+  partition_layouts=("Default" "LVM" "LVM+LUKS" "Maintain Current")
   PS3="$prompt1"
   echo -e "Select partition scheme:"
-  select OPT in "${partition_layout[@]}"; do
+  select OPT in "${partition_layouts[@]}"; do
+    partition_layout=$OPT
     case "$REPLY" in
       1)
         create_partition
@@ -288,7 +289,7 @@ setup_lvm(){
 #SELECT|FORMAT PARTITIONS {{{
 format_partitions(){
   print_title "https://wiki.archlinux.org/index.php/File_Systems"
-  print_info "This step will select and format the selected partiton where the archlinux will be installed"
+  print_info "This step will select and format the selected partition where archlinux will be installed"
   print_danger "\tAll data on the ROOT and SWAP partition will be LOST."
   i=0
 
@@ -378,6 +379,7 @@ format_partitions(){
             fi
             break
           done
+          swap_type="partition"
           break
           ;;
         2)
@@ -387,10 +389,12 @@ format_partitions(){
           mkswap ${MOUNTPOINT}/swapfile
           swapon ${MOUNTPOINT}/swapfile
           i=$(( i + 1 ))
+          swap_type="file"
           break
           ;;
         3)
           i=$(( i + 1 ))
+          swap_type="none"
           break
           ;;
         *)
@@ -543,6 +547,7 @@ configure_fstab(){
     esac
     [[ -n $OPT ]] && break
   done
+  fstab=$OPT
   echo "Review your fstab"
   [[ -f ${MOUNTPOINT}/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" ${MOUNTPOINT}/etc/fstab
   pause_function
@@ -592,6 +597,7 @@ configure_hardwareclock(){
     esac
     [[ -n $OPT ]] && break
   done
+  hwclock=$OPT
 }
 #}}}
 #CONFIGURE LOCALE {{{
@@ -810,18 +816,18 @@ pacman -Sy
 while true
 do
   print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
-  echo " 1) $(mainmenu_item "${checklist[1]}" "Select Keymap")"
-  echo " 2) $(mainmenu_item "${checklist[2]}" "Select Editor")"
-  echo " 3) $(mainmenu_item "${checklist[3]}" "Configure Mirrorlist")"
-  echo " 4) $(mainmenu_item "${checklist[4]}" "Partition Scheme")"
-  echo " 5) $(mainmenu_item "${checklist[5]}" "Install Base System")"
-  echo " 6) $(mainmenu_item "${checklist[6]}" "Configure Fstab")"
-  echo " 7) $(mainmenu_item "${checklist[7]}" "Configure Hostname")"
-  echo " 8) $(mainmenu_item "${checklist[8]}" "Configure Timezone")"
-  echo " 9) $(mainmenu_item "${checklist[9]}" "Configure Hardware Clock")"
-  echo "10) $(mainmenu_item "${checklist[10]}" "Configure Locale")"
+  echo " 1) $(mainmenu_item "${checklist[1]}"  "Select Keymap"            "${KEYMAP}" )"
+  echo " 2) $(mainmenu_item "${checklist[2]}"  "Select Editor"            "${EDITOR}" )"
+  echo " 3) $(mainmenu_item "${checklist[3]}"  "Configure Mirrorlist"     "${country_name} (${country_code})" )"
+  echo " 4) $(mainmenu_item "${checklist[4]}"  "Partition Scheme"         "${partition_layout}: ${partition}(${filesystem}) swap(${swap_type})" )"
+  echo " 5) $(mainmenu_item "${checklist[5]}"  "Install Base System")"
+  echo " 6) $(mainmenu_item "${checklist[6]}"  "Configure Fstab"          "${fstab}" )"
+  echo " 7) $(mainmenu_item "${checklist[7]}"  "Configure Hostname"       "${host_name}" )"
+  echo " 8) $(mainmenu_item "${checklist[8]}"  "Configure Timezone"       "${ZONE}/${SUBZONE}" )"
+  echo " 9) $(mainmenu_item "${checklist[9]}"  "Configure Hardware Clock" "${hwclock}" )"
+  echo "10) $(mainmenu_item "${checklist[10]}" "Configure Locale"         "${LOCALE}" )"
   echo "11) $(mainmenu_item "${checklist[11]}" "Configure Mkinitcpio")"
-  echo "12) $(mainmenu_item "${checklist[12]}" "Install Bootloader")"
+  echo "12) $(mainmenu_item "${checklist[12]}" "Install Bootloader"       "${bootloader}" )"
   echo "13) $(mainmenu_item "${checklist[13]}" "Root Password")"
   echo ""
   echo " d) Done"
@@ -896,4 +902,3 @@ do
   done
 done
 #}}}
-
