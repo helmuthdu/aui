@@ -1841,7 +1841,7 @@ install_system_apps(){
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
-            package_install "virtualbox virtualbox-host-modules virtualbox-guest-iso"
+            package_install "virtualbox virtualbox-host-modules virtualbox-guest-iso qt4"
             aur_package_install "virtualbox-ext-oracle"
             add_user_to_group ${username} vboxusers
             add_module "vboxdrv vboxnetflt" "virtualbox-host"
