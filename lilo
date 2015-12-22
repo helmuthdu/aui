@@ -526,6 +526,31 @@ install_nfs(){
   fi
 }
 #}}}
+#ZSH {{{
+install_zsh(){
+  print_title "ZSH - https://wiki.archlinux.org/index.php/Zsh"
+  print_info "Zsh is a powerful shell that operates as both an interactive shell and as a scripting language interpreter. "
+  read_input_text "Install zsh" $ZSH
+  if [[ $OPTION == y ]]; then
+    package_install "zsh"
+    read_input_text "Install oh-my-zsh" $OH_MY_ZSH
+    if [[ $OPTION == y ]]; then
+      aur_package_install "oh-my-zsh-git"
+      if [[ -f /home/${username}/.zshrc ]]; then
+        read_input_text "Replace current .zshrc file"
+        if [[ $OPTION == y ]]; then
+          sudo -u ${username} mv ~/.zshrc ~/.zshrc.bkp
+          sudo -u ${username} cp /usr/share/oh-my-zsh/zshrc ~/.zshrc
+        fi
+      else
+        sudo -u ${username} cp /usr/share/oh-my-zsh/zshrc ~/.zshrc
+        sudo -u ${username} $EDITOR ~/.zshrc
+      fi
+    fi
+    pause_function
+  fi
+}
+#}}}
 #SAMBA {{{
 install_samba(){
   print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
@@ -3641,6 +3666,7 @@ do
       1)
         add_custom_repositories
         install_basic_setup
+        install_zsh
         install_ssh
         install_nfs
         install_samba
