@@ -640,7 +640,7 @@ install_bootloader(){
   select bootloader in "${bootloaders_list[@]}"; do
     case "$REPLY" in
       1)
-        pacstrap ${MOUNTPOINT} grub os-prober
+        pacstrap ${MOUNTPOINT} grub
         break
         ;;
       2)
