@@ -142,23 +142,18 @@
   USBMODEM="y"
 #}}}
 #ACCESSORIES {{{
-  # 1) Cairo Dock
-  # 2) Catfish
-  # 3) Compiz
-  # 4) Conky
-  # 5) Docky
-  # 6) Galculator
-  # 7) Pamac
-  # 8) Pyrenamer
-  # 9) LastPass Pocket
-  #10) Shutter
-  #11) Springseed
-  #12) Synapse
-  #13) Terminator
-  #14) Unified Remote
-  #15) Zim
-  #16) Plank
-  ACCESSORIES_OPTIONS=""
+  # 1) Catfish
+  # 2) Conky
+  # 3) Docky
+  # 4) Galculator
+  # 5) Pamac
+  # 6) Pyrenamer
+  # 7) Enpass
+  # 8) Shutter|Hotshots
+  # 9) Synapse
+  #10) Terminix
+  #11) Unified Remote
+  ACCESSORIES_OPTIONS="10"
 #}}}
 #DEVELOPEMENT {{{
   # 1) Atom
@@ -174,37 +169,6 @@
   #11) OracleJDK
   #12) NodeJS
   DEVELOPMENT_OPTIONS="11"
-  #ECLIPSE {{{
-    # 1) Eclipse Classic
-    # 2) Eclipse IDE for C/C++ Developers
-    # 3) Android Development Tools for Eclipse
-    # 4) Web Development Tools for Eclipse
-    # 5) PHP Development Tools for Eclipse
-    # 6) Python Development Tools for Eclipse
-    # 7) Aptana Studio plugin for Eclipse
-    # 8) Vim-like editing plugin for Eclipse
-    # 9) Git support plugin for Eclipse
-    #10) Colortheme for Eclipse
-    ECLIPSE_OPTIONS="1"
-  #}}}
-  #NODEJS {{{
-    # 1) backbone
-    # 2) bower
-    # 3) coffee-script
-    # 4) express
-    # 5) grunt
-    # 6) jsbeautify
-    # 7) jshint
-    # 8) jslint
-    # 9) less
-    #10) markdown
-    #11) mocha
-    #12) stylus
-    #13) uglify-js
-    #14) underscore
-    #15) yeoman
-    NODEJS_OPTIONS="2 7 8 9 13 15"
-  #}}}
 #}}}
 #OFFICE {{{
   # 1) Abiword+Gnumeric|Calligra
@@ -216,9 +180,8 @@
   # 7) Impressive
   # 8) Latex
   # 9) LibreOffice
-  #10) MediaElch
-  #11) OCRFeeder
-  #12) Xmind
+  #10) OCRFeeder
+  #11) Xmind
   OFFICE_OPTIONS="9"
 #}}}
 #SYSTEM TOOLS {{{
@@ -230,7 +193,7 @@
   # 6) Htop
   # 7) UFW
   # 8) Virtualbox
-  # 9) Webmin
+  # 9) Cockpit
   #10) Wine
   #11) Docker
   SYSTEMTOOLS_OPTIONS="10"
@@ -246,7 +209,6 @@
   # 8) Scribus
   # 9) Shotwell
   #10) Simple Scan
-  #11) XnViewMP
   GRAPHICS_OPTIONS="2-7 9"
 #}}}
 #INTERNET {{{
@@ -333,9 +295,8 @@
   #EDITORS|TOOLS {{{
     # 1) Audacity
     # 2) Easytag
-    # 3) Google Music Manager
-    # 4) OcenAudio
-    # 5) Soundconverter|Soundkonverter
+    # 3) OcenAudio
+    # 4) Soundconverter|Soundkonverter
     AUDIO_EDITOR_OPTIONS="2"
   #}}}
 #}}}
@@ -345,18 +306,16 @@
   # 3) Codecs
   VIDEO_OPTIONS="1-3"
   #PLAYERS {{{
-    # 1) Audience
-    # 2) Gnome Mplayer
-    # 3) LiveStreamer
-    # 4) Minitube
-    # 5) Miro
-    # 6) MPV
-    # 7) Parole
-    # 8) Popcorn Time
-    # 9) SMplayer
-    #10) VLC
-    #11) Kodi
-    VIDEO_PLAYER_OPTIONS="10"
+    # 1) Gnome Mplayer
+    # 2) LiveStreamer
+    # 3) Minitube
+    # 4) Miro
+    # 5) MPV
+    # 6) Parole
+    # 7) Popcorn Time
+    # 8) VLC
+    # 9) Kodi
+    VIDEO_PLAYER_OPTIONS="8"
   #}}}
   #EDITORS|TOOLS {{{
     # 1) Arista

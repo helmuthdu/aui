@@ -530,7 +530,7 @@
     done
   } #}}}
   system_update() { #{{{
-    pacman -Syy
+    pacman -Sy
   } #}}}
   npm_install() { #{{{
     #install packages using pacman
