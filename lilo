@@ -539,12 +539,12 @@ install_zsh(){
       if [[ -f /home/${username}/.zshrc ]]; then
         read_input_text "Replace current .zshrc file"
         if [[ $OPTION == y ]]; then
-          sudo -u ${username} mv ~/.zshrc ~/.zshrc.bkp
-          sudo -u ${username} cp /usr/share/oh-my-zsh/zshrc ~/.zshrc
+          sudo -u ${username} mv /home/${username}/.zshrc /home/${username}/.zshrc.bkp
+          sudo -u ${username} cp /usr/share/oh-my-zsh/zshrc /home/${username}/.zshrc
         fi
       else
-        sudo -u ${username} cp /usr/share/oh-my-zsh/zshrc ~/.zshrc
-        sudo -u ${username} $EDITOR ~/.zshrc
+        sudo -u ${username} cp /usr/share/oh-my-zsh/zshrc /home/${username}/.zshrc
+        sudo -u ${username} $EDITOR /home/${username}/.zshrc
       fi
     fi
     pause_function
@@ -619,7 +619,7 @@ install_tlp(){
     package_install "tlp"
     system_ctl enable tlp
     system_ctl enable tlp-sleep
-    system_ctl mask systemd-rfkill
+    system_ctl disable systemd-rfkill
     tlp start
     pause_function
   fi
@@ -1136,7 +1136,6 @@ install_desktop_environment(){
       #DEEPIN {{{
       print_title "DEEPIN - http://www.linuxdeepin.com"
       print_info "The desktop interface and apps feature an intuitive and elegant design. Moving around, sharing and searching etc. has become simply a joyful experience."
-      add_repository "home_metakcahura_arch-deepin_Arch_Extra" "http://download.opensuse.org/repositories/home:/metakcahura:/arch-deepin/Arch_Extra/\$arch" "Never"
       package_install "deepin deepin-extra"
       # config xinitrc
       config_xinitrc "startdde"
@@ -1180,7 +1179,7 @@ install_desktop_environment(){
       #KDE {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
-      package_install "plasma kde-applications kde-l10n-$LOCALE_KDE sddm"
+      package_install "plasma kde-applications-meta kde-meta-kdenetwork kde-meta-kdeutils kde-l10n-$LOCALE_KDE sddm"
       # config xinitrc
       config_xinitrc "startkde"
       pause_function
@@ -1417,8 +1416,12 @@ install_nm_wicd(){
       fi
       package_install "networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc"
       is_package_installed "ntp" && package_install "networkmanager-dispatcher-ntpd"
+      if is_package_installed "tlp"; then
+        package_install "tlp-rdw"
+      fi
       # Network Management daemon
-      system_ctl enable NetworkManager
+      system_ctl enable NetworkManager.service
+      system_ctl enable NetworkManager-dispatcher.service
       pause_function
       ;;
     2)
@@ -1451,7 +1454,12 @@ install_usb_modem(){
   read_input_text "Install usb 3G modem support" $USBMODEM
   if [[ $OPTION == y ]]; then
     package_install "usbutils usb_modeswitch"
-    is_package_installed "networkmanager" && package_install "modemmanager" || package_install "wvdial"
+    if is_package_installed "networkmanager"; then
+      package_install "modemmanager"
+      system_ctl enable ModemManager.service
+    else
+      package_install "wvdial"
+    fi
     pause_function
   fi
 }
@@ -3573,6 +3581,7 @@ install_extra(){
   do
     print_title "EXTRA"
     echo " 1) Global Menu $AUR"
+    echo " 2) $(menu_item "profile-sync-daemon") $AUR"
     echo " b) BACK"
     echo ""
     EXTRA_OPTIONS+=" b"
@@ -3590,6 +3599,11 @@ install_extra(){
           else
             add_line "gtk-shell-shows-menubar = 1" "/home/${username}/.config/gtk-3.0/settings.ini"
           fi
+          ;;
+        2)
+          aur_package_install "profile-sync-daemon"
+          sudo -u ${username} $EDITOR /home/${username}/.config/psd/psd.config
+          sudo -u ${username} systemctl --user enable psd.service
           ;;
         "b")
           break

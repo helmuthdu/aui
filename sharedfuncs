@@ -74,10 +74,10 @@
   EXTERNAL=`echo -e "(${BYellow}external${Reset})"`
   AUI_DIR=`pwd` #CURRENT DIRECTORY
   [[ $1 == -v || $1 == --verbose ]] && VERBOSE_MODE=1 || VERBOSE_MODE=0 # VERBOSE MODE
-  LOG="${AUI_DIR}/`basename ${0}`_error.log" # LOG FILE
+  LOG="${AUI_DIR}/`basename ${0}`.log" # LOG FILE
   [[ -f $LOG ]] && rm -f $LOG
   PKG=""
-  PKG_FAIL="${AUI_DIR}/`basename ${0}`_pkg_fail_list.log"
+  PKG_FAIL="${AUI_DIR}/`basename ${0}`_fail_install.log"
   [[ -f $PKG_FAIL ]] && rm -f $PKG_FAIL
   XPINGS=0 # CONNECTION CHECK
   SPIN="/-\|" #SPINNER POSITION
@@ -192,7 +192,7 @@
     connection_test() {
       ping -q -w 1 -c 1 `ip r | grep default | awk 'NR==1 {print $3}'` &> /dev/null && return 1 || return 0
     }
-    WIRED_DEV=`ip link | grep "eno\|enp" | awk '{print $2}'| sed 's/://' | sed '1!d'`
+    WIRED_DEV=`ip link | grep "ens\|eno\|enp" | awk '{print $2}'| sed 's/://' | sed '1!d'`
     WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://' | sed '1!d'`
     if connection_test; then
       print_warning "ERROR! Connection not Found."
