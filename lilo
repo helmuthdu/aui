@@ -1760,7 +1760,6 @@ install_system_apps(){
             package_install "virtualbox virtualbox-guest-iso qt4"
             aur_package_install "virtualbox-ext-oracle"
             add_user_to_group ${username} vboxusers
-            add_module "vboxdrv vboxnetadp vboxnetflt vboxpci" "virtualbox-host"
             modprobe vboxdrv vboxnetflt
           else
             cecho " ${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
