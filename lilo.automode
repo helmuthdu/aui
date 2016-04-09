@@ -38,7 +38,6 @@
   CUPS="y"
   CUSTOMREPO="n"         # Add custom repositories
   FIRMWARE="y"           # Install custom firmwares
-  GITTOR="n"
   NFS="n"
   READAHEAD="y"
   SAMBA="y"
@@ -121,15 +120,12 @@
   # 2) GTK2|GTK3 Themes
   THEMES_OPTIONS="1 2"
   #ICONS THEMES {{{
-    # 1) Moka
-    # 2) Nitrux
-    # 3) Numix
-    ICONS_THEMES="3"
+    # 1) Numix
+    ICONS_THEMES="1"
   #}}}
   #GTK THEMES {{{
-    # 1) Numix
-    # 2) Zukitwo
-    GTK_THEMES="1-2"
+    # 1) Arc
+    GTK_THEMES="1"
   #}}}
 #}}}
 #NETWORK MANAGER {{{
