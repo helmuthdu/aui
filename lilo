@@ -847,40 +847,13 @@ install_additional_firmwares(){
   fi
 }
 #}}}
-#GIT ACCESS THRU A FIREWALL {{{
-install_git_tor(){
-  print_title "GIT-TOR - https://wiki.archlinux.org/index.php/Tor"
-  print_info "Tor is an open source implementation of 2nd generation onion routing that provides free access to an anonymous proxy network. Its primary goal is to enable online anonymity by protecting against traffic analysis attacks."
-  read_input_text "Ensuring access to GIT through a firewall (bypass college/work firewall)" $GITTOR
-  if [[ $OPTION == y ]]; then
-    package_install "openbsd-netcat vidalia privoxy git"
-    if [[ ! -f /usr/bin/proxy-wrapper ]]; then
-      echo 'forward-socks5   /               127.0.0.1:9050 .' >> /etc/privoxy/config
-      echo -e '#!/bin/bash\nnc -xlocalhost:9050 -X5 $*' > /usr/bin/proxy-wrapper
-      chmod +x /usr/bin/proxy-wrapper
-      echo -e '\nexport GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"' >> /etc/bash.bashrc
-      export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"
-      su - ${username} -c 'export GIT_PROXY_COMMAND="/usr/bin/proxy-wrapper"'
-    fi
-    groupadd -g 42 privoxy
-    useradd -u 42 -g privoxy -s /bin/false -d /etc/privoxy privoxy
-    system_ctl start tor
-    system_ctl start privoxy
-    system_ctl enable tor
-    system_ctl enable privoxy
-    pause_function
-  fi
-}
-#}}}
 #DESKTOP ENVIRONMENT {{{
 install_desktop_environment(){
   install_icon_theme() { #{{{
     while true
     do
       print_title "GNOME ICONS"
-      echo " 1) $(menu_item "moka-icon-theme-git")"
-      echo " 2) $(menu_item "nitrux-icon-theme")"
-      echo " 3) $(menu_item "numix-icon-theme-git")"
+      echo " 1) $(menu_item "numix-icon-theme-git")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -889,12 +862,6 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            aur_package_install "moka-icon-theme-git"
-            ;;
-          2)
-            aur_package_install "nitrux-icon-theme"
-            ;;
-          3)
             aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
             ;;
           "b")
@@ -912,8 +879,7 @@ install_desktop_environment(){
     while true
     do
       print_title "GTK2/GTK3 THEMES"
-      echo " 1) $(menu_item "numix-themes" "Numix")"
-      echo " 2) $(menu_item "zuki-themes-git" "Zukitwo")"
+      echo " 1) $(menu_item "gtk-theme-arc-git" "Arc Themes")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -922,10 +888,7 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            aur_package_install "numix-themes"
-            ;;
-          2)
-            aur_package_install "zuki-themes-git"
+            aur_package_install "gtk-theme-arc-git "
             ;;
           "b")
             break
@@ -994,8 +957,8 @@ install_desktop_environment(){
     while true
     do
       print_title "$1 THEMES"
-      echo " 1) $(menu_item "moka-icons-git nitrux-icon-theme numix-circle-icon-theme-git" "Icons Themes") $AUR"
-      echo " 2) $(menu_item "numix-themes zuki-themes-git" "GTK Themes") $AUR"
+      echo " 1) $(menu_item "numix-circle-icon-theme-git" "Icons Themes") $AUR"
+      echo " 2) $(menu_item "gtk-theme-arc-git " "GTK Themes") $AUR"
       echo ""
       echo " d) DONE"
       echo ""
@@ -1159,7 +1122,7 @@ install_desktop_environment(){
       print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
       package_install "gnome gnome-extra telepathy"
-      package_install "gedit-plugins gnome-tweak-tool gnome-power-manager gucharmap gvfs-goa"
+      package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gucharmap gvfs-goa"
       package_install "deja-dup"
       aur_package_install "nautilus-share"
       # config xinitrc
@@ -1726,8 +1689,6 @@ install_system_apps(){
           freshclam
           ;;
         2)
-          print_title "FirewallD - https://fedoraproject.org/wiki/FirewallD"
-          print_info "firewalld provides a dynamically managed firewall with support for network/firewall zones to define the trust level of network connections or interfaces. It has support for IPv4, IPv6 firewall settings and for ethernet bridges and has a separation of runtime and persistent configuration options. It also supports an interface for services or applications to add firewall rules directly."
           is_package_installed "ufw" && package_remove "ufw"
           is_package_installed "firewalld" && package_remove "firewalld"
           package_install "firewalld"
@@ -1822,7 +1783,6 @@ install_graphics_apps(){
           ;;
         4)
           package_install "inkscape python2-numpy python-lxml"
-          aur_package_install "sozi"
           ;;
         5)
           package_install "mcomix"
@@ -2501,9 +2461,6 @@ install_video_apps(){
             aur_package_install "codecs64"
           fi
           package_install "ffmpeg"
-          sudo -u ${username} mkdir -p /home/${username}/.config/aacs/ &&
-            cd /home/${username}/.config/aacs/ &&
-            sudo -u ${username} wget http://vlc-bluray.whoknowsmy.name/files/KEYDB.cfg
           ;;
         "b")
           break
@@ -3562,7 +3519,6 @@ do
         font_config
         install_cups
         install_additional_firmwares
-        install_git_tor
         checklist[1]=1
         ;;
       2)
