@@ -346,8 +346,8 @@
     for module in $1; do
       #check if the name of the module can be the same of the module or the given name
       [[ $# -lt 2 ]] && local _module_name="$module" || local _module_name="$2"
-      local _is_disabled=`cat /etc/modules-load.d/${_module_name}.conf | grep $module &> /dev/null`
-      [[ -z $_is_disabled ]] && echo "$module" >> /etc/modules-load.d/${_module_name}.conf
+      local _has_module=`cat /etc/modules-load.d/${_module_name}.conf 2>&1 | grep $module`
+      [[ -z $_has_module ]] && echo "$module" >> /etc/modules-load.d/${_module_name}.conf
       start_module "$module"
     done
   } #}}}
@@ -396,7 +396,7 @@
     local _add_line=${1}
     local _filepath=${2}
 
-    local _has_line=`grep -ci "${_add_line}" ${_filepath}`
+    local _has_line=`grep -ci "${_add_line}" ${_filepath} 2>&1`
     [[ $_has_line -eq 0 ]] && echo "${_add_line}" >> ${_filepath}
   } #}}}
   replace_line() { #{{{
@@ -583,18 +583,6 @@
   elihw() { #{{{
     [[ $OPT == b || $OPT == d ]] && break;
   } #}}}
-  add_user_to_group() { #{{{
-    local _user=${1}
-    local _group=${2}
-
-    if [[ -z ${_group} ]]; then
-      error_msg "ERROR! 'add_user_to_group' was not given enough parameters."
-    fi
-
-    ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Adding ${Bold}${_user}${Reset} to ${Bold}${_group}${Reset} "
-    gpasswd -a ${_user} ${_group} >>"$LOG" 2>&1 &
-    pid=$!;progress $pid
-  } #}}}
   system_ctl() { #{{{
     local _action=${1}
     local _object=${2}
@@ -607,6 +595,23 @@
     arch-chroot $MOUNTPOINT /bin/bash -c "${1}"
   }
   #}}}
+  run_as_user() { #{{{
+    sudo -H -u ${username} ${1}
+  }
+  #}}}
+  add_user_to_group() { #{{{
+    local _user=${1}
+    local _group=${2}
+
+    if [[ -z ${_group} ]]; then
+      error_msg "ERROR! 'add_user_to_group' was not given enough parameters."
+    fi
+
+    ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Adding ${Bold}${_user}${Reset} to ${Bold}${_group}${Reset} "
+    groupadd ${_group} >>"$LOG" 2>&1 &
+    gpasswd -a ${_user} ${_group} >>"$LOG" 2>&1 &
+    pid=$!;progress $pid
+  } #}}}
   setlocale() { #{{{
     local _locale_list=(`cat /etc/locale.gen | grep UTF-8 | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
     PS3="$prompt1"

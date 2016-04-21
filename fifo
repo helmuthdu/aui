@@ -500,13 +500,13 @@ install_base_system(){
   if [[ -n $WIRELESS_DEV ]]; then
     pacstrap ${MOUNTPOINT} iw wireless_tools wpa_actiond wpa_supplicant dialog
   fi
-  WIRED_DEV=`ip link | grep "eno\|enp" | awk '{print $2}'| sed 's/://' | sed '1!d'`
+  WIRED_DEV=`ip link | grep "ens\|eno\|enp" | awk '{print $2}'| sed 's/://' | sed '1!d'`
   if [[ -n $WIRED_DEV ]]; then
-    arch_chroot "systemctl enable dhcpcd@${WIRED_DEV}"
+    arch_chroot "systemctl enable dhcpcd@${WIRED_DEV}.service"
   fi
   if is_package_installed "espeakup"; then
     pacstrap ${MOUNTPOINT} alsa-utils espeakup brltty
-    arch_chroot "systemctl enable espeakup"
+    arch_chroot "systemctl enable espeakup.service"
   fi
 }
 #}}}
@@ -579,6 +579,10 @@ configure_timezone(){
     read_input_text "Confirm timezone (${ZONE}/${SUBZONE})"
   done
   arch_chroot "ln -s /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
+  arch_chroot "sed -i '/#NTP=/d' /etc/systemd/timesyncd.conf"
+  arch_chroot "sed -i 's/#Fallback//' /etc/systemd/timesyncd.conf"
+  arch_chroot "echo \"FallbackNTP=0.pool.ntp.org 1.pool.ntp.org 0.fr.pool.ntp.org\" >> /etc/systemd/timesyncd.conf"
+  arch_chroot "timedatectl set-ntp true "
 }
 #}}}
 #CONFIGURE HARDWARECLOCK {{{

@@ -437,10 +437,7 @@ add_custom_repositories(){
 #BASIC SETUP {{{
 install_basic_setup(){
   print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-  package_install "bc rsync mlocate bash-completion pkgstats"
-  print_title "NTPd - https://wiki.archlinux.org/index.php/NTPd"
-  package_install "ntp"
-  is_package_installed "ntp" && ntpd -u ntp:ntp
+  package_install "bc rsync mlocate bash-completion pkgstats arch-wiki-lite"
   pause_function
   print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
   package_install "zip unzip unrar p7zip lzop cpio"
@@ -534,16 +531,16 @@ install_zsh(){
     package_install "zsh"
     read_input_text "Install oh-my-zsh" $OH_MY_ZSH
     if [[ $OPTION == y ]]; then
-      aur_package_install "oh-my-zsh-git"
       if [[ -f /home/${username}/.zshrc ]]; then
         read_input_text "Replace current .zshrc file"
         if [[ $OPTION == y ]]; then
-          sudo -u ${username} mv /home/${username}/.zshrc /home/${username}/.zshrc.bkp
-          sudo -u ${username} cp /usr/share/oh-my-zsh/zshrc /home/${username}/.zshrc
+          run_as_user "mv /home/${username}/.zshrc /home/${username}/.zshrc.bkp"
+          run_as_user "sh -c \"$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)\""
+          run_as_user "$EDITOR /home/${username}/.zshrc"
         fi
       else
-        sudo -u ${username} cp /usr/share/oh-my-zsh/zshrc /home/${username}/.zshrc
-        sudo -u ${username} $EDITOR /home/${username}/.zshrc
+        run_as_user "sh -c \"$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)\""
+        run_as_user "$EDITOR /home/${username}/.zshrc"
       fi
     fi
     pause_function
@@ -630,8 +627,9 @@ install_xorg(){
   print_info "Xorg is the public, open-source implementation of the X window system version 11."
   echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
   package_install "xorg-server xorg-server-utils xorg-server-xwayland xorg-xinit xorg-xkill"
-  package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard xf86-input-wacom xf86-input-libinput"
+  package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard xf86-input-wacom xf86-input-joystick xf86-input-libinput"
   package_install "mesa"
+  modprobe uinput
   pause_function
 }
 #}}}
@@ -702,7 +700,7 @@ install_video_cards(){
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
-    gpasswd -a ${username} bumblebee
+    add_user_to_group ${username} bumblebee
   #}}}
   #NVIDIA {{{
   elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
@@ -1427,7 +1425,6 @@ install_accessories_apps(){
     echo " 8) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots" || echo "Shutter";)")"
     echo " 9) $(menu_item "synapse")"
     echo "10) $(menu_item "terminix")"
-    echo "11) $(menu_item "unified-remote-server" "Unified Remote")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1440,6 +1437,8 @@ install_accessories_apps(){
           ;;
         2)
           aur_package_install "conky-lua"
+          package_install "lm_sensors"
+          sensors-detect --auto
           ;;
         3)
           package_install "docky"
@@ -1469,10 +1468,6 @@ install_accessories_apps(){
           ;;
         10)
           aur_package_install "terminix"
-          ;;
-        11)
-          aur_package_install "unified-remote-server"
-          system_ctl enable urserver
           ;;
         "b")
           break
@@ -1525,8 +1520,7 @@ install_development_apps(){
           ;;
         5)
           aur_package_install "android-sdk android-sdk-platform-tools android-sdk-build-tools android-platform"
-          groupadd sdkusers
-          gpasswd -a ${username} sdkusers
+          add_user_to_group ${username} sdkusers
           chown -R :sdkusers /opt/android-sdk/
           chmod -R g+w /opt/android-sdk/
           add_line "export ANDROID_HOME=/opt/android-sdk" "/home/${username}/.bashrc"
@@ -1540,10 +1534,6 @@ install_development_apps(){
           ;;
         8)
           package_install "qtcreator"
-          mkdir -p /home/${username}/.config/Nokia/qtcreator/styles
-          curl -o monokai.xml http://angrycoding.googlecode.com/svn/branches/qt-creator-monokai-theme/monokai.xml
-          mv monokai.xml /home/${username}/.config/Nokia/qtcreator/styles/
-          chown -R ${username}:users /home/${username}/.config
           ;;
         9)
           aur_package_install "mysql-workbench-gpl"
@@ -1662,16 +1652,18 @@ install_system_apps(){
   do
     print_title "SYSTEM TOOLS APPS"
     echo " 1) $(menu_item "clamav")"
-    echo " 2) $(menu_item "firewalld")"
-    echo " 3) $(menu_item "gparted")"
-    echo " 4) $(menu_item "grsync")"
-    echo " 5) $(menu_item "hosts-update") $AUR"
-    echo " 6) $(menu_item "htop")"
-    echo " 7) $(menu_item "ufw")"
-    echo " 8) $(menu_item "virtualbox")"
-    echo " 9) $(menu_item "cockpit")"
-    echo "10) $(menu_item "wine")"
-    echo "11) $(menu_item "docker")"
+    echo " 2) $(menu_item "cockpit")"
+    echo " 3) $(menu_item "docker")"
+    echo " 4) $(menu_item "firewalld")"
+    echo " 5) $(menu_item "gparted")"
+    echo " 6) $(menu_item "grsync")"
+    echo " 7) $(menu_item "hosts-update") $AUR"
+    echo " 8) $(menu_item "htop")"
+    echo " 9) $(menu_item "plex-media-server" "Plex") $AUR"
+    echo "10) $(menu_item "ufw")"
+    echo "11) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
+    echo "12) $(menu_item "virtualbox")"
+    echo "13) $(menu_item "wine")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1689,32 +1681,47 @@ install_system_apps(){
           freshclam
           ;;
         2)
+          aur_package_install "cockpit"
+          ;;
+        3)
+          package_install "docker"
+          add_user_to_group ${username} docker
+          ;;
+        4)
           is_package_installed "ufw" && package_remove "ufw"
           is_package_installed "firewalld" && package_remove "firewalld"
           package_install "firewalld"
           system_ctl enable firewalld
           ;;
-        3)
+        5)
           package_install "gparted"
           ;;
-        4)
+        6)
           package_install "grsync"
           ;;
-        5)
+        7)
           aur_package_install "hosts-update"
           hosts-update
           ;;
-        6)
+        8)
           package_install "htop"
           ;;
-        7)
+        9)
+          aur_package_install "plex-media-server"
+          system_ctl enable plexmediaserver.service
+          ;;
+        10)
           print_title "UFW - https://wiki.archlinux.org/index.php/Ufw"
           print_info "Ufw stands for Uncomplicated Firewall, and is a program for managing a netfilter firewall. It provides a command line interface and aims to be uncomplicated and easy to use."
           is_package_installed "firewalld" && package_remove "firewalld"
           aur_package_install "ufw gufw"
-          system_ctl enable ufw
+          system_ctl enable ufw.service
           ;;
-        8)
+        11)
+          aur_package_install "unified-remote-server"
+          system_ctl enable urserver.service
+          ;;
+        12)
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
@@ -1723,19 +1730,11 @@ install_system_apps(){
             add_user_to_group ${username} vboxusers
             modprobe vboxdrv vboxnetflt
           else
-            cecho " ${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
+            cecho "${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
           ;;
-        9)
-          aur_package_install "cockpit"
-          ;;
-        10)
+        13)
           package_install "icoutils wine wine_gecko wine-mono winetricks"
-          ;;
-        11)
-          package_install "docker"
-          groupadd docker
-          gpasswd -a ${USER} docker
           ;;
         "b")
           break
@@ -2290,7 +2289,7 @@ install_audio_apps(){
           # transparent to most people on most music and is already quite high in quality.
           # The resulting bitrate should be in the 170-210kbps range, according to music
           # complexity.
-          sudo -u ${username} gconftool-2 --type string --set /system/gstreamer/0.10/audio/profiles/mp3/pipeline "audio/x-raw-int,rate=44100,channels=2 ! lame name=enc preset=1001 ! id3v2mux"
+          run_as_user "gconftool-2 --type string --set /system/gstreamer/0.10/audio/profiles/mp3/pipeline \audio/x-raw-int,rate=44100,channels=2 ! lame name=enc preset=1001 ! id3v2mux\""
           ;;
         "b")
           break
@@ -2478,20 +2477,9 @@ install_games(){
   while true
   do
     print_title "GAMES - https://wiki.archlinux.org/index.php/Games"
-    echo " 1) Action|Adventure"
-    echo " 2) Arcade|Platformer"
-    echo " 3) Dungeon"
-    echo " 4) Emulators"
-    echo " 5) FPS"
-    echo " 6) MMO"
-    echo " 7) Puzzle"
-    echo " 8) RPG"
-    echo " 9) Racing"
-    echo "10) Simulation"
-    echo "11) Strategy"
-    echo "12) Terminal"
-    echo "13) PlayOnLinux"
-    echo "14) Steam"
+    echo " 1) Desura"
+    echo " 2) PlayOnLinux"
+    echo " 3) Steam"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2500,651 +2488,16 @@ install_games(){
     for OPT in ${OPTIONS[@]}; do
       case "$OPT" in
         1)
-          #ACTION|ADVENTURE {{{
-          while true
-          do
-            print_title "ACTION AND ADVENTURE"
-            echo " 1) $(menu_item "astromenace")"
-            echo " 2) $(menu_item "counter-strike-2d" "Counter-Strike 2D") $AUR"
-            echo " 3) $(menu_item "dead-cyborg-episode1" "Dead Cyborg") $AUR"
-            echo " 4) $(menu_item "mars-shooter" "M.A.R.S.") $AUR"
-            echo " 5) $(menu_item "nikki") $AUR"
-            echo " 6) $(menu_item "opentyrian-hg") $AUR"
-            echo " 7) $(menu_item "srb2" "Sonic Robot Blast 2") $AUR"
-            echo " 8) $(menu_item "steelstorm") $AUR"
-            echo ""
-            echo " b) BACK"
-            echo ""
-
-            ACTION+=" b"
-            read_input_options "$ACTION"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  package_install "astromenace"
-                  ;;
-                2)
-                  aur_package_install "counter-strike-2d"
-                  ;;
-                3)
-                  aur_package_install "dead-cyborg-episode1"
-                  ;;
-                4)
-                  aur_package_install "mars-shooter"
-                  ;;
-                5)
-                  aur_package_install "nikki"
-                  ;;
-                6)
-                  aur_package_install "opentyrian-hg"
-                  ;;
-                7)
-                  aur_package_install "srb2"
-                  ;;
-                8)
-                  aur_package_install "steelstorm"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
+          aur_package_install "desura"
           OPT=1
           ;;
         2)
-          #ARCADE|PLATFORMER {{{
-          while true
-          do
-            print_title "ARCADE AND PLATFORMER"
-            echo " 1) $(menu_item "abuse")"
-            echo " 2) $(menu_item "btanks" "Battle Tanks")"
-            echo " 3) $(menu_item "bomberclone")"
-            echo " 4) $(menu_item "funguloids" "Those Funny Funguloids") $AUR"
-            echo " 5) $(menu_item "frogatto")"
-            echo " 6) $(menu_item "goonies") $AUR"
-            echo " 7) $(menu_item "mari0") $AUR"
-            echo " 8) $(menu_item "neverball")"
-            echo " 9) $(menu_item "opensonic") $AUR"
-            echo "10) $(menu_item "robombs_bin" "Robombs") $AUR"
-            echo "11) $(menu_item "smc" "Super Maryo Chronicles")"
-            echo "12) $(menu_item "xmoto")"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            ARCADE+=" b"
-            read_input_options "$ARCADE"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  package_install "abuse"
-                  ;;
-                2)
-                  package_install "btanks"
-                  ;;
-                3)
-                  package_install "bomberclone"
-                  ;;
-                4)
-                  aur_package_install "funguloids"
-                  ;;
-                5)
-                  package_install "frogatto"
-                  ;;
-                6)
-                  aur_package_install "goonies"
-                  ;;
-                7)
-                  aur_package_install "mari0"
-                  ;;
-                8)
-                  package_install "neverball"
-                  ;;
-                9)
-                  aur_package_install "opensonic"
-                  ;;
-                10)
-                  aur_package_install "robombs_bin"
-                  ;;
-                11)
-                  package_install "smc"
-                  ;;
-                12)
-                  package_install "xmoto"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
+          aur_package_install "playonlinux"
           OPT=2
           ;;
         3)
-          #DUNGEON {{{
-          while true
-          do
-            print_title "DUNGEON"
-            echo " 1) $(menu_item "adom") $AUR"
-            echo " 2) $(menu_item "tome4" "Tales of MajEyal") $AUR"
-            echo " 3) $(menu_item "lostlabyrinth" "Lost Labyrinth") $AUR"
-            echo " 4) $(menu_item "scourge" "S.C.O.U.R.G.E.") $AUR"
-            echo " 5) $(menu_item "stone-soupe" "Stone-Soupe")"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            DUNGEON+=" b"
-            read_input_options "$DUNGEON"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  aur_package_install "adom"
-                  ;;
-                2)
-                  aur_package_install "tome4"
-                  ;;
-                3)
-                  aur_package_install "lostlabyrinth"
-                  ;;
-                4)
-                  aur_package_install "scourge"
-                  ;;
-                5)
-                  aur_package_install "stone-soup"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
+          package_install "steam"
           OPT=3
-          ;;
-        4)
-          #EMULATORS {{{
-          while true
-          do
-            print_title "EMULATORS"
-            echo " 1) $(menu_item "higan-gtk higan-qt" "BSNES")"
-            echo " 2) $(menu_item "desmume")"
-            echo " 3) $(menu_item "dolphin-emu" "Dolphin")"
-            echo " 4) $(menu_item "epsxe") $AUR"
-            echo " 5) $(menu_item "project64") $AUR"
-            echo " 6) $(menu_item "snesx9x")"
-            echo " 7) $(menu_item "vbam-gtk" "VisualBoyAdvanced")"
-            echo " 8) $(menu_item "wxmupen64plus") $AUR"
-            echo " 9) $(menu_item "zsnes")"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            EMULATORS+=" b"
-            read_input_options "$EMULATORS"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  if [[ ${KDE} -eq 1 ]]; then
-                    package_install "higan-qt"
-                  else
-                    package_install "higan-gtk"
-                  fi
-                  ;;
-                2)
-                  package_install "desmume"
-                  ;;
-                3)
-                  package_install "dolphin-emu"
-                  ;;
-                4)
-                  aur_package_install "epsxe"
-                  ;;
-                5)
-                  aur_package_install "project64"
-                  ;;
-                6)
-                  package_install "snes9x-gtk"
-                  ;;
-                7)
-                  package_install "vbam-gtk"
-                  ;;
-                8)
-                  aur_package_install "wxmupen64plus"
-                  ;;
-                9)
-                  package_install "zsnes"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=4
-          ;;
-        5)
-          #FPS {{{
-          while true
-          do
-            print_title "FPS"
-            echo " 1) $(menu_item "alienarena")"
-            echo " 2) $(menu_item "warsow")"
-            echo " 3) $(menu_item "enemy-territory" "Wolfenstein: Enemy Territory") $AUR"
-            echo " 4) $(menu_item "worldofpadman" "World of Padman") $AUR"
-            echo " 5) $(menu_item "xonotic")"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            FPS+=" b"
-            read_input_options "$FPS"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  package_install "alienarena"
-                  ;;
-                2)
-                  package_install "warsow"
-                  ;;
-                3)
-                  aur_package_install "enemy-territory"
-                  ;;
-                4)
-                  aur_package_install "worldofpadman"
-                  ;;
-                5)
-                  package_install "xonotic"
-                  ;;
-
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=5
-          ;;
-        6)
-          #MMO {{{
-          while true
-          do
-            print_title "MMO"
-            echo " 1) $(menu_item "hon" "Heroes of Newerth") $AUR"
-            echo " 2) $(menu_item "leagueoflegends" "League of Legends") $AUR"
-            echo " 3) $(menu_item "manaplus") $AUR"
-            echo " 4) $(menu_item "unix-runescape-client" "Runescape") $AUR"
-            echo " 5) $(menu_item "savage2") $AUR"
-            echo " 6) $(menu_item "spiral-knights") $AUR"
-            echo " 7) $(menu_item "wakfu") $AUR"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            MMO+=" b"
-            read_input_options "$MMO"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  aur_package_install "hon"
-                  ;;
-                2)
-                  aur_package_install "leagueoflegends"
-                  add_user_to_group ${username} "lol"
-                  ;;
-                3)
-                  aur_package_install "manaplus"
-                  ;;
-                4)
-                  aur_package_install "unix-runescape-client"
-                  ;;
-                5)
-                  aur_package_install "savage2"
-                  ;;
-                6)
-                  aur_package_install "spiral-knights"
-                  ;;
-                7)
-                  aur_package_install "wakfu"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=6
-          ;;
-        7)
-          #PUZZLE {{{
-          while true
-          do
-            print_title "PUZZLE"
-            echo " 1) $(menu_item "frozen-bubble")"
-            echo " 2) $(menu_item "puzzle-moppet-bin") $AUR"
-            echo " 3) $(menu_item "numptyphysics-svn") $AUR"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            PUZZLE+=" b"
-            read_input_options "$PUZZLE"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  package_install "frozen-bubble"
-                  ;;
-                2)
-                  aur_package_install "puzzle-moppet-bin"
-                  ;;
-                3)
-                  aur_package_install "numptyphysics-svn"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=7
-          ;;
-        8)
-          #RPG {{{
-          while true
-          do
-            print_title "RPG"
-            echo " 1) $(menu_item "ardentryst") $AUR"
-            echo " 2) $(menu_item "flare-rpg") $AUR"
-            echo " 3) $(menu_item "freedroidrpg" "Freedroid RPG")"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            RPG+=" b"
-            read_input_options "$RPG"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  aur_package_install "ardentryst"
-                  ;;
-                2)
-                  aur_package_install "flare-rpg"
-                  ;;
-                3)
-                  package_install "freedroidrpg"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=8
-          ;;
-        9)
-          #RACING {{{
-          while true
-          do
-            print_title "RACING"
-            echo " 1) $(menu_item "maniadrive") $AUR"
-            echo " 2) $(menu_item "death-rally") $AUR"
-            echo " 3) $(menu_item "stuntrally") $AUR"
-            echo " 4) $(menu_item "supertuxkart")"
-            echo " 5) $(menu_item "speed-dreams")"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            RACING+=" b"
-            read_input_options "$RACING"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  aur_package_install "maniadrive"
-                  ;;
-                2)
-                  aur_package_install "death-rally"
-                  ;;
-                3)
-                  aur_package_install "stuntrally"
-                  ;;
-                4)
-                  package_install "supertuxkart"
-                  ;;
-                5)
-                  package_install "speed-dreams"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=9
-          ;;
-        10)
-          #SIMULATION {{{
-          while true
-          do
-            print_title "SIMULATION"
-            echo " 1) $(menu_item "simutrans")"
-            echo " 2) $(menu_item "corsix-th" "Theme Hospital") $AUR"
-            echo " 3) $(menu_item "openttd")"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            SIMULATION+=" b"
-            read_input_options "$SIMULATION"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  package_install "simutrans"
-                  ;;
-                2)
-                  aur_package_install "corsix-th"
-                  ;;
-                3)
-                  package_install "openttd"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=10
-          ;;
-        11)
-          #STRATEGY {{{
-          while true
-          do
-            print_title "STRATEGY"
-            echo " 1) $(menu_item "0ad")"
-            echo " 2) $(menu_item "hedgewars")"
-            echo " 3) $(menu_item "megaglest")"
-            echo " 4) $(menu_item "unknown-horizons") $AUR"
-            echo " 5) $(menu_item "warzone2100")"
-            echo " 6) $(menu_item "wesnoth")"
-            echo " 7) $(menu_item "zod") $AUR"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            STRATEGY+=" b"
-            read_input_options "$STRATEGY"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  package_install "0ad"
-                  ;;
-                2)
-                  package_install "hedgewars"
-                  ;;
-                3)
-                  package_install "megaglest"
-                  ;;
-                4)
-                  package_install "unknow-horizons"
-                  ;;
-                5)
-                  package_install "warzone2100"
-                  ;;
-                6)
-                  package_install "wesnoth"
-                  ;;
-                7)
-                  aur_package_install "commander-zod"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=11
-          ;;
-        12)
-          #TERMINAL {{{
-          while true
-          do
-            print_title "TERMINAL"
-            echo " 1) $(menu_item "asciiquarium") $AUR"
-            echo " 2) $(menu_item "bastet") $AUR"
-            echo " 3) $(menu_item "bsd-games")"
-            echo " 4) $(menu_item "cmatrix")"
-            echo " 5) $(menu_item "cowsay")"
-            echo " 6) $(menu_item "fortune-mod")"
-            echo " 7) $(menu_item "funny-manpages") $AUR"
-            echo " 8) $(menu_item "greed") $AUR"
-            echo " 9) $(menu_item "moon-buggy") $AUR"
-            echo "10) $(menu_item "myman") $AUR"
-            echo "11) $(menu_item "nethack")"
-            echo "12) $(menu_item "ninvaders") $AUR"
-            echo "13) $(menu_item "ponysay")"
-            echo "14) $(menu_item "robotfindskitten") $AUR"
-            echo "15) $(menu_item "ski") $AUR"
-            echo "16) $(menu_item "toilet") $AUR"
-            echo ""
-            echo " b) BACK"
-            echo ""
-            TERMINAL_GAMES+=" b"
-            read_input_options "$TERMINAL_GAMES"
-            for OPT in ${OPTIONS[@]}; do
-              case "$OPT" in
-                1)
-                  aur_package_install "asciiquarium"
-                  ;;
-                2)
-                  aur_package_install "bastet"
-                  ;;
-                3)
-                  package_install "bsd-games"
-                  ;;
-                4)
-                  package_install "cmatrix"
-                  ;;
-                5)
-                  package_install "cowsay"
-                  ;;
-                6)
-                  package_install "fortune-mod"
-                  ;;
-                7)
-                  aur_package_install "funny-manpages"
-                  ;;
-                8)
-                  aur_package_install "greed"
-                  ;;
-                9)
-                  aur_package_install "moon-buggy"
-                  ;;
-                10)
-                  aur_package_install "myman"
-                  ;;
-                11)
-                  package_install "nethack"
-                  ;;
-                12)
-                  aur_package_install "ninvaders"
-                  ;;
-                13)
-                  package_install "ponysay"
-                  ;;
-                14)
-                  aur_package_install "robotfindskitten"
-                  ;;
-                15)
-                  aur_package_install "ski"
-                  ;;
-                16)
-                  aur_package_install "toilet"
-                  ;;
-                "b")
-                  break
-                  ;;
-                *)
-                  invalid_option
-                  ;;
-              esac
-            done
-            elihw
-          done
-          #}}}
-          OPT=12
-          ;;
-        13)
-          aur_package_install "playonlinux"
-          OPT=13
-          ;;
-        14)
-          aur_package_install "steam"
-          OPT=14
           ;;
         "b")
           break
@@ -3168,23 +2521,23 @@ install_web_server(){
   install_mariadb(){ #{{{
     package_install "mariadb"
     /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-    system_ctl enable mysqld
-    systemctl start mysqld
+    system_ctl enable mysqld.service
+    systemctl start mysqld.service
     /usr/bin/mysql_secure_installation
   } #}}}
   install_postgresql(){ #{{{
     package_install "postgresql"
-    systemd-tmpfiles --create postgresql.conf
     mkdir -p /var/lib/postgres
     chown -R postgres:postgres /var/lib/postgres
+    systemd-tmpfiles --create postgresql.conf
     echo "Enter your new postgres account password:"
     passwd postgres
     while [[ $? -ne 0 ]]; do
       passwd postgres
     done
     su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
-    system_ctl enable postgresql
-    system_ctl start postgresql
+    system_ctl enable postgresql.service
+    system_ctl start postgresql.service
     read_input_text "Install Postgis + Pgrouting" $POSTGIS
     [[ $OPTION == y ]] && install_gis_extension
   } #}}}
@@ -3260,7 +2613,7 @@ install_web_server(){
       package_install "apache php php-apache php-mcrypt php-gd"
       install_mariadb
       install_adminer
-      system_ctl enable httpd
+      system_ctl enable httpd.service
       configure_php_apache
       configure_php "mariadb"
       create_sites_folder
@@ -3269,7 +2622,7 @@ install_web_server(){
       package_install "apache php php-apache php-pgsql php-gd"
       install_postgresql
       install_adminer
-      system_ctl enable httpd
+      system_ctl enable httpd.service
       configure_php_apache
       configure_php "postgresql"
       create_sites_folder
@@ -3277,16 +2630,16 @@ install_web_server(){
     3)
       package_install "nginx php php-mcrypt php-fpm"
       install_mariadb
-      system_ctl enable nginx
-      system_ctl enable php-fpm
+      system_ctl enable nginx.service
+      system_ctl enable php-fpm.service
       configure_php_nginx
       configure_php "mariadb"
       ;;
     4)
       package_install "nginx php php-fpm php-pgsql"
       install_postgresql
-      system_ctl enable nginx
-      system_ctl enable php-fpm
+      system_ctl enable nginx.service
+      system_ctl enable php-fpm.service
       configure_php_nginx
       configure_php "postgresql"
       ;;
@@ -3421,15 +2774,16 @@ install_extra(){
             aur_package_install "kdeplasma-applets-menubar"
           fi
           if [[ ! -f /home/${username}/.config/gtk-3.0/settings.ini ]]; then
-            sudo -u ${username} echo -e "[Settings]\ngtk-shell-shows-menubar = 1" > /home/${username}/.config/gtk-3.0/settings.ini
+            run_as_user "echo -e \"[Settings]\ngtk-shell-shows-menubar = 1\" > /home/${username}/.config/gtk-3.0/settings.ini"
           else
             add_line "gtk-shell-shows-menubar = 1" "/home/${username}/.config/gtk-3.0/settings.ini"
           fi
           ;;
         2)
           aur_package_install "profile-sync-daemon"
-          sudo -u ${username} $EDITOR /home/${username}/.config/psd/psd.config
-          sudo -u ${username} systemctl --user enable psd.service
+          run_as_user "psd"
+          run_as_user "$EDITOR /home/${username}/.config/psd/psd.conf"
+          run_as_user "systemctl --user enable psd.service"
           ;;
         "b")
           break
@@ -3479,7 +2833,8 @@ if is_package_installed "kdebase-workspace"; then KDE=1; fi
 
 while true
 do
-  print_title "ARCHLINUX U INSTALL - https://github.com/helmuthdu/aui"
+  print_title "ARCHLINUX INSTALL - https://github.com/helmuthdu/aui"
+  print_warning "USERNAME: ${username}"
   echo " 1) $(mainmenu_item "${checklist[1]}" "Basic Setup")"
   echo " 2) $(mainmenu_item "${checklist[2]}" "Desktop Environment|Window Manager")"
   echo " 3) $(mainmenu_item "${checklist[3]}" "Accessories Apps")"

@@ -143,12 +143,11 @@
   # 3) Docky
   # 4) Galculator
   # 5) Pamac
-  # 6) Pyrenamer
-  # 7) Enpass
-  # 8) Shutter|Hotshots
-  # 9) Synapse
-  #10) Terminix
-  #11) Unified Remote
+  # 7) Pyrenamer
+  # 8) Enpass
+  # 9) Shutter|Hotshots
+  #10) Synapse
+  #11) Terminix
   ACCESSORIES_OPTIONS="10"
 #}}}
 #DEVELOPEMENT {{{
@@ -182,16 +181,18 @@
 #}}}
 #SYSTEM TOOLS {{{
   # 1) ClamAV
-  # 2) FirewallD
-  # 3) Gparted
-  # 4) Grsync
-  # 5) Hosts Update
-  # 6) Htop
-  # 7) UFW
-  # 8) Virtualbox
-  # 9) Cockpit
-  #10) Wine
-  #11) Docker
+  # 2) Cockpit
+  # 3) Docker
+  # 4) FirewallD
+  # 5) Gparted
+  # 6) Grsync
+  # 7) Hosts Update
+  # 8) Htop
+  # 9) Plex
+  #10) UFW
+  #11) Unified Remote
+  #12) Virtualbox
+  #13) Wine
   SYSTEMTOOLS_OPTIONS="10"
 #}}}
 #GRAPHICS {{{
@@ -328,139 +329,10 @@
   #}}}
 #}}}
 #GAMES {{{
-  # 1) Action|Adventure
-  # 2) Arcade|Platformer
-  # 3) Dungeon
-  # 4) Emulators
-  # 5) FPS
-  # 6) MMO
-  # 7) Puzzle
-  # 8) RPG
-  # 9) Racing
-  #10) Simulation
-  #11) Strategy
-  #12) Terminal
-  #13) PlayOnLinux
-  #14) Steam
+  #1) Desura
+  #2) PlayOnLinux
+  #3) Steam
   GAMES_OPTIONS=""
-  #ACTION {{{
-    # 1) Astromenace
-    # 2) Counter-Strike 2D
-    # 3) Dead Cyborg
-    # 4) M.A.R.S.
-    # 5) Nikki
-    # 6) OpenTyrian
-    # 7) Sonic Robot Bast 2
-    # 8) SteelStorm
-    ACTION=""
-  #}}}
-  #ARCADE {{{
-    # 1) Abuse
-    # 2) Battle Tanks
-    # 3) Bomberclone
-    # 4) Those Funny Funguloids
-    # 5) Frogatto
-    # 6) Goonies
-    # 7) Mari0
-    # 8) Neverball
-    # 9) Opensonic
-    #10) Robombs
-    #11) Super Mario Chronicles
-    #12) X-Moto
-    ARCADE=""
-  #}}}
-  #DUNGEON {{{
-    # 1) Adom
-    # 2) Tales of MajEyal
-    # 3) Lost Labyrinth
-    # 4) S.C.O.U.R.G.E.
-    # 5) Stone-Soupe
-    DUNGEON=""
-  #}}}
-  #EMULATORS {{{
-    # 1) BSNES
-    # 2) Desmume
-    # 3) Dolphin
-    # 4) ePSXe
-    # 5) Project64
-    # 6) Snes9x
-    # 7) VisualBoyAdvanced
-    # 8) wxMupen64Plus
-    # 9) ZSNES
-    EMULATORS=""
-  #}}}
-  #FPS {{{
-    # 1) AlienArena
-    # 2) Warsow
-    # 3) Wolfenstein: Enemy Territory
-    # 4) World of Padman
-    # 5) Xonotic
-    FPS=""
-  #}}}
-  #MMO {{{
-    # 1) Heroes of Newerth
-    # 2) League of Legends
-    # 3) ManaPlus
-    # 4) Runescape
-    # 5) Savage II
-    # 6) Spiral Knights
-    # 7) Wakfu
-    MMO=""
-  #}}}
-  #PUZZLE {{{
-    # 1) Frozen Bubble
-    # 2) Puzzle Moppet
-    # 3) Numptyphysics
-    PUZZLE=""
-  #}}}
-  #RPG {{{
-    # 1) Ardentryst
-    # 2) Flare
-    # 3) Freedroid RPG
-    RPG=""
-  #}}}
-  #RACING {{{
-    # 1) Maniadrive
-    # 2) Death Rally
-    # 3) Stuntrally
-    # 4) SupertuxKart
-    # 5) Speed Dreams
-    RACING=""
-  #}}}
-  #SIMULATION {{{
-    # 1) Simultrans
-    # 2) Theme Hospital
-    # 3) OpenTTD
-    SIMULATION=""
-  #}}}
-  #STRATEGY {{{
-    # 1) 0ad
-    # 2) Hedgewars
-    # 3) MegaGlest
-    # 4) Warzone 2100
-    # 5) Wesnoth
-    # 6) Zod
-    STRATEGY=""
-  #}}}
-  #TERMINAL {{{
-    #  1) Asciiquarium
-    #  2) Bastet
-    #  3) Bsd-games
-    #  4) Cmatrix
-    #  5) Cowsay
-    #  6) Fortune-mod
-    #  7) Funny-manpages
-    #  8) Greed
-    #  9) Moon-buggy
-    # 10) Myman
-    # 11) Nethack
-    # 12) Ninvaders
-    # 13) Ponysay
-    # 14) Robotfindskitten
-    # 15) Ski
-    # 16) Toilet
-    TERMINAL_GAMES=""
-  #}}}
 #}}}
 #WEBSERVER {{{
   # 1) LAMP - APACHE, MariaDB & PHP
@@ -482,5 +354,6 @@
 #}}}
 #EXTRA {{{
   # 1) Global Menu
+  # 2) Profile Sync
   EXTRA_OPTIONS=""
 #}}}
