@@ -143,11 +143,11 @@
   # 3) Docky
   # 4) Galculator
   # 5) Pamac
-  # 7) Pyrenamer
-  # 8) Enpass
-  # 9) Shutter|Hotshots
-  #10) Synapse
-  #11) Terminix
+  # 6) Pyrenamer
+  # 7) Enpass
+  # 8) Shutter|Hotshots
+  # 9) Synapse
+  #10) Terminix
   ACCESSORIES_OPTIONS="10"
 #}}}
 #DEVELOPEMENT {{{
