@@ -362,7 +362,7 @@ choose_aurhelper(){
             exit 0
           fi
         fi
-        AUR_PKG_MANAGER="packer"
+        AUR_PKG_MANAGER="apacman"
         ;;
       3)
         if ! is_package_installed "pacaur" ; then
