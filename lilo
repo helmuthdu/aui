@@ -357,7 +357,7 @@ choose_aurhelper(){
           pacman -D --asdeps jshon
           aui_download_packages "apacman"
           if ! is_package_installed "apacman" ; then
-            echo "Packer not installed. EXIT now"
+            echo "Apacman not installed. EXIT now"
             pause_function
             exit 0
           fi
@@ -761,7 +761,7 @@ install_cups(){
   read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
   if [[ $OPTION == y ]]; then
     package_install "cups cups-filters ghostscript gsfonts"
-    package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
+    package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters foomatic-db-ppds foomatic-db-nonfree-ppds plip splix cups-pdf"
     package_install "system-config-printer"
     system_ctl enable org.cups.cupsd
     pause_function
