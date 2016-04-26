@@ -1,4 +1,5 @@
-### Project no longer maintained
+### Project only accepting patches
+This project is not actively developed but *will* accept PRs
 
 # Archlinux U Install
 
