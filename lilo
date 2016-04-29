@@ -357,12 +357,12 @@ choose_aurhelper(){
           pacman -D --asdeps jshon
           aui_download_packages "apacman"
           if ! is_package_installed "apacman" ; then
-            echo "Packer not installed. EXIT now"
+            echo "Apacman not installed. EXIT now"
             pause_function
             exit 0
           fi
         fi
-        AUR_PKG_MANAGER="packer"
+        AUR_PKG_MANAGER="apacman"
         ;;
       3)
         if ! is_package_installed "pacaur" ; then
@@ -761,7 +761,7 @@ install_cups(){
   read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
   if [[ $OPTION == y ]]; then
     package_install "cups cups-filters ghostscript gsfonts"
-    package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters hplip splix cups-pdf"
+    package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters foomatic-db-ppds foomatic-db-nonfree-ppds plip splix cups-pdf"
     package_install "system-config-printer"
     system_ctl enable org.cups.cupsd
     pause_function
@@ -1356,9 +1356,9 @@ install_nm_wicd(){
       print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
       print_info "NetworkManager is a program for providing detection and configuration for systems to automatically connect to network. NetworkManager's functionality can be useful for both wireless and wired networks."
       if [[ ${KDE} -eq 1 ]]; then
-        is_package_installed "plasma" && aur_package_install "plasma-nm" || package_install "networkmanager dnsmasq kdeplasma-applets-plasma-nm"
+        is_package_installed "plasma" &&  package_install "networkmanager dnsmasq plasma-nm networkmanager-qt"
       else
-        package_install "networkmanager dnsmasq network-manager-applet"
+        package_install "networkmanager dnsmasq network-manager-applet nm-connection-editor"
       fi
       package_install "networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc"
       is_package_installed "ntp" && package_install "networkmanager-dispatcher-ntpd"
