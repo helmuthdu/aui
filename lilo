@@ -685,7 +685,7 @@ install_video_cards(){
   check_vga
   #Virtualbox {{{
   if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
-    package_install "virtualbox-guest-utils mesa-libgl"
+    package_install "virtualbox-guest-modules-arch mesa-libgl"
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${username} vboxsf
     system_ctl disable ntpd
@@ -907,7 +907,7 @@ install_desktop_environment(){
       echo " 1) $(menu_item "entrance-git" "Entrance") $AUR"
       echo " 2) $(menu_item "gdm" "GDM")"
       echo " 3) $(menu_item "lightdm" "LightDM")"
-      echo " 4) $(menu_item "ssdm" "SSDM")"
+      echo " 4) $(menu_item "sddm" "SDDM")"
       echo " 5) $(menu_item "slim" "Slim")"
       echo ""
       echo " b) BACK|SKIP"
@@ -933,8 +933,8 @@ install_desktop_environment(){
             system_ctl enable lightdm
             ;;
           4)
-            package_install "ssdm"
-            system_ctl enable ssdm
+            package_install "sddm"
+            system_ctl enable sddm
             ;;
           5)
             package_install "slim"
@@ -987,7 +987,7 @@ install_desktop_environment(){
     while true
     do
       print_title "$1 ESSENTIAL APPS"
-      echo " 1) $(menu_item "entrance-git gdm lightdm ssdm" "Display Manager") $AUR"
+      echo " 1) $(menu_item "entrance-git gdm lightdm sddm" "Display Manager") $AUR"
       echo " 2) $(menu_item "dmenu")"
       echo " 3) $(menu_item "viewnior")"
       echo " 4) $(menu_item "gmrun")"
