@@ -1123,6 +1123,8 @@ install_desktop_environment(){
       package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gucharmap gvfs-goa"
       package_install "deja-dup"
       aur_package_install "nautilus-share"
+      # remove gnome games
+      package_remove "aisleriot atomix four-in-a-row five-or-more gnome-2048 gnome-chess gnome-mahjongg gnome-nibbles gnome-robots gnome-sudoku gnome-tetravex gnome-taquin swell-foop hitori iagno quadrapassel"
       # config xinitrc
       config_xinitrc "gnome-session"
       GNOME=1
