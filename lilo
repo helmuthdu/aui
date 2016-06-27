@@ -761,7 +761,7 @@ install_cups(){
   read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
   if [[ $OPTION == y ]]; then
     package_install "cups cups-filters ghostscript gsfonts"
-    package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters foomatic-db-ppds foomatic-db-nonfree-ppds plip splix cups-pdf"
+    package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters foomatic-db-ppds foomatic-db-nonfree-ppds hplip splix cups-pdf"
     package_install "system-config-printer"
     system_ctl enable org.cups.cupsd
     pause_function
@@ -1119,12 +1119,12 @@ install_desktop_environment(){
       #GNOME {{{
       print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
-      package_install "gnome gnome-extra telepathy"
-      package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gucharmap gvfs-goa"
+      package_install "gnome gnome-extra gnome-software gnome-initial-setup telepathy"
+      package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gvfs-goa "
       package_install "deja-dup"
       aur_package_install "nautilus-share"
       # remove gnome games
-      package_remove "aisleriot atomix four-in-a-row five-or-more gnome-2048 gnome-chess gnome-mahjongg gnome-nibbles gnome-robots gnome-sudoku gnome-tetravex gnome-taquin swell-foop hitori iagno quadrapassel"
+      package_remove "aisleriot atomix four-in-a-row five-or-more gnome-2048 gnome-chess gnome-klotski gnome-mahjongg gnome-mines gnome-nibbles gnome-robots gnome-sudoku gnome-tetravex gnome-taquin swell-foop hitori iagno quadrapassel lightsoff"
       # config xinitrc
       config_xinitrc "gnome-session"
       GNOME=1
@@ -1138,7 +1138,7 @@ install_desktop_environment(){
       #KDE {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
-      package_install "plasma kde-applications-meta kde-meta-kdenetwork kde-meta-kdeutils kde-l10n-$LOCALE_KDE sddm"
+      package_install "plasma kf5 ark dolphin dolphin-plugins gwenview kate kcalc konsole telepathy-kde kde-l10n-$LOCALE_KDE sddm"
       # config xinitrc
       config_xinitrc "startkde"
       pause_function
@@ -1318,7 +1318,7 @@ install_desktop_environment(){
   #COMMON PKGS {{{
     #MTP SUPPORT {{{
     if is_package_installed "libmtp" ; then
-      [[ ${KDE} -eq 1 ]] && package_install "kio-mtp" || package_install "gvfs-mtp"
+      package_install "gvfs-mtp"
     fi
     #}}}
     if [[ ${KDE} -eq 0 ]]; then
@@ -1328,7 +1328,6 @@ install_desktop_environment(){
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
       is_package_installed "samba" && package_install "gvfs-smb"
-      #aur_package_install "gnome-defaults-list"
     fi
     #Fix p7FM
     package_install "wxgtk2.8"
