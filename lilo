@@ -1855,7 +1855,7 @@ install_internet_apps(){
                   package_install "chromium"
                   ;;
                 3)
-                  package_install "firefox firefox-i18n-$LOCALE_FF firefox-adblock-plus flashplugin "
+                  package_install "firefox firefox-i18n-$LOCALE_FF"
                   # speedup firefox load
                   package_install "upx"
                   upx --best /usr/lib/firefox/firefox
