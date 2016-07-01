@@ -1069,7 +1069,7 @@ install_desktop_environment(){
   echo " 3) Enlightenment   12) i3"
   echo " 4) GNOME           13) OpenBox"
   echo " 5) KDE             14) Xmonad"
-  echo " 6) LXQT            14) Budgie"
+  echo " 6) LXQT"
   echo " 7) Mate"
   echo " 8) XFCE"
   echo " 9) Budgie"
@@ -1234,18 +1234,25 @@ install_desktop_environment(){
       ;;
       #}}}
     9)
-      #BUDGIE {{{
-      print_title "BUDGIE - https://wiki.archlinux.org/index.php/Budgie_Desktop"
-      print_info "Budgie is the default desktop of Solus Operating System, written from scratch. Besides a more modern design, Budgie can emulate the look and feel of the GNOME 2 desktop."
-      package_install "budgie-desktop"
-      # config xinitrc
-      config_xinitrc "budgie-desktop"
-      pause_function
-      install_themes "GNOME"
-      #Gnome Display Manager (a reimplementation of xdm)
-      system_ctl enable gdm
-      ;;
-      #}}}      
+    #BUDGIE {{{
+    print_title "BUDGIE - https://wiki.archlinux.org/index.php/Budgie_Desktop"
+    print_info "Budgie is the default desktop of Solus Operating System, written from scratch. Besides a more modern design, Budgie can emulate the look and feel of the GNOME 2 desktop."
+    package_install "gnome gnome-extra gnome-software gnome-initial-setup telepathy"
+    package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gvfs-goa "
+    package_install "deja-dup"
+    package_install "budgie-desktop"
+    aur_package_install "nautilus-share"
+    # remove gnome games
+    package_remove "aisleriot atomix four-in-a-row five-or-more gnome-2048 gnome-chess gnome-klotski gnome-mahjongg gnome-mines gnome-nibbles gnome-robots gnome-sudoku gnome-tetravex gnome-taquin swell-foop hitori iagno quadrapassel lightsoff"
+    # config xinitrc
+    config_xinitrc "export XDG_CURRENT_DESKTOP=Budgie:GNOME \n budgie-desktop"
+    GNOME=1
+    pause_function
+    install_themes "GNOME"
+    #Gnome Display Manager (a reimplementation of xdm)
+    system_ctl enable gdm
+    ;;
+    #}}}
     10)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
