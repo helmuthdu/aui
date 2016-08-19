@@ -1093,7 +1093,7 @@ install_desktop_environment(){
       #DEEPIN {{{
       print_title "DEEPIN - http://www.linuxdeepin.com"
       print_info "The desktop interface and apps feature an intuitive and elegant design. Moving around, sharing and searching etc. has become simply a joyful experience."
-      package_install "deepin deepin-extra"
+      package_install "deepin deepin-extra lightdm-gtk-greeter"
       # config xinitrc
       config_xinitrc "startdde"
       #Tweaks
