@@ -761,7 +761,7 @@ install_cups(){
   read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
   if [[ $OPTION == y ]]; then
     package_install "cups cups-filters ghostscript gsfonts"
-    package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters foomatic-db-ppds foomatic-db-nonfree-ppds hplip splix cups-pdf"
+    package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters foomatic-db-ppds foomatic-db-nonfree-ppds hplip splix cups-pdf foomatic-db-gutenprint-ppds"
     package_install "system-config-printer"
     system_ctl enable org.cups.cupsd
     pause_function
@@ -1064,14 +1064,15 @@ install_desktop_environment(){
 
   echo -e "Select your DE or WM:\n"
   echo " --- DE ---         --- WM ---"
-  echo " 1) Cinnamon        9) Awesome"
-  echo " 2) Deepin          10) Fluxbox"
-  echo " 3) Enlightenment   11) i3"
-  echo " 4) GNOME           12) OpenBox"
-  echo " 5) KDE             13) Xmonad"
+  echo " 1) Cinnamon        10) Awesome"
+  echo " 2) Deepin          11) Fluxbox"
+  echo " 3) Enlightenment   12) i3"
+  echo " 4) GNOME           13) OpenBox"
+  echo " 5) KDE             14) Xmonad"
   echo " 6) LXQT"
   echo " 7) Mate"
   echo " 8) XFCE"
+  echo " 9) Budgie"
   echo ""
   echo " b) BACK"
   read_input $DESKTOPENV
@@ -1093,7 +1094,7 @@ install_desktop_environment(){
       #DEEPIN {{{
       print_title "DEEPIN - http://www.linuxdeepin.com"
       print_info "The desktop interface and apps feature an intuitive and elegant design. Moving around, sharing and searching etc. has become simply a joyful experience."
-      package_install "deepin deepin-extra"
+      package_install "deepin deepin-extra lightdm-gtk-greeter"
       # config xinitrc
       config_xinitrc "startdde"
       #Tweaks
@@ -1233,6 +1234,26 @@ install_desktop_environment(){
       ;;
       #}}}
     9)
+    #BUDGIE {{{
+    print_title "BUDGIE - https://wiki.archlinux.org/index.php/Budgie_Desktop"
+    print_info "Budgie is the default desktop of Solus Operating System, written from scratch. Besides a more modern design, Budgie can emulate the look and feel of the GNOME 2 desktop."
+    package_install "gnome gnome-extra gnome-software gnome-initial-setup telepathy"
+    package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gvfs-goa "
+    package_install "deja-dup"
+    package_install "budgie-desktop"
+    aur_package_install "nautilus-share"
+    # remove gnome games
+    package_remove "aisleriot atomix four-in-a-row five-or-more gnome-2048 gnome-chess gnome-klotski gnome-mahjongg gnome-mines gnome-nibbles gnome-robots gnome-sudoku gnome-tetravex gnome-taquin swell-foop hitori iagno quadrapassel lightsoff"
+    # config xinitrc
+    config_xinitrc "export XDG_CURRENT_DESKTOP=Budgie:GNOME \n budgie-desktop"
+    GNOME=1
+    pause_function
+    install_themes "GNOME"
+    #Gnome Display Manager (a reimplementation of xdm)
+    system_ctl enable gdm
+    ;;
+    #}}}
+    10)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
       print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
@@ -1251,7 +1272,7 @@ install_desktop_environment(){
       install_themes "AWESOME"
       ;;
       #}}}
-    10)
+    11)
       #FLUXBOX {{{
       print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
       print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
@@ -1265,7 +1286,7 @@ install_desktop_environment(){
       pause_function
       ;;
       #}}}
-    11)
+    12)
       #I3 {{{
       print_title "i3 - https://wiki.archlinux.org/index.php/I3"
       print_info "i3 is a dynamic tiling window manager inspired by wmii that is primarily targeted at developers and advanced users. The stated goals for i3 include clear documentation, proper multi-monitor support, a tree structure for windows, and different modes like in vim."
@@ -1278,7 +1299,7 @@ install_desktop_environment(){
       install_themes "i3"
       ;;
       #}}}
-    12)
+    13)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -1295,7 +1316,7 @@ install_desktop_environment(){
       install_themes "OPENBOX"
       ;;
       #}}}
-    13)
+    14)
       #XMONAD {{{
       print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
       print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
@@ -1726,7 +1747,7 @@ install_system_apps(){
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
-            package_install "virtualbox virtualbox-guest-iso qt4"
+            package_install "virtualbox virtualbox-guest-iso qt4 qt5-x11extras"
             aur_package_install "virtualbox-ext-oracle"
             add_user_to_group ${username} vboxusers
             modprobe vboxdrv vboxnetflt
