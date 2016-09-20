@@ -459,7 +459,7 @@ install_basic_setup(){
   pause_function
   print_title "NTFS/FAT/exFAT/F2FS - https://wiki.archlinux.org/index.php/File_Systems"
   print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
-  package_install "ntfs-3g dosfstools exfat-utils f2fs-tools fuse fuse-exfat autofs"
+  package_install "ntfs-3g dosfstools exfat-utils f2fs-tools fuse fuse-exfat autofs mtpfs"
   pause_function
 }
 #}}}
@@ -646,11 +646,6 @@ font_config(){
     read_input $FONTCONFIG
     case "$OPTION" in
       1)
-        is_package_installed "fontconfig-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
-        is_package_installed "fontconfig-infinality-ultimate" && pacman -Rdds --noconfirm fontconfig-infinality-ultimate freetype2-infinality-ultimate cairo-infinality-ultimate
-        if [[ $ARCHI == x86_64 ]]; then
-          is_package_installed "lib32-fontconfig-infinality-ultimate" && pacman -Rdds --noconfirm lib32-cairo-infinality-ultimate lib32-fontconfig-infinality-ultimate lib32-freetype2-infinality-ultimate
-        fi
         pacman -S --asdeps --needed cairo fontconfig freetype2
         break
         ;;
@@ -659,14 +654,11 @@ font_config(){
         add_key "962DDE58"
         add_repository "infinality-bundle" "http://bohoomil.com/repo/\$arch" "Never"
         [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://bohoomil.com/repo/multilib/\$arch" "Never"
-        is_package_installed "freetype2" && pacman -Rdds --noconfirm freetype2 fontconfig cairo
-        is_package_installed "freetype2-ubuntu" && pacman -Rdds freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
         pacman -S --needed infinality-bundle
         [[ $ARCHI == x86_64 ]] && pacman -S --needed infinality-bundle-multilib
         break
         ;;
       3)
-        is_package_installed "fontconfig" && pacman -Rdds freetype2 fontconfig cairo
         aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
         break
         ;;
@@ -1139,7 +1131,7 @@ install_desktop_environment(){
       #KDE {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
-      package_install "plasma kf5 ark dolphin dolphin-plugins quota-tools gwenview kipi-plugins kate kcalc konsole telepathy-kde kde-l10n-$LOCALE_KDE sddm"
+      package_install "plasma kf5 ark dolphin dolphin-plugins kio-extras kdeconnect quota-tools gwenview kipi-plugins kate kcalc konsole telepathy-kde kde-l10n-$LOCALE_KDE sddm"
       # config xinitrc
       config_xinitrc "startkde"
       pause_function
