@@ -37,7 +37,7 @@ select_keymap(){
 #DEFAULT EDITOR {{{
 select_editor(){
   print_title "DEFAULT EDITOR"
-  editors_list=("emacs" "nano" "vi" "vim" "zile");
+  editors_list=("emacs" "nano" "vi" "vim" "neovim" "zile");
   PS3="$prompt1"
   echo -e "Select editor\n"
   select EDITOR in "${editors_list[@]}"; do
