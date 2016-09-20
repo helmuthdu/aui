@@ -220,7 +220,7 @@ select_user(){
     select EDITOR in "${editors_list[@]}"; do
       if contains_element "$EDITOR" "${editors_list[@]}"; then
         if [[ $EDITOR == vim || $EDITOR == neovim ]]; then
-          [[ $EDITOR == vim ]] && ! is_package_installed "gvim" && package_install "vim ctags" || package_install "neovim python2-neovim python-neovim"
+          [[ $EDITOR == vim ]] && (! is_package_installed "gvim" && package_install "vim ctags") || package_install "neovim python2-neovim python-neovim"
           #VIMRC {{{
           if [[ ! -f /home/${username}/.vimrc ]]; then
             vimrc_list=("Default" "Vanilla" "Get from github");
@@ -258,6 +258,11 @@ select_user(){
               [[ -n $OPT ]] && break
             done
           fi
+          if [[ $EDITOR == neovim  && ! -f /home/${username}/.config/nvim ]]; then
+            mkdir ~/.config
+            ln -s ~/.vim ~/.config/nvim
+            ln -s ~/.vimrc ~/.config/nvim/init.vim
+          fi
           #}}}
         else
           package_install "$EDITOR"
@@ -291,7 +296,7 @@ select_user(){
     [[ -n $OPT ]] && break
   done
   [[ ! -f /home/${username}/.bashrc ]] && configure_user_account;
-  if [ -n "$http_proxy" ]; then
+  if [[ -n "$http_proxy" ]]; then
       echo "proxy = $http_proxy" > /home/${username}/.curlrc
       chown ${username}:users /home/${username}/.curlrc
   fi
@@ -641,7 +646,6 @@ font_config(){
     print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
     echo " 1) Default"
     echo " 2) Infinality"
-    echo " 3) Ubuntu ${AUR}"
     echo ""
     read_input $FONTCONFIG
     case "$OPTION" in
@@ -656,10 +660,6 @@ font_config(){
         [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://bohoomil.com/repo/multilib/\$arch" "Never"
         pacman -S --needed infinality-bundle
         [[ $ARCHI == x86_64 ]] && pacman -S --needed infinality-bundle-multilib
-        break
-        ;;
-      3)
-        aur_package_install "freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu"
         break
         ;;
       *)
@@ -1226,25 +1226,25 @@ install_desktop_environment(){
       ;;
       #}}}
     9)
-    #BUDGIE {{{
-    print_title "BUDGIE - https://wiki.archlinux.org/index.php/Budgie_Desktop"
-    print_info "Budgie is the default desktop of Solus Operating System, written from scratch. Besides a more modern design, Budgie can emulate the look and feel of the GNOME 2 desktop."
-    package_install "gnome gnome-extra gnome-software gnome-initial-setup telepathy"
-    package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gvfs-goa "
-    package_install "deja-dup"
-    package_install "budgie-desktop"
-    aur_package_install "nautilus-share"
-    # remove gnome games
-    package_remove "aisleriot atomix four-in-a-row five-or-more gnome-2048 gnome-chess gnome-klotski gnome-mahjongg gnome-mines gnome-nibbles gnome-robots gnome-sudoku gnome-tetravex gnome-taquin swell-foop hitori iagno quadrapassel lightsoff"
-    # config xinitrc
-    config_xinitrc "export XDG_CURRENT_DESKTOP=Budgie:GNOME \n budgie-desktop"
-    GNOME=1
-    pause_function
-    install_themes "GNOME"
-    #Gnome Display Manager (a reimplementation of xdm)
-    system_ctl enable gdm
-    ;;
-    #}}}
+      #BUDGIE {{{
+      print_title "BUDGIE - https://wiki.archlinux.org/index.php/Budgie_Desktop"
+      print_info "Budgie is the default desktop of Solus Operating System, written from scratch. Besides a more modern design, Budgie can emulate the look and feel of the GNOME 2 desktop."
+      package_install "gnome gnome-extra gnome-software gnome-initial-setup telepathy"
+      package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gvfs-goa "
+      package_install "deja-dup"
+      package_install "budgie-desktop"
+      aur_package_install "nautilus-share"
+      # remove gnome games
+      package_remove "aisleriot atomix four-in-a-row five-or-more gnome-2048 gnome-chess gnome-klotski gnome-mahjongg gnome-mines gnome-nibbles gnome-robots gnome-sudoku gnome-tetravex gnome-taquin swell-foop hitori iagno quadrapassel lightsoff"
+      # config xinitrc
+      config_xinitrc "export XDG_CURRENT_DESKTOP=Budgie:GNOME \n budgie-desktop"
+      GNOME=1
+      pause_function
+      install_themes "GNOME"
+      #Gnome Display Manager (a reimplementation of xdm)
+      system_ctl enable gdm
+      ;;
+      #}}}
     10)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
