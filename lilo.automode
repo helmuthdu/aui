@@ -344,11 +344,11 @@
 #}}}
 #FONTS {{{
   # 1) ttf-dejavu
-  # 2) ttf-funfonts
+  # 2) ttf-fira-code
   # 3) ttf-google-webfonts
   # 4) ttf-liberation
-  # 5) ttf-ms-fonts
-  # 6) ttf-vista-fonts
+  # 5) ttf-mac-fonts
+  # 6) ttf-ms-fonts
   # 7) wqy-microhei
   FONTS_OPTIONS="1-7"
 #}}}

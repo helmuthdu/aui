@@ -754,7 +754,6 @@ install_cups(){
   if [[ $OPTION == y ]]; then
     package_install "cups cups-filters ghostscript gsfonts"
     package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters foomatic-db-ppds foomatic-db-nonfree-ppds hplip splix cups-pdf foomatic-db-gutenprint-ppds"
-    package_install "system-config-printer"
     system_ctl enable org.cups.cupsd
     pause_function
   fi
@@ -1117,7 +1116,7 @@ install_desktop_environment(){
       package_install "deja-dup"
       aur_package_install "nautilus-share"
       # remove gnome games
-      package_remove "aisleriot atomix four-in-a-row five-or-more gnome-2048 gnome-chess gnome-klotski gnome-mahjongg gnome-mines gnome-nibbles gnome-robots gnome-sudoku gnome-tetravex gnome-taquin swell-foop hitori iagno quadrapassel lightsoff"
+      package_remove "aisleriot atomix four-in-a-row five-or-more gnome-2048 gnome-chess gnome-klotski gnome-mahjongg gnome-mines gnome-nibbles gnome-robots gnome-sudoku gnome-tetravex gnome-taquin swell-foop hitori iagno quadrapassel lightsoff tali"
       # config xinitrc
       config_xinitrc "gnome-session"
       GNOME=1
@@ -1340,6 +1339,7 @@ install_desktop_environment(){
       package_install "pavucontrol"
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
+      is_package_installed "cups" && package_install "system-config-printer"
       is_package_installed "samba" && package_install "gvfs-smb"
     fi
     #Fix p7FM
@@ -1695,7 +1695,7 @@ install_system_apps(){
           freshclam
           ;;
         2)
-          aur_package_install "cockpit linux-user-chroot ostree"
+          aur_package_install "cockpit storaged linux-user-chroot ostree"
           ;;
         3)
           package_install "docker"
@@ -1739,7 +1739,7 @@ install_system_apps(){
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
-            package_install "virtualbox virtualbox-guest-iso qt4 qt5-x11extras linux-headers"
+            package_install "virtualbox virtualbox-host-dkms virtualbox-guest-iso linux-headers"
             aur_package_install "virtualbox-ext-oracle"
             add_user_to_group ${username} vboxusers
             modprobe vboxdrv vboxnetflt
@@ -2666,11 +2666,11 @@ install_fonts(){
   do
     print_title "FONTS - https://wiki.archlinux.org/index.php/Fonts"
     echo " 1) $(menu_item "ttf-dejavu")"
-    echo " 2) $(menu_item "ttf-funfonts") $AUR"
+    echo " 2) $(menu_item "ttf-fira-code") $AUR"
     echo " 3) $(menu_item "ttf-google-fonts-git") $AUR"
     echo " 4) $(menu_item "ttf-liberation")"
-    echo " 5) $(menu_item "ttf-ms-fonts") $AUR"
-    echo " 6) $(menu_item "ttf-vista-fonts") $AUR"
+    echo " 5) $(menu_item "ttf-mac-fonts") $AUR"
+    echo " 6) $(menu_item "ttf-ms-fonts") $AUR"
     echo " 7) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support)"
     echo ""
     echo " b) BACK"
@@ -2683,7 +2683,7 @@ install_fonts(){
           package_install "ttf-dejavu"
           ;;
         2)
-          aur_package_install "ttf-funfonts"
+          aur_package_install "ttf-fira-code"
           ;;
         3)
           package_remove "ttf-droid"
@@ -2696,10 +2696,10 @@ install_fonts(){
           package_install "ttf-liberation"
           ;;
         5)
-          aur_package_install "ttf-ms-fonts"
+          aur_package_install "ttf-mac-fonts"
           ;;
         6)
-          aur_package_install "ttf-vista-fonts"
+          aur_package_install "ttf-ms-fonts"
           ;;
         7)
           package_install "wqy-microhei"
