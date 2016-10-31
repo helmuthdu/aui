@@ -1429,15 +1429,15 @@ install_accessories_apps(){
   while true
   do
     print_title "ACCESSORIES APPS"
-    echo " 1) $(menu_item "catfish")"
-    echo " 2) $(menu_item "conky-lua") $AUR"
-    echo " 3) $(menu_item "docky") $AUR"
-    echo " 4) $(menu_item "galculator") $AUR"
-    echo " 5) $(menu_item "pamac-aur" "Pamac") $AUR"
-    echo " 6) $(menu_item "pyrenamer") $AUR"
-    echo " 7) $(menu_item "enpass-bin") $AUR"
-    echo " 8) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots" || echo "Shutter";)")"
-    echo " 9) $(menu_item "synapse")"
+    echo " 1) $(menu_item "albert")"
+    echo " 2) $(menu_item "catfish")"
+    echo " 3) $(menu_item "conky-lua") $AUR"
+    echo " 4) $(menu_item "docky") $AUR"
+    echo " 5) $(menu_item "galculator") $AUR"
+    echo " 6) $(menu_item "pamac-aur" "Pamac") $AUR"
+    echo " 7) $(menu_item "pyrenamer") $AUR"
+    echo " 8) $(menu_item "enpass-bin") $AUR"
+    echo " 9) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots" || echo "Shutter";)")"
     echo "10) $(menu_item "terminix")"
     echo ""
     echo " b) BACK"
@@ -1447,38 +1447,38 @@ install_accessories_apps(){
     for OPT in ${OPTIONS[@]}; do
       case "$OPT" in
         1)
-          package_install "catfish"
+          aur_package_install "albert"
           ;;
         2)
+          package_install "catfish"
+          ;;
+        3)
           aur_package_install "conky-lua"
           package_install "lm_sensors"
           sensors-detect --auto
           ;;
-        3)
+        4)
           package_install "docky"
           aur_package_install "dockmanager"
           ;;
-        4)
+        5)
           package_install "galculator"
           ;;
-        5)
+        6)
           aur_package_install "pamac-aur"
           ;;
-        6)
+        7)
           aur_package_install "pyrenamer"
           ;;
-        7)
+        8)
           aur_package_install "enpass-bin"
           ;;
-        8)
+        9)
           if [[ ${KDE} -eq 1 ]]; then
             aur_package_install "hotshots"
           else
             package_install "shutter"
           fi
-          ;;
-        9)
-          package_install "synapse"
           ;;
         10)
           aur_package_install "terminix"

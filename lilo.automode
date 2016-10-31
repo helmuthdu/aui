@@ -138,15 +138,15 @@
   USBMODEM="y"
 #}}}
 #ACCESSORIES {{{
-  # 1) Catfish
-  # 2) Conky
-  # 3) Docky
-  # 4) Galculator
-  # 5) Pamac
-  # 6) Pyrenamer
-  # 7) Enpass
-  # 8) Shutter|Hotshots
-  # 9) Synapse
+  # 1) Albert
+  # 2) Catfish
+  # 3) Conky
+  # 4) Docky
+  # 5) Galculator
+  # 6) Pamac
+  # 7) Pyrenamer
+  # 8) Enpass
+  # 9) Shutter|Hotshots
   #10) Terminix
   ACCESSORIES_OPTIONS="10"
 #}}}
