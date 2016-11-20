@@ -580,9 +580,6 @@
     fi
     echo -e "$(checkbox "$1") ${Bold}$2${Reset} ${state}"
   } #}}}
-  elihw() { #{{{
-    [[ $OPT == b || $OPT == d ]] && break;
-  } #}}}
   system_ctl() { #{{{
     local _action=${1}
     local _object=${2}
