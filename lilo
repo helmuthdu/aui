@@ -831,7 +831,7 @@ install_additional_firmwares(){
             ;;
         esac
       done
-      elihw
+      source sharedfuncs_elihw
     done
   fi
 }
@@ -861,7 +861,7 @@ install_desktop_environment(){
             ;;
         esac
       done
-      elihw
+      source sharedfuncs_elihw
     done
   } #}}}
   install_gtk_theme() { #{{{
@@ -887,7 +887,7 @@ install_desktop_environment(){
             ;;
         esac
       done
-      elihw
+      source sharedfuncs_elihw
     done
   } #}}}
   install_display_manager() { #{{{
@@ -939,7 +939,7 @@ install_desktop_environment(){
             ;;
         esac
       done
-      elihw
+      source sharedfuncs_elihw
     done
   } #}}}
   install_themes() { #{{{
@@ -971,7 +971,7 @@ install_desktop_environment(){
             ;;
         esac
       done
-      elihw
+      source sharedfuncs_elihw
     done
   } #}}}
   install_misc_apps() { #{{{
@@ -1046,7 +1046,7 @@ install_desktop_environment(){
             ;;
         esac
       done
-      elihw
+      source sharedfuncs_elihw
     done
   } #}}}
 
@@ -1174,7 +1174,7 @@ install_desktop_environment(){
               ;;
           esac
         done
-        elihw
+        source sharedfuncs_elihw
       done
       #}}}
       system_ctl enable sddm
@@ -1491,7 +1491,7 @@ install_accessories_apps(){
           ;;
       esac
     done
-    elihw
+    source sharedfuncs_elihw
   done
 }
 #}}}
@@ -1572,7 +1572,7 @@ install_development_apps(){
           ;;
       esac
     done
-    elihw
+    source sharedfuncs_elihw
   done
 }
 #}}}
@@ -1656,7 +1656,7 @@ install_office_apps(){
           ;;
       esac
     done
-    elihw
+    source sharedfuncs_elihw
   done
 }
 #}}}
@@ -1758,7 +1758,7 @@ install_system_apps(){
           ;;
       esac
     done
-    elihw
+    source sharedfuncs_elihw
   done
 }
 #}}}
@@ -1822,7 +1822,7 @@ install_graphics_apps(){
           ;;
       esac
     done
-    elihw
+    source sharedfuncs_elihw
   done
 }
 #}}}
@@ -1891,7 +1891,7 @@ install_internet_apps(){
                   ;;
               esac
             done
-            elihw
+            source sharedfuncs_elihw
           done
           #}}}
           OPT=1
@@ -1972,7 +1972,7 @@ install_internet_apps(){
                   ;;
               esac
             done
-            elihw
+            source sharedfuncs_elihw
           done
           #}}}
           OPT=2
@@ -2005,7 +2005,7 @@ install_internet_apps(){
                   ;;
               esac
             done
-            elihw
+            source sharedfuncs_elihw
           done
           #}}}
           OPT=3
@@ -2066,7 +2066,7 @@ install_internet_apps(){
                   ;;
               esac
             done
-            elihw
+            source sharedfuncs_elihw
           done
           #}}}
           OPT=4
@@ -2099,7 +2099,7 @@ install_internet_apps(){
                   ;;
               esac
             done
-            elihw
+            source sharedfuncs_elihw
           done
           #}}}
           OPT=5
@@ -2132,7 +2132,7 @@ install_internet_apps(){
                   ;;
               esac
             done
-            elihw
+            source sharedfuncs_elihw
           done
           #}}}
           OPT=6
@@ -2145,7 +2145,7 @@ install_internet_apps(){
           ;;
       esac
     done
-    elihw
+    source sharedfuncs_elihw
   done
 }
 #}}}
@@ -2245,7 +2245,7 @@ install_audio_apps(){
                   ;;
               esac
             done
-            elihw
+            source sharedfuncs_elihw
           done
           #}}}
           OPT=1
@@ -2290,7 +2290,7 @@ install_audio_apps(){
                   ;;
               esac
             done
-            elihw
+            source sharedfuncs_elihw
           done
           #}}}
           OPT=2
@@ -2313,7 +2313,7 @@ install_audio_apps(){
           ;;
       esac
     done
-    elihw
+    source sharedfuncs_elihw
   done
 }
 #}}}
@@ -2390,7 +2390,7 @@ install_video_apps(){
                   ;;
               esac
             done
-            elihw
+            source sharedfuncs_elihw
           done
           #}}}
           OPT=1
@@ -2459,7 +2459,7 @@ install_video_apps(){
                   ;;
               esac
             done
-            elihw
+            source sharedfuncs_elihw
           done
           #}}}
           OPT=2
@@ -2482,7 +2482,7 @@ install_video_apps(){
           ;;
       esac
     done
-    elihw
+    source sharedfuncs_elihw
   done
 }
 #}}}
@@ -2521,7 +2521,7 @@ install_games(){
           ;;
       esac
     done
-    elihw
+    source sharedfuncs_elihw
   done
 }
 #}}}
@@ -2712,7 +2712,7 @@ install_fonts(){
           ;;
       esac
     done
-    elihw
+    source sharedfuncs_elihw
   done
 }
 #}}}
@@ -2807,7 +2807,7 @@ install_extra(){
           ;;
       esac
     done
-    elihw
+    source sharedfuncs_elihw
   done
 }
 #}}}
