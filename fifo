@@ -32,7 +32,6 @@ select_keymap(){
   PS3="$prompt1"
   print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
   echo "keymap list in /usr/share/kbd/keymaps"
-  #read -p "Keymap: " KEYMAP
     select KEYMAP in "${keymap_list[@]}"; do
     if contains_element "$KEYMAP" "${keymap_list[@]}"; then
       loadkeys "$KEYMAP";
