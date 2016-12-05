@@ -234,6 +234,7 @@ select_user(){
                   mv vim /home/${username}/.vim
                   ln -sf /home/${username}/.vim/vimrc /home/${username}/.vimrc
                   cp -R vim /home/${username}/.vim/fonts /home/${username}/.fonts
+                  git clone https://github.com/morhetz/gruvbox.git /home/${username}/.vim/bundle/gruvbox
                   ;;
                 3)
                   package_install "git"
