@@ -391,7 +391,8 @@ choose_aurhelper(){
     [[ -n $OPT ]] && break
   done
   if [[ $LATER_DEPS_NEEDED == 1 ]] ; then
-    $AUR_PKG_MANAGER -S vim-gruvbox-git vim-gruvbox-git
+    aur_package_install "vim-gruvbox-git";
+    aur_package_install "vim-airline-gruvbox-git";
   fi
 
   pause_function
