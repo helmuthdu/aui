@@ -230,11 +230,10 @@ select_user(){
               case "$REPLY" in
                 1)
                   package_install "git"
-                  git clone https://github.com/helmuthdu/vim
-                  mv vim /home/${username}/.vim
+                  git clone https://github.com/helmuthdu/vim /home/${username}/.vim
                   ln -sf /home/${username}/.vim/vimrc /home/${username}/.vimrc
                   cp -R vim /home/${username}/.vim/fonts /home/${username}/.fonts
-                  git clone https://github.com/morhetz/gruvbox.git /home/${username}/.vim/bundle/gruvbox
+                  LATER_DEPS_NEEDED=1
                   ;;
                 3)
                   package_install "git"
@@ -391,6 +390,10 @@ choose_aurhelper(){
     esac
     [[ -n $OPT ]] && break
   done
+  if [[ $LATER_DEPS_NEEDED == 1 ]] ; then
+    AUR_PKG_MANAGER -S vim-gruvbox-git vim-gruvbox-git
+  fi
+
   pause_function
 }
 #}}}
