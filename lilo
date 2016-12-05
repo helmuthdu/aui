@@ -390,11 +390,6 @@ choose_aurhelper(){
     esac
     [[ -n $OPT ]] && break
   done
-  if [[ $LATER_DEPS_NEEDED == 1 ]] ; then
-    aur_package_install "vim-gruvbox-git";
-    aur_package_install "vim-airline-gruvbox-git";
-  fi
-
   pause_function
 }
 #}}}
@@ -448,6 +443,10 @@ add_custom_repositories(){
 install_basic_setup(){
   print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
   package_install "bc rsync mlocate bash-completion pkgstats arch-wiki-lite"
+    if [[ $LATER_DEPS_NEEDED == 1 ]] ; then
+    aur_package_install "vim-gruvbox-git";
+    aur_package_install "vim-airline-gruvbox-git";
+    fi
   pause_function
   print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
   package_install "zip unzip unrar p7zip lzop cpio"
