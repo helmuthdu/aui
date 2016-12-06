@@ -1095,6 +1095,7 @@ install_desktop_environment(){
       #Tweaks
       pause_function
       system_ctl enable lightdm
+      sed -i /etc/lightdm/lightdm.conf 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-deepin-greeter/'
       ;;
       #}}}
     3)
