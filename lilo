@@ -189,6 +189,7 @@ select_user(){
       case "$REPLY" in
         1)
           package_install "git"
+          package_install "colordiff"
           git clone https://github.com/helmuthdu/dotfiles
           cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc dotfiles/.yaourtrc ~/
           cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc dotfiles/.yaourtrc /home/${username}/
@@ -233,7 +234,7 @@ select_user(){
                   git clone https://github.com/helmuthdu/vim /home/${username}/.vim
                   ln -sf /home/${username}/.vim/vimrc /home/${username}/.vimrc
                   cp -R vim /home/${username}/.vim/fonts /home/${username}/.fonts
-                  LATER_DEPS_NEEDED=1
+                  GRUVBOX_NEEDED=1
                   ;;
                 3)
                   package_install "git"
@@ -443,7 +444,8 @@ add_custom_repositories(){
 install_basic_setup(){
   print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
   package_install "bc rsync mlocate bash-completion pkgstats arch-wiki-lite"
-    if [[ $LATER_DEPS_NEEDED == 1 ]] ; then
+
+    if [[ $GRUVBOX_NEEDED == 1 ]] ; then
     aur_package_install "vim-gruvbox-git";
     aur_package_install "vim-airline-gruvbox-git";
     fi
