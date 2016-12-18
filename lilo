@@ -189,11 +189,11 @@ select_user(){
       case "$REPLY" in
         1)
           package_install "git"
+          package_install "colordiff"
           git clone https://github.com/helmuthdu/dotfiles
           cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc dotfiles/.yaourtrc ~/
           cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc dotfiles/.yaourtrc /home/${username}/
           rm -fr dotfiles
-          COLORDIFF_NEEDED=1
           ;;
         2)
           cp /etc/skel/.bashrc /home/${username}
@@ -443,11 +443,7 @@ add_custom_repositories(){
 #BASIC SETUP {{{
 install_basic_setup(){
   print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
-    if [[ $COLORDIFF_NEEDED == 1 ]] ; then
-        package_install "bc rsync mlocate bash-completion pkgstats arch-wiki-lite colordiff"
-    else 
-        package_install "bc rsync mlocate bash-completion pkgstats arch-wiki-lite"
-    fi
+  package_install "bc rsync mlocate bash-completion pkgstats arch-wiki-lite"
 
     if [[ $GRUVBOX_NEEDED == 1 ]] ; then
     aur_package_install "vim-gruvbox-git";
