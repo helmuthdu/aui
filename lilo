@@ -1909,7 +1909,7 @@ install_internet_apps(){
           do
             print_title "DOWNLOAD|FILESHARE"
             echo " 1) $(menu_item "aerofs") $AUR"
-            echo " 2) $(menu_item "btsync" "BitTorrent Sync") $AUR"
+            echo " 2) $(menu_item "rslsync" "Resilio Sync") $AUR"
             echo " 3) $(menu_item "deluge")"
             echo " 4) $(menu_item "dropbox") $AUR"
             echo " 5) $(menu_item "flareget") $AUR"
@@ -1931,7 +1931,7 @@ install_internet_apps(){
                   aur_package_install "aerofs"
                   ;;
                 2)
-                  aur_package_install "btsync"
+                  aur_package_install "rslsync"
                   ;;
                 3)
                   package_install "deluge"
