@@ -226,7 +226,7 @@
   #}}}
   #DOWNLOAD|FILESHARE {{{
     # 1) AeroFS
-    # 2) BitTorrent Sync
+    # 2) Resilio Sync
     # 3) Deluge
     # 4) Dropbox
     # 5) FlareGet
