@@ -1511,7 +1511,7 @@ install_development_apps(){
     echo " 2) $(menu_item "emacs")"
     echo " 3) $(menu_item "gvim")"
     echo " 4) $(menu_item "meld")"
-    echo " 5) $(menu_item "android-studio" "Android Studio")"
+    echo " 5) $(menu_item "android-studio" "Android Studio") $AUR"
     echo " 6) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
     echo " 7) $(menu_item "monodevelop")"
     echo " 8) $(menu_item "qtcreator")"
@@ -1673,7 +1673,7 @@ install_system_apps(){
   do
     print_title "SYSTEM TOOLS APPS"
     echo " 1) $(menu_item "clamav")"
-    echo " 2) $(menu_item "cockpit")"
+    echo " 2) $(menu_item "cockpit") $AUR"
     echo " 3) $(menu_item "docker")"
     echo " 4) $(menu_item "firewalld")"
     echo " 5) $(menu_item "gparted")"
@@ -2025,7 +2025,7 @@ install_internet_apps(){
             echo " 1) $(menu_item "hexchat konversation" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
             echo " 2) $(menu_item "irssi")"
             echo " 3) $(menu_item "pidgin")"
-            echo " 4) $(menu_item "skype")"
+            echo " 4) $(menu_item "skype") $AUR"
             echo " 5) $(menu_item "teamspeak3")"
             echo " 6) $(menu_item "viber") $AUR"
             echo " 7) $(menu_item "telegram-desktop-bin") $AUR"
@@ -2051,7 +2051,7 @@ install_internet_apps(){
                   package_install "pidgin"
                   ;;
                 4)
-                  package_install "skype"
+                  aur_package_install "skype"
                   ;;
                 5)
                   package_install "teamspeak3"
