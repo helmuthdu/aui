@@ -58,8 +58,6 @@ language_selector(){
   #KDE #{{{
   if [[ $LOCALE == pt_BR || $LOCALE == en_GB || $LOCALE == zh_CN ]]; then
     LOCALE_KDE=`echo $LOCALE | tr '[:upper:]' '[:lower:]'`
-  elif [[ $LOCALE == en_US ]]; then
-    LOCALE_KDE="en_gb"
   else
     LOCALE_KDE=`echo $LOCALE | cut -d\_ -f1`
   fi
@@ -115,8 +113,6 @@ language_selector(){
       #KDE #{{{
       if [[ $LOCALE == pt_BR || $LOCALE == en_GB || $LOCALE == zh_CN ]]; then
         LOCALE_KDE=`echo $LOCALE | tr '[:upper:]' '[:lower:]'`
-      elif [[ $LOCALE == en_US ]]; then
-        LOCALE_KDE="en_gb"
       else
         LOCALE_KDE=`echo $LOCALE | cut -d\_ -f1`
       fi
@@ -455,18 +451,16 @@ install_basic_setup(){
   pause_function
   print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
   print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers services and hosts running on a local network with no specific configuration."
-  package_install "avahi nss-mdns"
+  package_install "avahi"
   is_package_installed "avahi" && system_ctl enable avahi-daemon
   pause_function
   print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
   print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
   package_install "alsa-utils alsa-plugins"
-  [[ ${ARCHI} == x86_64 ]] && package_install "lib32-alsa-plugins"
   pause_function
   print_title "PULSEAUDIO - https://wiki.archlinux.org/index.php/Pulseaudio"
   print_info "PulseAudio is the default sound server that serves as a proxy to sound applications using existing kernel sound components like ALSA or OSS"
   package_install "pulseaudio pulseaudio-alsa"
-  [[ ${ARCHI} == x86_64 ]] && package_install "lib32-libpulse"
   pause_function
   print_title "NTFS/FAT/exFAT/F2FS - https://wiki.archlinux.org/index.php/File_Systems"
   print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
@@ -637,8 +631,8 @@ install_xorg(){
   print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
   print_info "Xorg is the public, open-source implementation of the X window system version 11."
   echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
-  package_install "xorg-server xorg-server-utils xorg-server-xwayland xorg-xinit xorg-xkill"
-  package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard xf86-input-wacom xf86-input-joystick xf86-input-libinput"
+  package_install "xorg-server xorg-server-utils xorg-server-xwayland xorg-xinit xorg-xkill xorg-smproxy xorg-x11perf xorg-xcursorgen xorg-xdpyinfo xorg-xdriinfo xorg-xev xorg-xkbevd xorg-xkbutils xorg-xlsatoms xorg-xlsclients xorg-xpr xorg-xvinfo xorg-xwd xorg-xwininfo xorg-xwud xterm"
+  package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard xf86-input-wacom xf86-input-libinput"
   package_install "mesa"
   modprobe uinput
   pause_function
@@ -694,7 +688,6 @@ install_video_cards(){
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
     pacman -S --needed xf86-video-intel bumblebee nvidia
-    [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -706,7 +699,6 @@ install_video_cards(){
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
     package_install "libva-vdpau-driver"
     pacman -S --needed nvidia{,-utils}
-    [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -717,9 +709,6 @@ install_video_cards(){
     is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
     [[ -f /etc/X11/xorg.conf.d/20-nvidia.conf ]] && rm /etc/X11/xorg.conf.d/20-nvidia.conf
     package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl libva-vdpau-driver"
-    if [[ ${ARCHI} == x86_64 ]]; then
-      is_package_installed "lib32-nvidia-utils" && pacman -Rdds --noconfirm lib32-nvidia-utils
-    fi
     replace_line '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -741,11 +730,6 @@ install_video_cards(){
   else
     package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl libva-vdpau-driver"
   fi
-  #}}}
-  if [[ ${ARCHI} == x86_64 ]]; then
-    is_package_installed "mesa-libgl" && package_install "lib32-mesa-libgl"
-    is_package_installed "mesa-vdpau" && package_install "lib32-mesa-vdpau"
-  fi
   if is_package_installed "libva-vdpau-driver"; then
     add_line "export LIBVA_DRIVER_NAME=vdpau" "/etc/profile"
   fi
@@ -758,7 +742,10 @@ install_cups(){
   print_info "CUPS is the standards-based, open source printing system developed by Apple Inc. for Mac OS X and other UNIX-like operating systems."
   read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
   if [[ $OPTION == y ]]; then
-    package_install "cups cups-filters ghostscript gsfonts"
+  	if [[ ${KDE} -eq 1 ]]; then
+  		package_install "print-manager"
+  	fi
+    package_install "cups cups-filters ghostscript gsfonts"    
     package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters foomatic-db-ppds foomatic-db-nonfree-ppds hplip splix cups-pdf foomatic-db-gutenprint-ppds"
     system_ctl enable org.cups.cupsd
     pause_function
@@ -930,7 +917,7 @@ install_desktop_environment(){
             system_ctl enable lightdm
             ;;
           4)
-            package_install "sddm"
+            package_install "sddm sddm-kcm"
             system_ctl enable sddm
             ;;
           5)
@@ -1118,8 +1105,8 @@ install_desktop_environment(){
       #GNOME {{{
       print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
-      package_install "gnome gnome-extra gnome-software gnome-initial-setup telepathy"
-      package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gvfs-goa "
+      package_install "gnome gnome-extra gnome-software gnome-initial-setup"
+      package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gvfs-goa"
       package_install "deja-dup"
       aur_package_install "nautilus-share"
       # remove gnome games
@@ -1137,7 +1124,14 @@ install_desktop_environment(){
       #KDE {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
-      package_install "plasma-meta kf5 ark dolphin dolphin-plugins kio-extras kdeconnect quota-tools gwenview kipi-plugins kate kcalc konsole spectacle telepathy-kde kde-l10n-$LOCALE_KDE sddm"
+      #Selected packages from plasma group
+      package_install "breeze breeze-gtk kactivitymanagerd kde-cli-tools kde-gtk-config kdecoration kdeplasma-addons khotkeys kinfocenter kmenuedit kscreen kscreenlocker ksshaskpass ksysguard kuiserver kwallet-pam kwayland-integration kwin kwrited libkscreen libksysguard milou oxygen plasma-desktop plasma-integration plasma-nm plasma-pa plasma-workspace plasma-workspace-wallpapers polkit-kde-agent powerdevil systemsettings user-manager"
+      #Selected packages from kf5 group
+      package_install "attica-qt5 baloo bluez-qt breeze-icons frameworkintegration kactivities kactivities-stats karchive kauth kbookmarks kcmutils kcodecs kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdeclarative kded kdesu kdnssd kdoctools kemoticons kfilemetadata kglobalaccel kguiaddons ki18n kiconthemes kidletime kinit kio kitemmodels kitemviews kjobwidgets knewstuff knotifications knotifyconfig kpackage kparts kpeople kpty krunner kservice ktexteditor ktextwidgets kunitconversion kwallet kwayland kwidgetsaddons kwindowsystem kxmlgui oxygen-icons plasma-framework prison solid sonnet syntax-highlighting threadweaver"
+      package_install "plasma-kde4 ark dolphin dolphin-plugins kio-extras kdebase-runtime kdelibs kdeconnect kdeutils-sweeper kdialog kfind khelpcenter kdesudo kwalletmanager gksu gwenview kipi-plugins kate kcalc konsole spectacle okular sddm"
+      if [[ $LOCALE_KDE != en_US ]]; then
+      	package_install "kde-l10n-$LOCALE_KDE"
+      fi
       # config xinitrc
       config_xinitrc "startkde"
       pause_function
@@ -1171,7 +1165,6 @@ install_desktop_environment(){
               ;;
             5)
               package_install "yakuake"
-              aur_package_install "yakuake-skin-plasma-oxygen-panel"
               ;;
             "d")
               break
@@ -1342,7 +1335,6 @@ install_desktop_environment(){
     #}}}
     if [[ ${KDE} -eq 0 ]]; then
       package_install "gvfs gvfs-afc gvfs-mtp gvfs-google"
-      package_install "xdg-user-dirs"
       package_install "pavucontrol"
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
@@ -1351,8 +1343,11 @@ install_desktop_environment(){
     fi
     #Fix p7FM
     package_install "wxgtk2.8"
+    package_install "acpid xdg-user-dirs"
   #}}}
   #COMMON CONFIG {{{
+  	# create user directories
+    xdg-user-dirs-update
     # speed up application startup
     mkdir -p ~/.compose-cache
     # D-Bus interface for user account query and manipulation
@@ -1377,18 +1372,16 @@ install_nm_wicd(){
       print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
       print_info "NetworkManager is a program for providing detection and configuration for systems to automatically connect to network. NetworkManager's functionality can be useful for both wireless and wired networks."
       if [[ ${KDE} -eq 1 ]]; then
-        is_package_installed "plasma-meta" &&  package_install "networkmanager dnsmasq plasma-nm networkmanager-qt"
+        #is_package_installed "plasma-meta" &&  package_install "networkmanager dnsmasq plasma-nm networkmanager-qt"
+        package_install "networkmanager dnsmasq plasma-nm modemmanager-qt networkmanager-qt"
       else
         package_install "networkmanager dnsmasq network-manager-applet nm-connection-editor"
       fi
-      package_install "networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc"
-      is_package_installed "ntp" && package_install "networkmanager-dispatcher-ntpd"
       if is_package_installed "tlp"; then
         package_install "tlp-rdw"
       fi
       # Network Management daemon
       system_ctl enable NetworkManager.service
-      system_ctl enable NetworkManager-dispatcher.service
       pause_function
       ;;
     2)
@@ -1612,8 +1605,8 @@ install_office_apps(){
           else
             package_install "gnumeric abiword abiword-plugins"
           fi
-          aur_package_install "hunspell-$LOCALE_HS"
-          aur_package_install "aspell-$LOCALE_AS"
+          package_install "hunspell hunspell-$LOCALE_HS"
+          package_install "aspell aspell-$LOCALE_AS"
           ;;
         2)
           package_install "calibre"
@@ -1644,13 +1637,16 @@ install_office_apps(){
           ;;
         9)
           print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
-          package_install "libreoffice-fresh libreoffice-$LOCALE_LO"
-          aur_package_install "hunspell-$LOCALE_HS"
-          aur_package_install "aspell-$LOCALE_AS"
+          package_install "libreoffice-fresh"
+          if [[ $LOCALE_LO != en_US ]]; then
+          	package_install "libreoffice-fresh-$LOCALE_LO"
+          fi
+          package_install "hunspell hunspell-$LOCALE_HS"
+          package_install "aspell aspell-$LOCALE_AS"
           ;;
         10)
           package_install "ocrfeeder tesseract gocr"
-          aur_package_install "aspell-$LOCALE_AS"
+          package_install "aspell aspell-$LOCALE_AS"
           ;;
         11)
           package_install "xmind"
@@ -1875,10 +1871,10 @@ install_internet_apps(){
                   package_install "chromium"
                   ;;
                 3)
-                  package_install "firefox firefox-i18n-$LOCALE_FF"
-                  # speedup firefox load
-                  package_install "upx"
-                  upx --best /usr/lib/firefox/firefox
+                  package_install "firefox"
+                  if [[ $LOCALE_FF != en_US ]]; then
+                    package_install "firefox-i18n-$LOCALE_FF"
+                  fi
                   ;;
                 4)
                   if [[ ${KDE} -eq 1 ]]; then
@@ -2303,8 +2299,7 @@ install_audio_apps(){
           OPT=2
           ;;
         3)
-          package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good \
-                           gst-plugins-bad gst-plugins-ugly gst-libav"
+          package_install "gst-plugins-base gst-plugins-base-libs gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav"
           [[ ${KDE} -eq 1 ]] && package_install "phonon-qt5-gstreamer"
           # Use the 'standard' preset by default. This preset should generally be
           # transparent to most people on most music and is already quite high in quality.
@@ -2472,14 +2467,10 @@ install_video_apps(){
           OPT=2
           ;;
         3)
-          package_install "libquicktime libdvdnav libdvdcss cdrdao"
-          aur_package_install "libaacs"
-          if [[ $ARCHI == i686 ]]; then
-            aur_package_install "codecs"
-          else
-            aur_package_install "codecs64"
+          package_install "libdvdnav libdvdcss cdrdao cdrtools ffmpeg ffmpeg2.8 ffmpegthumbnailer ffmpegthumbs"
+          if [[ ${KDE} -eq 1 ]]; then
+          	package_install "kdegraphics-thumbnailers"
           fi
-          package_install "ffmpeg"
           ;;
         "b")
           break
@@ -2676,9 +2667,11 @@ install_fonts(){
     echo " 2) $(menu_item "ttf-fira-code") $AUR"
     echo " 3) $(menu_item "ttf-google-fonts-git") $AUR"
     echo " 4) $(menu_item "ttf-liberation")"
-    echo " 5) $(menu_item "ttf-mac-fonts") $AUR"
-    echo " 6) $(menu_item "ttf-ms-fonts") $AUR"
-    echo " 7) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support)"
+    echo " 5) $(menu_item "ttf-bitstream-vera")"
+    echo " 6) $(menu_item "ttf-hack")"
+    echo " 7) $(menu_item "ttf-mac-fonts") $AUR"
+    echo " 8) $(menu_item "ttf-ms-fonts") $AUR"
+    echo " 9) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support)"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2703,12 +2696,18 @@ install_fonts(){
           package_install "ttf-liberation"
           ;;
         5)
-          aur_package_install "ttf-mac-fonts"
+          package_install "ttf-bitstream-vera"
           ;;
         6)
-          aur_package_install "ttf-ms-fonts"
+          package_install "ttf-hack"
           ;;
         7)
+          aur_package_install "ttf-mac-fonts"
+          ;;
+        8)
+          aur_package_install "ttf-ms-fonts"
+          ;;
+        9)
           package_install "wqy-microhei"
           ;;
         "b")
