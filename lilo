@@ -650,7 +650,7 @@ font_config(){
     read_input $FONTCONFIG
     case "$OPTION" in
       1)
-        package_install cairo fontconfig freetype2
+        package_install "cairo fontconfig freetype2"
         break
         ;;
       2)
@@ -658,8 +658,8 @@ font_config(){
         add_key "962DDE58"
         add_repository "infinality-bundle" "http://bohoomil.com/repo/\$arch" "Never"
         [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://bohoomil.com/repo/multilib/\$arch" "Never"
-        package_install infinality-bundle
-        [[ $ARCHI == x86_64 ]] && package_install infinality-bundle-multilib
+        package_install "infinality-bundle"
+        [[ $ARCHI == x86_64 ]] && package_install "infinality-bundle-multilib"
         break
         ;;
       *)
@@ -694,7 +694,7 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    package_install xf86-video-intel bumblebee nvidia
+    package_install "xf86-video-intel bumblebee nvidia"
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -705,7 +705,7 @@ install_video_cards(){
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
     package_install "libva-vdpau-driver"
-    package_install nvidia{,-utils}
+    package_install "nvidia{,-utils}"
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
