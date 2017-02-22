@@ -451,7 +451,7 @@ install_basic_setup(){
   pause_function
   print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
   print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers services and hosts running on a local network with no specific configuration."
-  package_install "avahi  nss-mdns"
+  package_install "avahi nss-mdns"
   is_package_installed "avahi" && system_ctl enable avahi-daemon
   pause_function
   print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
@@ -682,6 +682,13 @@ install_video_cards(){
     add_user_to_group ${username} vboxsf
     system_ctl disable ntpd
     system_ctl enable vboxservice
+  #}}}
+  #Virtualbox {{{
+  elif [[ ${VIDEO_DRIVER} == vmware ]]; then
+    package_install "xf86-video-vmware xf86-input-vmmouse open-vm-tools"
+    cat /proc/version > /etc/arch-release
+    system_ctl disable ntpd
+    system_ctl enable vmtoolsd
   #}}}
   #Bumblebee {{{
   elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
@@ -1340,17 +1347,16 @@ install_desktop_environment(){
     #}}}
     if [[ ${KDE} -eq 0 ]]; then
       package_install "gvfs gvfs-afc gvfs-mtp gvfs-google"
+      package_install "xdg-user-dirs"
       package_install "pavucontrol"
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
       is_package_installed "cups" && package_install "system-config-printer"
       is_package_installed "samba" && package_install "gvfs-smb"
     fi
-    package_install "acpid xdg-user-dirs"
+    package_install "acpid"
   #}}}
   #COMMON CONFIG {{{
-  	# create user directories
-  	# su ${username} -c "xdg-user-dirs-update"
     # speed up application startup
     mkdir -p ~/.compose-cache
     # D-Bus interface for user account query and manipulation
@@ -1435,16 +1441,16 @@ install_accessories_apps(){
   while true
   do
     print_title "ACCESSORIES APPS"
-    echo " 1) $(menu_item "albert")"
+    echo " 1) $(menu_item "albert") $AUR"
     echo " 2) $(menu_item "catfish")"
     echo " 3) $(menu_item "conky-lua") $AUR"
     echo " 4) $(menu_item "docky") $AUR"
-    echo " 5) $(menu_item "galculator") $AUR"
+    echo " 5) $(menu_item "galculator")"
     echo " 6) $(menu_item "pamac-aur" "Pamac") $AUR"
     echo " 7) $(menu_item "pyrenamer") $AUR"
     echo " 8) $(menu_item "enpass-bin") $AUR"
-    echo " 9) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots" || echo "Shutter";)")"
-    echo "10) $(menu_item "terminix")"
+    echo " 9) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots $AUR" || echo "Shutter";)")"
+    echo "10) $(menu_item "terminix") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1621,7 +1627,7 @@ install_office_apps(){
           package_install "gcstar"
           ;;
         4)
-          package_install "geeknote-git"
+          aur_package_install "geeknote-git"
           ;;
         5)
           aur_package_install "haroopad"
@@ -1683,7 +1689,7 @@ install_system_apps(){
     echo " 7) $(menu_item "hosts-update") $AUR"
     echo " 8) $(menu_item "htop")"
     echo " 9) $(menu_item "plex-media-server" "Plex") $AUR"
-    echo "10) $(menu_item "ufw")"
+    echo "10) $(menu_item "ufw") $AUR"
     echo "11) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
     echo "12) $(menu_item "virtualbox")"
     echo "13) $(menu_item "wine")"
@@ -2190,7 +2196,7 @@ install_audio_apps(){
             echo "10) $(menu_item "radiotray") $AUR"
             echo "11) $(menu_item "rhythmbox")"
             echo "12) $(menu_item "spotify") $AUR"
-            echo "13) $(menu_item "timidity++")"
+            echo "13) $(menu_item "timidity++") $AUR"
             echo "14) $(menu_item "tomahawk") $AUR"
             echo "15) $(menu_item "quodlibet")"
             echo ""
@@ -2495,8 +2501,8 @@ install_games(){
   while true
   do
     print_title "GAMES - https://wiki.archlinux.org/index.php/Games"
-    echo " 1) Desura"
-    echo " 2) PlayOnLinux"
+    echo " 1) Desura $AUR"
+    echo " 2) PlayOnLinux $AUR"
     echo " 3) Steam"
     echo ""
     echo " b) BACK"
