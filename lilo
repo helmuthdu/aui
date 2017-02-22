@@ -451,7 +451,7 @@ install_basic_setup(){
   pause_function
   print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
   print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers services and hosts running on a local network with no specific configuration."
-  package_install "avahi"
+  package_install "avahi  nss-mdns"
   is_package_installed "avahi" && system_ctl enable avahi-daemon
   pause_function
   print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
@@ -650,7 +650,7 @@ font_config(){
     read_input $FONTCONFIG
     case "$OPTION" in
       1)
-        pacman -S --asdeps --needed cairo fontconfig freetype2
+        package_install cairo fontconfig freetype2
         break
         ;;
       2)
@@ -658,8 +658,8 @@ font_config(){
         add_key "962DDE58"
         add_repository "infinality-bundle" "http://bohoomil.com/repo/\$arch" "Never"
         [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://bohoomil.com/repo/multilib/\$arch" "Never"
-        pacman -S --needed infinality-bundle
-        [[ $ARCHI == x86_64 ]] && pacman -S --needed infinality-bundle-multilib
+        package_install infinality-bundle
+        [[ $ARCHI == x86_64 ]] && package_install infinality-bundle-multilib
         break
         ;;
       *)
@@ -687,7 +687,7 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    pacman -S --needed xf86-video-intel bumblebee nvidia
+    package_install xf86-video-intel bumblebee nvidia
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -698,7 +698,7 @@ install_video_cards(){
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
     package_install "libva-vdpau-driver"
-    pacman -S --needed nvidia{,-utils}
+    package_install nvidia{,-utils}
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -919,6 +919,10 @@ install_desktop_environment(){
           4)
             package_install "sddm sddm-kcm"
             system_ctl enable sddm
+            sddm --example-config > /etc/sddm.conf
+            sed -i 's/Current=/Current=breeze/' /etc/sddm.conf
+            sed -i 's/CursorTheme=/CursorTheme=breeze_cursors/' /etc/sddm.conf
+            sed -i 's/Numlock=none/Numlock=on/' /etc/sddm.conf
             ;;
           5)
             package_install "slim"
@@ -1129,7 +1133,7 @@ install_desktop_environment(){
       #Selected packages from kf5 group
       package_install "attica-qt5 baloo bluez-qt breeze-icons frameworkintegration kactivities kactivities-stats karchive kauth kbookmarks kcmutils kcodecs kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdeclarative kded kdesu kdnssd kdoctools kemoticons kfilemetadata kglobalaccel kguiaddons ki18n kiconthemes kidletime kinit kio kitemmodels kitemviews kjobwidgets knewstuff knotifications knotifyconfig kpackage kparts kpeople kpty krunner kservice ktexteditor ktextwidgets kunitconversion kwallet kwayland kwidgetsaddons kwindowsystem kxmlgui oxygen-icons plasma-framework prison solid sonnet syntax-highlighting threadweaver"
       package_install "plasma-kde4 ark dolphin dolphin-plugins kio-extras kdebase-runtime kdelibs kdeconnect kdeutils-sweeper kdialog kfind khelpcenter kdesudo kwalletmanager gksu gwenview kipi-plugins kate kcalc konsole spectacle okular sddm"
-      if [[ $LOCALE_KDE != en_US ]]; then
+      if [[ $LOCALE != en_US ]]; then
       	package_install "kde-l10n-$LOCALE_KDE"
       fi
       # config xinitrc
@@ -1347,7 +1351,7 @@ install_desktop_environment(){
   #}}}
   #COMMON CONFIG {{{
   	# create user directories
-    xdg-user-dirs-update
+  	su ${username} -c "xdg-user-dirs-update"
     # speed up application startup
     mkdir -p ~/.compose-cache
     # D-Bus interface for user account query and manipulation
@@ -1373,7 +1377,7 @@ install_nm_wicd(){
       print_info "NetworkManager is a program for providing detection and configuration for systems to automatically connect to network. NetworkManager's functionality can be useful for both wireless and wired networks."
       if [[ ${KDE} -eq 1 ]]; then
         #is_package_installed "plasma-meta" &&  package_install "networkmanager dnsmasq plasma-nm networkmanager-qt"
-        package_install "networkmanager dnsmasq plasma-nm modemmanager-qt networkmanager-qt"
+        package_install "networkmanager dnsmasq plasma-nm networkmanager-qt"
       else
         package_install "networkmanager dnsmasq network-manager-applet nm-connection-editor"
       fi
@@ -1415,7 +1419,10 @@ install_usb_modem(){
   if [[ $OPTION == y ]]; then
     package_install "usbutils usb_modeswitch"
     if is_package_installed "networkmanager"; then
-      package_install "modemmanager"
+    	package_install "modemmanager"
+    	if [[ ${KDE} -eq 1 ]]; then
+    		package_install "modemmanager-qt"
+    	fi
       system_ctl enable ModemManager.service
     else
       package_install "wvdial"
@@ -1638,7 +1645,7 @@ install_office_apps(){
         9)
           print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
           package_install "libreoffice-fresh"
-          if [[ $LOCALE_LO != en_US ]]; then
+          if [[ $LOCALE != en_US ]]; then
           	package_install "libreoffice-fresh-$LOCALE_LO"
           fi
           package_install "hunspell hunspell-$LOCALE_HS"
@@ -1871,10 +1878,7 @@ install_internet_apps(){
                   package_install "chromium"
                   ;;
                 3)
-                  package_install "firefox"
-                  if [[ $LOCALE_FF != en_US ]]; then
-                    package_install "firefox-i18n-$LOCALE_FF"
-                  fi
+                  package_install "firefox firefox-i18n-$LOCALE_FF"
                   ;;
                 4)
                   if [[ ${KDE} -eq 1 ]]; then
@@ -1910,7 +1914,7 @@ install_internet_apps(){
             echo " 4) $(menu_item "dropbox") $AUR"
             echo " 5) $(menu_item "flareget") $AUR"
             echo " 6) $(menu_item "jdownloader") $AUR"
-            echo " 7) $(menu_item "qbittorrent") $AUR"
+            echo " 7) $(menu_item "qbittorrent")"
             echo " 8) $(menu_item "sparkleshare")"
             echo " 9) $(menu_item "spideroak") $AUR"
             echo "10) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
@@ -1942,7 +1946,7 @@ install_internet_apps(){
                   aur_package_install "jdownloader"
                   ;;
                 7)
-                  aur_package_install "qbittorrent"
+                  package_install "qbittorrent"
                   ;;
                 8)
                   package_install "sparkleshare"
@@ -1998,7 +2002,9 @@ install_internet_apps(){
                   package_install "liferea"
                   ;;
                 2)
-                  package_install "thunderbird thunderbird-i18n-$LOCALE_TB"
+                  package_install "thunderbird"
+                  if [[ LOCALE_TB != en_US ]]; then
+                  package_install "thunderbird-i18n-$LOCALE_TB"
                   ;;
                 "b")
                   break
