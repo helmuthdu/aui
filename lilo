@@ -918,7 +918,7 @@ install_desktop_environment(){
             ;;
           4)
             package_install "sddm sddm-kcm"
-            system_ctl enable sddm
+            system_ctl enable sddm            
             sddm --example-config > /etc/sddm.conf
             sed -i 's/Current=/Current=breeze/' /etc/sddm.conf
             sed -i 's/CursorTheme=/CursorTheme=breeze_cursors/' /etc/sddm.conf
@@ -1128,11 +1128,8 @@ install_desktop_environment(){
       #KDE {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
-      #Selected packages from plasma group
-      package_install "breeze breeze-gtk kactivitymanagerd kde-cli-tools kde-gtk-config kdecoration kdeplasma-addons khotkeys kinfocenter kmenuedit kscreen kscreenlocker ksshaskpass ksysguard kuiserver kwallet-pam kwayland-integration kwin kwrited libkscreen libksysguard milou oxygen plasma-desktop plasma-integration plasma-nm plasma-pa plasma-workspace plasma-workspace-wallpapers polkit-kde-agent powerdevil systemsettings user-manager"
-      #Selected packages from kf5 group
-      package_install "attica-qt5 baloo bluez-qt breeze-icons frameworkintegration kactivities kactivities-stats karchive kauth kbookmarks kcmutils kcodecs kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdeclarative kded kdesu kdnssd kdoctools kemoticons kfilemetadata kglobalaccel kguiaddons ki18n kiconthemes kidletime kinit kio kitemmodels kitemviews kjobwidgets knewstuff knotifications knotifyconfig kpackage kparts kpeople kpty krunner kservice ktexteditor ktextwidgets kunitconversion kwallet kwayland kwidgetsaddons kwindowsystem kxmlgui oxygen-icons plasma-framework prison solid sonnet syntax-highlighting threadweaver"
-      package_install "plasma-kde4 ark dolphin dolphin-plugins kio-extras kdebase-runtime kdelibs kdeconnect kdeutils-sweeper kdialog kfind khelpcenter kdesudo kwalletmanager gksu gwenview kipi-plugins kate kcalc konsole spectacle okular sddm"
+      package_install "breeze breeze-gtk kactivitymanagerd kde-cli-tools kde-gtk-config kdeplasma-addons khotkeys kinfocenter kmenuedit kscreen ksshaskpass ksysguard kwallet-pam kwayland-integration kwrited oxygen plasma-desktop plasma-nm plasma-pa plasma-workspace-wallpapers powerdevil user-manager kdnssd kdoctools oxygen-icons"
+      package_install "breeze-kde4 ark dolphin dolphin-plugins kdebase-runtime kdeconnect kdeutils-sweeper kdialog kfind khelpcenter kwalletmanager gksu gwenview kipi-plugins kate kcalc konsole spectacle okular sddm sddm-kcm"
       if [[ $LOCALE != en_US ]]; then
       	package_install "kde-l10n-$LOCALE_KDE"
       fi
@@ -1182,6 +1179,10 @@ install_desktop_environment(){
       done
       #}}}
       system_ctl enable sddm
+      sddm --example-config > /etc/sddm.conf
+      sed -i 's/Current=/Current=breeze/' /etc/sddm.conf
+      sed -i 's/CursorTheme=/CursorTheme=breeze_cursors/' /etc/sddm.conf
+      sed -i 's/Numlock=none/Numlock=on/' /etc/sddm.conf
       KDE=1
       ;;
       #}}}
@@ -1351,7 +1352,7 @@ install_desktop_environment(){
   #}}}
   #COMMON CONFIG {{{
   	# create user directories
-  	su ${username} -c "xdg-user-dirs-update"
+  	# su ${username} -c "xdg-user-dirs-update"
     # speed up application startup
     mkdir -p ~/.compose-cache
     # D-Bus interface for user account query and manipulation
