@@ -683,7 +683,7 @@ install_video_cards(){
     system_ctl disable ntpd
     system_ctl enable vboxservice
   #}}}
-  #Virtualbox {{{
+  #VMware {{{
   elif [[ ${VIDEO_DRIVER} == vmware ]]; then
     package_install "xf86-video-vmware xf86-input-vmmouse open-vm-tools"
     cat /proc/version > /etc/arch-release
