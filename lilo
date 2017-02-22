@@ -2004,7 +2004,8 @@ install_internet_apps(){
                 2)
                   package_install "thunderbird"
                   if [[ LOCALE_TB != en_US ]]; then
-                  package_install "thunderbird-i18n-$LOCALE_TB"
+                  	package_install "thunderbird-i18n-$LOCALE_TB"
+                  fi
                   ;;
                 "b")
                   break
