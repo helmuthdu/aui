@@ -742,12 +742,9 @@ install_cups(){
   print_info "CUPS is the standards-based, open source printing system developed by Apple Inc. for Mac OS X and other UNIX-like operating systems."
   read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
   if [[ $OPTION == y ]]; then
-  	if [[ ${KDE} -eq 1 ]]; then
-  		package_install "print-manager"
-  	fi
     package_install "cups cups-filters ghostscript gsfonts"    
     package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-filters foomatic-db-ppds foomatic-db-nonfree-ppds hplip splix cups-pdf foomatic-db-gutenprint-ppds"
-    system_ctl enable org.cups.cupsd
+    system_ctl enable org.cups.cupsd.service
     pause_function
   fi
 }
@@ -1130,6 +1127,9 @@ install_desktop_environment(){
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
       package_install "breeze breeze-gtk kactivitymanagerd kde-cli-tools kde-gtk-config kdeplasma-addons khotkeys kinfocenter kmenuedit kscreen ksshaskpass ksysguard kwallet-pam kwayland-integration kwrited oxygen plasma-desktop plasma-nm plasma-pa plasma-workspace-wallpapers powerdevil user-manager kdnssd kdoctools oxygen-icons"
       package_install "breeze-kde4 ark dolphin dolphin-plugins kdebase-runtime kdeconnect kdeutils-sweeper kdialog kfind khelpcenter kwalletmanager gksu gwenview kipi-plugins kate kcalc konsole spectacle okular sddm sddm-kcm"
+      if is_package_installed "cups" ; then
+      	package_install "print-manager"
+      fi
       if [[ $LOCALE != en_US ]]; then
       	package_install "kde-l10n-$LOCALE_KDE"
       fi
@@ -1346,8 +1346,6 @@ install_desktop_environment(){
       is_package_installed "cups" && package_install "system-config-printer"
       is_package_installed "samba" && package_install "gvfs-smb"
     fi
-    #Fix p7FM
-    package_install "wxgtk2.8"
     package_install "acpid xdg-user-dirs"
   #}}}
   #COMMON CONFIG {{{
