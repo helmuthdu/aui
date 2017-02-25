@@ -1113,12 +1113,8 @@ install_desktop_environment(){
       #GNOME {{{
       print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
-      package_install "gnome gnome-extra gnome-software gnome-initial-setup"
-      package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gvfs-goa"
-      package_install "deja-dup"
-      aur_package_install "nautilus-share"
-      # remove gnome games
-      package_remove "aisleriot atomix four-in-a-row five-or-more gnome-2048 gnome-chess gnome-klotski gnome-mahjongg gnome-mines gnome-nibbles gnome-robots gnome-sudoku gnome-tetravex gnome-taquin swell-foop hitori iagno quadrapassel lightsoff tali"
+      package_install "adwaita-icon-theme baobab eog evince gnome-backgrounds gnome-calculator gnome-contacts gnome-control-center gnome-disk-utility gnome-font-viewer gnome-keyring gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-standard grilo-plugins mutter nautilus totem tracker gdm gnome-initial-setup"
+      package_install "brasero cheese dconf-editor file-roller gedit gnome-calendar gnome-color-manager gnome-documents gnome-logs gnome-maps gnome-music gnome-photos gnome-sound-recorder gnome-tweak-tool gnome-weather nautilus-sendto orca seahorse"
       # config xinitrc
       config_xinitrc "gnome-session"
       GNOME=1
@@ -1347,12 +1343,12 @@ install_desktop_environment(){
     #}}}
     if [[ ${KDE} -eq 0 ]]; then
       package_install "gvfs gvfs-afc gvfs-mtp gvfs-google"
-      package_install "xdg-user-dirs"
+      package_install "xdg-user-dirs-gtk"
       package_install "pavucontrol"
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
-      is_package_installed "cups" && package_install "system-config-printer"
-      is_package_installed "samba" && package_install "gvfs-smb"
+      is_package_installed "cups" && package_install "system-config-printer gtk3-print-backends"
+      is_package_installed "samba" && package_install "gvfs-smb nautilus-share"
     fi
     package_install "acpid"
   #}}}
