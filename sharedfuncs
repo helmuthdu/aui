@@ -146,7 +146,7 @@
   }
   #}}}
   check_trim() { #{{{
-    [[ -n $(hdparm -I /dev/sda | grep TRIM &> /dev/null) ]] && TRIM=1
+    [[ -n $(hdparm -I /dev/sda | grep TRIM 2> /dev/null) ]] && TRIM=1
   }
   #}}}
   check_root() { #{{{
@@ -253,6 +253,9 @@
     if [[ -n $(dmidecode --type 1 | grep VirtualBox) ]]; then
       cecho Virtualbox
       VIDEO_DRIVER="virtualbox"
+    elif [[ -n $(dmidecode --type 1 | grep VMware) ]]; then
+      cecho VMware
+      VIDEO_DRIVER="vmware"
     elif [[ $_vga_length -eq 2 ]] && [[ -n $(echo ${_vga} | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
       cecho Bumblebee
       VIDEO_DRIVER="bumblebee"
