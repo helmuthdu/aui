@@ -440,11 +440,6 @@ add_custom_repositories(){
 install_basic_setup(){
   print_title "BASH TOOLS - https://wiki.archlinux.org/index.php/Bash"
   package_install "bc rsync mlocate bash-completion pkgstats arch-wiki-lite"
-
-    if [[ $GRUVBOX_NEEDED == 1 ]] ; then
-    aur_package_install "vim-gruvbox-git";
-    aur_package_install "vim-airline-gruvbox-git";
-    fi
   pause_function
   print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
   package_install "zip unzip unrar p7zip lzop cpio"
@@ -631,8 +626,7 @@ install_xorg(){
   print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
   print_info "Xorg is the public, open-source implementation of the X window system version 11."
   echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
-  package_install "xorg-server xorg-server-utils xorg-server-xwayland xorg-xinit xorg-xkill xorg-smproxy xorg-x11perf xorg-xcursorgen xorg-xdpyinfo xorg-xdriinfo xorg-xev xorg-xkbevd xorg-xkbutils xorg-xlsatoms xorg-xlsclients xorg-xpr xorg-xvinfo xorg-xwd xorg-xwininfo xorg-xwud xterm"
-  package_install "xf86-input-synaptics xf86-input-mouse xf86-input-keyboard xf86-input-wacom xf86-input-libinput"
+  package_install "xorg-server xorg-server-utils xorg-server-xwayland xorg-xinit xorg-xkill xorg-xinput xf86-input-libinput"
   package_install "mesa"
   modprobe uinput
   pause_function
@@ -650,7 +644,7 @@ font_config(){
     read_input $FONTCONFIG
     case "$OPTION" in
       1)
-        package_install "cairo fontconfig freetype2"
+        pacman -S --asdeps --needed cairo fontconfig freetype2
         break
         ;;
       2)
@@ -658,8 +652,8 @@ font_config(){
         add_key "962DDE58"
         add_repository "infinality-bundle" "http://bohoomil.com/repo/\$arch" "Never"
         [[ $ARCHI == x86_64 ]] && add_repository "infinality-bundle-multilib" "http://bohoomil.com/repo/multilib/\$arch" "Never"
-        package_install "infinality-bundle"
-        [[ $ARCHI == x86_64 ]] && package_install "infinality-bundle-multilib"
+        pacman -S --needed infinality-bundle
+        [[ $ARCHI == x86_64 ]] && pacman -S --needed infinality-bundle-multilib
         break
         ;;
       *)
@@ -694,7 +688,8 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    package_install "bumblebee nvidia"
+    pacman -S --needed xf86-video-intel bumblebee nvidia
+    [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-virtualgl lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -704,8 +699,8 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    package_install "libva-vdpau-driver"
-    package_install "nvidia{,-utils}"
+    pacman -S --needed nvidia{,-utils}
+    [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -714,8 +709,9 @@ install_video_cards(){
   #Nouveau [NVIDIA] {{{
   elif [[ ${VIDEO_DRIVER} == nouveau ]]; then
     is_package_installed "nvidia" && pacman -Rdds --noconfirm nvidia{,-utils}
+    [[ ${ARCHI} == x86_64 ]] && is_package_installed "lib32-nvidia-utils" && pacman -Rdds --noconfirm lib32-nvidia-utils
     [[ -f /etc/X11/xorg.conf.d/20-nvidia.conf ]] && rm /etc/X11/xorg.conf.d/20-nvidia.conf
-    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl libva-vdpau-driver"
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl libvdpau-va-gl"
     replace_line '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
     mkinitcpio -p linux
@@ -726,19 +722,24 @@ install_video_cards(){
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
     [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/catalyst.conf
     [[ -f /etc/X11/xorg.conf ]] && rm /etc/X11/xorg.conf
-    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl mesa-vdpau libva-vdpau-driver"
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl mesa-vdpau libvdpau-va-gl"
     add_module "radeon" "ati"
   #}}}
   #Intel {{{
   elif [[ ${VIDEO_DRIVER} == intel ]]; then
-    package_install "mesa-libgl"
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl libvdpau-va-gl"
   #}}}
   #Vesa {{{
   else
-    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl libva-vdpau-driver"
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl libvdpau-va-gl"
   fi
-  if is_package_installed "libva-vdpau-driver"; then
-    add_line "export LIBVA_DRIVER_NAME=vdpau" "/etc/profile"
+  #}}}
+  if [[ ${ARCHI} == x86_64 ]]; then
+    is_package_installed "mesa-libgl" && package_install "lib32-mesa-libgl"
+    is_package_installed "mesa-vdpau" && package_install "lib32-mesa-vdpau"
+  fi
+  if is_package_installed "libvdpau-va-gl"; then
+    add_line "export VDPAU_DRIVER=va_gl" "/etc/profile"
   fi
   pause_function
 }
@@ -1113,8 +1114,11 @@ install_desktop_environment(){
       #GNOME {{{
       print_title "GNOME - https://wiki.archlinux.org/index.php/GNOME"
       print_info "GNOME is a desktop environment and graphical user interface that runs on top of a computer operating system. It is composed entirely of free and open source software. It is an international project that includes creating software development frameworks, selecting application software for the desktop, and working on the programs that manage application launching, file handling, and window and task management."
-      package_install "adwaita-icon-theme baobab eog evince gnome-backgrounds gnome-calculator gnome-contacts gnome-control-center gnome-disk-utility gnome-font-viewer gnome-keyring gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-standard grilo-plugins mutter nautilus totem tracker gdm gnome-initial-setup"
-      package_install "brasero cheese dconf-editor file-roller gedit gnome-calendar gnome-color-manager gnome-documents gnome-logs gnome-maps gnome-music gnome-photos gnome-sound-recorder gnome-tweak-tool gnome-weather nautilus-sendto orca seahorse"
+      package_install "gnome gnome-extra gnome-software gnome-initial-setup"
+      package_install "deja-dup gedit-plugins gpaste gnome-tweak-tool gnome-power-manager"
+      aur_package_install "nautilus-share"
+      # remove gnome games
+      package_remove "aisleriot atomix four-in-a-row five-or-more gnome-2048 gnome-chess gnome-klotski gnome-mahjongg gnome-mines gnome-nibbles gnome-robots gnome-sudoku gnome-tetravex gnome-taquin swell-foop hitori iagno quadrapassel lightsoff tali"
       # config xinitrc
       config_xinitrc "gnome-session"
       GNOME=1
@@ -1128,14 +1132,10 @@ install_desktop_environment(){
       #KDE {{{
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
-      package_install "breeze breeze-gtk kactivitymanagerd kde-cli-tools kde-gtk-config kdeplasma-addons khotkeys kinfocenter kmenuedit kscreen ksshaskpass ksysguard kwallet-pam kwayland-integration kwrited oxygen plasma-desktop plasma-nm plasma-pa plasma-workspace-wallpapers powerdevil user-manager kdnssd kdoctools oxygen-icons"
-      package_install "breeze-kde4 ark dolphin dolphin-plugins kdebase-runtime kdeconnect kdeutils-sweeper kdialog kfind khelpcenter kwalletmanager gksu gwenview kipi-plugins kate kcalc konsole spectacle okular sddm sddm-kcm"
-      if is_package_installed "cups" ; then
-      	package_install "print-manager"
-      fi
-      if [[ $LOCALE != en_US ]]; then
-      	package_install "kde-l10n-$LOCALE_KDE"
-      fi
+      package_install "plasma kf5 sddm"
+      package_install "ark dolphin dolphin-plugins kio-extras kdeconnect quota-tools gwenview kipi-plugins kate kcalc konsole spectacle okular kdeutils-sweeper kwalletmanager"
+      is_package_installed "cups" && package_install "print-manager"
+      [[ $LOCALE != en_US ]] && package_install "kde-l10n-$LOCALE_KDE"
       # config xinitrc
       config_xinitrc "startkde"
       pause_function
@@ -1237,8 +1237,7 @@ install_desktop_environment(){
       print_title "BUDGIE - https://wiki.archlinux.org/index.php/Budgie_Desktop"
       print_info "Budgie is the default desktop of Solus Operating System, written from scratch. Besides a more modern design, Budgie can emulate the look and feel of the GNOME 2 desktop."
       package_install "gnome gnome-extra gnome-software gnome-initial-setup telepathy"
-      package_install "gedit-plugins gpaste gnome-tweak-tool gnome-power-manager gvfs-goa "
-      package_install "deja-dup"
+      package_install "deja-dup gedit-plugins gpaste gnome-tweak-tool gnome-power-manager"
       package_install "budgie-desktop"
       aur_package_install "nautilus-share"
       # remove gnome games
@@ -1342,15 +1341,14 @@ install_desktop_environment(){
     fi
     #}}}
     if [[ ${KDE} -eq 0 ]]; then
-      package_install "gvfs gvfs-afc gvfs-mtp gvfs-google"
+      package_install "gvfs gvfs-goa gvfs-afc gvfs-mtp gvfs-google"
       package_install "xdg-user-dirs-gtk"
       package_install "pavucontrol"
       package_install "ttf-bitstream-vera ttf-dejavu"
       aur_package_install "gnome-defaults-list"
       is_package_installed "cups" && package_install "system-config-printer gtk3-print-backends"
-      is_package_installed "samba" && package_install "gvfs-smb nautilus-share"
+      is_package_installed "samba" && package_install "gvfs-smb"
     fi
-    package_install "acpid"
   #}}}
   #COMMON CONFIG {{{
     # speed up application startup
@@ -1377,15 +1375,20 @@ install_nm_wicd(){
       print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
       print_info "NetworkManager is a program for providing detection and configuration for systems to automatically connect to network. NetworkManager's functionality can be useful for both wireless and wired networks."
       if [[ ${KDE} -eq 1 ]]; then
-        #is_package_installed "plasma-meta" &&  package_install "networkmanager dnsmasq plasma-nm networkmanager-qt"
         package_install "networkmanager dnsmasq plasma-nm networkmanager-qt"
       else
         package_install "networkmanager dnsmasq network-manager-applet nm-connection-editor"
       fi
-      if is_package_installed "tlp"; then
-        package_install "tlp-rdw"
+      # vpn support
+      package_install "networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc"
+      # auto update datetime from network
+      if is_package_installed "ntp"; then
+        package_install "networkmanager-dispatcher-ntpd"
+        system_ctl enable NetworkManager-dispatcher.service
       fi
-      # Network Management daemon
+      # power manager support
+      is_package_installed "tlp" && package_install "tlp-rdw"
+      # network management daemon
       system_ctl enable NetworkManager.service
       pause_function
       ;;
@@ -1420,10 +1423,8 @@ install_usb_modem(){
   if [[ $OPTION == y ]]; then
     package_install "usbutils usb_modeswitch"
     if is_package_installed "networkmanager"; then
-    	package_install "modemmanager"
-    	if [[ ${KDE} -eq 1 ]]; then
-    		package_install "modemmanager-qt"
-    	fi
+      package_install "modemmanager"
+      [[ ${KDE} -eq 1 ]] && package_install "modemmanager-qt"
       system_ctl enable ModemManager.service
     else
       package_install "wvdial"
@@ -1646,9 +1647,7 @@ install_office_apps(){
         9)
           print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
           package_install "libreoffice-fresh"
-          if [[ $LOCALE != en_US ]]; then
-          	package_install "libreoffice-fresh-$LOCALE_LO"
-          fi
+          [[ $LOCALE != en_US ]] && package_install "libreoffice-fresh-$LOCALE_LO"
           package_install "hunspell hunspell-$LOCALE_HS"
           package_install "aspell aspell-$LOCALE_AS"
           ;;
@@ -2004,9 +2003,7 @@ install_internet_apps(){
                   ;;
                 2)
                   package_install "thunderbird"
-                  if [[ LOCALE_TB != en_US ]]; then
-                  	package_install "thunderbird-i18n-$LOCALE_TB"
-                  fi
+                  [[ LOCALE_TB != en_US ]] && package_install "thunderbird-i18n-$LOCALE_TB"
                   ;;
                 "b")
                   break
