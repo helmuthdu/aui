@@ -1446,7 +1446,7 @@ install_accessories_apps(){
     echo " 6) $(menu_item "pamac-aur" "Pamac") $AUR"
     echo " 7) $(menu_item "pyrenamer") $AUR"
     echo " 8) $(menu_item "enpass-bin") $AUR"
-    echo " 9) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots $AUR" || echo "Shutter";)")"
+    echo " 9) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots $AUR" || echo "Shutter $AUR";)")"
     echo "10) $(menu_item "terminix") $AUR"
     echo ""
     echo " b) BACK"
@@ -1486,7 +1486,7 @@ install_accessories_apps(){
           if [[ ${KDE} -eq 1 ]]; then
             aur_package_install "hotshots"
           else
-            package_install "shutter"
+            aur_package_install "shutter"
           fi
           ;;
         10)
@@ -1517,7 +1517,7 @@ install_development_apps(){
     echo " 6) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
     echo " 7) $(menu_item "monodevelop")"
     echo " 8) $(menu_item "qtcreator")"
-    echo " 9) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
+    echo " 9) $(menu_item "mysql-workbench" "MySQL Workbench")"
     echo "10) $(menu_item "jdk7-openjdk" "OpenJDK")"
     echo "11) $(menu_item "jdk" "Oracle JDK") $AUR"
     echo "12) $(menu_item "nodejs")"
@@ -1559,7 +1559,7 @@ install_development_apps(){
           package_install "qtcreator"
           ;;
         9)
-          aur_package_install "mysql-workbench-gpl"
+          package_install "mysql-workbench"
           ;;
         10)
           package_remove "jdk"
@@ -1862,7 +1862,7 @@ install_internet_apps(){
             echo " 1) $(menu_item "google-chrome" "Chrome") $AUR"
             echo " 2) $(menu_item "chromium")"
             echo " 3) $(menu_item "firefox")"
-            echo " 4) $(menu_item "midori rekonq" "$([[ ${KDE} -eq 1 ]] && echo "Rekonq" || echo "Midori";)")"
+            echo " 4) $(menu_item "midori konqueror" "$([[ ${KDE} -eq 1 ]] && echo "Konqueror" || echo "Midori";)")"
             echo " 5) $(menu_item "opera")"
             echo ""
             echo " b) BACK"
@@ -1882,7 +1882,7 @@ install_internet_apps(){
                   ;;
                 4)
                   if [[ ${KDE} -eq 1 ]]; then
-                    package_install "rekonq"
+                    package_install "konqueror"
                   else
                     package_install "midori"
                   fi
@@ -2179,10 +2179,10 @@ install_audio_apps(){
             print_title "AUDIO PLAYERS"
             echo " 1) $(menu_item "amarok")"
             echo " 2) $(menu_item "audacious")"
-            echo " 3) $(menu_item "banshee")"
+            echo " 3) $(menu_item "banshee") $AUR"
             echo " 4) $(menu_item "clementine")"
             echo " 5) $(menu_item "deadbeef")"
-            echo " 6) $(menu_item "guayadeque")"
+            echo " 6) $(menu_item "guayadeque") $AUR"
             echo " 7) $(menu_item "musique") $AUR"
             echo " 8) $(menu_item "nuvolaplayer") $AUR"
             echo " 9) $(menu_item "pragha")"
@@ -2206,7 +2206,7 @@ install_audio_apps(){
                   package_install "audacious audacious-plugins"
                   ;;
                 3)
-                  package_install "banshee"
+                  aur_package_install "banshee"
                   ;;
                 4)
                   package_install "clementine"
@@ -2215,7 +2215,7 @@ install_audio_apps(){
                   package_install "deadbeef"
                   ;;
                 6)
-                  package_install "guayadeque"
+                  aur_package_install "guayadeque"
                   ;;
                 7)
                   aur_package_install "musique"
@@ -2230,7 +2230,8 @@ install_audio_apps(){
                   aur_package_install "radiotray"
                   ;;
                 11)
-                  package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako pywebkitgtk"
+                  package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako"
+                  aur_package_install "pywebkitgtk"
                   ;;
                 12)
                   aur_package_install "spotify"
@@ -2407,7 +2408,7 @@ install_video_apps(){
           while true
           do
             print_title "VIDEO EDITORS|TOOLS"
-            echo " 1) $(menu_item "arista")"
+            echo " 1) $(menu_item "arista") $AUR"
             echo " 2) $(menu_item "avidemux-gtk avidemux-qt" "Avidemux")"
             echo " 3) $(menu_item "filebot") $AUR"
             echo " 4) $(menu_item "handbrake")"
@@ -2425,7 +2426,7 @@ install_video_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
-                  package_install "arista"
+                  aur_package_install "arista"
                   ;;
                 2)
                   if [[ ${KDE} -eq 1 ]]; then
