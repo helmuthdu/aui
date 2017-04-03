@@ -220,7 +220,7 @@
     # 1) Chrome
     # 2) Chromium
     # 3) Firefox
-    # 4) Midori|Rekonq
+    # 4) Midori|Konqueror
     # 5) Opera
     BROWSERS_OPTIONS="3"
   #}}}
