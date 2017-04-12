@@ -2686,6 +2686,7 @@ install_fonts(){
     echo " 7) $(menu_item "ttf-mac-fonts") $AUR"
     echo " 8) $(menu_item "ttf-ms-fonts") $AUR"
     echo " 9) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support)"
+    echo "10) $(menu_item "noto-fonts-cjk") (Chinese/Japanese/Korean Support)"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2723,6 +2724,9 @@ install_fonts(){
           ;;
         9)
           package_install "wqy-microhei"
+          ;;
+        10)
+          package_install "noto-fonts-cjk"
           ;;
         "b")
           break

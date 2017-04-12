@@ -348,10 +348,13 @@
   # 2) ttf-fira-code
   # 3) ttf-google-webfonts
   # 4) ttf-liberation
-  # 5) ttf-mac-fonts
-  # 6) ttf-ms-fonts
-  # 7) wqy-microhei
-  FONTS_OPTIONS="1-7"
+  # 5) ttf-bitstream-vera
+  # 6) ttf-hack
+  # 7) ttf-mac-fonts
+  # 8) ttf-ms-fonts
+  # 9) wqy-microhei
+  #10) noto-fonts-cjk
+  FONTS_OPTIONS="1-10"
 #}}}
 #EXTRA {{{
   # 1) Global Menu
