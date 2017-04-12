@@ -163,6 +163,7 @@
   #10) OpenJDK
   #11) OracleJDK
   #12) NodeJS
+  #13) Microsoft Visual Studio Code
   DEVELOPMENT_OPTIONS="11"
 #}}}
 #OFFICE {{{
