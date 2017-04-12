@@ -853,7 +853,7 @@ install_desktop_environment(){
             aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
             ;;
           2)
-            aur_package_install "arc-icon-theme-git"
+            aur_package_install "arc-icon-theme-git moka-icon-theme-git"
             ;;
           "b")
             break
