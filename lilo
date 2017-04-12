@@ -840,7 +840,8 @@ install_desktop_environment(){
     while true
     do
       print_title "GNOME ICONS"
-      echo " 1) $(menu_item "numix-icon-theme-git")"
+      echo " 1) $(menu_item "numix-icon-theme-git") $AUR"
+      echo " 2) $(menu_item "arc-icon-theme-git") $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -850,6 +851,9 @@ install_desktop_environment(){
         case "$OPT" in
           1)
             aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
+            ;;
+          2)
+            aur_package_install "arc-icon-theme-git"
             ;;
           "b")
             break
