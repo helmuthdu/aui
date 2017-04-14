@@ -473,7 +473,7 @@
           su - ${username} -c "${AUR_PKG_MANAGER} --noconfirm -S ${PKG}" >>"$LOG" 2>&1 &
           pid=$!;progress $pid
         else
-          su - ${username} -c "${AUR_PKG_MANAGER} -S ${PKG}"
+          su - ${username} -c "${AUR_PKG_MANAGER} --noconfirm -S ${PKG}"
         fi
       else
         if [[ $VERBOSE_MODE -eq 0 ]]; then
