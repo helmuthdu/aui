@@ -484,7 +484,7 @@ install_ssh(){
       sed -i '/LogLevel/s/^#//' /etc/ssh/sshd_config
       sed -i '/LoginGraceTime/s/^#//' /etc/ssh/sshd_config
       sed -i '/PermitRootLogin/s/^#//' /etc/ssh/sshd_config
-      sed -i '/HostbasedAuthentication/s/^#//' /etc/ssh/sshd_config
+      sed -i '/HostbasedAuthentication no/s/^#//' /etc/ssh/sshd_config
       sed -i '/StrictModes/s/^#//' /etc/ssh/sshd_config
       sed -i '/RSAAuthentication/s/^#//' /etc/ssh/sshd_config
       sed -i '/PubkeyAuthentication/s/^#//' /etc/ssh/sshd_config
