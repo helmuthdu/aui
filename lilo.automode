@@ -47,10 +47,7 @@
   ZSH="y"
   OH_MY_ZSH="y"
   PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA) driver
-  #FONT CONFIGURATION {{{
-    # 1) Default
-    # 2) Infinality
-    FONTCONFIG=2
+  FONTCONFIG="y"
   #}}}
   #ADDITIONAL FIRMWARE {{{
     # 1) aic94xx-firmware
