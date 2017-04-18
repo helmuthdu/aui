@@ -1464,7 +1464,8 @@ install_accessories_apps(){
     echo " 8) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots" || echo "Shutter";)")"
     echo " 9) $(menu_item "synapse")"
     echo "10) $(menu_item "terminix")"
-    echo "11) $(menu_item "unified-remote-server" "Unified Remote")"
+    echo "11) $(menu_item "terminator")"
+    echo "12) $(menu_item "unified-remote-server" "Unified Remote")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1508,6 +1509,9 @@ install_accessories_apps(){
           aur_package_install "terminix"
           ;;
         11)
+          package_install "terminator"
+          ;;
+        12)
           aur_package_install "unified-remote-server"
           system_ctl enable urserver
           ;;
