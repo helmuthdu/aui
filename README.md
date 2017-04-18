@@ -1,4 +1,5 @@
-### Project no longer maintained
+### Project only accepting patches
+This project is not actively developed but *will* accept PRs
 
 # Archlinux U Install
 
@@ -13,11 +14,13 @@ You can try it first with a `virtualbox`
 
 ## How to get it
 ### With git
+- Increase cowspace partition: `mount -o remount,size=2G /run/archiso/cowspace`
 - Get list of packages and install git: `pacman -Sy git`
 - get the script: `git clone git://github.com/helmuthdu/aui`
 
 ### Without git
 - get the script: ` wget https://github.com/helmuthdu/aui/tarball/master -O - | tar xz`
+    - an alternate URL (for less typing (github shorten)) is ` https://git.io/vS1GH -O - | tar xz`
     - an alternate URL (for less typing) is ` wget http://bit.ly/NoUPC6 -O - | tar xz`
     - super short `wget ow.ly/wnFgh -O aui.zip`
 
