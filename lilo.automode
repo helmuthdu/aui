@@ -145,6 +145,7 @@
   # 8) Enpass
   # 9) Shutter|Hotshots
   #10) Terminix
+  #11) Terminator
   ACCESSORIES_OPTIONS="10"
 #}}}
 #DEVELOPEMENT {{{
@@ -152,16 +153,18 @@
   # 2) Emacs
   # 3) Gvim
   # 4) Meld
-  # 5) Android Studio
-  # 6) IntelliJ IDEA
-  # 7) Monodevelop
-  # 8) QT Creator
-  # 9) MySQL Workbench
-  #10) OpenJDK
-  #11) OracleJDK
-  #12) NodeJS
-  #13) Microsoft Visual Studio Code
-  DEVELOPMENT_OPTIONS="11"
+  # 5) Sublime Text 2
+  # 6) Sublime Text 3
+  # 7) Android Studio
+  # 8) IntelliJ IDEA
+  # 9) Monodevelop
+  #10) QT Creator
+  #11) MySQL Workbench
+  #12) OpenJDK
+  #13) OracleJDK
+  #14) NodeJS
+  #15) Microsoft Visual Studio Code
+  DEVELOPMENT_OPTIONS="13"
 #}}}
 #OFFICE {{{
   # 1) Abiword+Gnumeric|Calligra
