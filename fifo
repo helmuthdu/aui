@@ -590,7 +590,7 @@ configure_timezone(){
     settimezone
     read_input_text "Confirm timezone (${ZONE}/${SUBZONE})"
   done
-  arch_chroot "ln -s /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
+  arch_chroot "ln -sf /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
   arch_chroot "sed -i '/#NTP=/d' /etc/systemd/timesyncd.conf"
   arch_chroot "sed -i 's/#Fallback//' /etc/systemd/timesyncd.conf"
   arch_chroot "echo \"FallbackNTP=0.pool.ntp.org 1.pool.ntp.org 0.fr.pool.ntp.org\" >> /etc/systemd/timesyncd.conf"
