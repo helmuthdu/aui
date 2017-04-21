@@ -1360,7 +1360,7 @@ install_nm_wicd(){
       if [[ ${KDE} -eq 1 ]]; then
         package_install "networkmanager dnsmasq plasma-nm networkmanager-qt"
       else
-        package_install "networkmanager dnsmasq network-manager-applet nm-connection-editor"
+        package_install "networkmanager dnsmasq network-manager-applet nm-connection-editor gnome-keyring"
       fi
       # vpn support
       package_install "networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc"
