@@ -1505,8 +1505,8 @@ install_development_apps(){
     echo " 2) $(menu_item "emacs")"
     echo " 3) $(menu_item "gvim")"
     echo " 4) $(menu_item "meld")"
-    echo " 5) $(menu_item "sublime-text")"
-    echo " 6) $(menu_item "sublime-text-dev")"
+    echo " 5) $(menu_item "sublime-text") $AUR"
+    echo " 6) $(menu_item "sublime-text-dev") $AUR"
     echo " 7) $(menu_item "android-studio" "Android Studio")"
     echo " 8) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
     echo " 9) $(menu_item "monodevelop")"
@@ -1536,10 +1536,10 @@ install_development_apps(){
           package_install "meld"
           ;;
         5)
-          package_install "sublime-text"
+          aur_package_install "sublime-text"
           ;;
         6)
-          package_install "sublime-text-dev"
+          aur_package_install "sublime-text-dev"
           ;;
         7)
           aur_package_install "android-sdk android-sdk-platform-tools android-sdk-build-tools android-platform"
