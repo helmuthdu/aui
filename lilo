@@ -2416,7 +2416,7 @@ install_video_apps(){
             echo " 3) $(menu_item "filebot") $AUR"
             echo " 4) $(menu_item "handbrake")"
             echo " 5) $(menu_item "kazam") $AUR"
-            echo " 6) $(menu_item "kdeenlive")"
+            echo " 6) $(menu_item "kdenlive")"
             echo " 7) $(menu_item "lwks" "Lightworks") $AUR"
             echo " 8) $(menu_item "openshot")"
             echo " 9) $(menu_item "pitivi")"
