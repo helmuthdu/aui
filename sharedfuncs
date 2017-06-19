@@ -383,7 +383,7 @@
     pacman-key -r $1
     pacman-key --lsign-key $1
   } #}}}
-  add_key_user { #{{{
+  add_key_user() { #{{{
   	su - ${username} -c"
 	gpg --recv-keys --keyserver $1
 	"
