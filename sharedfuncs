@@ -383,6 +383,11 @@
     pacman-key -r $1
     pacman-key --lsign-key $1
   } #}}}
+  add_key_user { #{{{
+  	su - ${username} -c"
+	gpg --recv-keys --keyserver $1
+	"
+  } #}}}
   pacman_key(){ #{{{
     if [[ ! -d /etc/pacman.d/gnupg ]]; then
       print_title "PACMAN KEY - https://wiki.archlinux.org/index.php/pacman-key"

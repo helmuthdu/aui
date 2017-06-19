@@ -370,8 +370,8 @@ choose_aurhelper(){
         if ! is_package_installed "pacaur" ; then
           package_install "base-devel yajl expac"
           pacman -D --asdeps yajl expac
-          add_key "F56C0C53"
-          aui_download_packages "cower pacaur"
+          add_key_user "hkp://pgp.mit.edu 1EB2638FF56C0C53"
+	  aui_download_packages "cower pacaur"
           pacman -D --asdeps cower
           if ! is_package_installed "pacaur" ; then
             echo "Pacaur not installed. EXIT now"
