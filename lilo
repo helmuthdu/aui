@@ -1923,6 +1923,7 @@ install_internet_apps(){
             echo "10) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
             echo "11) $(menu_item "uget")"
             echo "12) $(menu_item "youtube-dl")"
+	    echo "13) $(menu_item "tixati") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -1974,6 +1975,9 @@ install_internet_apps(){
                 12)
                   package_install "youtube-dl"
                   ;;
+		13)
+		  aur_package_install "tixati"
+		  ;;
                 "b")
                   break
                   ;;
@@ -2034,6 +2038,7 @@ install_internet_apps(){
             echo " 6) $(menu_item "viber") $AUR"
             echo " 7) $(menu_item "telegram-desktop-bin") $AUR"
             echo " 8) $(menu_item "qtox-git") $AUR"
+	    echo " 9) $(menu_item "discord") &AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2069,6 +2074,9 @@ install_internet_apps(){
                 8)
                   aur_package_install "qtox-git"
                   ;;
+		9)
+		  aur_package_install "discord"
+		  ;;
                 "b")
                   break
                   ;;
@@ -2501,6 +2509,7 @@ install_games(){
     echo " 1) Desura $AUR"
     echo " 2) PlayOnLinux $AUR"
     echo " 3) Steam"
+    echo " 4) Minecraft"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2520,6 +2529,10 @@ install_games(){
           package_install "steam"
           OPT=3
           ;;
+	4)
+	  aur_package_install "minecraft"
+	  OPT=4
+	  ;;
         "b")
           break
           ;;
