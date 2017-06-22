@@ -2038,7 +2038,7 @@ install_internet_apps(){
             echo " 6) $(menu_item "viber") $AUR"
             echo " 7) $(menu_item "telegram-desktop-bin") $AUR"
             echo " 8) $(menu_item "qtox-git") $AUR"
-	    echo " 9) $(menu_item "discord") &AUR"
+	    echo " 9) $(menu_item "discord") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
