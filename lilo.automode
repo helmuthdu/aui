@@ -194,6 +194,8 @@
   #11) Unified Remote
   #12) Virtualbox
   #13) Wine
+  #14) netdata
+  #15) nload
   SYSTEMTOOLS_OPTIONS="10"
 #}}}
 #GRAPHICS {{{
