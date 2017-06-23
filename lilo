@@ -906,7 +906,7 @@ install_desktop_environment(){
             ;;
           4)
             package_install "sddm sddm-kcm"
-            system_ctl enable sddm            
+            system_ctl enable sddm
             sddm --example-config > /etc/sddm.conf
             sed -i 's/Current=/Current=breeze/' /etc/sddm.conf
             sed -i 's/CursorTheme=/CursorTheme=breeze_cursors/' /etc/sddm.conf
@@ -1691,6 +1691,8 @@ install_system_apps(){
     echo "11) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
     echo "12) $(menu_item "virtualbox")"
     echo "13) $(menu_item "wine")"
+    echo "14) $(menu_item "netdata")"
+    echo "15) $(menu_item "nload")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1762,6 +1764,13 @@ install_system_apps(){
           ;;
         13)
           package_install "icoutils wine wine_gecko wine-mono winetricks"
+          ;;
+        14)
+          package_install "netdata"
+          system_ctl enable netdata.service
+          ;;
+        15)
+          package_install "nload"
           ;;
         "b")
           break
