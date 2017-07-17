@@ -109,7 +109,7 @@
     # 1) Elsa
     # 2) GDM
     # 3) LightDM
-    # 4) SSDM
+    # 4) SDDM
     # 5) Slim
     DISPLAY_MANAGER="3"
   #}}}
