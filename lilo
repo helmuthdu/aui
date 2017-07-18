@@ -1876,6 +1876,7 @@ install_internet_apps(){
             echo " 3) $(menu_item "firefox")"
             echo " 4) $(menu_item "midori konqueror" "$([[ ${KDE} -eq 1 ]] && echo "Konqueror" || echo "Midori";)")"
             echo " 5) $(menu_item "opera")"
+            echo " 6) $(menu_item "vivaldi") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -1901,6 +1902,9 @@ install_internet_apps(){
                   ;;
                 5)
                   package_install "opera"
+                  ;;
+                6)
+                  aur_package_install "vivaldi"
                   ;;
                 "b")
                   break
