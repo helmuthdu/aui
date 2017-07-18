@@ -670,6 +670,7 @@ install_bootloader(){
         if [[ $UEFI -eq 1 ]]
         then
           pacstrap ${MOUNTPOINT} refind-efi os-prober
+          break
         else
           invalid_option
         fi
@@ -806,13 +807,15 @@ configure_bootloader(){
     rEFInd)
       print_title "REFIND - https://wiki.archlinux.org/index.php/REFInd"
       print_info "rEFInd is a UEFI boot manager capable of launching EFISTUB kernels. It is a fork of the no-longer-maintained rEFIt and fixes many issues with respect to non-Mac UEFI booting. It is designed to be platform-neutral and to simplify booting multiple OSes."
+      print_warning "When refind-install (used in Automatic mode) is run in chroot (e.g. in live system when installing Arch Linux) /boot/refind-linux.conf is populated with kernel options from the live system not the one on which it is installed. You need to adjust kernel options in /boot/refind-linux.conf manually."
       refind_install_mode=("Automatic" "Manual")
       PS3="$prompt1"
       echo -e "rEFInd install:\n"
       select OPT in "${refind_install_mode[@]}"; do
         case "$REPLY" in
           1)
-            arch_chroot "refind-install --usedefault ${EFI_MOUNTPOINT} --alldrivers"
+            arch_chroot "refind-install"
+            $EDITOR ${MOUNTPOINT}/boot/refind_linux.conf
             break
             ;;
           2)
