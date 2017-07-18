@@ -1430,7 +1430,7 @@ install_accessories_apps(){
     echo " 7) $(menu_item "enpass-bin") $AUR"
     echo " 8) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots" || echo "Shutter";)")"
     echo " 9) $(menu_item "synapse")"
-    echo "10) $(menu_item "terminix")"
+    echo "10) $(menu_item "tilix-bin") $AUR"
     echo "11) $(menu_item "terminator")"
     echo "12) $(menu_item "unified-remote-server" "Unified Remote")"
     echo ""
@@ -1475,7 +1475,7 @@ install_accessories_apps(){
           fi
           ;;
         10)
-          aur_package_install "terminix"
+          aur_package_install "tilix-bin"
           ;;
         11)
           package_install "terminator"
