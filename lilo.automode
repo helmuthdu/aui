@@ -225,6 +225,7 @@
     # 3) Firefox
     # 4) Midori|Konqueror
     # 5) Opera
+    # 6) Vivaldi
     BROWSERS_OPTIONS="3"
   #}}}
   #DOWNLOAD|FILESHARE {{{
