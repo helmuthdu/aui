@@ -33,13 +33,13 @@
     Cyan=$(tput setaf 6)
     White=$(tput setaf 7)
     # Bold
-    BRed=${Bold}$(tput setaf 1)
-    BGreen=${Bold}$(tput setaf 2)
-    BYellow=${Bold}$(tput setaf 3)
-    BBlue=${Bold}$(tput setaf 4)
-    BPurple=${Bold}$(tput setaf 5)
-    BCyan=${Bold}$(tput setaf 6)
-    BWhite=${Bold}$(tput setaf 7)
+    BRed=${Bold}${Red}
+    BGreen=${Bold}${Green}
+    BYellow=${Bold}${Yellow}
+    BBlue=${Bold}${Blue}
+    BPurple=${Bold}${Purple}
+    BCyan=${Bold}${Cyan}
+    BWhite=${Bold}${White}
   #}}}
   # PROMPT {{{
     prompt1="Enter your option: "
