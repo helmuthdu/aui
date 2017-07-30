@@ -1441,38 +1441,38 @@ install_accessories_apps(){
     for OPT in ${OPTIONS[@]}; do
       case "$OPT" in
         1)
-          aur_package_install "albert"
-          ;;
-        2)
           package_install "catfish"
           ;;
-        3)
+        2)
           aur_package_install "conky-lua"
           package_install "lm_sensors"
           sensors-detect --auto
           ;;
-        4)
+        3)
           package_install "docky"
           aur_package_install "dockmanager"
           ;;
-        5)
+        4)
           package_install "galculator"
           ;;
-        6)
+        5)
           aur_package_install "pamac-aur"
           ;;
-        7)
+        6)
           aur_package_install "pyrenamer"
           ;;
-        8)
+        7)
           aur_package_install "enpass-bin"
           ;;
-        9)
+        8)
           if [[ ${KDE} -eq 1 ]]; then
             aur_package_install "hotshots"
           else
             aur_package_install "shutter"
           fi
+          ;;
+        9)
+          package_install "synapse"
           ;;
         10)
           aur_package_install "tilix-bin"
@@ -2255,7 +2255,9 @@ install_audio_apps(){
                   ;;
                 11)
                   package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako"
-                  aur_package_install "pywebkitgtk"
+                  #aur_package_install "pywebkitgtk"
+                  # pywebkitgtk compile needed and take alot of time around 4-5H on i5-8gigram-ssd hdd
+                  # + only need when Cannot activate "context pane" plugin
                   ;;
                 12)
                   aur_package_install "spotify"
