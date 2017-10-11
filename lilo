@@ -323,7 +323,7 @@ configure_sudo(){
     echo 'Defaults !env_editor, editor="/usr/bin/vim:/usr/bin/vi:/usr/bin/nano"' >> /etc/sudoers
     echo 'Defaults timestamp_timeout=15' >> /etc/sudoers
     echo 'Defaults passprompt="[sudo] password for %u: "' >> /etc/sudoers
-    echo 'Defaults lecture=never' >> /etc/sudores
+    echo 'Defaults lecture=never' >> /etc/sudoers
   fi
   #}}}
 }
