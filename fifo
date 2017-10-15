@@ -501,6 +501,8 @@ format_partitions(){
 #INSTALL BASE SYSTEM {{{
 install_base_system(){
   print_title "INSTALL BASE SYSTEM"
+  print_info "Installing PGP keyring"
+  pacman -Sy archlinux-keyring
   print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
   rm ${MOUNTPOINT}${EFI_MOUNTPOINT}/vmlinuz-linux
   pacstrap ${MOUNTPOINT} base base-devel parted btrfs-progs f2fs-tools ntp net-tools
