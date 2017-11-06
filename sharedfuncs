@@ -217,7 +217,6 @@
             break
             ;;
           3)
-            ip link set ${WIRELESS_DEV} up
             wifi-menu ${WIRELESS_DEV}
             break
             ;;
