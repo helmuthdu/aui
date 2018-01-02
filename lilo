@@ -220,7 +220,7 @@ select_user(){
           [[ $EDITOR == vim ]] && (! is_package_installed "gvim" && package_install "vim ctags") || package_install "neovim python2-neovim python-neovim"
           #VIMRC {{{
           if [[ ! -f /home/${username}/.vimrc ]]; then
-            vimrc_list=("Default" "Vanilla" "Get from github");
+            vimrc_list=("Get helmuthdu .vimrc from github" "Vanilla .vimrc" "Get personal .vimrc from github");
             PS3="$prompt1"
             echo -e "Choose your .vimrc\n"
             select OPT in "${vimrc_list[@]}"; do
