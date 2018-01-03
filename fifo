@@ -509,11 +509,9 @@ select_linux_version() {
        if [ "linux (default)" == "$EDITOR" ];then
           pacstrap ${MOUNTPOINT} base linux-headers
        elif [ "linux-lts (long term support)" == "$EDITOR" ];then
-          pacman -Sg base | cut -d ' ' -f 2 | sed s/\^linux\$/linux-lts/g | pacstrap ${MOUNTPOINT} -
-          pacstrap ${MOUNTPOINT} linux-lts-headers
+          pacman -Sg base | cut -d ' ' -f 2 | sed s/\^linux\$/linux-lts/g | pacstrap ${MOUNTPOINT} - linux-lts-headers
        elif [ "linux-hardened (security features)" == "$EDITOR" ];then
-          pacman -Sg base | cut -d ' ' -f 2 | sed s/\^linux\$/linux-hardened/g | pacstrap ${MOUNTPOINT} -
-          pacstrap ${MOUNTPOINT} linux-hardened-headers
+          pacman -Sg base | cut -d ' ' -f 2 | sed s/\^linux\$/linux-hardened/g | pacstrap ${MOUNTPOINT} - linux-hardened-headers
       fi
       break
     else
