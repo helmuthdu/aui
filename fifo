@@ -499,13 +499,34 @@ format_partitions(){
 }
 #}}}
 #INSTALL BASE SYSTEM {{{
+select_linux_version() {
+  print_title "LINUX VERSION"
+  version_list=("linux (default)" "linux-lts (long term support)" "linux-hardened (security features)");
+  PS3="$prompt1"
+  echo -e "Select linux version to install\n"
+  select VERSION in "${version_list[@]}"; do
+    if contains_element "$VERSION" "${version_list[@]}"; then
+       if [ "linux (default)" == "$VERSION" ];then
+          pacstrap ${MOUNTPOINT} base linux-headers
+       elif [ "linux-lts (long term support)" == "$VERSION" ];then
+          pacman -Sg base | cut -d ' ' -f 2 | sed s/\^linux\$/linux-lts/g | pacstrap ${MOUNTPOINT} - linux-lts-headers
+       elif [ "linux-hardened (security features)" == "$VERSION" ];then
+          pacman -Sg base | cut -d ' ' -f 2 | sed s/\^linux\$/linux-hardened/g | pacstrap ${MOUNTPOINT} - linux-hardened-headers
+      fi
+      break
+    else
+      invalid_option
+    fi
+  done
+}
 install_base_system(){
   print_title "INSTALL BASE SYSTEM"
   print_info "Installing PGP keyring"
   pacman -Sy archlinux-keyring
   print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
   rm ${MOUNTPOINT}${EFI_MOUNTPOINT}/vmlinuz-linux
-  pacstrap ${MOUNTPOINT} base base-devel parted btrfs-progs f2fs-tools ntp net-tools
+  select_linux_version
+  pacstrap ${MOUNTPOINT} base-devel parted btrfs-progs f2fs-tools ntp net-tools
   [[ $? -ne 0 ]] && error_msg "Installing base system to ${MOUNTPOINT} failed. Check error messages above."
   local PTABLE=`parted -l | grep "gpt"`
   [[ -n $PTABLE ]] && pacstrap ${MOUNTPOINT} gptfdisk
