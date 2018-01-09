@@ -651,7 +651,11 @@ install_video_cards(){
   check_vga
   #Virtualbox {{{
   if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
-    package_install "virtualbox-guest-modules-arch virtualbox-guest-utils mesa-libgl"
+    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+      package_install "virtualbox-guest-dkms virtualbox-guest-utils mesa-libgl"
+    else
+      package_install "virtualbox-guest-modules-arch virtualbox-guest-utils mesa-libgl"
+    fi
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${username} vboxsf
     system_ctl disable ntpd
