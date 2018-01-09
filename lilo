@@ -693,7 +693,11 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    pacman -S --needed nvidia{,-utils}
+    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+      package_install "nvidia-dkms nvidia-utils libglvnd"
+    else
+      package_install "nvidia nvidia-utils libglvnd"
+    fi
     [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
