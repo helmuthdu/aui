@@ -701,6 +701,7 @@ install_video_cards(){
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
     if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
       package_install "nvidia-dkms nvidia-utils libglvnd"
+      echo "Do not forget to make a mkinitcpio every time you updated the nvidia driver!"
     else
       package_install "nvidia nvidia-utils libglvnd"
     fi
@@ -839,6 +840,7 @@ install_additional_firmwares(){
         esac
       done
       source sharedfuncs_elihw
+      create_ramdisk_environment
     done
   fi
 }
