@@ -673,10 +673,16 @@ install_video_cards(){
   #}}}
   #VMware {{{
   elif [[ ${VIDEO_DRIVER} == vmware ]]; then
-    package_install "xf86-video-vmware xf86-input-vmmouse open-vm-tools"
+    package_install "xf86-video-vmware xf86-input-vmmouse"
+    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+      aur_package_install "open-vm-tools-dkms"
+    else
+      package_install "open-vm-tools"
+    fi
     cat /proc/version > /etc/arch-release
     system_ctl disable ntpd
     system_ctl enable vmtoolsd
+    create_ramdisk_environment
   #}}}
   #Bumblebee {{{
   elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
