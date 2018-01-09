@@ -645,6 +645,15 @@ font_config(){
 }
 #}}}
 #VIDEO CARDS {{{
+create_ramdisk_environment(){
+  if [ "$(ls /boot | grep hardened -c)" -gt "0" ]; then
+    mkinitcpio -p linux-hardened
+  elif [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+    mkinitcpio -p linux-lts
+  else
+    mkinitcpio -p linux
+  fi
+}
 install_video_cards(){
   package_install "dmidecode"
   print_title "VIDEO CARD"
@@ -660,6 +669,7 @@ install_video_cards(){
     add_user_to_group ${username} vboxsf
     system_ctl disable ntpd
     system_ctl enable vboxservice
+    create_ramdisk_environment
   #}}}
   #VMware {{{
   elif [[ ${VIDEO_DRIVER} == vmware ]]; then
@@ -676,7 +686,7 @@ install_video_cards(){
     [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-virtualgl lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
-    mkinitcpio -p linux
+    create_ramdisk_environment
     add_user_to_group ${username} bumblebee
   #}}}
   #NVIDIA {{{
@@ -687,7 +697,7 @@ install_video_cards(){
     [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
-    mkinitcpio -p linux
+    create_ramdisk_environment
     nvidia-xconfig --add-argb-glx-visuals --allow-glx-with-composite --composite -no-logo --render-accel -o /etc/X11/xorg.conf.d/20-nvidia.conf;
   #}}}
   #Nouveau [NVIDIA] {{{
@@ -698,7 +708,7 @@ install_video_cards(){
     package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl libvdpau-va-gl"
     replace_line '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
-    mkinitcpio -p linux
+    create_ramdisk_environment
   #}}}
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
