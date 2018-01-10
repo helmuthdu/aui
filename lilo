@@ -645,24 +645,44 @@ font_config(){
 }
 #}}}
 #VIDEO CARDS {{{
+create_ramdisk_environment(){
+  if [ "$(ls /boot | grep hardened -c)" -gt "0" ]; then
+    mkinitcpio -p linux-hardened
+  elif [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+    mkinitcpio -p linux-lts
+  else
+    mkinitcpio -p linux
+  fi
+}
 install_video_cards(){
   package_install "dmidecode"
   print_title "VIDEO CARD"
   check_vga
   #Virtualbox {{{
   if [[ ${VIDEO_DRIVER} == virtualbox ]]; then
-    package_install "virtualbox-guest-modules-arch virtualbox-guest-utils mesa-libgl"
+    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+      package_install "virtualbox-guest-dkms virtualbox-guest-utils mesa-libgl"
+    else
+      package_install "virtualbox-guest-modules-arch virtualbox-guest-utils mesa-libgl"
+    fi
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${username} vboxsf
     system_ctl disable ntpd
     system_ctl enable vboxservice
+    create_ramdisk_environment
   #}}}
   #VMware {{{
   elif [[ ${VIDEO_DRIVER} == vmware ]]; then
-    package_install "xf86-video-vmware xf86-input-vmmouse open-vm-tools"
+    package_install "xf86-video-vmware xf86-input-vmmouse"
+    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+      aur_package_install "open-vm-tools-dkms"
+    else
+      package_install "open-vm-tools"
+    fi
     cat /proc/version > /etc/arch-release
     system_ctl disable ntpd
     system_ctl enable vmtoolsd
+    create_ramdisk_environment
   #}}}
   #Bumblebee {{{
   elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
@@ -672,18 +692,23 @@ install_video_cards(){
     [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-virtualgl lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
-    mkinitcpio -p linux
+    create_ramdisk_environment
     add_user_to_group ${username} bumblebee
   #}}}
   #NVIDIA {{{
   elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
-    pacman -S --needed nvidia{,-utils}
+    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+      package_install "nvidia-dkms nvidia-utils libglvnd"
+      echo "Do not forget to make a mkinitcpio every time you updated the nvidia driver!"
+    else
+      package_install "nvidia nvidia-utils libglvnd"
+    fi
     [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
-    mkinitcpio -p linux
+    create_ramdisk_environment
     nvidia-xconfig --add-argb-glx-visuals --allow-glx-with-composite --composite -no-logo --render-accel -o /etc/X11/xorg.conf.d/20-nvidia.conf;
   #}}}
   #Nouveau [NVIDIA] {{{
@@ -694,7 +719,7 @@ install_video_cards(){
     package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl libvdpau-va-gl"
     replace_line '#*options nouveau modeset=1' 'options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '#*MODULES="nouveau"' 'MODULES="nouveau"' /etc/mkinitcpio.conf
-    mkinitcpio -p linux
+    create_ramdisk_environment
   #}}}
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
@@ -702,8 +727,13 @@ install_video_cards(){
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
     [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/catalyst.conf
     [[ -f /etc/X11/xorg.conf ]] && rm /etc/X11/xorg.conf
-    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl mesa-vdpau libvdpau-va-gl"
-    add_module "radeon" "ati"
+    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+      aur_package_install "catalyst-total"
+     else
+       package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl mesa-vdpau libvdpau-va-gl"
+      add_module "radeon" "ati"
+    fi
+    create_ramdisk_environment
   #}}}
   #Intel {{{
   elif [[ ${VIDEO_DRIVER} == intel ]]; then
@@ -810,6 +840,7 @@ install_additional_firmwares(){
         esac
       done
       source sharedfuncs_elihw
+      create_ramdisk_environment
     done
   fi
 }
