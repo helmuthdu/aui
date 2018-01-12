@@ -1411,7 +1411,8 @@ install_nm_wicd(){
       print_title "WICD - https://wiki.archlinux.org/index.php/Wicd"
       print_info "Wicd is a network connection manager that can manage wireless and wired interfaces, similar and an alternative to NetworkManager."
       if [[ ${KDE} -eq 1 ]]; then
-        aur_package_install "wicd wicd-kde"
+        echo "KDE unsupported. Installing CLI and curses versions only."
+        package_install "wicd"
       else
         package_install "wicd wicd-gtk"
       fi
