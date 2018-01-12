@@ -781,7 +781,7 @@ install_additional_firmwares(){
       echo " 4) $(menu_item "b43-firmware-legacy") $AUR"
       echo " 5) $(menu_item "bfa-firmware") $AUR"
       echo " 6) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
-      echo " 7) $(menu_item "broadcom-wl") $AUR"
+      echo " 7) $(menu_item "broadcom-wl-dkms")"
       echo " 8) $(menu_item "ipw2100-fw")"
       echo " 9) $(menu_item "ipw2200-fw")"
       echo "10) $(menu_item "libffado") [Fireware Audio Devices]"
@@ -813,7 +813,7 @@ install_additional_firmwares(){
             package_install "bluez-firmware"
             ;;
           7)
-            aur_package_install "broadcom-wl"
+            package_install "broadcom-wl-dkms"
             ;;
           8)
             package_install "ipw2100-fw"
