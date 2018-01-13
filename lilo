@@ -852,7 +852,7 @@ install_desktop_environment(){
     do
       print_title "GNOME ICONS"
       echo " 1) $(menu_item "numix-icon-theme-git") $AUR"
-      echo " 2) $(menu_item "arc-icon-theme-git") $AUR"
+      echo " 2) $(menu_item "arc-icon-theme")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -864,7 +864,8 @@ install_desktop_environment(){
             aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
             ;;
           2)
-            aur_package_install "arc-icon-theme-git moka-icon-theme-git"
+            aur_package_install "moka-icon-theme-git"
+            package_install "arc-icon-theme"
             ;;
           "b")
             break
