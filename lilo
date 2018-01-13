@@ -881,7 +881,7 @@ install_desktop_environment(){
     while true
     do
       print_title "GTK2/GTK3 THEMES"
-      echo " 1) $(menu_item "gtk-theme-arc-git" "Arc Themes")"
+      echo " 1) $(menu_item "arc-gtk-theme" "Arc Themes")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -890,7 +890,7 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            aur_package_install "gtk-theme-arc-git "
+            package_install "arc-gtk-theme"
             ;;
           "b")
             break
@@ -964,7 +964,7 @@ install_desktop_environment(){
     do
       print_title "$1 THEMES"
       echo " 1) $(menu_item "numix-circle-icon-theme-git" "Icons Themes") $AUR"
-      echo " 2) $(menu_item "gtk-theme-arc-git " "GTK Themes") $AUR"
+      echo " 2) $(menu_item "arc-gtk-theme" "GTK Themes")"
       echo ""
       echo " d) DONE"
       echo ""
