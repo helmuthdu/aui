@@ -826,7 +826,7 @@ install_additional_firmwares(){
             ;;
           11)
             package_install "libmtp"
-            aur_package_install "android-udev"
+            package_install "android-udev"
             ;;
           12)
             package_install "libraw1394"
