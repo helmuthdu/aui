@@ -2080,12 +2080,14 @@ install_internet_apps(){
             echo " 1) $(menu_item "hexchat konversation" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
             echo " 2) $(menu_item "irssi")"
             echo " 3) $(menu_item "pidgin")"
-            echo " 4) $(menu_item "skype") $AUR"
+            echo " 4) $(menu_item "skypeforlinux-preview-bin") $AUR"
             echo " 5) $(menu_item "teamspeak3")"
             echo " 6) $(menu_item "viber") $AUR"
-            echo " 7) $(menu_item "telegram-desktop-bin") $AUR"
-            echo " 8) $(menu_item "qtox-git") $AUR"
+            echo " 7) $(menu_item "telegram-desktop")"
+            echo " 8) $(menu_item "qtox")"
 	    echo " 9) $(menu_item "discord") $AUR"
+	    echo " 10) $(menu_item "slack") $AUR"
+	    echo " 11) $(menu_item "vk-messenger") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2107,7 +2109,7 @@ install_internet_apps(){
                   package_install "pidgin"
                   ;;
                 4)
-                  aur_package_install "skype"
+                  aur_package_install "skypeforlinux-preview-bin"
                   ;;
                 5)
                   package_install "teamspeak3"
@@ -2116,13 +2118,19 @@ install_internet_apps(){
                   aur_package_install "viber"
                   ;;
                 7)
-                  aur_package_install "telegram-desktop-bin"
+                  package_install "telegram-desktop"
                   ;;
                 8)
-                  aur_package_install "qtox-git"
+                  package_install "qtox"
                   ;;
 		9)
 		  aur_package_install "discord"
+		  ;;
+		10)
+		  aur_package_install "slack"
+		  ;;
+		11)
+		  aur_package_install "vk-messanger"
 		  ;;
                 "b")
                   break
@@ -2242,7 +2250,7 @@ install_audio_apps(){
             echo " 5) $(menu_item "deadbeef")"
             echo " 6) $(menu_item "guayadeque") $AUR"
             echo " 7) $(menu_item "musique") $AUR"
-            echo " 8) $(menu_item "nuvolaplayer") $AUR"
+            echo " 8) $(menu_item "nuvolaplayer-git") $AUR"
             echo " 9) $(menu_item "pragha")"
             echo "10) $(menu_item "radiotray") $AUR"
             echo "11) $(menu_item "rhythmbox")"
@@ -2279,7 +2287,7 @@ install_audio_apps(){
                   aur_package_install "musique"
                   ;;
                 8)
-                  aur_package_install "nuvolaplayer"
+                  aur_package_install "nuvolaplayer-git"
                   ;;
                 9)
                   package_install "pragha"
