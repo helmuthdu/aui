@@ -258,7 +258,9 @@
     # 6) Viber
     # 7) Telegram Desktop
     # 8) qTox
-    # 9) discord
+    # 9) Discord
+    # 10) Slack
+    # 11) VK Messanger
     IM_OPTIONS="4"
   #}}}
   #MAPPING {{{
