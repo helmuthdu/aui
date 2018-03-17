@@ -330,7 +330,7 @@ format_partitions(){
   fi
 
   select_filesystem(){
-    filesystems_list=( "btrfs" "ext2" "ext3" "ext4" "f2fs" "jfs" "nilfs2" "ntfs" "vfat" "xfs");
+    filesystems_list=( "btrfs" "ext2" "ext3" "ext4" "f2fs" "jfs" "nilfs2" "ntfs" "reiserfs" "vfat" "xfs");
     PS3="$prompt1"
     echo -e "Select filesystem:\n"
     select filesystem in "${filesystems_list[@]}"; do
@@ -355,7 +355,7 @@ format_partitions(){
     if [[ $OPTION == y ]]; then
       [[ -z $3 ]] && select_filesystem || filesystem=$3
       mkfs.${filesystem} $1 \
-        $([[ ${filesystem} == xfs || ${filesystem} == btrfs ]] && echo "-f") \
+        $([[ ${filesystem} == xfs || ${filesystem} == btrfs || ${filesystem} == reiserfs ]] && echo "-f") \
         $([[ ${filesystem} == vfat ]] && echo "-F32") \
         $([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard") \
         $([[ $TRIM -eq 1 && ${filesystem} == btrfs ]] && echo "-O discard")
