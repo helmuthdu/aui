@@ -1542,7 +1542,8 @@ install_development_apps(){
     echo " 5) $(menu_item "sublime-text") $AUR"
     echo " 6) $(menu_item "sublime-text-dev") $AUR"
     echo " 7) $(menu_item "android-studio" "Android Studio")"
-    echo " 8) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
+    echo " 8a) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA Community Edition")"
+    echo " 8b) $(menu_item "intellij-idea-ultimate-edition" "IntelliJ IDEA Ultimate Edition (Commercial)")"
     echo " 9) $(menu_item "monodevelop")"
     echo "10) $(menu_item "qtcreator")"
     echo "11) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
@@ -1584,8 +1585,11 @@ install_development_apps(){
           add_line "export ANDROID_HOME=/opt/android-sdk" "/home/${username}/.bashrc"
           aur_package_install "android-studio"
           ;;
-        8)
+        8a)
           package_install "intellij-idea-community-edition"
+          ;;
+        8b)
+          package_install "intellij-idea-ultimate-edition"
           ;;
         9)
           package_install "monodevelop monodevelop-debugger-gdb"
