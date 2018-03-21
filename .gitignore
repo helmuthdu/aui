@@ -11,3 +11,5 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 
+### Local log files
+*.log

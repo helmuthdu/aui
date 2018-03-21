@@ -2806,6 +2806,66 @@ install_fonts(){
   done
 }
 #}}}
+#IME INPUT TOOLS {{{
+choose_ime(){
+  while true
+  do
+    print_title "IME Internationalization - Input Tools - https://wiki.archlinux.org/index.php/Internationalization"
+    echo " 1) $(menu_item "fcitx")"
+    echo " 2) $(menu_item "ibus")"
+    echo ""
+    echo " b) BACK"
+    echo ""
+    FONTS_OPTIONS+=" b"
+    read_input_options "$FONTS_OPTIONS"
+    for OPT in ${OPTIONS[@]}; do
+      case "$OPT" in
+        1)
+          package_install "ttf-dejavu"
+          ;;
+        2)
+          aur_package_install "ttf-fira-code"
+          ;;
+        3)
+          package_remove "ttf-droid"
+          package_remove "ttf-roboto"
+          package_remove "ttf-ubuntu-font-family"
+          package_remove "otf-oswald-ib"
+          aur_package_install "ttf-google-fonts-git"
+          ;;
+        4)
+          package_install "ttf-liberation"
+          ;;
+        5)
+          package_install "ttf-bitstream-vera"
+          ;;
+        6)
+          package_install "ttf-hack"
+          ;;
+        7)
+          aur_package_install "ttf-mac-fonts"
+          ;;
+        8)
+          aur_package_install "ttf-ms-fonts"
+          ;;
+        9)
+          package_install "wqy-microhei"
+          ;;
+        10)
+          package_install "noto-fonts-cjk"
+          ;;
+        "b")
+          break
+          ;;
+        *)
+          invalid_option
+          ;;
+      esac
+    done
+    source sharedfuncs_elihw
+  done
+}
+#}}}
 #CLEAN ORPHAN PACKAGES {{{
 clean_orphan_packages(){
   print_title "CLEAN ORPHAN PACKAGES"
