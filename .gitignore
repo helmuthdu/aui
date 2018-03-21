@@ -1,5 +1,8 @@
-### Jetbreains
+### Jetbrains
 .idea/*
+
+### Intellij idea
+*.iml
 
 ### VisualStudioCode
 .vscode/*
