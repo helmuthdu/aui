@@ -2816,15 +2816,6 @@ clean_orphan_packages(){
 #}}}
 #RECONFIGURE SYSTEM {{{
 reconfigure_system(){
-  print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
-  print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
-  OPTION=n
-  while [[ $OPTION != y ]]; do
-    getkeymap
-    read_input_text "Confirm keymap: $KEYMAP"
-  done
-  localectl set-keymap ${KEYMAP}
-
   print_title "HOSTNAME - https://wiki.archlinux.org/index.php/HOSTNAME"
   print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
   read -p "Hostname [ex: archlinux]: " HN
