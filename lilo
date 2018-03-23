@@ -1713,21 +1713,24 @@ install_system_apps(){
   while true
   do
     print_title "SYSTEM TOOLS APPS"
-    echo " 1) $(menu_item "clamav")"
-    echo " 2) $(menu_item "cockpit") $AUR"
-    echo " 3) $(menu_item "docker")"
-    echo " 4) $(menu_item "firewalld")"
-    echo " 5) $(menu_item "gparted")"
-    echo " 6) $(menu_item "grsync")"
-    echo " 7) $(menu_item "hosts-update") $AUR"
-    echo " 8) $(menu_item "htop")"
-    echo " 9) $(menu_item "plex-media-server" "Plex") $AUR"
-    echo "10) $(menu_item "ufw") $AUR"
-    echo "11) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
-    echo "12) $(menu_item "virtualbox")"
-    echo "13) $(menu_item "wine")"
-    echo "14) $(menu_item "netdata")"
-    echo "15) $(menu_item "nload")"
+    echo " 1) $(menu_item "clamav" "clamav antivirus")"
+    echo " 2) $(menu_item "cockpit" "cockpit- A web system administration tool") $AUR"
+    echo " 3) $(menu_item "webmin" "webmin- A web system administration tool") $AUR"
+    echo " 4) $(menu_item "docker")"
+    echo " 5) $(menu_item "firewalld")"
+    echo " 6) $(menu_item "gparted")"
+    echo " 7) $(menu_item "grsync" "grsync- Sync files")"
+    echo " 8) $(menu_item "hosts-update" "hosts-update Injects the mvps blocklist to /etc/hosts to prevent thousands of parasites, hijackers and unwanted adware/spyware/privacy websites from working.") $AUR"
+    echo " 9) $(menu_item "htop" "htop- Interactive text-mode process viewer")"
+    echo "10) $(menu_item "plex-media-server" "Plex") $AUR"
+    echo "11) $(menu_item "ufw") $AUR"
+    echo "12) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
+    echo "13) $(menu_item "virtualbox")"
+    echo "14) $(menu_item "wine")"
+    echo "15) $(menu_item "netdata")"
+    echo "16) $(menu_item "nload")"
+    echo "17) $(menu_item "gnome-logs" "Assorted Graphical log viewers")"
+    echo "18) $(menu_item "seahorse" "seahorse Password keyring management GUI")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1748,44 +1751,47 @@ install_system_apps(){
           aur_package_install "cockpit storaged linux-user-chroot ostree"
           ;;
         3)
+          aur_package_install "webmin"
+          ;;
+        4)
           package_install "docker"
           add_user_to_group ${username} docker
           ;;
-        4)
+        5)
           is_package_installed "ufw" && package_remove "ufw"
           is_package_installed "firewalld" && package_remove "firewalld"
           package_install "firewalld"
           system_ctl enable firewalld
           ;;
-        5)
+        6)
           package_install "gparted"
           ;;
-        6)
+        7)
           package_install "grsync"
           ;;
-        7)
+        8)
           aur_package_install "hosts-update"
           hosts-update
           ;;
-        8)
+        9)
           package_install "htop"
           ;;
-        9)
+        10)
           aur_package_install "plex-media-server"
           system_ctl enable plexmediaserver.service
           ;;
-        10)
+        11)
           print_title "UFW - https://wiki.archlinux.org/index.php/Ufw"
           print_info "Ufw stands for Uncomplicated Firewall, and is a program for managing a netfilter firewall. It provides a command line interface and aims to be uncomplicated and easy to use."
           is_package_installed "firewalld" && package_remove "firewalld"
           aur_package_install "ufw gufw"
           system_ctl enable ufw.service
           ;;
-        11)
+        12)
           aur_package_install "unified-remote-server"
           system_ctl enable urserver.service
           ;;
-        12)
+        13)
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
@@ -1797,15 +1803,23 @@ install_system_apps(){
             cecho "${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
           ;;
-        13)
+        14)
           package_install "icoutils wine wine_gecko wine-mono winetricks"
           ;;
-        14)
+        15)
           package_install "netdata"
           system_ctl enable netdata.service
           ;;
-        15)
+        16)
           package_install "nload"
+          ;;
+        17)
+          package_install "gnome-logs"
+          package_install "qjournalctl"
+          package_install "pacmanlogviewer"
+          ;;
+        18)
+          package_install "seahorse"
           ;;
         "b")
           break
