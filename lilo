@@ -1731,6 +1731,7 @@ install_system_apps(){
     echo "16) $(menu_item "nload")"
     echo "17) $(menu_item "gnome-logs" "Assorted Graphical log viewers")"
     echo "18) $(menu_item "seahorse" "seahorse Password keyring management GUI")"
+    echo "19) $(menu_item "tor" "tor Tor network and tools for anonymous browsing.")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1820,6 +1821,10 @@ install_system_apps(){
           ;;
         18)
           package_install "seahorse"
+          ;;
+        19)
+          package_install "tor torsocks arm"
+          aur_package_install "tor-browser"
           ;;
         "b")
           break
