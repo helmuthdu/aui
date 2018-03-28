@@ -199,7 +199,7 @@
   #16) nload
   #17) Assorted Graphical log viewers
   #18) seahorse Password keyring management GUI
-  SYSTEMTOOLS_OPTIONS="10"
+  SYSTEMTOOLS_OPTIONS="11"
 #}}}
 #GRAPHICS {{{
   # 1) Blender
