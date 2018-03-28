@@ -168,7 +168,7 @@
   #17) Git GUI-s
   #18) Diff GUI-s like kdiff3
   #19) Search/ replace tools: regexxer
-  DEVELOPMENT_OPTIONS="13"
+  DEVELOPMENT_OPTIONS="14"
 #}}}
 #OFFICE {{{
   # 1) Abiword+Gnumeric|Calligra
