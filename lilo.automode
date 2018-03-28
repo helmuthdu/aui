@@ -183,19 +183,22 @@
 #SYSTEM TOOLS {{{
   # 1) ClamAV
   # 2) Cockpit
-  # 3) Docker
-  # 4) FirewallD
-  # 5) Gparted
-  # 6) Grsync
-  # 7) Hosts Update
-  # 8) Htop
-  # 9) Plex
-  #10) UFW
-  #11) Unified Remote
-  #12) Virtualbox
-  #13) Wine
-  #14) netdata
-  #15) nload
+  # 3) Webmin
+  # 4) Docker
+  # 5) FirewallD
+  # 6) Gparted
+  # 7) Grsync
+  # 8) Hosts Update
+  # 9) Htop
+  #10) Plex
+  #11) UFW
+  #12) Unified Remote
+  #13) Virtualbox
+  #14) Wine
+  #15) netdata
+  #16) nload
+  #17) Assorted Graphical log viewers
+  #18) seahorse Password keyring management GUI
   SYSTEMTOOLS_OPTIONS="10"
 #}}}
 #GRAPHICS {{{
@@ -226,6 +229,7 @@
     # 4) Midori|Konqueror
     # 5) Opera
     # 6) Vivaldi
+    # 7) Tor-browser
     BROWSERS_OPTIONS="3"
   #}}}
   #DOWNLOAD|FILESHARE {{{
