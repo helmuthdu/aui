@@ -1989,7 +1989,8 @@ install_internet_apps(){
             echo "10) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
             echo "11) $(menu_item "uget")"
             echo "12) $(menu_item "youtube-dl")"
-	    echo "13) $(menu_item "tixati") $AUR"
+    	    echo "13) $(menu_item "tixati" "tixati p2p bittorrent client") $AUR"
+    	    echo "14) $(menu_item "google-drive-ocamlfuse" "google-drive-ocamlfuse") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2041,9 +2042,12 @@ install_internet_apps(){
                 12)
                   package_install "youtube-dl"
                   ;;
-		13)
-		  aur_package_install "tixati"
-		  ;;
+                13)
+                  aur_package_install "tixati"
+                  ;;
+                14)
+                  aur_package_install "google-drive-ocamlfuse"
+                  ;;
                 "b")
                   break
                   ;;
