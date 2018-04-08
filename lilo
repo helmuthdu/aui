@@ -1539,13 +1539,13 @@ install_development_apps(){
     echo " 2) $(menu_item "emacs")"
     echo " 3) $(menu_item "gvim")"
     echo " 4) $(menu_item "meld")"
-    echo " 5) $(menu_item "sublime-text") $AUR"
-    echo " 6) $(menu_item "sublime-text-dev") $AUR"
+    echo " 5) $(menu_item "sublime-text2" "Sublime Text 2") $AUR"
+    echo " 6) $(menu_item "sublime-text-dev" "Sublime Text Dev") $AUR"
     echo " 7) $(menu_item "android-studio" "Android Studio")"
     echo " 8) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
     echo " 9) $(menu_item "monodevelop")"
     echo "10) $(menu_item "qtcreator")"
-    echo "11) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
+    echo "11) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
     echo "12) $(menu_item "jdk7-openjdk" "OpenJDK")"
     echo "13) $(menu_item "jdk" "Oracle JDK") $AUR"
     echo "14) $(menu_item "nodejs")"
@@ -1571,7 +1571,7 @@ install_development_apps(){
           package_install "meld"
           ;;
         5)
-          aur_package_install "sublime-text"
+          aur_package_install "sublime-text2"
           ;;
         6)
           aur_package_install "sublime-text-dev"
@@ -1594,7 +1594,7 @@ install_development_apps(){
           package_install "qtcreator"
           ;;
         11)
-          aur_package_install "mysql-workbench-gpl"
+          aur_package_install "mysql-workbench"
           ;;
         12)
           package_remove "jdk"
