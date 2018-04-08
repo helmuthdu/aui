@@ -1546,10 +1546,12 @@ install_development_apps(){
     echo " 9) $(menu_item "monodevelop")"
     echo "10) $(menu_item "qtcreator")"
     echo "11) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
-    echo "12) $(menu_item "jdk7-openjdk" "OpenJDK")"
-    echo "13) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "14) $(menu_item "nodejs")"
-    echo "15) $(menu_item "visual-studio-code-bin") $AUR"
+    echo "12) $(menu_item "jdk8-openjdk" "OpenJDK 8")"
+    echo "13) $(menu_item "jdk9-openjdk" "OpenJDK 9")"
+    echo "14) $(menu_item "jdk10-openjdk" "OpenJDK 10")"
+    echo "15) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "16) $(menu_item "nodejs")"
+    echo "17) $(menu_item "visual-studio-code-bin") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1598,17 +1600,25 @@ install_development_apps(){
           ;;
         12)
           package_remove "jdk"
-          package_install "jdk8-openjdk icedtea-web"
+          package_install "jdk8-openjdk"
           ;;
         13)
-          package_remove "jre{7,8}-openjdk"
-          package_remove "jdk{7,8}-openjdk"
-          aur_package_install "jdk"
+          package_remove "jdk"
+          package_install "jdk9-openjdk"
           ;;
         14)
-          package_install "nodejs"
+          package_remove "jdk"
+          package_install "jdk10-openjdk"
           ;;
         15)
+          package_remove "jre{7,8,9,10}-openjdk"
+          package_remove "jdk{7,8,9,10}-openjdk"
+          aur_package_install "jdk"
+          ;;
+        16)
+          package_install "nodejs"
+          ;;
+        17)
           aur_package_install "visual-studio-code-bin"
           ;;
         "b")
