@@ -2866,6 +2866,7 @@ install_extra(){
     print_title "EXTRA"
     echo " 1) Global Menu $AUR"
     echo " 2) $(menu_item "profile-sync-daemon") $AUR"
+    echo ""
     echo " b) BACK"
     echo ""
     EXTRA_OPTIONS+=" b"
