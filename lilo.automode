@@ -326,6 +326,7 @@
     # 7) Popcorn Time
     # 8) VLC
     # 9) Kodi
+    #10) obs-studio
     VIDEO_PLAYER_OPTIONS="8"
   #}}}
   #EDITORS|TOOLS {{{
