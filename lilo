@@ -1545,15 +1545,19 @@ install_development_apps(){
     echo " 4) $(menu_item "meld")"
     echo " 5) $(menu_item "sublime-text") $AUR"
     echo " 6) $(menu_item "sublime-text-dev") $AUR"
-    echo " 7) $(menu_item "android-studio" "Android Studio")"
-    echo " 8) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA")"
-    echo " 9) $(menu_item "monodevelop")"
-    echo "10) $(menu_item "qtcreator")"
-    echo "11) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
-    echo "12) $(menu_item "jdk7-openjdk" "OpenJDK")"
-    echo "13) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "14) $(menu_item "nodejs")"
-    echo "15) $(menu_item "visual-studio-code-bin") $AUR"
+    echo " 7) $(menu_item "android-studio" "Android Studio") $AUR"
+    echo " 8) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA Community Edition") $AUR"
+    echo " 9) $(menu_item "intellij-idea-ultimate-edition" "IntelliJ IDEA Ultimate Edition (Commercial)") $AUR"
+    echo "10) $(menu_item "monodevelop")"
+    echo "11) $(menu_item "qtcreator")"
+    echo "12) $(menu_item "mysql-workbench-gpl" "MySQL Workbench") $AUR"
+    echo "13) $(menu_item "jdk7-openjdk" "OpenJDK")"
+    echo "14) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "15) $(menu_item "nodejs")"
+    echo "16) $(menu_item "visual-studio-code-bin") $AUR"
+    echo "17) $(menu_item "gitg" "Git GUI-s")"
+    echo "18) $(menu_item "kdiff3" "Visual diff tools")"
+    echo "19) $(menu_item "regexxer" "regexxer - Find and replace GUI tools")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1592,28 +1596,41 @@ install_development_apps(){
           package_install "intellij-idea-community-edition"
           ;;
         9)
-          package_install "monodevelop monodevelop-debugger-gdb"
+          package_install "intellij-idea-ultimate-edition"
           ;;
         10)
-          package_install "qtcreator"
+          package_install "monodevelop monodevelop-debugger-gdb"
           ;;
         11)
-          aur_package_install "mysql-workbench-gpl"
+          package_install "qtcreator"
           ;;
         12)
+          aur_package_install "mysql-workbench-gpl"
+          ;;
+        13)
           package_remove "jdk"
           package_install "jdk8-openjdk icedtea-web"
           ;;
-        13)
+        14)
           package_remove "jre{7,8}-openjdk"
           package_remove "jdk{7,8}-openjdk"
           aur_package_install "jdk"
           ;;
-        14)
+        15)
           package_install "nodejs"
           ;;
-        15)
+        16)
           aur_package_install "visual-studio-code-bin"
+          ;;
+        17)
+          aur_package_install "gitg"
+          aur_package_install "qgit"
+          ;;
+        18)
+          aur_package_install "kdiff3"
+          ;;
+        19)
+          aur_package_install "regexxer"
           ;;
         "b")
           break

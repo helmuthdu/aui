@@ -157,14 +157,18 @@
   # 6) Sublime Text 3
   # 7) Android Studio
   # 8) IntelliJ IDEA
-  # 9) Monodevelop
-  #10) QT Creator
-  #11) MySQL Workbench
-  #12) OpenJDK
-  #13) OracleJDK
-  #14) NodeJS
-  #15) Microsoft Visual Studio Code
-  DEVELOPMENT_OPTIONS="13"
+  # 9) IntelliJ IDEA Ultimate Edition
+  #10) Monodevelop
+  #11) QT Creator
+  #12) MySQL Workbench
+  #13) OpenJDK
+  #14) OracleJDK
+  #15) NodeJS
+  #16) Microsoft Visual Studio Code
+  #17) Git GUI-s
+  #18) Diff GUI-s like kdiff3
+  #19) Search/ replace tools: regexxer
+  DEVELOPMENT_OPTIONS="14"
 #}}}
 #OFFICE {{{
   # 1) Abiword+Gnumeric|Calligra
