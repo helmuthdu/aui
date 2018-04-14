@@ -178,6 +178,7 @@
   # 9) LibreOffice
   #10) OCRFeeder
   #11) Xmind
+  #12) goldendict
   OFFICE_OPTIONS="9"
 #}}}
 #SYSTEM TOOLS {{{
