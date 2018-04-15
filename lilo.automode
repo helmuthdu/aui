@@ -161,13 +161,15 @@
   #10) Monodevelop
   #11) QT Creator
   #12) MySQL Workbench
-  #13) OpenJDK
-  #14) OracleJDK
-  #15) NodeJS
-  #16) Microsoft Visual Studio Code
-  #17) Git GUI-s
-  #18) Diff GUI-s like kdiff3
-  #19) Search/ replace tools: regexxer
+  #13) OpenJDK 8
+  #14) OpenJDK 9
+  #15) OpenJDK 10
+  #16) OracleJDK
+  #17) NodeJS
+  #18) Microsoft Visual Studio Code
+  #19) Git GUI-s
+  #20) Diff GUI-s like kdiff3
+  #21) Search/ replace tools: regexxer
   DEVELOPMENT_OPTIONS="14"
 #}}}
 #OFFICE {{{

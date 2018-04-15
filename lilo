@@ -1546,17 +1546,20 @@ install_development_apps(){
     echo " 5) $(menu_item "sublime-text2" "Sublime Text 2") $AUR"
     echo " 6) $(menu_item "sublime-text-dev" "Sublime Text Dev") $AUR"
     echo " 7) $(menu_item "android-studio" "Android Studio")"
-    echo " 8a) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA Community Edition")"
-    echo " 8b) $(menu_item "intellij-idea-ultimate-edition" "IntelliJ IDEA Ultimate Edition (Commercial)")"
-    echo " 9) $(menu_item "monodevelop")"
-    echo "10) $(menu_item "qtcreator")"
-    echo "11) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
-    echo "12) $(menu_item "jdk8-openjdk" "OpenJDK 8")"
-    echo "13) $(menu_item "jdk9-openjdk" "OpenJDK 9")"
-    echo "14) $(menu_item "jdk10-openjdk" "OpenJDK 10")"
-    echo "15) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "16) $(menu_item "nodejs")"
-    echo "17) $(menu_item "visual-studio-code-bin") $AUR"
+    echo " 8) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA Community Edition")"
+    echo " 9) $(menu_item "intellij-idea-ultimate-edition" "IntelliJ IDEA Ultimate Edition (Commercial)")"
+    echo "10) $(menu_item "monodevelop")"
+    echo "11) $(menu_item "qtcreator")"
+    echo "12) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
+    echo "13) $(menu_item "jdk8-openjdk" "OpenJDK 8")"
+    echo "14) $(menu_item "jdk9-openjdk" "OpenJDK 9")"
+    echo "15) $(menu_item "jdk10-openjdk" "OpenJDK 10")"
+    echo "16) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "17) $(menu_item "nodejs")"
+    echo "18) $(menu_item "visual-studio-code-bin") $AUR"
+    echo "19) $(menu_item "gitg" "Git GUI-s")"
+    echo "20) $(menu_item "kdiff3" "Visual diff tools")"
+    echo "21) $(menu_item "regexxer" "regexxer - Find and replace GUI tools")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1591,43 +1594,53 @@ install_development_apps(){
           add_line "export ANDROID_HOME=/opt/android-sdk" "/home/${username}/.bashrc"
           aur_package_install "android-studio"
           ;;
-        8a)
+        8)
           package_install "intellij-idea-community-edition"
           ;;
-        8b)
+        9)
           package_install "intellij-idea-ultimate-edition"
           ;;
-        9)
+        10)
           package_install "monodevelop monodevelop-debugger-gdb"
           ;;
-        10)
+        11)
           package_install "qtcreator"
           ;;
-        11)
-          aur_package_install "mysql-workbench"
-          ;;
         12)
-          package_remove "jdk"
-          package_install "jdk8-openjdk"
+          aur_package_install "mysql-workbench"
           ;;
         13)
           package_remove "jdk"
-          package_install "jdk9-openjdk"
+          package_install "jdk8-openjdk"
           ;;
         14)
           package_remove "jdk"
-          package_install "jdk10-openjdk"
+          package_install "jdk9-openjdk"
           ;;
         15)
+          package_remove "jdk"
+          package_install "jdk10-openjdk"
+          ;;
+        16)
           package_remove "jre{7,8,9,10}-openjdk"
           package_remove "jdk{7,8,9,10}-openjdk"
           aur_package_install "jdk"
           ;;
-        16)
+        17)
           package_install "nodejs"
           ;;
-        17)
+        18)
           aur_package_install "visual-studio-code-bin"
+          ;;
+        19)
+          aur_package_install "gitg"
+          aur_package_install "qgit"
+          ;;
+        20)
+          aur_package_install "kdiff3"
+          ;;
+        21)
+          aur_package_install "regexxer"
           ;;
         "b")
           break
