@@ -376,6 +376,11 @@
   #10) noto-fonts-cjk
   FONTS_OPTIONS="1-10"
 #}}}
+#IME INPUT TOOLS  {{{
+  # 1) fcitx
+  # 2) ibus
+  IME_OPTIONS=""
+#}}}
 #EXTRA {{{
   # 1) Global Menu
   # 2) Profile Sync

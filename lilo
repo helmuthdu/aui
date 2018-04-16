@@ -2863,6 +2863,50 @@ install_fonts(){
   done
 }
 #}}}
+#IME INPUT TOOLS {{{
+choose_ime_m17n(){
+  while true	
+  do	
+    print_title "M17n based IME - Input scripts (such as the Indic ones) using m17n maps - https://wiki.archlinux.org/index.php/Internationalization"
+    echo " 1) $(menu_item "fcitx")"	
+    echo " 2) $(menu_item "ibus")"	
+    echo ""	
+    echo " b) BACK"	
+    echo ""	
+    IME_OPTIONS+=" b"
+    read_input_options "IME_OPTIONS"
+    for OPT in ${OPTIONS[@]}; do	
+      case "$OPT" in	
+        1)	
+          package_install "fcitx"
+          package_install "fcitx-m17n"
+          package_install "fcitx-qt4"
+          package_install "fcitx-qt5"
+          package_install "fcitx-gtk2"
+          package_install "fcitx-gtk3"
+          package_install "kcm-fcitx"
+          package_install "fcitx-configtool"
+          echo -e '#!/bin/sh\n\n\n# Identify fcitx as a input module for both GTK and QT apps\nXMODIFIERS=@im=fcitx\nGTK_IM_MODULE=fcitx\nQT_IM_MODULE=fcitx\n\nexport XMODIFIERS GTK_IM_MODULE QT_IM_MODULE\necho we set XMODIFIERS GTK_IM_MODULE QT_IM_MODULE in profile.d\n' > /etc/profile.d/ime.sh
+          # echo -e '#!/bin/sh\n\n\n# Identify fcitx as a input module for both GTK and QT apps\nXMODIFIERS=@im=fcitx\nGTK_IM_MODULE=fcitx\nQT_IM_MODULE=fcitx\n\nexport XMODIFIERS GTK_IM_MODULE QT_IM_MODULE\necho we set XMODIFIERS GTK_IM_MODULE QT_IM_MODULE in xprofile\n' > /etc/xprofile
+          ;;
+        2)	
+          package_install "ibus"
+          package_install "ibus-m17n"
+          package_install "ibus-qt"
+          echo -e '#!/bin/sh\n\n\n# Identify ibus as a input module for both GTK and QT apps\nXMODIFIERS=@im=ibus\nGTK_IM_MODULE=ibus\nQT_IM_MODULE=ibus\n\nexport XMODIFIERS GTK_IM_MODULE QT_IM_MODULE\necho we set XMODIFIERS GTK_IM_MODULE QT_IM_MODULE in profile.d\n' > /etc/profile.d/ime.sh
+          ;;
+        "b")
+          break	
+          ;;	
+        *)	
+          invalid_option	
+          ;;	
+      esac	
+    done	
+    source sharedfuncs_elihw	
+  done	
+}	
+#}}}
 #CLEAN ORPHAN PACKAGES {{{
 clean_orphan_packages(){
   print_title "CLEAN ORPHAN PACKAGES"
@@ -3001,9 +3045,10 @@ do
   echo "11) $(mainmenu_item "${checklist[11]}" "Games")"
   echo "12) $(mainmenu_item "${checklist[12]}" "Web server")"
   echo "13) $(mainmenu_item "${checklist[13]}" "Fonts")"
-  echo "14) $(mainmenu_item "${checklist[14]}" "Extra")"
-  echo "15) $(mainmenu_item "${checklist[15]}" "Clean Orphan Packages")"
-  echo "16) $(mainmenu_item "${checklist[16]}" "Reconfigure System")"
+  echo "14) $(mainmenu_item "${checklist[14]}" "International script input: M17n based IME")"
+  echo "15) $(mainmenu_item "${checklist[15]}" "Extra")"
+  echo "16) $(mainmenu_item "${checklist[16]}" "Clean Orphan Packages")"
+  echo "17) $(mainmenu_item "${checklist[17]}" "Reconfigure System")"
   echo ""
   echo " q) Quit"
   echo ""
@@ -3084,19 +3129,23 @@ do
         checklist[13]=1
         ;;
       14)
-        install_extra
+        choose_ime_m17n
         checklist[14]=1
         ;;
       15)
-        clean_orphan_packages
+        install_extra
         checklist[15]=1
         ;;
       16)
+        clean_orphan_packages
+        checklist[16]=1
+        ;;
+      17)
         print_danger "\nWARNING: THIS OPTION WILL RECONFIGURE THINGS LIKE HOSTNAME, TIMEZONE, CLOCK..."
         read_input_text "Are you sure you want to continue?"
         [[ $OPTION != y ]] && continue
         reconfigure_system
-        checklist[16]=1
+        checklist[17]=1
         ;;
       "q")
         finish
