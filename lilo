@@ -2480,6 +2480,7 @@ install_video_apps(){
             echo " 7) $(menu_item "popcorntime-ce") $AUR"
             echo " 8) $(menu_item "vlc")"
             echo " 9) $(menu_item "kodi")"
+            echo "10) $(menu_item "obs-studio")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2515,6 +2516,9 @@ install_video_apps(){
                 9)
                   package_install "kodi"
                   add_user_to_group ${username} kodi
+                  ;;
+                10)
+                  package_install "obs-studio-git"
                   ;;
                 "b")
                   break
