@@ -333,7 +333,7 @@ choose_aurhelper(){
   print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
   print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
   print_warning "\tNone of these tools are officially supported by Arch devs."
-  aurhelper=("yaourt" "apacman" "pacaur")
+  aurhelper=("yaourt" "apacman" "pacaur" "trizen")
   PS3="$prompt1"
   echo -e "Choose your default AUR helper to install\n"
   select OPT in "${aurhelper[@]}"; do
@@ -381,6 +381,20 @@ choose_aurhelper(){
           fi
         fi
         AUR_PKG_MANAGER="pacaur"
+        ;;
+      4)
+        if ! is_package_installed "trizen" ; then
+          package_install "base-devel git perl"
+          pacman -D --asdeps git perl
+	  aui_download_packages "trizen"
+          pacman -D --asdeps trizen
+          if ! is_package_installed "trizen" ; then
+            echo "trizen not installed. EXIT now"
+            pause_function
+            exit 0
+          fi
+        fi
+        AUR_PKG_MANAGER="trizen"
         ;;
       *)
         invalid_option
