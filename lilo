@@ -1643,6 +1643,9 @@ install_development_apps(){
         21)
           aur_package_install "regexxer"
           ;;
+	22)
+	  aur_package_install "rstudio-desktop-bin"
+	  ;;
         "b")
           break
           ;;
