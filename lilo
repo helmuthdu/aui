@@ -1579,6 +1579,7 @@ install_development_apps(){
     echo "20) $(menu_item "gitg" "Git GUI-s")"
     echo "21) $(menu_item "kdiff3" "Visual diff tools")"
     echo "22) $(menu_item "regexxer" "regexxer - Find and replace GUI tools")"
+    echo "23) $(menu_item "postman-bin" "Postman") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1663,6 +1664,9 @@ install_development_apps(){
           ;;
         22)
           aur_package_install "regexxer"
+          ;;
+        23)
+          aur_package_install "postman-bin"
           ;;
         "b")
           break
