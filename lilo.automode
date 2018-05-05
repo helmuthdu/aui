@@ -62,6 +62,7 @@
     #10) libffado [Firmware Audio Devices]
     #11) libmtp [Android Devices]
     #12) libraw1394 [IEE1394 Driver]
+    #13) wd719x-firmware
     FIRMWARE_OPTIONS="11"
   #}}}
 #}}}
@@ -156,21 +157,24 @@
   # 5) Sublime Text 2
   # 6) Sublime Text 3
   # 7) Android Studio
-  # 8) IntelliJ IDEA
-  # 9) IntelliJ IDEA Ultimate Edition
-  #10) Monodevelop
-  #11) QT Creator
-  #12) MySQL Workbench
-  #13) OpenJDK 8
-  #14) OpenJDK 9
-  #15) OpenJDK 10
-  #16) OracleJDK
-  #17) NodeJS
-  #18) Microsoft Visual Studio Code
-  #19) Git GUI-s
-  #20) Diff GUI-s like kdiff3
-  #21) Search/ replace tools: regexxer
-  DEVELOPMENT_OPTIONS="14"
+  # 8) Jetbrains Toolbox
+  # 9) IntelliJ IDEA
+  #10) IntelliJ IDEA Ultimate Edition
+  #11) Monodevelop
+  #12) QT Creator
+  #13) MySQL Workbench
+  #14) OpenJDK 8
+  #15) OpenJDK 9
+  #16) OpenJDK 10
+  #17) OracleJDK
+  #18) NodeJS
+  #19) Microsoft Visual Studio Code
+  #20) Git GUI-s
+  #21) Diff GUI-s like kdiff3
+  #22) Search/ replace tools: regexxer
+  #23) Postman
+  #24) Gitkraken
+  DEVELOPMENT_OPTIONS="15"
 #}}}
 #OFFICE {{{
   # 1) Abiword+Gnumeric|Calligra
