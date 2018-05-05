@@ -333,61 +333,29 @@ choose_aurhelper(){
   print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
   print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
   print_warning "\tNone of these tools are officially supported by Arch devs."
-  aurhelper=("yaourt" "apacman" "pacaur" "trizen")
+  aurhelper=("aurutils" "trizen" "yay")
   PS3="$prompt1"
   echo -e "Choose your default AUR helper to install\n"
   select OPT in "${aurhelper[@]}"; do
     case "$REPLY" in
       1)
-        print_title "YAOURT - https://wiki.archlinux.org/index.php/Yaourt"
-        print_info "Yaourt (Yet AnOther User Repository Tool) is a community-contributed wrapper for pacman which adds seamless access to the AUR, allowing and automating package compilation and installation from your choice of the thousands of PKGBUILDs in the AUR, in addition to the many thousands of available Arch Linux binary packages."
-        if ! is_package_installed "yaourt" ; then
-          package_install "base-devel yajl namcap"
-          pacman -D --asdeps yajl namcap
-          aui_download_packages "package-query yaourt"
-          pacman -D --asdeps package-query
-          if ! is_package_installed "yaourt" ; then
-            echo "Yaourt not installed. EXIT now"
+        if ! is_package_installed "aurutils" ; then
+          package_install "base-devel git jq pacutils"
+          pacman -D --asdeps jq pacutils
+	        aui_download_packages "aurutils"
+          if ! is_package_installed "aurutils" ; then
+            echo "aurutils not installed. EXIT now"
             pause_function
             exit 0
           fi
         fi
-        AUR_PKG_MANAGER="yaourt --tmp /var/tmp/"
+        AUR_PKG_MANAGER="aurutils"
         ;;
       2)
-        if ! is_package_installed "apacman" ; then
-          package_install "base-devel git jshon"
-          pacman -D --asdeps jshon
-          aui_download_packages "apacman"
-          if ! is_package_installed "apacman" ; then
-            echo "Apacman not installed. EXIT now"
-            pause_function
-            exit 0
-          fi
-        fi
-        AUR_PKG_MANAGER="apacman"
-        ;;
-      3)
-        if ! is_package_installed "pacaur" ; then
-          package_install "base-devel yajl expac"
-          pacman -D --asdeps yajl expac
-          add_key_user "hkp://pgp.mit.edu 1EB2638FF56C0C53"
-	  aui_download_packages "cower pacaur"
-          pacman -D --asdeps cower
-          if ! is_package_installed "pacaur" ; then
-            echo "Pacaur not installed. EXIT now"
-            pause_function
-            exit 0
-          fi
-        fi
-        AUR_PKG_MANAGER="pacaur"
-        ;;
-      4)
         if ! is_package_installed "trizen" ; then
           package_install "base-devel git perl"
-          pacman -D --asdeps git perl
-	  aui_download_packages "trizen"
-          pacman -D --asdeps trizen
+          pacman -D --asdeps perl
+	        aui_download_packages "trizen"
           if ! is_package_installed "trizen" ; then
             echo "trizen not installed. EXIT now"
             pause_function
@@ -395,6 +363,19 @@ choose_aurhelper(){
           fi
         fi
         AUR_PKG_MANAGER="trizen"
+        ;;
+      3)
+        if ! is_package_installed "yay" ; then
+          package_install "base-devel git go"
+          pacman -D --asdeps go
+          aui_download_packages "yay"
+          if ! is_package_installed "yay" ; then
+            echo "yay not installed. EXIT now"
+            pause_function
+            exit 0
+          fi
+        fi
+        AUR_PKG_MANAGER="yay"
         ;;
       *)
         invalid_option
@@ -475,6 +456,10 @@ install_basic_setup(){
   print_title "NTFS/FAT/exFAT/F2FS - https://wiki.archlinux.org/index.php/File_Systems"
   print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
   package_install "ntfs-3g dosfstools exfat-utils f2fs-tools fuse fuse-exfat autofs mtpfs"
+  pause_function
+  print_title "SYSTEMD-TIMESYNCD - https://wiki.archlinux.org/index.php/Systemd-timesyncd"
+  print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
+  timedatectl set-ntp true
   pause_function
 }
 #}}}
@@ -681,7 +666,6 @@ install_video_cards(){
     fi
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
     add_user_to_group ${username} vboxsf
-    system_ctl disable ntpd
     system_ctl enable vboxservice
     create_ramdisk_environment
   #}}}
@@ -694,7 +678,6 @@ install_video_cards(){
       package_install "open-vm-tools"
     fi
     cat /proc/version > /etc/arch-release
-    system_ctl disable ntpd
     system_ctl enable vmtoolsd
     create_ramdisk_environment
   #}}}
@@ -737,16 +720,18 @@ install_video_cards(){
   #}}}
   #ATI {{{
   elif [[ ${VIDEO_DRIVER} == ati ]]; then
-    is_package_installed "catalyst-total" && pacman -Rdds --noconfirm catalyst-total
     [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
-    [[ -f /etc/modules-load.d/catalyst.conf ]] && rm /etc/modules-load.d/catalyst.conf
     [[ -f /etc/X11/xorg.conf ]] && rm /etc/X11/xorg.conf
-    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
-      aur_package_install "catalyst-total"
-     else
-       package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl mesa-vdpau libvdpau-va-gl"
-      add_module "radeon" "ati"
-    fi
+    package_install "xf86-video-${VIDEO_DRIVER} mesa-libgl mesa-vdpau libvdpau-va-gl"
+    add_module "radeon" "ati"
+    create_ramdisk_environment
+  #}}}
+  #AMDGPU {{{
+  elif [[ ${VIDEO_DRIVER} == amdgpu ]]; then
+    [[ -f /etc/X11/xorg.conf.d/20-radeon.conf ]] && rm /etc/X11/xorg.conf.d/20-radeon.conf
+    [[ -f /etc/X11/xorg.conf ]] && rm /etc/X11/xorg.conf
+    package_install "xf86-video-${VIDEO_DRIVER} vulkan-radeon mesa-libgl mesa-vdpau libvdpau-va-gl"
+    add_module "amdgpu radeon" "ati"
     create_ramdisk_environment
   #}}}
   #Intel {{{
@@ -774,8 +759,8 @@ install_cups(){
   print_info "CUPS is the standards-based, open source printing system developed by Apple Inc. for Mac OS X and other UNIX-like operating systems."
   read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
   if [[ $OPTION == y ]]; then
-    package_install "cups cups-filters ghostscript gsfonts"
-    package_install "gutenprint foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-db-ppds foomatic-db-nonfree-ppds hplip splix cups-pdf foomatic-db-gutenprint-ppds"
+    package_install "cups cups-pdf"
+    package_install "gutenprint ghostscript gsfonts foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-db-ppds foomatic-db-nonfree-ppds foomatic-db-gutenprint-ppds"
     system_ctl enable org.cups.cupsd.service
     pause_function
   fi
@@ -1123,7 +1108,7 @@ install_desktop_environment(){
       #}}}
     2)
       #DEEPIN {{{
-      print_title "DEEPIN - http://www.linuxdeepin.com"
+      print_title "DEEPIN - https://wiki.archlinux.org/index.php/Deepin_Desktop_Environment"
       print_info "The desktop interface and apps feature an intuitive and elegant design. Moving around, sharing and searching etc. has become simply a joyful experience."
       package_install "deepin deepin-extra lightdm-gtk-greeter"
       # config xinitrc
@@ -1231,7 +1216,7 @@ install_desktop_environment(){
       #LXQT {{{
       print_title "LXQT - http://wiki.archlinux.org/index.php/lxqt"
       print_info "LXQt is the Qt port and the upcoming version of LXDE, the Lightweight Desktop Environment. It is the product of the merge between the LXDE-Qt and the Razor-qt projects: A lightweight, modular, blazing-fast and user-friendly desktop environment."
-      package_install "lxqt openbox oxygen-icons qtcurve"
+      package_install "lxqt openbox breeze-icons"
       package_install "leafpad epdfview"
       mkdir -p /home/${username}/.config/lxqt
       cp /etc/xdg/lxqt/* /home/${username}/.config/lxqt
@@ -1419,11 +1404,6 @@ install_nm_wicd(){
       fi
       # vpn support
       package_install "networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc"
-      # auto update datetime from network
-      if is_package_installed "ntp"; then
-        package_install "networkmanager-dispatcher-ntpd"
-        system_ctl enable NetworkManager-dispatcher.service
-      fi
       # power manager support
       is_package_installed "tlp" && package_install "tlp-rdw"
       # network management daemon
@@ -1477,18 +1457,16 @@ install_accessories_apps(){
   while true
   do
     print_title "ACCESSORIES APPS"
-    echo " 1) $(menu_item "catfish")"
-    echo " 2) $(menu_item "conky-lua") $AUR"
-    echo " 3) $(menu_item "docky") $AUR"
-    echo " 4) $(menu_item "galculator") $AUR"
-    echo " 5) $(menu_item "pamac-aur" "Pamac") $AUR"
-    echo " 6) $(menu_item "pyrenamer") $AUR"
-    echo " 7) $(menu_item "enpass-bin") $AUR"
-    echo " 8) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots" || echo "Shutter";)")"
-    echo " 9) $(menu_item "synapse")"
+    echo " 1) $(menu_item "albert")"
+    echo " 2) $(menu_item "catfish")"
+    echo " 3) $(menu_item "conky-lua") $AUR"
+    echo " 4) $(menu_item "enpass-bin") $AUR"
+    echo " 5) $(menu_item "keepass")"
+    echo " 6) $(menu_item "pamac-aur" "Pamac") $AUR"
+    echo " 7) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots" || echo "Shutter";)")"
+    echo " 8) $(menu_item "synapse")"
+    echo " 9) $(menu_item "terminator")"
     echo "10) $(menu_item "tilix-bin") $AUR"
-    echo "11) $(menu_item "terminator")"
-    echo "12) $(menu_item "unified-remote-server" "Unified Remote")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1497,48 +1475,40 @@ install_accessories_apps(){
     for OPT in ${OPTIONS[@]}; do
       case "$OPT" in
         1)
-          package_install "catfish"
+          package_install "albert"
           ;;
         2)
+          package_install "catfish"
+          ;;
+        3)
           aur_package_install "conky-lua"
           package_install "lm_sensors"
           sensors-detect --auto
           ;;
-        3)
-          package_install "docky"
-          aur_package_install "dockmanager"
-          ;;
         4)
-          package_install "galculator"
-          ;;
-        5)
-          aur_package_install "pamac-aur"
-          ;;
-        6)
-          aur_package_install "pyrenamer"
-          ;;
-        7)
           aur_package_install "enpass-bin"
           ;;
-        8)
+        5)
+          package_install "keepass"
+          ;;
+        6)
+          aur_package_install "pamac-aur"
+          ;;
+        7)
           if [[ ${KDE} -eq 1 ]]; then
             aur_package_install "hotshots"
           else
             aur_package_install "shutter"
           fi
           ;;
-        9)
+        8)
           package_install "synapse"
+          ;;
+        9)
+          package_install "terminator"
           ;;
         10)
           aur_package_install "tilix-bin"
-          ;;
-        11)
-          package_install "terminator"
-          ;;
-        12)
-          aur_package_install "unified-remote-server"
-          system_ctl enable urserver
           ;;
         "b")
           break
@@ -1562,11 +1532,11 @@ install_development_apps(){
     echo " 3) $(menu_item "gvim")"
     echo " 4) $(menu_item "meld")"
     echo " 5) $(menu_item "sublime-text2" "Sublime Text 2") $AUR"
-    echo " 6) $(menu_item "sublime-text-dev" "Sublime Text Dev") $AUR"
-    echo " 7) $(menu_item "android-studio" "Android Studio")"
+    echo " 6) $(menu_item "sublime-text-dev" "Sublime Text 3") $AUR"
+    echo " 7) $(menu_item "android-studio" "Android Studio") $AUR"
     echo " 8) $(menu_item "jetbrains-toolbox" "Jetbrains Toolbox") $AUR"
     echo " 9) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA Community Edition")"
-    echo "10) $(menu_item "intellij-idea-ultimate-edition" "IntelliJ IDEA Ultimate Edition (Commercial)")"
+    echo "10) $(menu_item "intellij-idea-ultimate-edition" "IntelliJ IDEA Ultimate Edition") $AUR"
     echo "11) $(menu_item "monodevelop")"
     echo "12) $(menu_item "qtcreator")"
     echo "13) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
@@ -1575,10 +1545,10 @@ install_development_apps(){
     echo "16) $(menu_item "jdk10-openjdk" "OpenJDK 10")"
     echo "17) $(menu_item "jdk" "Oracle JDK") $AUR"
     echo "18) $(menu_item "nodejs")"
-    echo "19) $(menu_item "visual-studio-code-bin") $AUR"
-    echo "20) $(menu_item "gitg" "Git GUI-s")"
-    echo "21) $(menu_item "kdiff3" "Visual diff tools")"
-    echo "22) $(menu_item "regexxer" "regexxer - Find and replace GUI tools")"
+    echo "19) $(menu_item "visual-studio-code-bin" "Visual Studio Code") $AUR"
+    echo "20) $(menu_item "gitg")"
+    echo "21) $(menu_item "kdiff3")"
+    echo "22) $(menu_item "regexxer")"
     echo "23) $(menu_item "postman-bin" "Postman") $AUR"
     echo "24) $(menu_item "gitkraken" "Gitkraken") $AUR"
     echo ""
@@ -1622,7 +1592,7 @@ install_development_apps(){
           package_install "intellij-idea-community-edition"
           ;;
         10)
-          package_install "intellij-idea-ultimate-edition"
+          aur_package_install "intellij-idea-ultimate-edition"
           ;;
         11)
           package_install "monodevelop monodevelop-debugger-gdb"
@@ -1691,23 +1661,22 @@ install_office_apps(){
     print_title "OFFICE APPS"
     echo " 1) $(menu_item "goffice calligra-libs" "$([[ ${KDE} -eq 1 ]] && echo "Caligra" || echo "Abiword + Gnumeric";)")"
     echo " 2) $(menu_item "calibre")"
-    echo " 3) $(menu_item "gcstar")"
-    echo " 4) $(menu_item "geeknote-git") $AUR"
-    echo " 5) $(menu_item "haroopad") $AUR"
-    echo " 6) $(menu_item "homebank")"
-    echo " 7) $(menu_item "impressive")"
-    echo " 8) $(menu_item "texlive-core" "latex")"
-    echo " 9) $(menu_item "libreoffice-fresh" "LibreOffice")"
-    echo "10) $(menu_item "ocrfeeder")"
+    echo " 3) $(menu_item "goldendict")"
+    echo " 4) $(menu_item "homebank")"
+    echo " 5) $(menu_item "texlive-core" "latex")"
+    echo " 6) $(menu_item "libreoffice-fresh" "LibreOffice")"
+    echo " 7) $(menu_item "lyx")"
+    echo " 8) $(menu_item "ocrfeeder")"
+    echo " 9) $(menu_item "tellico")"
+    echo "10) $(menu_item "typora")"
     echo "11) $(menu_item "xmind")"
-    echo "12) $(menu_item "goldendict")"
     echo ""
     echo " b) BACK"
     echo ""
     OFFICE_OPTIONS+=" b"
     read_input_options "$OFFICE_OPTIONS"
     for OPT in ${OPTIONS[@]}; do
-      case "$OPT" in
+      case "$OPT" in      
         1)
           if [[ ${KDE} -eq 1 ]]; then
             package_install "calligra"
@@ -1721,45 +1690,39 @@ install_office_apps(){
           package_install "calibre"
           ;;
         3)
-          package_install "gcstar"
+          package_install "goldendict"
           ;;
         4)
-          aur_package_install "geeknote-git"
-          ;;
-        5)
-          aur_package_install "haroopad"
-          ;;
-        6)
           package_install "homebank"
           ;;
-        7)
-          package_install "impressive"
-          ;;
-        8)
+        5)
           package_install "texlive-most"
           if [[ $LOCALE == pt_BR ]]; then
             aur_package_install "abntex"
           fi
-          if [[ ${KDE} -eq 0 ]]; then
-            package_install "gummi"
-          fi
           ;;
-        9)
+        6)
           print_title "LIBREOFFICE - https://wiki.archlinux.org/index.php/LibreOffice"
           package_install "libreoffice-fresh"
           [[ $LOCALE != en_US ]] && package_install "libreoffice-fresh-$LOCALE_LO"
           package_install "hunspell hunspell-$LOCALE_HS"
           package_install "aspell aspell-$LOCALE_AS"
           ;;
-        10)
+        7)
+          package_install "lyx"
+          ;;
+        8)
           package_install "ocrfeeder tesseract gocr"
           package_install "aspell aspell-$LOCALE_AS"
           ;;
+        9)
+          package_install "tellico"
+          ;;
+        10)
+          package_install "typora"
+          ;;
         11)
           package_install "xmind"
-          ;;
-        12)
-          package_install "goldendict"
           ;;
         "b")
           break
@@ -1778,24 +1741,21 @@ install_system_apps(){
   while true
   do
     print_title "SYSTEM TOOLS APPS"
-    echo " 1) $(menu_item "clamav" "clamav antivirus")"
-    echo " 2) $(menu_item "cockpit" "cockpit- A web system administration tool") $AUR"
-    echo " 3) $(menu_item "webmin" "webmin- A web system administration tool") $AUR"
+    echo " 1) $(menu_item "clamav" "Clamav Antivirus")"
+    echo " 2) $(menu_item "cockpit") $AUR"
+    echo " 3) $(menu_item "webmin") $AUR"
     echo " 4) $(menu_item "docker")"
     echo " 5) $(menu_item "firewalld")"
     echo " 6) $(menu_item "gparted")"
-    echo " 7) $(menu_item "grsync" "grsync- Sync files")"
-    echo " 8) $(menu_item "hosts-update" "hosts-update Injects the mvps blocklist to /etc/hosts to prevent thousands of parasites, hijackers and unwanted adware/spyware/privacy websites from working.") $AUR"
-    echo " 9) $(menu_item "htop" "htop- Interactive text-mode process viewer")"
-    echo "10) $(menu_item "plex-media-server" "Plex") $AUR"
-    echo "11) $(menu_item "ufw") $AUR"
-    echo "12) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
-    echo "13) $(menu_item "virtualbox")"
-    echo "14) $(menu_item "wine")"
-    echo "15) $(menu_item "netdata")"
-    echo "16) $(menu_item "nload")"
-    echo "17) $(menu_item "gnome-logs" "Assorted Graphical log viewers")"
-    echo "18) $(menu_item "seahorse" "seahorse Password keyring management GUI")"
+    echo " 7) $(menu_item "grsync")"
+    echo " 8) $(menu_item "hosts-update") $AUR"
+    echo " 9) $(menu_item "htop")"
+    echo "10) $(menu_item "ufw") $AUR"
+    echo "11) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
+    echo "12) $(menu_item "virtualbox")"
+    echo "13) $(menu_item "wine")"
+    echo "14) $(menu_item "netdata")"
+    echo "15) $(menu_item "nload")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1842,21 +1802,17 @@ install_system_apps(){
           package_install "htop"
           ;;
         10)
-          aur_package_install "plex-media-server"
-          system_ctl enable plexmediaserver.service
-          ;;
-        11)
           print_title "UFW - https://wiki.archlinux.org/index.php/Ufw"
           print_info "Ufw stands for Uncomplicated Firewall, and is a program for managing a netfilter firewall. It provides a command line interface and aims to be uncomplicated and easy to use."
           is_package_installed "firewalld" && package_remove "firewalld"
           aur_package_install "ufw gufw"
           system_ctl enable ufw.service
           ;;
-        12)
+        11)
           aur_package_install "unified-remote-server"
           system_ctl enable urserver.service
           ;;
-        13)
+        12)
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
@@ -1868,23 +1824,15 @@ install_system_apps(){
             cecho "${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
           ;;
-        14)
+        13)
           package_install "icoutils wine wine_gecko wine-mono winetricks"
           ;;
-        15)
+        14)
           package_install "netdata"
           system_ctl enable netdata.service
           ;;
-        16)
+        15)
           package_install "nload"
-          ;;
-        17)
-          package_install "gnome-logs"
-          package_install "qjournalctl"
-          package_install "pacmanlogviewer"
-          ;;
-        18)
-          package_install "seahorse"
           ;;
         "b")
           break
@@ -1913,6 +1861,7 @@ install_graphics_apps(){
     echo " 8) $(menu_item "scribus")"
     echo " 9) $(menu_item "shotwell")"
     echo "10) $(menu_item "simple-scan")"
+    echo "11) $(menu_item "yacreader")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1949,6 +1898,9 @@ install_graphics_apps(){
           ;;
         10)
           package_install "simple-scan"
+          ;;
+        11)
+          package_install "yacreader"
           ;;
         "b")
           break
@@ -2042,20 +1994,19 @@ install_internet_apps(){
           while true
           do
             print_title "DOWNLOAD|FILESHARE"
-            echo " 1) $(menu_item "aerofs") $AUR"
-            echo " 2) $(menu_item "rslsync" "Resilio Sync") $AUR"
-            echo " 3) $(menu_item "deluge")"
-            echo " 4) $(menu_item "dropbox") $AUR"
-            echo " 5) $(menu_item "flareget") $AUR"
-            echo " 6) $(menu_item "jdownloader") $AUR"
-            echo " 7) $(menu_item "qbittorrent")"
+            echo " 1) $(menu_item "deluge")"
+            echo " 2) $(menu_item "dropbox") $AUR"
+            echo " 3) $(menu_item "flareget") $AUR"
+    	      echo " 4) $(menu_item "google-drive-ocamlfuse", "Google Drive OCamlFuse") $AUR"           
+            echo " 5) $(menu_item "jdownloader") $AUR"
+            echo " 6) $(menu_item "qbittorrent")"
+            echo " 7) $(menu_item "rslsync" "Resilio Sync") $AUR"           
             echo " 8) $(menu_item "sparkleshare")"
-            echo " 9) $(menu_item "spideroak") $AUR"
-            echo "10) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
-            echo "11) $(menu_item "uget")"
-            echo "12) $(menu_item "youtube-dl")"
-    	    echo "13) $(menu_item "tixati" "tixati p2p bittorrent client") $AUR"
-    	    echo "14) $(menu_item "google-drive-ocamlfuse" "google-drive-ocamlfuse") $AUR"
+            echo " 9) $(menu_item "spideroak-one") $AUR"
+    	      echo "10) $(menu_item "tixati") $AUR"
+            echo "11) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+            echo "12) $(menu_item "uget")"
+            echo "13) $(menu_item "youtube-dl")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2064,26 +2015,26 @@ install_internet_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
-                  aur_package_install "aerofs"
-                  ;;
-                2)
-                  aur_package_install "rslsync"
-                  ;;
-                3)
                   package_install "deluge"
                   ;;
-                4)
+                2)
                   aur_package_install "dropbox"
                   ;;
-                5)
+                3)
                   aur_package_install "flareget"
                   ;;
-                6)
+                4)
+                  aur_package_install "google-drive-ocamlfuse"
+                  ;;
+                5)
                   aur_package_install "jdownloader"
                   ;;
-                7)
+                6)
                   package_install "qbittorrent"
                   ;;
+                7)
+                  aur_package_install "rslsync"
+                  ;;                  
                 8)
                   package_install "sparkleshare"
                   ;;
@@ -2091,6 +2042,9 @@ install_internet_apps(){
                   aur_package_install "spideroak"
                   ;;
                 10)
+                  aur_package_install "tixati"
+                  ;;
+                11)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "transmission-qt"
                   else
@@ -2101,17 +2055,11 @@ install_internet_apps(){
                     replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${username}/.config/transmission/settings.json
                   fi
                   ;;
-                11)
+                12)
                   package_install "uget"
                   ;;
-                12)
-                  package_install "youtube-dl"
-                  ;;
                 13)
-                  aur_package_install "tixati"
-                  ;;
-                14)
-                  aur_package_install "google-drive-ocamlfuse"
+                  package_install "youtube-dl"
                   ;;
                 "b")
                   break
@@ -2239,7 +2187,7 @@ install_internet_apps(){
           do
             print_title "MAPPING TOOLS"
             echo " 1) $(menu_item "google-earth") $AUR"
-            echo " 2) $(menu_item "worldwind" "NASA World Wind") $AUR"
+            echo " 2) $(menu_item "qgis" "QGIS") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2251,7 +2199,7 @@ install_internet_apps(){
                   aur_package_install "google-earth"
                   ;;
                 2)
-                  aur_package_install "worldwind"
+                  aur_package_install "qgis"
                   ;;
                 "b")
                   break
@@ -2333,19 +2281,15 @@ install_audio_apps(){
             print_title "AUDIO PLAYERS"
             echo " 1) $(menu_item "amarok")"
             echo " 2) $(menu_item "audacious")"
-            echo " 3) $(menu_item "banshee") $AUR"
-            echo " 4) $(menu_item "clementine")"
-            echo " 5) $(menu_item "deadbeef")"
-            echo " 6) $(menu_item "guayadeque") $AUR"
-            echo " 7) $(menu_item "musique") $AUR"
-            echo " 8) $(menu_item "nuvolaplayer-git") $AUR"
-            echo " 9) $(menu_item "pragha")"
-            echo "10) $(menu_item "radiotray") $AUR"
-            echo "11) $(menu_item "rhythmbox")"
-            echo "12) $(menu_item "spotify") $AUR"
-            echo "13) $(menu_item "timidity++") $AUR"
-            echo "14) $(menu_item "tomahawk") $AUR"
-            echo "15) $(menu_item "quodlibet")"
+            echo " 3) $(menu_item "clementine")"
+            echo " 4) $(menu_item "deadbeef")"
+            echo " 5) $(menu_item "guayadeque") $AUR"
+            echo " 6) $(menu_item "musique") $AUR"
+            echo " 7) $(menu_item "pragha")"
+            echo " 8) $(menu_item "rhythmbox")"
+            echo " 9) $(menu_item "spotify") $AUR"
+            echo "10) $(menu_item "timidity++") $AUR"
+            echo "11) $(menu_item "quodlibet")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2360,46 +2304,31 @@ install_audio_apps(){
                   package_install "audacious audacious-plugins"
                   ;;
                 3)
-                  aur_package_install "banshee"
-                  ;;
-                4)
                   package_install "clementine"
                   ;;
-                5)
+                4)
                   package_install "deadbeef"
                   ;;
-                6)
+                5)
                   aur_package_install "guayadeque"
                   ;;
-                7)
+                6)
                   aur_package_install "musique"
                   ;;
-                8)
-                  aur_package_install "nuvolaplayer-git"
-                  ;;
-                9)
+                7)
                   package_install "pragha"
                   ;;
-                10)
-                  aur_package_install "radiotray"
-                  ;;
-                11)
+                8)
                   package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako"
-                  #aur_package_install "pywebkitgtk"
-                  # pywebkitgtk compile needed and take alot of time around 4-5H on i5-8gigram-ssd hdd
-                  # + only need when Cannot activate "context pane" plugin
                   ;;
-                12)
+                9)
                   aur_package_install "spotify"
                   ;;
-                13)
+                10)
                   aur_package_install "timidity++ fluidr3"
                   echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                   ;;
-                14)
-                  aur_package_install "tomahawk"
-                  ;;
-                15)
+                11)
                   package_install "quodlibet"
                   ;;
                 "b")
@@ -2504,13 +2433,12 @@ install_video_apps(){
             echo " 1) $(menu_item "gnome-mplayer")"
             echo " 2) $(menu_item "livestreamer")"
             echo " 3) $(menu_item "minitube")"
-            echo " 4) $(menu_item "miro") $AUR"
-            echo " 5) $(menu_item "mpv")"
-            echo " 6) $(menu_item "parole")"
+            echo " 4) $(menu_item "mpv")"
+            echo " 5) $(menu_item "parole")"
+            echo " 6) $(menu_item "plex-media-server" "Plex") $AUR"
             echo " 7) $(menu_item "popcorntime-ce") $AUR"
             echo " 8) $(menu_item "vlc")"
             echo " 9) $(menu_item "kodi")"
-            echo "10) $(menu_item "obs-studio")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2528,13 +2456,14 @@ install_video_apps(){
                   package_install "minitube"
                   ;;
                 4)
-                  aur_package_install "miro"
-                  ;;
-                5)
                   package_install "mpv"
                   ;;
-                6)
+                5)
                   package_install "parole"
+                  ;;
+                6)
+                  aur_package_install "plex-media-server"
+                  system_ctl enable plexmediaserver.service
                   ;;
                 7)
                   aur_package_install "popcorntime-ce"
@@ -2546,9 +2475,6 @@ install_video_apps(){
                 9)
                   package_install "kodi"
                   add_user_to_group ${username} kodi
-                  ;;
-                10)
-                  package_install "obs-studio-git"
                   ;;
                 "b")
                   break
@@ -2572,12 +2498,11 @@ install_video_apps(){
             echo " 2) $(menu_item "avidemux-gtk avidemux-qt" "Avidemux")"
             echo " 3) $(menu_item "filebot") $AUR"
             echo " 4) $(menu_item "handbrake")"
-            echo " 5) $(menu_item "kazam") $AUR"
-            echo " 6) $(menu_item "kdenlive")"
-            echo " 7) $(menu_item "lwks" "Lightworks") $AUR"
-            echo " 8) $(menu_item "openshot")"
-            echo " 9) $(menu_item "pitivi")"
-            echo "10) $(menu_item "transmageddon")"
+            echo " 5) $(menu_item "kdenlive")"
+            echo " 6) $(menu_item "lwks" "Lightworks") $AUR"
+            echo " 7) $(menu_item "openshot")"
+            echo " 8) $(menu_item "pitivi")"
+            echo " 9) $(menu_item "transmageddon")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2602,21 +2527,18 @@ install_video_apps(){
                   package_install "handbrake"
                   ;;
                 5)
-                  aur_package_install "kazam"
-                  ;;
-                6)
                   package_install "kdenlive"
                   ;;
-                7)
+                6)
                   aur_package_install "lwks"
                   ;;
-                8)
+                7)
                   package_install "openshot"
                   ;;
-                9)
+                8)
                   package_install "pitivi frei0r-plugins"
                   ;;
-                10)
+                9)
                   package_install "transmageddon"
                   ;;
                 "b")
@@ -2989,8 +2911,7 @@ install_extra(){
   while true
   do
     print_title "EXTRA"
-    echo " 1) Global Menu $AUR"
-    echo " 2) $(menu_item "profile-sync-daemon") $AUR"
+    echo " 1) $(menu_item "profile-sync-daemon") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2999,18 +2920,6 @@ install_extra(){
     for OPT in ${OPTIONS[@]}; do
       case "$OPT" in
         1)
-          aur_package_install "gtk2-appmenu gtk3-appmenu"
-          if [[ ${KDE} -eq 1 ]]; then
-            aur_package_install "appmenu-qt appmenu-gtk"
-            aur_package_install "kdeplasma-applets-menubar"
-          fi
-          if [[ ! -f /home/${username}/.config/gtk-3.0/settings.ini ]]; then
-            run_as_user "echo -e \"[Settings]\ngtk-shell-shows-menubar = 1\" > /home/${username}/.config/gtk-3.0/settings.ini"
-          else
-            add_line "gtk-shell-shows-menubar = 1" "/home/${username}/.config/gtk-3.0/settings.ini"
-          fi
-          ;;
-        2)
           aur_package_install "profile-sync-daemon"
           run_as_user "psd"
           run_as_user "$EDITOR /home/${username}/.config/psd/psd.conf"

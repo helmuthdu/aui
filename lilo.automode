@@ -44,9 +44,9 @@
   SSH="y"
   TLP="n"                # Laptop Power Manager
   ZRAM="y"
-  ZSH="y"
-  OH_MY_ZSH="y"
-  PROPRIETARY_DRIVER="n" # Proprietary (NVIDIA) driver
+  ZSH="n"
+  OH_MY_ZSH="n"
+  BETTER_VIDEO_DRIVER="n" # NVIDIA/AMDGPU
   FONTCONFIG="y"
   #}}}
   #ADDITIONAL FIRMWARE {{{
@@ -139,15 +139,14 @@
   # 1) Albert
   # 2) Catfish
   # 3) Conky
-  # 4) Docky
-  # 5) Galculator
+  # 4) Enpass
+  # 5) keepass
   # 6) Pamac
-  # 7) Pyrenamer
-  # 8) Enpass
-  # 9) Shutter|Hotshots
+  # 7) Shutter|Hotshots
+  # 8) Synapse
+  # 9) Terminator
   #10) Tilix
-  #11) Terminator
-  ACCESSORIES_OPTIONS="10"
+  ACCESSORIES_OPTIONS="4 10"
 #}}}
 #DEVELOPEMENT {{{
   # 1) Atom
@@ -170,8 +169,8 @@
   #18) NodeJS
   #19) Microsoft Visual Studio Code
   #20) Git GUI-s
-  #21) Diff GUI-s like kdiff3
-  #22) Search/ replace tools: regexxer
+  #21) kdiff3
+  #22) Regexxer
   #23) Postman
   #24) Gitkraken
   DEVELOPMENT_OPTIONS="15"
@@ -179,17 +178,16 @@
 #OFFICE {{{
   # 1) Abiword+Gnumeric|Calligra
   # 2) Calibre
-  # 3) GCStar
-  # 4) Geeknote
-  # 5) Haroopad
-  # 6) Homebank
-  # 7) Impressive
-  # 8) Latex
-  # 9) LibreOffice
-  #10) OCRFeeder
+  # 3) Goldendict
+  # 4) Homebank
+  # 5) Latex
+  # 6) LibreOffice
+  # 7) Lyx
+  # 8) OCRFeeder
+  # 9) Tellico
+  #10) Typora
   #11) Xmind
-  #12) goldendict
-  OFFICE_OPTIONS="9"
+  OFFICE_OPTIONS="6"
 #}}}
 #SYSTEM TOOLS {{{
   # 1) ClamAV
@@ -201,16 +199,13 @@
   # 7) Grsync
   # 8) Hosts Update
   # 9) Htop
-  #10) Plex
-  #11) UFW
-  #12) Unified Remote
-  #13) Virtualbox
-  #14) Wine
-  #15) netdata
-  #16) nload
-  #17) Assorted Graphical log viewers
-  #18) seahorse Password keyring management GUI
-  SYSTEMTOOLS_OPTIONS="11"
+  #10) UFW
+  #11) Unified Remote
+  #12) Virtualbox
+  #13) Wine
+  #14) netdata
+  #15) nload
+  SYSTEMTOOLS_OPTIONS="11 13"
 #}}}
 #GRAPHICS {{{
   # 1) Blender
@@ -223,7 +218,8 @@
   # 8) Scribus
   # 9) Shotwell
   #10) Simple Scan
-  GRAPHICS_OPTIONS="2-7 9"
+  #11) YACReader
+  GRAPHICS_OPTIONS="2-5 9"
 #}}}
 #INTERNET {{{
   # 1) Browser
@@ -244,21 +240,20 @@
     BROWSERS_OPTIONS="3"
   #}}}
   #DOWNLOAD|FILESHARE {{{
-    # 1) AeroFS
-    # 2) Resilio Sync
-    # 3) Deluge
-    # 4) Dropbox
-    # 5) FlareGet
-    # 6) Jdownloader
-    # 7) qBittorrent
-    # 8) Sparkleshare
-    # 9) Spider Oak
-    #10) Trasmission
-    #11) uGet
-    #12) youtube-dl
-    #13) tixati
-    #14) tixati
-    DOWNLOAD_OPTIONS=""
+    #  1) Deluge
+    #  2) Dropbox
+    #  3) Flareget
+    #  4) Google Drive OCamlFuse
+    #  5) Jdownloader
+    #  6) qBittorrent
+    #  7) Resilio Sync
+    #  8) Sparkleshare
+    #  9) Spideroak
+    # 10) Tixati
+    # 11) Transmission
+    # 12) uGet
+    # 13) Youtube-dl
+    DOWNLOAD_OPTIONS="11"
   #}}}
   #EMAIL|RSS {{{
     # 1) Liferea
@@ -281,7 +276,7 @@
   #}}}
   #MAPPING {{{
     # 1) Google Earth
-    # 2) NASA World Wind
+    # 2) QGIS
     MAPPING_OPTIONS=""
   #}}}
   #VNC|Desktop Share {{{
@@ -298,20 +293,16 @@
   #PLAYERS {{{
     # 1) Amarok
     # 2) Audacious
-    # 3) Banshee
-    # 4) Clementine
-    # 5) Deadbeef
-    # 6) Guayadeque
-    # 7) Musique
-    # 8) Nuvola
-    # 9) Pragha
-    #10) Radiotray
-    #11) Rhythmbox
-    #12) Spotify
-    #13) Timidity++
-    #14) Tomahawk
-    #15) quodlibet
-    AUDIO_PLAYER_OPTIONS="4"
+    # 3) Clementine
+    # 4) Deadbeef
+    # 5) Guayadeque
+    # 6) Musique
+    # 7) Pragha
+    # 8) Rhythmbox
+    # 9) Spotify
+    #10) Timidity++
+    #11) quodlibet
+    AUDIO_PLAYER_OPTIONS="8"
   #}}}
   #EDITORS|TOOLS {{{
     # 1) Audacity
@@ -330,13 +321,12 @@
     # 1) Gnome Mplayer
     # 2) LiveStreamer
     # 3) Minitube
-    # 4) Miro
-    # 5) MPV
-    # 6) Parole
+    # 4) MPV
+    # 5) Parole
+    # 6) Plex 
     # 7) Popcorn Time
     # 8) VLC
     # 9) Kodi
-    #10) obs-studio
     VIDEO_PLAYER_OPTIONS="8"
   #}}}
   #EDITORS|TOOLS {{{
@@ -344,13 +334,12 @@
     # 2) Avidemux
     # 3) Filebot
     # 4) Handbrake
-    # 5) Kazam
-    # 6) Kdenlive
-    # 7) Lightworks
-    # 8) Openshot
-    # 9) Pitivi
-    #10) Transmageddon
-    VIDEO_EDITOR_OPTIONS="1"
+    # 5) Kdenlive
+    # 6) Lightworks
+    # 7) Openshot
+    # 8) Pitivi
+    # 9) Transmageddon
+    VIDEO_EDITOR_OPTIONS="8"
   #}}}
 #}}}
 #GAMES {{{
@@ -379,7 +368,7 @@
   # 8) ttf-ms-fonts
   # 9) wqy-microhei
   #10) noto-fonts-cjk
-  FONTS_OPTIONS="1-10"
+  FONTS_OPTIONS="1-9"
 #}}}
 #IME INPUT TOOLS  {{{
   # 1) fcitx
@@ -387,7 +376,6 @@
   IME_OPTIONS=""
 #}}}
 #EXTRA {{{
-  # 1) Global Menu
-  # 2) Profile Sync
+  # 1) Profile Sync
   EXTRA_OPTIONS=""
 #}}}
