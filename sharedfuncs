@@ -60,7 +60,7 @@
     KDE=0
   #}}}
   # MOUNTPOINTS {{{
-    EFI_MOUNTPOINT="/boot/efi"
+    EFI_MOUNTPOINT="/boot"
     ROOT_MOUNTPOINT="/dev/sda1"
     BOOT_MOUNTPOINT="/dev/sda"
     MOUNTPOINT="/mnt"

@@ -119,7 +119,8 @@
   THEMES_OPTIONS="1 2"
   #ICONS THEMES {{{
     # 1) Numix
-    ICONS_THEMES="1"
+    # 2) Papirus
+    ICONS_THEMES="2"
   #}}}
   #GTK THEMES {{{
     # 1) Arc

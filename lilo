@@ -443,7 +443,7 @@ install_basic_setup(){
   print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
   print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers services and hosts running on a local network with no specific configuration."
   package_install "avahi nss-mdns"
-  is_package_installed "avahi" && system_ctl enable avahi-daemon
+  is_package_installed "avahi" && system_ctl enable avahi-daemon.service
   pause_function
   print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
   print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
@@ -576,8 +576,8 @@ install_samba(){
       pdbedit -a -u ${username}
     done
     # enable services
-    system_ctl enable smbd
-    system_ctl enable nmbd
+    system_ctl enable smb.service
+    system_ctl enable nmb.service
     pause_function
   fi
 }
@@ -613,9 +613,10 @@ install_tlp(){
   read_input_text "Install TLP" $TLP
   if [[ $OPTION == y ]]; then
     package_install "tlp"
-    system_ctl enable tlp
-    system_ctl enable tlp-sleep
-    system_ctl disable systemd-rfkill
+    system_ctl enable tlp.service
+    system_ctl enable tlp-sleep.service
+    system_ctl mask systemd-rfkill.service
+    system_ctl mask systemd-rfkill.socket
     tlp start
     pause_function
   fi
@@ -626,9 +627,17 @@ install_xorg(){
   print_title "XORG - https://wiki.archlinux.org/index.php/Xorg"
   print_info "Xorg is the public, open-source implementation of the X window system version 11."
   echo "Installing X-Server (req. for Desktopenvironment, GPU Drivers, Keyboardlayout,...)"
-  package_install "xorg-server xorg-apps xorg-server-xwayland xorg-xinit xorg-xkill xorg-xinput xf86-input-libinput"
+  package_install "xorg-server xorg-apps xorg-xinit xorg-xkill xorg-xinput xf86-input-libinput"
   package_install "mesa"
   modprobe uinput
+  pause_function
+}
+#}}}
+#WAYLAND {{{
+install_wayland(){
+  print_title "WAYLAND - https://wiki.archlinux.org/index.php/Wayland"
+  print_info "Wayland is a protocol for a compositing window manager to talk to its clients, as well as a library implementing the protocol. "
+  package_install "weston xorg-server-xwayland"
   pause_function
 }
 #}}}
@@ -636,11 +645,8 @@ install_xorg(){
 font_config(){
   print_title "FONTS CONFIGURATION - https://wiki.archlinux.org/index.php/Font_Configuration"
   print_info "Fontconfig is a library designed to provide a list of available fonts to applications, and also for configuration for how fonts get rendered."
-  read_input_text "Install Fontconfig" $FONTCONFIG
-  if [[ $OPTION == y ]]; then
-    pacman -S --asdeps --needed cairo fontconfig freetype2
-    pause_function
-  fi
+  pacman -S --asdeps --needed cairo fontconfig freetype2
+  pause_function
 }
 #}}}
 #VIDEO CARDS {{{
@@ -855,7 +861,7 @@ install_desktop_environment(){
     do
       print_title "GNOME ICONS"
       echo " 1) $(menu_item "numix-icon-theme-git") $AUR"
-      echo " 2) $(menu_item "arc-icon-theme")"
+      echo " 2) $(menu_item "papirus-icon-theme-git")"
       echo ""
       echo " b) BACK"
       echo ""
@@ -867,8 +873,7 @@ install_desktop_environment(){
             aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
             ;;
           2)
-            aur_package_install "moka-icon-theme-git"
-            package_install "arc-icon-theme"
+            package_install "papirus-icon-theme-git"
             ;;
           "b")
             break
@@ -1397,15 +1402,12 @@ install_nm_wicd(){
     1)
       print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
       print_info "NetworkManager is a program for providing detection and configuration for systems to automatically connect to network. NetworkManager's functionality can be useful for both wireless and wired networks."
+      package_install "networkmanager dnsmasq networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc"
       if [[ ${KDE} -eq 1 ]]; then
-        package_install "networkmanager dnsmasq plasma-nm networkmanager-qt"
-      else
-        package_install "networkmanager dnsmasq network-manager-applet nm-connection-editor gnome-keyring"
+        package_install "plasma-nm"
+      elif [[ ${GNOME} -eq 0 ]]; then
+        package_install "network-manager-applet nm-connection-editor gnome-keyring"
       fi
-      # vpn support
-      package_install "networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc"
-      # power manager support
-      is_package_installed "tlp" && package_install "tlp-rdw"
       # network management daemon
       system_ctl enable NetworkManager.service
       pause_function
@@ -1420,7 +1422,7 @@ install_nm_wicd(){
         package_install "wicd wicd-gtk"
       fi
       # WICD daemon
-      system_ctl enable wicd
+      system_ctl enable wicd.service
       pause_function
       ;;
     3)
@@ -1428,7 +1430,7 @@ install_nm_wicd(){
       print_info "ConnMan is an alternative to NetworkManager and Wicd and was created by Intel and the Moblin project for use with embedded devices."
       package_install "connman"
       # ConnMan daemon
-      system_ctl enable connman
+      system_ctl enable connman.service
       pause_function
       ;;
   esac
@@ -2470,7 +2472,6 @@ install_video_apps(){
                   ;;
                 8)
                   package_install "vlc"
-                  [[ ${KDE} -eq 1 ]] && package_install "phonon-qt5-vlc"
                   ;;
                 9)
                   package_install "kodi"
@@ -2823,7 +2824,7 @@ install_fonts(){
 choose_ime_m17n(){
   while true	
   do	
-    print_title "M17n based IME - Input scripts (such as the Indic ones) using m17n maps - https://wiki.archlinux.org/index.php/Internationalization"
+    print_title "INTERNATIONALIZATION - https://wiki.archlinux.org/index.php/Internationalization"
     echo " 1) $(menu_item "fcitx")"	
     echo " 2) $(menu_item "ibus")"	
     echo ""	
@@ -2988,7 +2989,7 @@ do
   echo "11) $(mainmenu_item "${checklist[11]}" "Games")"
   echo "12) $(mainmenu_item "${checklist[12]}" "Web server")"
   echo "13) $(mainmenu_item "${checklist[13]}" "Fonts")"
-  echo "14) $(mainmenu_item "${checklist[14]}" "International script input: M17n based IME")"
+  echo "14) $(mainmenu_item "${checklist[14]}" "Internationalization")"
   echo "15) $(mainmenu_item "${checklist[15]}" "Extra")"
   echo "16) $(mainmenu_item "${checklist[16]}" "Clean Orphan Packages")"
   echo "17) $(mainmenu_item "${checklist[17]}" "Reconfigure System")"
@@ -3011,6 +3012,7 @@ do
         install_zram
         install_video_cards
         install_xorg
+        install_wayland
         font_config
         install_cups
         install_additional_firmwares
