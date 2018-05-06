@@ -2168,14 +2168,15 @@ install_internet_apps(){
             echo " 1) $(menu_item "hexchat konversation" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
             echo " 2) $(menu_item "irssi")"
             echo " 3) $(menu_item "pidgin")"
-            echo " 4) $(menu_item "skypeforlinux-preview-bin") $AUR"
-            echo " 5) $(menu_item "teamspeak3")"
-            echo " 6) $(menu_item "viber") $AUR"
-            echo " 7) $(menu_item "telegram-desktop")"
-            echo " 8) $(menu_item "qtox")"
-            echo " 9) $(menu_item "discord") $AUR"
-            echo " 10) $(menu_item "slack") $AUR"
-            echo " 11) $(menu_item "vk-messenger") $AUR"
+            echo " 4) $(menu_item "skypeforlinux-stable-bin" "Skype Stable") $AUR"
+            echo " 5) $(menu_item "skypeforlinux-preview-bin" "Skype Preview") $AUR"
+            echo " 6) $(menu_item "teamspeak3")"
+            echo " 7) $(menu_item "viber") $AUR"
+            echo " 8) $(menu_item "telegram-desktop")"
+            echo " 9) $(menu_item "qtox")"
+            echo " 10) $(menu_item "discord") $AUR"
+            echo " 11) $(menu_item "slack") $AUR"
+            echo " 12) $(menu_item "vk-messenger") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2197,27 +2198,30 @@ install_internet_apps(){
                   package_install "pidgin"
                   ;;
                 4)
-                  aur_package_install "skypeforlinux-preview-bin"
+                  aur_package_install "skypeforlinux-stable-bin"
                   ;;
                 5)
-                  package_install "teamspeak3"
+                  aur_package_install "skypeforlinux-preview-bin"
                   ;;
                 6)
-                  aur_package_install "viber"
+                  package_install "teamspeak3"
                   ;;
                 7)
-                  package_install "telegram-desktop"
+                  aur_package_install "viber"
                   ;;
                 8)
-                  package_install "qtox"
+                  package_install "telegram-desktop"
                   ;;
                 9)
-                  aur_package_install "discord"
+                  package_install "qtox"
                   ;;
                 10)
-                  aur_package_install "slack"
+                  aur_package_install "discord"
                   ;;
                 11)
+                  aur_package_install "slack"
+                  ;;
+                12)
                   aur_package_install "vk-messanger"
                   ;;
                 "b")
