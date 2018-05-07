@@ -294,8 +294,8 @@ select_user(){
   done
   [[ ! -f /home/${username}/.bashrc ]] && configure_user_account;
   if [[ -n "$http_proxy" ]]; then
-      echo "proxy = $http_proxy" > /home/${username}/.curlrc
-      chown ${username}:users /home/${username}/.curlrc
+    echo "proxy = $http_proxy" > /home/${username}/.curlrc
+    chown ${username}:users /home/${username}/.curlrc
   fi
 }
 #}}}
@@ -333,29 +333,15 @@ choose_aurhelper(){
   print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
   print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
   print_warning "\tNone of these tools are officially supported by Arch devs."
-  aurhelper=("aurutils" "trizen" "yay")
+  aurhelper=("trizen" "yay")
   PS3="$prompt1"
   echo -e "Choose your default AUR helper to install\n"
   select OPT in "${aurhelper[@]}"; do
     case "$REPLY" in
       1)
-        if ! is_package_installed "aurutils" ; then
-          package_install "base-devel git jq pacutils"
-          pacman -D --asdeps jq pacutils
-	        aui_download_packages "aurutils"
-          if ! is_package_installed "aurutils" ; then
-            echo "aurutils not installed. EXIT now"
-            pause_function
-            exit 0
-          fi
-        fi
-        AUR_PKG_MANAGER="aurutils"
-        ;;
-      2)
         if ! is_package_installed "trizen" ; then
           package_install "base-devel git perl"
-          pacman -D --asdeps perl
-	        aui_download_packages "trizen"
+          aui_download_packages "trizen"
           if ! is_package_installed "trizen" ; then
             echo "trizen not installed. EXIT now"
             pause_function
@@ -364,7 +350,7 @@ choose_aurhelper(){
         fi
         AUR_PKG_MANAGER="trizen"
         ;;
-      3)
+      2)
         if ! is_package_installed "yay" ; then
           package_install "base-devel git go"
           pacman -D --asdeps go
@@ -473,36 +459,36 @@ install_ssh(){
     system_ctl enable sshd
     [[ ! -f /etc/ssh/sshd_config.aui ]] && cp -v /etc/ssh/sshd_config /etc/ssh/sshd_config.aui;
     #CONFIGURE SSHD_CONF #{{{
-      sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
-      sed -i '/Protocol 2/s/^#//' /etc/ssh/sshd_config
-      sed -i '/HostKey \/etc\/ssh\/ssh_host_rsa_key/s/^#//' /etc/ssh/sshd_config
-      sed -i '/HostKey \/etc\/ssh\/ssh_host_dsa_key/s/^#//' /etc/ssh/sshd_config
-      sed -i '/HostKey \/etc\/ssh\/ssh_host_ecdsa_key/s/^#//' /etc/ssh/sshd_config
-      sed -i '/KeyRegenerationInterval/s/^#//' /etc/ssh/sshd_config
-      sed -i '/ServerKeyBits/s/^#//' /etc/ssh/sshd_config
-      sed -i '/SyslogFacility/s/^#//' /etc/ssh/sshd_config
-      sed -i '/LogLevel/s/^#//' /etc/ssh/sshd_config
-      sed -i '/LoginGraceTime/s/^#//' /etc/ssh/sshd_config
-      sed -i '/PermitRootLogin/s/^#//' /etc/ssh/sshd_config
-      sed -i '/HostbasedAuthentication no/s/^#//' /etc/ssh/sshd_config
-      sed -i '/StrictModes/s/^#//' /etc/ssh/sshd_config
-      sed -i '/RSAAuthentication/s/^#//' /etc/ssh/sshd_config
-      sed -i '/PubkeyAuthentication/s/^#//' /etc/ssh/sshd_config
-      sed -i '/IgnoreRhosts/s/^#//' /etc/ssh/sshd_config
-      sed -i '/PermitEmptyPasswords/s/^#//' /etc/ssh/sshd_config
-      sed -i '/AllowTcpForwarding/s/^#//' /etc/ssh/sshd_config
-      sed -i '/AllowTcpForwarding no/d' /etc/ssh/sshd_config
-      sed -i '/X11Forwarding/s/^#//' /etc/ssh/sshd_config
-      sed -i '/X11Forwarding/s/no/yes/' /etc/ssh/sshd_config
-      sed -i -e '/\tX11Forwarding yes/d' /etc/ssh/sshd_config
-      sed -i '/X11DisplayOffset/s/^#//' /etc/ssh/sshd_config
-      sed -i '/X11UseLocalhost/s/^#//' /etc/ssh/sshd_config
-      sed -i '/PrintMotd/s/^#//' /etc/ssh/sshd_config
-      sed -i '/PrintMotd/s/yes/no/' /etc/ssh/sshd_config
-      sed -i '/PrintLastLog/s/^#//' /etc/ssh/sshd_config
-      sed -i '/TCPKeepAlive/s/^#//' /etc/ssh/sshd_config
-      sed -i '/the setting of/s/^/#/' /etc/ssh/sshd_config
-      sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
+    sed -i '/Port 22/s/^#//' /etc/ssh/sshd_config
+    sed -i '/Protocol 2/s/^#//' /etc/ssh/sshd_config
+    sed -i '/HostKey \/etc\/ssh\/ssh_host_rsa_key/s/^#//' /etc/ssh/sshd_config
+    sed -i '/HostKey \/etc\/ssh\/ssh_host_dsa_key/s/^#//' /etc/ssh/sshd_config
+    sed -i '/HostKey \/etc\/ssh\/ssh_host_ecdsa_key/s/^#//' /etc/ssh/sshd_config
+    sed -i '/KeyRegenerationInterval/s/^#//' /etc/ssh/sshd_config
+    sed -i '/ServerKeyBits/s/^#//' /etc/ssh/sshd_config
+    sed -i '/SyslogFacility/s/^#//' /etc/ssh/sshd_config
+    sed -i '/LogLevel/s/^#//' /etc/ssh/sshd_config
+    sed -i '/LoginGraceTime/s/^#//' /etc/ssh/sshd_config
+    sed -i '/PermitRootLogin/s/^#//' /etc/ssh/sshd_config
+    sed -i '/HostbasedAuthentication no/s/^#//' /etc/ssh/sshd_config
+    sed -i '/StrictModes/s/^#//' /etc/ssh/sshd_config
+    sed -i '/RSAAuthentication/s/^#//' /etc/ssh/sshd_config
+    sed -i '/PubkeyAuthentication/s/^#//' /etc/ssh/sshd_config
+    sed -i '/IgnoreRhosts/s/^#//' /etc/ssh/sshd_config
+    sed -i '/PermitEmptyPasswords/s/^#//' /etc/ssh/sshd_config
+    sed -i '/AllowTcpForwarding/s/^#//' /etc/ssh/sshd_config
+    sed -i '/AllowTcpForwarding no/d' /etc/ssh/sshd_config
+    sed -i '/X11Forwarding/s/^#//' /etc/ssh/sshd_config
+    sed -i '/X11Forwarding/s/no/yes/' /etc/ssh/sshd_config
+    sed -i -e '/\tX11Forwarding yes/d' /etc/ssh/sshd_config
+    sed -i '/X11DisplayOffset/s/^#//' /etc/ssh/sshd_config
+    sed -i '/X11UseLocalhost/s/^#//' /etc/ssh/sshd_config
+    sed -i '/PrintMotd/s/^#//' /etc/ssh/sshd_config
+    sed -i '/PrintMotd/s/yes/no/' /etc/ssh/sshd_config
+    sed -i '/PrintLastLog/s/^#//' /etc/ssh/sshd_config
+    sed -i '/TCPKeepAlive/s/^#//' /etc/ssh/sshd_config
+    sed -i '/the setting of/s/^/#/' /etc/ssh/sshd_config
+    sed -i '/RhostsRSAAuthentication and HostbasedAuthentication/s/^/#/' /etc/ssh/sshd_config
     #}}}
     pause_function
   fi
@@ -1363,28 +1349,28 @@ install_desktop_environment(){
       ;;
   esac
   #COMMON PKGS {{{
-    #MTP SUPPORT {{{
-    if is_package_installed "libmtp" ; then
-      package_install "gvfs-mtp"
-    fi
-    #}}}
-    if [[ ${KDE} -eq 0 ]]; then
-      package_install "gvfs gvfs-goa gvfs-afc gvfs-mtp gvfs-google"
-      package_install "xdg-user-dirs-gtk"
-      package_install "pavucontrol"
-      package_install "ttf-bitstream-vera ttf-dejavu"
-      aur_package_install "gnome-defaults-list"
-      is_package_installed "cups" && package_install "system-config-printer gtk3-print-backends"
-      is_package_installed "samba" && package_install "gvfs-smb"
-    fi
+  #MTP SUPPORT {{{
+  if is_package_installed "libmtp" ; then
+    package_install "gvfs-mtp"
+  fi
+  #}}}
+  if [[ ${KDE} -eq 0 ]]; then
+    package_install "gvfs gvfs-goa gvfs-afc gvfs-mtp gvfs-google"
+    package_install "xdg-user-dirs-gtk"
+    package_install "pavucontrol"
+    package_install "ttf-bitstream-vera ttf-dejavu"
+    aur_package_install "gnome-defaults-list"
+    is_package_installed "cups" && package_install "system-config-printer gtk3-print-backends"
+    is_package_installed "samba" && package_install "gvfs-smb"
+  fi
   #}}}
   #COMMON CONFIG {{{
-    # speed up application startup
-    mkdir -p ~/.compose-cache
-    # D-Bus interface for user account query and manipulation
-    system_ctl enable accounts-daemon
-    # Improvements
-    add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
+  # speed up application startup
+  mkdir -p ~/.compose-cache
+  # D-Bus interface for user account query and manipulation
+  system_ctl enable accounts-daemon
+  # Improvements
+  add_line "fs.inotify.max_user_watches = 524288" "/etc/sysctl.d/99-sysctl.conf"
   #}}}
 }
 #}}}
@@ -1678,7 +1664,7 @@ install_office_apps(){
     OFFICE_OPTIONS+=" b"
     read_input_options "$OFFICE_OPTIONS"
     for OPT in ${OPTIONS[@]}; do
-      case "$OPT" in      
+      case "$OPT" in
         1)
           if [[ ${KDE} -eq 1 ]]; then
             package_install "calligra"
@@ -1999,13 +1985,13 @@ install_internet_apps(){
             echo " 1) $(menu_item "deluge")"
             echo " 2) $(menu_item "dropbox") $AUR"
             echo " 3) $(menu_item "flareget") $AUR"
-    	      echo " 4) $(menu_item "google-drive-ocamlfuse", "Google Drive OCamlFuse") $AUR"           
+            echo " 4) $(menu_item "google-drive-ocamlfuse", "Google Drive OCamlFuse") $AUR"
             echo " 5) $(menu_item "jdownloader") $AUR"
             echo " 6) $(menu_item "qbittorrent")"
-            echo " 7) $(menu_item "rslsync" "Resilio Sync") $AUR"           
+            echo " 7) $(menu_item "rslsync" "Resilio Sync") $AUR"
             echo " 8) $(menu_item "sparkleshare")"
             echo " 9) $(menu_item "spideroak-one") $AUR"
-    	      echo "10) $(menu_item "tixati") $AUR"
+            echo "10) $(menu_item "tixati") $AUR"
             echo "11) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
             echo "12) $(menu_item "uget")"
             echo "13) $(menu_item "youtube-dl")"
@@ -2036,7 +2022,7 @@ install_internet_apps(){
                   ;;
                 7)
                   aur_package_install "rslsync"
-                  ;;                  
+                  ;;
                 8)
                   package_install "sparkleshare"
                   ;;
@@ -2558,7 +2544,7 @@ install_video_apps(){
         3)
           package_install "libdvdnav libdvdcss cdrdao cdrtools ffmpeg ffmpeg2.8 ffmpegthumbnailer ffmpegthumbs"
           if [[ ${KDE} -eq 1 ]]; then
-          	package_install "kdegraphics-thumbnailers"
+            package_install "kdegraphics-thumbnailers"
           fi
           ;;
         "b")
@@ -2601,10 +2587,10 @@ install_games(){
           package_install "steam"
           OPT=3
           ;;
-	4)
-	  aur_package_install "minecraft"
-	  OPT=4
-	  ;;
+        4)
+          aur_package_install "minecraft"
+          OPT=4
+          ;;
         "b")
           break
           ;;
@@ -2624,6 +2610,7 @@ install_web_server(){
     local ADMINER=`cat /etc/httpd/conf/httpd.conf | grep Adminer`
     [[ -z $ADMINER ]] && echo -e '\n# Adminer Configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
   } #}}}
+
   install_mariadb(){ #{{{
     package_install "mariadb"
     /usr/bin/mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
@@ -2631,6 +2618,7 @@ install_web_server(){
     systemctl start mysqld.service
     /usr/bin/mysql_secure_installation
   } #}}}
+
   install_postgresql(){ #{{{
     package_install "postgresql"
     mkdir -p /var/lib/postgres
@@ -2647,10 +2635,12 @@ install_web_server(){
     read_input_text "Install Postgis + Pgrouting" $POSTGIS
     [[ $OPTION == y ]] && install_gis_extension
   } #}}}
+
   install_gis_extension(){ #{{{
     package_install "postgis"
     aur_package_install "pgrouting"
   } #}}}
+
   configure_php(){ #{{{
     if [[ -f /etc/php/php.ini.pacnew ]]; then
       mv -v /etc/php/php.ini /etc/php/php.ini.pacold
@@ -2669,6 +2659,7 @@ install_web_server(){
     sed -i '/gd.so/s/^;//' /etc/php/php.ini
     sed -i '/display_errors=/s/off/on/' /etc/php/php.ini
   } #}}}
+
   configure_php_apache(){ #{{{
     if [[ -f /etc/httpd/conf/httpd.conf.pacnew ]]; then
       mv -v /etc/httpd/conf/httpd.conf.pacnew /etc/httpd/conf/httpd.conf
@@ -2685,6 +2676,7 @@ install_web_server(){
       replace_line 'DirectoryIndex\ index.html' 'DirectoryIndex\ index.html\ index.php' /etc/httpd/conf/httpd.conf
     fi
   } #}}}
+
   configure_php_nginx(){ #{{{
     if [[ -f /etc/nginx/nginx.conf.pacnew ]]; then
       mv -v /etc/nginx/nginx.conf.pacnew /etc/nginx/nginx.conf
@@ -2694,6 +2686,7 @@ install_web_server(){
     sed -i -e '/location ~ \.php$ {/,/}/d' /etc/nginx/nginx.conf
     sed -i -e '/pass the PHP/a\        #\n        location ~ \.php$ {\n            fastcgi_pass   unix:/var/run/php-fpm/php-fpm.sock;\n            fastcgi_index  index.php;\n            root           /srv/http;\n            include        fastcgi.conf;\n        }' /etc/nginx/nginx.conf
   } #}}}
+
   create_sites_folder(){ #{{{
     [[ ! -f  /etc/httpd/conf/extra/httpd-userdir.conf.aui ]] && cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
     replace_line 'public_html' 'Sites' /etc/httpd/conf/extra/httpd-userdir.conf
@@ -2704,6 +2697,7 @@ install_web_server(){
     echo "You can access your projects at \"http://localhost/~username\""
     pause_function
   } #}}}
+ 
   print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
   print_info "*Adminer is installed by default in all options"
   echo " 1) LAMP - APACHE, MariaDB & PHP"
@@ -2822,19 +2816,19 @@ install_fonts(){
 #}}}
 #IME INPUT TOOLS {{{
 choose_ime_m17n(){
-  while true	
-  do	
+  while true
+  do
     print_title "INTERNATIONALIZATION - https://wiki.archlinux.org/index.php/Internationalization"
-    echo " 1) $(menu_item "fcitx")"	
-    echo " 2) $(menu_item "ibus")"	
-    echo ""	
-    echo " b) BACK"	
-    echo ""	
+    echo " 1) $(menu_item "fcitx")"
+    echo " 2) $(menu_item "ibus")"
+    echo ""
+    echo " b) BACK"
+    echo ""
     IME_OPTIONS+=" b"
     read_input_options "IME_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do	
-      case "$OPT" in	
-        1)	
+    for OPT in ${OPTIONS[@]}; do
+      case "$OPT" in
+        1)
           package_install "fcitx"
           package_install "fcitx-m17n"
           package_install "fcitx-qt4"
@@ -2846,23 +2840,23 @@ choose_ime_m17n(){
           echo -e '#!/bin/sh\n\n\n# Identify fcitx as a input module for both GTK and QT apps\nXMODIFIERS=@im=fcitx\nGTK_IM_MODULE=fcitx\nQT_IM_MODULE=fcitx\n\nexport XMODIFIERS GTK_IM_MODULE QT_IM_MODULE\necho we set XMODIFIERS GTK_IM_MODULE QT_IM_MODULE in profile.d\n' > /etc/profile.d/ime.sh
           # echo -e '#!/bin/sh\n\n\n# Identify fcitx as a input module for both GTK and QT apps\nXMODIFIERS=@im=fcitx\nGTK_IM_MODULE=fcitx\nQT_IM_MODULE=fcitx\n\nexport XMODIFIERS GTK_IM_MODULE QT_IM_MODULE\necho we set XMODIFIERS GTK_IM_MODULE QT_IM_MODULE in xprofile\n' > /etc/xprofile
           ;;
-        2)	
+        2)
           package_install "ibus"
           package_install "ibus-m17n"
           package_install "ibus-qt"
           echo -e '#!/bin/sh\n\n\n# Identify ibus as a input module for both GTK and QT apps\nXMODIFIERS=@im=ibus\nGTK_IM_MODULE=ibus\nQT_IM_MODULE=ibus\n\nexport XMODIFIERS GTK_IM_MODULE QT_IM_MODULE\necho we set XMODIFIERS GTK_IM_MODULE QT_IM_MODULE in profile.d\n' > /etc/profile.d/ime.sh
           ;;
         "b")
-          break	
-          ;;	
-        *)	
-          invalid_option	
-          ;;	
-      esac	
-    done	
-    source sharedfuncs_elihw	
-  done	
-}	
+          break
+          ;;
+        *)
+          invalid_option
+          ;;
+      esac
+    done
+    source sharedfuncs_elihw
+  done
+}
 #}}}
 #CLEAN ORPHAN PACKAGES {{{
 clean_orphan_packages(){

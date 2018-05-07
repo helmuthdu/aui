@@ -388,9 +388,7 @@
     pacman-key --lsign-key $1
   } #}}}
   add_key_user() { #{{{
-  	su - ${username} -c"
-	gpg --recv-keys --keyserver $1
-	"
+    su - ${username} -c "gpg --recv-keys --keyserver $1"
   } #}}}
   pacman_key(){ #{{{
     if [[ ! -d /etc/pacman.d/gnupg ]]; then

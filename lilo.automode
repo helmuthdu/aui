@@ -28,11 +28,12 @@
   # 9) Audio Apps
   #10) Video Apps
   #11) Games
-  #12) LAMP
+  #12) Web server
   #13) Fonts
-  #14) Extra
-  #15) Clean Orphan Packages
-  MAINMENU="1-13 15"
+  #14) Internationalization
+  #15) Extra
+  #16) Clean Orphan Packages
+  MAINMENU="1-13"
 #}}}
 #BASIC SETUP {{{
   CUPS="y"
@@ -324,7 +325,7 @@
     # 3) Minitube
     # 4) MPV
     # 5) Parole
-    # 6) Plex 
+    # 6) Plex
     # 7) Popcorn Time
     # 8) VLC
     # 9) Kodi
