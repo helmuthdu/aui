@@ -82,7 +82,7 @@
   #12) i3
   #13) OpenBox
   #14) Xmonad
-  DESKTOPENV=4
+  DESKTOPENV="4"
   #KDE {{{
     # 1) Choqok
     # 2) Digikam
@@ -133,9 +133,9 @@
   # 2) Wicd
   # 3) ConnMan
   # n) None
-  NETWORKMANAGER=1
-  #USB 3G MODEM SUPPORT
-  USBMODEM="y"
+  NETWORKMANAGER="1"
+  USBMODEM="y" #USB 3G MODEM SUPPORT
+  BLUETOOTH="y" #BLUETOOTH SUPPORT
 #}}}
 #ACCESSORIES {{{
   # 1) Albert
@@ -175,7 +175,7 @@
   #22) Regexxer
   #23) Postman
   #24) Gitkraken
-  DEVELOPMENT_OPTIONS="15"
+  DEVELOPMENT_OPTIONS="17"
 #}}}
 #OFFICE {{{
   # 1) Abiword+Gnumeric|Calligra
@@ -357,7 +357,7 @@
   # 2) LAPP - APACHE, POSTGRESQL & PHP
   # 3) LEMP - NGINX, MariaDB & PHP
   # 4) LEPP - NGINX, POSTGRESQL & PHP
-  WEBSERVER=4
+  WEBSERVER="4"
   POSTGIS="n"
 #}}}
 #FONTS {{{

@@ -1440,6 +1440,18 @@ install_usb_modem(){
   fi
 }
 #}}}
+#BLUETOOTH {{{
+install_bluetooth(){
+  print_title "BLUETOOTH - https://wiki.archlinux.org/index.php/Bluetooth"
+  print_info "Bluetooth is a standard for the short-range wireless interconnection of cellular phones, computers, and other electronic devices. In Linux, the canonical implementation of the Bluetooth protocol stack is BlueZ"
+  read_input_text "Install bluetooth support" $BLUETOOTH
+  if [[ $OPTION == y ]]; then
+    package_install "bluez bluez-utils"
+    system_ctl enable bluetooth.service
+    pause_function
+  fi
+}
+#}}}
 #ACCESSORIES {{{
 install_accessories_apps(){
   while true
@@ -3025,6 +3037,7 @@ do
         install_desktop_environment
         install_nm_wicd
         install_usb_modem
+        install_bluetooth
         checklist[2]=1
         ;;
       3)
