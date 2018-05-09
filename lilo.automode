@@ -266,14 +266,15 @@
     # 1) HexChat|Konversation
     # 2) Irssi
     # 3) Pidgin
-    # 4) Skype
-    # 5) Teamspeak
-    # 6) Viber
-    # 7) Telegram Desktop
-    # 8) qTox
-    # 9) Discord
-    # 10) Slack
-    # 11) VK Messanger
+    # 4) Skype Stable
+    # 5) Skype Preview
+    # 6) Teamspeak
+    # 7) Viber
+    # 8) Telegram Desktop
+    # 9) qTox
+    # 10) Discord
+    # 11) Slack
+    # 12) VK Messanger
     IM_OPTIONS="4"
   #}}}
   #MAPPING {{{
