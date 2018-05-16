@@ -275,6 +275,7 @@
     # 10) Discord
     # 11) Slack
     # 12) VK Messanger
+    # 13) Zoom.us
     IM_OPTIONS="4"
   #}}}
   #MAPPING {{{

@@ -2125,6 +2125,7 @@ install_internet_apps(){
             echo " 10) $(menu_item "discord") $AUR"
             echo " 11) $(menu_item "slack") $AUR"
             echo " 12) $(menu_item "vk-messenger") $AUR"
+            echo " 13) $(menu_item "zoom") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2171,6 +2172,9 @@ install_internet_apps(){
                   ;;
                 12)
                   aur_package_install "vk-messanger"
+                  ;;
+                13)
+                  aur_package_install "zoom"
                   ;;
                 "b")
                   break
