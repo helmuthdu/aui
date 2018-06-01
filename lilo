@@ -217,7 +217,7 @@ select_user(){
     select EDITOR in "${editors_list[@]}"; do
       if contains_element "$EDITOR" "${editors_list[@]}"; then
         if [[ $EDITOR == vim || $EDITOR == neovim ]]; then
-          [[ $EDITOR == vim ]] && (! is_package_installed "gvim" && package_install "vim ctags") || package_install "neovim python2-neovim python-neovim"
+          [[ $EDITOR == vim ]] && (! is_package_installed "gvim" && package_install "vim ctags") || package_install "neovim python2-neovim python-neovim xclip"
           #VIMRC {{{
           if [[ ! -f /home/${username}/.vimrc ]]; then
             vimrc_list=("Get helmuthdu .vimrc from github" "Vanilla .vimrc" "Get personal .vimrc from github");
