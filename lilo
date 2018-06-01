@@ -2566,7 +2566,7 @@ install_video_apps(){
           OPT=2
           ;;
         3)
-          package_install "libdvdnav libdvdcss cdrdao cdrtools ffmpeg ffmpeg2.8 ffmpegthumbnailer ffmpegthumbs"
+          package_install "libdvdnav libdvdcss cdrdao cdrtools ffmpeg ffmpegthumbnailer ffmpegthumbs"
           if [[ ${KDE} -eq 1 ]]; then
             package_install "kdegraphics-thumbnailers"
           fi
