@@ -248,14 +248,15 @@
     #  4) Google Drive OCamlFuse
     #  5) Jdownloader
     #  6) qBittorrent
-    #  7) Resilio Sync
-    #  8) Sparkleshare
-    #  9) Spideroak
-    # 10) Tixati
-    # 11) Transmission
-    # 12) uGet
-    # 13) Youtube-dl
-    DOWNLOAD_OPTIONS="11"
+    #  7) Nitroshare
+    #  8) Resilio Sync
+    #  9) Sparkleshare
+    # 10) Spideroak
+    # 11) Tixati
+    # 12) Transmission
+    # 13) uGet
+    # 14) Youtube-dl
+    DOWNLOAD_OPTIONS="12"
   #}}}
   #EMAIL|RSS {{{
     # 1) Liferea

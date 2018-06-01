@@ -2000,13 +2000,14 @@ install_internet_apps(){
             echo " 4) $(menu_item "google-drive-ocamlfuse", "Google Drive OCamlFuse") $AUR"
             echo " 5) $(menu_item "jdownloader") $AUR"
             echo " 6) $(menu_item "qbittorrent")"
-            echo " 7) $(menu_item "rslsync" "Resilio Sync") $AUR"
-            echo " 8) $(menu_item "sparkleshare")"
-            echo " 9) $(menu_item "spideroak-one") $AUR"
-            echo "10) $(menu_item "tixati") $AUR"
-            echo "11) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
-            echo "12) $(menu_item "uget")"
-            echo "13) $(menu_item "youtube-dl")"
+            echo " 7) $(menu_item "nitroshare") $AUR"
+            echo " 8) $(menu_item "rslsync" "Resilio Sync") $AUR"
+            echo " 9) $(menu_item "sparkleshare")"
+            echo "10) $(menu_item "spideroak-one") $AUR"
+            echo "11) $(menu_item "tixati") $AUR"
+            echo "12) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+            echo "13) $(menu_item "uget")"
+            echo "14) $(menu_item "youtube-dl")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2033,18 +2034,21 @@ install_internet_apps(){
                   package_install "qbittorrent"
                   ;;
                 7)
-                  aur_package_install "rslsync"
+                  package_install "nitroshare"
                   ;;
                 8)
-                  package_install "sparkleshare"
+                  aur_package_install "rslsync"
                   ;;
                 9)
-                  aur_package_install "spideroak"
+                  package_install "sparkleshare"
                   ;;
                 10)
-                  aur_package_install "tixati"
+                  aur_package_install "spideroak"
                   ;;
                 11)
+                  aur_package_install "tixati"
+                  ;;
+                12)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "transmission-qt"
                   else
@@ -2055,10 +2059,10 @@ install_internet_apps(){
                     replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${username}/.config/transmission/settings.json
                   fi
                   ;;
-                12)
+                13)
                   package_install "uget"
                   ;;
-                13)
+                14)
                   package_install "youtube-dl"
                   ;;
                 "b")
@@ -2717,7 +2721,7 @@ install_web_server(){
     echo "You can access your projects at \"http://localhost/~username\""
     pause_function
   } #}}}
- 
+
   print_title "WEB SERVER - https://wiki.archlinux.org/index.php/LAMP|LAPP"
   print_info "*Adminer is installed by default in all options"
   echo " 1) LAMP - APACHE, MariaDB & PHP"
