@@ -207,6 +207,7 @@
   #13) Wine
   #14) netdata
   #15) nload
+  #16) vmware-workstation12
   SYSTEMTOOLS_OPTIONS="11 13"
 #}}}
 #GRAPHICS {{{
