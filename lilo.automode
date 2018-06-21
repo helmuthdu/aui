@@ -38,16 +38,16 @@
 #BASIC SETUP {{{
   CUPS="y"
   CUSTOMREPO="n"         # Add custom repositories
-  FIRMWARE="y"           # Install custom firmwares
+  FIRMWARE="n"           # Install custom firmwares
   NFS="n"
-  READAHEAD="y"
-  SAMBA="y"
-  SSH="y"
+  READAHEAD="n"
+  SAMBA="n"
+  SSH="n"
   TLP="n"                # Laptop Power Manager
-  ZRAM="y"
+  ZRAM="n"
   ZSH="n"
   OH_MY_ZSH="n"
-  BETTER_VIDEO_DRIVER="n" # NVIDIA/AMDGPU
+  BETTER_VIDEO_DRIVER="y" # NVIDIA/AMDGPU
   FONTCONFIG="y"
   #}}}
   #ADDITIONAL FIRMWARE {{{
@@ -64,7 +64,7 @@
     #11) libmtp [Android Devices]
     #12) libraw1394 [IEE1394 Driver]
     #13) wd719x-firmware
-    FIRMWARE_OPTIONS="11"
+    FIRMWARE_OPTIONS=""
   #}}}
 #}}}
 #DESKTOP ENVIRONMENT|WINDOW MANAGER {{{
@@ -207,6 +207,7 @@
   #13) Wine
   #14) netdata
   #15) nload
+  #16) vmware-workstation12
   SYSTEMTOOLS_OPTIONS="11 13"
 #}}}
 #GRAPHICS {{{
