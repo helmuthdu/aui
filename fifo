@@ -609,7 +609,7 @@ configure_locale(){
     read_input_text "Confirm locale ($LOCALE)"
   done
   echo 'LANG="'$LOCALE_UTF8'"' > ${MOUNTPOINT}/etc/locale.conf
-  arch_chroot "sed -i 's/#'${LOCALE_UTF8}'/'${LOCALE_UTF8}'/' /etc/locale.gen"
+  arch_chroot "sed -i 's/#\('${LOCALE_UTF8}'\)/\1/' /etc/locale.gen"
   arch_chroot "locale-gen"
 }
 #}}}
