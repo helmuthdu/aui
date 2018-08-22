@@ -52,7 +52,7 @@ You can try it first with a `virtualbox`
 - Create and configure new user
 - Install and configure sudo
 - Automatic enable services in systemd
-- Install an AUR Helper [yaourt, packer, pacaur]
+- Install an AUR Helper [trizen, yay]
 - Install base system
 - Install systemd
 - Install Preload
@@ -69,7 +69,7 @@ You can try it first with a `virtualbox`
 - Install Graphics apps [Inkscape, Gimp, Blender, MComix]
 - Install Internet apps [Firefox, Google-Chrome, Jdownloader...]
 - Install Multimedia apps [Rhythmbox, Clementine, Codecs...]
-- Install Games [HoN, World of Padman, Wesnoth...]
+- Install Games [Desura, PlayOnLinux, Steam, Minecraft...]
 - Install Fonts [Liberation, MS-Fonts, Google-webfonts...]
 - Install and configure Web Servers
 - Many More...
