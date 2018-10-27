@@ -540,7 +540,7 @@ install_samba(){
   read_input_text "Install Samba" $SAMBA
   if [[ $OPTION == y ]]; then
     package_install "samba smbnetfs"
-    [[ ! -f /etc/samba/smb.conf ]] && cp /etc/samba/smb.conf.default /etc/samba/smb.conf
+    [[ ! -f /etc/samba/smb.conf ]] && wget -O /etc/samba/smb.conf "https://git.samba.org/samba.git/?p=samba.git;a=blob_plain;f=examples/smb.conf.default;hb=HEAD"
     local CONFIG_SAMBA=`cat /etc/samba/smb.conf | grep usershare`
     if [[ -z $CONFIG_SAMBA ]]; then
       # configure usershare
