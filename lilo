@@ -859,7 +859,7 @@ install_desktop_environment(){
             aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
             ;;
           2)
-            package_install "papirus-icon-theme-git"
+            aur_package_install "papirus-icon-theme-git"
             ;;
           "b")
             break
