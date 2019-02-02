@@ -2176,7 +2176,7 @@ install_internet_apps(){
                   aur_package_install "discord"
                   ;;
                 11)
-                  aur_package_install "slack"
+                  aur_package_install "slack-desktop"
                   ;;
                 12)
                   aur_package_install "vk-messanger"
