@@ -908,6 +908,8 @@ install_desktop_environment(){
       echo " 3) $(menu_item "lightdm" "LightDM")"
       echo " 4) $(menu_item "sddm" "SDDM")"
       echo " 5) $(menu_item "slim" "Slim")"
+      echo " 6) $(menu item "lxdm" "lxdm")"
+      echo " 7) $(menu item "lxdm-gtk3" "lxdm-gtk3")"
       echo ""
       echo " b) BACK|SKIP"
       echo ""
@@ -942,6 +944,14 @@ install_desktop_environment(){
           5)
             package_install "slim"
             system_ctl enable slim
+            ;;
+          6)
+            package_install "lxdm"
+            system_ctl enable lxdm
+            ;;
+          7)
+            package_install "lxdm-gtk3"
+            system_ctl enable lxdm
             ;;
           "b")
             break
