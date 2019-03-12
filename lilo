@@ -773,15 +773,14 @@ install_additional_firmwares(){
       echo " 2) $(menu_item "alsa-firmware")"
       echo " 3) $(menu_item "b43-firmware") $AUR"
       echo " 4) $(menu_item "b43-firmware-legacy") $AUR"
-      echo " 5) $(menu_item "bfa-firmware") $AUR"
-      echo " 6) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
-      echo " 7) $(menu_item "broadcom-wl-dkms")"
-      echo " 8) $(menu_item "ipw2100-fw")"
-      echo " 9) $(menu_item "ipw2200-fw")"
-      echo "10) $(menu_item "libffado") [Fireware Audio Devices]"
-      echo "11) $(menu_item "libmtp") [Android Devices]"
-      echo "12) $(menu_item "libraw1394") [IEEE1394 Driver]"
-      echo "13) $(menu_item "wd719x-firmware") $AUR"
+      echo " 5) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
+      echo " 6) $(menu_item "broadcom-wl-dkms")"
+      echo " 7) $(menu_item "ipw2100-fw")"
+      echo " 8) $(menu_item "ipw2200-fw")"
+      echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
+      echo "10) $(menu_item "libmtp") [Android Devices]"
+      echo "11) $(menu_item "libraw1394") [IEEE1394 Driver]"
+      echo "12) $(menu_item "wd719x-firmware") $AUR"
       echo ""
       echo " d) DONE"
       echo ""
@@ -802,31 +801,28 @@ install_additional_firmwares(){
             aur_package_install "b43-firmware-legacy"
             ;;
           5)
-            aur_package_install "bfa-firmware"
-            ;;
-          6)
             package_install "bluez-firmware"
             ;;
-          7)
+          6)
             package_install "broadcom-wl-dkms"
             ;;
-          8)
+          7)
             package_install "ipw2100-fw"
             ;;
-          9)
+          8)
             package_install "ipw2200-fw"
             ;;
-          10)
+          9)
             package_install "libffado"
             ;;
-          11)
+          10)
             package_install "libmtp"
             package_install "android-udev"
             ;;
-          12)
+          11)
             package_install "libraw1394"
             ;;
-          13)
+          12)
             aur_package_install "wd719x-firmware"
             ;;
           "d")
