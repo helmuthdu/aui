@@ -2012,6 +2012,7 @@ install_internet_apps(){
             echo "12) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
             echo "13) $(menu_item "uget")"
             echo "14) $(menu_item "youtube-dl")"
+	    echo "15) $(menu_item "megasync")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2069,6 +2070,9 @@ install_internet_apps(){
                 14)
                   package_install "youtube-dl"
                   ;;
+		15)
+		  aur_package_install "megasync"
+		  ;;
                 "b")
                   break
                   ;;
