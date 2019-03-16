@@ -257,6 +257,7 @@
     # 12) Transmission
     # 13) uGet
     # 14) Youtube-dl
+    # 15) Megasync
     DOWNLOAD_OPTIONS="12"
   #}}}
   #EMAIL|RSS {{{
