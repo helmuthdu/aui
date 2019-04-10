@@ -493,7 +493,7 @@ install_base_system(){
   [[ -n $PTABLE ]] && pacstrap ${MOUNTPOINT} gptfdisk
   WIRELESS_DEV=`ip link | grep wl | awk '{print $2}'| sed 's/://' | sed '1!d'`
   if [[ -n $WIRELESS_DEV ]]; then
-    pacstrap ${MOUNTPOINT} iw wireless_tools wpa_actiond wpa_supplicant dialog
+    pacstrap ${MOUNTPOINT} iw wireless_tools wpa_supplicant dialog
   else
     WIRED_DEV=`ip link | grep "ens\|eno\|enp" | awk '{print $2}'| sed 's/://' | sed '1!d'`
     if [[ -n $WIRED_DEV ]]; then
