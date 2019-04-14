@@ -258,6 +258,7 @@
     # 13) uGet
     # 14) Youtube-dl
     # 15) Megasync
+    # 16) eXtreme Download Manager
     DOWNLOAD_OPTIONS="12"
   #}}}
   #EMAIL|RSS {{{
