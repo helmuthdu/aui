@@ -2022,6 +2022,7 @@ install_internet_apps(){
             echo "13) $(menu_item "uget")"
             echo "14) $(menu_item "youtube-dl")"
 	    echo "15) $(menu_item "megasync")"
+	    echo "16) $(menu_item "extreme download manager") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2081,6 +2082,9 @@ install_internet_apps(){
                   ;;
 		15)
 		  aur_package_install "megasync"
+		  ;;
+		 16)
+		  aur_package_install "xdman"
 		  ;;
                 "b")
                   break
