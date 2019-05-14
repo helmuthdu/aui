@@ -1759,13 +1759,14 @@ install_system_apps(){
     echo " 7) $(menu_item "grsync")"
     echo " 8) $(menu_item "hosts-update") $AUR"
     echo " 9) $(menu_item "htop")"
-    echo "10) $(menu_item "ufw") $AUR"
-    echo "11) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
-    echo "12) $(menu_item "virtualbox")"
-    echo "13) $(menu_item "wine")"
-    echo "14) $(menu_item "netdata")"
-    echo "15) $(menu_item "nload")"
-    echo "16) $(menu_item "vmware-workstation12" "VMware Workstation 12") $AUR"
+    echo "10) $(menu_item "gotop") $AUR"
+    echo "11) $(menu_item "ufw") $AUR"
+    echo "12) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
+    echo "13) $(menu_item "virtualbox")"
+    echo "14) $(menu_item "wine")"
+    echo "15) $(menu_item "netdata")"
+    echo "16) $(menu_item "nload")"
+    echo "17) $(menu_item "vmware-workstation12" "VMware Workstation 12") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1812,17 +1813,20 @@ install_system_apps(){
           package_install "htop"
           ;;
         10)
+          aur_package_install "gotop-bin"
+	  ;;
+        11)
           print_title "UFW - https://wiki.archlinux.org/index.php/Ufw"
           print_info "Ufw stands for Uncomplicated Firewall, and is a program for managing a netfilter firewall. It provides a command line interface and aims to be uncomplicated and easy to use."
           is_package_installed "firewalld" && package_remove "firewalld"
           aur_package_install "ufw gufw"
           system_ctl enable ufw.service
           ;;
-        11)
+        12)
           aur_package_install "unified-remote-server"
           system_ctl enable urserver.service
           ;;
-        12)
+        13)
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
@@ -1834,17 +1838,17 @@ install_system_apps(){
             cecho "${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
           ;;
-        13)
+        14)
           package_install "icoutils wine wine_gecko wine-mono winetricks"
           ;;
-        14)
+        15)
           package_install "netdata"
           system_ctl enable netdata.service
           ;;
-        15)
+        16)
           package_install "nload"
           ;;
-        16)
+        17)
           aur_package_install "vmware-workstation12"
           ;;
         "b")
@@ -2463,15 +2467,16 @@ install_video_apps(){
           while true
           do
             print_title "VIDEO PLAYERS"
-            echo " 1) $(menu_item "gnome-mplayer")"
-            echo " 2) $(menu_item "livestreamer")"
-            echo " 3) $(menu_item "minitube")"
-            echo " 4) $(menu_item "mpv")"
-            echo " 5) $(menu_item "parole")"
-            echo " 6) $(menu_item "plex-media-server" "Plex") $AUR"
-            echo " 7) $(menu_item "popcorntime-ce") $AUR"
-            echo " 8) $(menu_item "vlc")"
-            echo " 9) $(menu_item "kodi")"
+            echo "  1) $(menu_item "gnome-mplayer")"
+            echo "  2) $(menu_item "livestreamer")"
+            echo "  3) $(menu_item "minitube")"
+            echo "  4) $(menu_item "mpv")"
+            echo "  5) $(menu_item "smplayer")"
+            echo "  6) $(menu_item "parole")"
+            echo "  7) $(menu_item "plex-media-server" "Plex") $AUR"
+            echo "  8) $(menu_item "popcorntime-ce") $AUR"
+            echo "  9) $(menu_item "vlc")"
+            echo " 10) $(menu_item "kodi")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2492,19 +2497,22 @@ install_video_apps(){
                   package_install "mpv"
                   ;;
                 5)
-                  package_install "parole"
+                  package_install "smplayer"
                   ;;
                 6)
+                  package_install "parole"
+                  ;;
+                7)
                   aur_package_install "plex-media-server"
                   system_ctl enable plexmediaserver.service
                   ;;
-                7)
+                8)
                   aur_package_install "popcorntime-ce"
                   ;;
-                8)
+                9)
                   package_install "vlc"
                   ;;
-                9)
+                10)
                   package_install "kodi"
                   add_user_to_group ${username} kodi
                   ;;
