@@ -462,7 +462,7 @@ format_partitions(){
 #INSTALL BASE SYSTEM {{{
 select_linux_version() {
   print_title "LINUX VERSION"
-  version_list=("linux (default)" "linux-lts (long term support)" "linux-hardened (security features) "linux-zen (tuned kernel)");
+  version_list=("linux (default)" "linux-lts (long term support)" "linux-hardened (security features)");
   PS3="$prompt1"
   echo -e "Select linux version to install\n"
   select VERSION in "${version_list[@]}"; do
@@ -473,8 +473,6 @@ select_linux_version() {
           pacman -Sg base | cut -d ' ' -f 2 | sed s/\^linux\$/linux-lts/g | pacstrap ${MOUNTPOINT} - linux-lts-headers
        elif [ "linux-hardened (security features)" == "$VERSION" ];then
           pacman -Sg base | cut -d ' ' -f 2 | sed s/\^linux\$/linux-hardened/g | pacstrap ${MOUNTPOINT} - linux-hardened-headers
-       elif [ "linux-zen (tuned kernel)" == "$VERSION" ];then
-          pacman -Sg base | cut -d ' ' -f 2 | sed s/\^linux\$/linux-zen/g | pacstrap ${MOUNTPOINT} - linux-zen-headers
       fi
       break
     else
