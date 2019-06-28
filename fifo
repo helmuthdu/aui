@@ -770,12 +770,19 @@ configure_bootloader(){
             arch_chroot "bootctl --path=${EFI_MOUNTPOINT} install"
             print_warning "Please check your .conf file"
             partuuid=`blkid -s PARTUUID ${ROOT_MOUNTPOINT} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
-            if [[ $LUKS -eq 1 ]]; then
-              echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\tcryptdevice=\/dev\/${LUKS_DISK}:luks root=\/dev\/mapper\/${ROOT_PART} rw" > ${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/entries/arch.conf
-            elif [[ $LVM -eq 1 ]]; then
-              echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=\/dev\/mapper\/${ROOT_PART} rw" > ${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/entries/arch.conf
+            if [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep hardened -c)" -gt "0" ]; then
+              img_name="linux-hardened"
+            elif [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep lts -c)" -gt "0" ]; then
+              img_name="linux-lts"
             else
-              echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=PARTUUID=${partuuid} rw" > ${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/entries/arch.conf
+              img_name="linux"
+            fi
+            if [[ $LUKS -eq 1 ]]; then
+              echo -e "title\tArch Linux\nlinux\t/vmlinuz-${img_name}\ninitrd\t/initramfs-${img_name}.img\noptions\tcryptdevice=\/dev\/${LUKS_DISK}:luks root=\/dev\/mapper\/${ROOT_PART} rw" > ${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/entries/arch.conf
+            elif [[ $LVM -eq 1 ]]; then
+              echo -e "title\tArch Linux\nlinux\t/vmlinuz-${img_name}\ninitrd\t/initramfs-${img_name}.img\noptions\troot=\/dev\/mapper\/${ROOT_PART} rw" > ${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/entries/arch.conf
+            else
+              echo -e "title\tArch Linux\nlinux\t/vmlinuz-${img_name}\ninitrd\t/initramfs-${img_name}.img\noptions\troot=PARTUUID=${partuuid} rw" > ${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/entries/arch.conf
             fi
             echo -e "default  arch\ntimeout  5" > ${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/loader.conf
             pause_function
