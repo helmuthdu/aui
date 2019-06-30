@@ -653,6 +653,8 @@ create_ramdisk_environment(){
     mkinitcpio -p linux-hardened
   elif [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
     mkinitcpio -p linux-lts
+  elif [ "$(ls /boot | grep zen -c)" -gt "0" ]; then
+    mkinitcpio -p linux-zen
   else
     mkinitcpio -p linux
   fi
@@ -771,6 +773,22 @@ install_cups(){
     system_ctl enable org.cups.cupsd.service
     pause_function
   fi
+}
+#}}}
+#MICROCODE {{{
+ucode_cpu(){
+  print_title "MICROCODE - https://wiki.archlinux.org/index.php/Microcode"
+  print_info "MICROCODE is a computer hardware technique that imposes an interpreter between the CPU hardware and the programmer-visible instruction set architecture of the computer."  
+  
+  #Intel {{{
+    if (lscpu | grep Intel) then
+      package_install "intel-ucode"
+  #}}}
+  #AMD {{{
+   else
+      package_install "amd-ucode"
+   fi
+  #}}}
 }
 #}}}
 #ADDITIONAL FIRMWARE {{{
