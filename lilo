@@ -366,7 +366,9 @@ choose_aurhelper(){
       3)
         if ! is_package_installed "aurman" ; then
           package_install "base-devel git expac python pyalpm python-requests python-feedparser python-regex python-dateutil"
-          aui_download_packages "aurman"
+	  git clone https://github.com/polygamma/aurman.git
+	  python3 aurman/setup.py install
+	  rm -rf aurman
           if ! is_package_installed "aurman" ; then
             echo "aurman not installed. EXIT now"
             pause_function
