@@ -261,10 +261,44 @@ select_user(){
             ln -s ~/.vimrc ~/.config/nvim/init.vim
           fi
           #}}}
+        elif [[ $EDITOR == emacs ]]; then
+            package_install "emacs"
+            #.emacs.d{{{
+            if [[ ! -d /home/${username}/.emacs.d && ! -f /home/${username}/.emacs ]]; then
+                emacsd_list=("Spacemacs" "Centaur Emacs" "Vanilla .emacs.d" "Get personal .emacs.d from github");
+                PS3="$prompt1"
+                echo -e "Choose your .emacs.d\n"
+                select OPT in "${emacsd_list[@]}"; do
+                    case "$REPLY" in
+                        1)
+                            package_install "git"
+                            git clone https://github.com/syl20bnr/spacemacs /home/${username}/.emacs.d
+                            ;;
+                        2)
+                            package_install "git"
+                            git clone --depth 1 https://github.com/seagle0128/.emacs.d.git /home/${username}/.emacs.d
+                            ;;
+                        4)
+                            package_install "git"
+                            read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
+                            read -p "Enter your github repository [ex: vim]: " GITHUB_REPO
+                            git clone https://github.com/$GITHUB_USER/$GITHUB_REPO /home/${username}/.emacs.d
+                            ;;
+                        2)
+                            echo "Nothing to do..."
+                            ;;
+                        *)
+                            invalid_option
+                            ;;
+                    esac
+                    [[ -n $OPT ]] && break
+                done
+            fi
+            #}}}
         else
-          package_install "$EDITOR"
+            package_install "$EDITOR"
         fi
-        break
+             break
       else
         invalid_option
       fi
