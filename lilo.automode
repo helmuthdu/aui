@@ -201,13 +201,14 @@
   # 7) Grsync
   # 8) Hosts Update
   # 9) Htop
-  #10) UFW
-  #11) Unified Remote
-  #12) Virtualbox
-  #13) Wine
-  #14) netdata
-  #15) nload
-  #16) vmware-workstation12
+  #10) Gotop
+  #11) UFW
+  #12) Unified Remote
+  #13) Virtualbox
+  #14) Wine
+  #15) netdata
+  #16) nload
+  #17) vmware-workstation12
   SYSTEMTOOLS_OPTIONS="11 13"
 #}}}
 #GRAPHICS {{{
@@ -330,11 +331,12 @@
     # 2) LiveStreamer
     # 3) Minitube
     # 4) MPV
-    # 5) Parole
-    # 6) Plex
-    # 7) Popcorn Time
-    # 8) VLC
-    # 9) Kodi
+    # 5) Smplayer
+    # 6) Parole
+    # 7) Plex
+    # 8) Popcorn Time
+    # 9) VLC
+    #10) Kodi
     VIDEO_PLAYER_OPTIONS="8"
   #}}}
   #EDITORS|TOOLS {{{
