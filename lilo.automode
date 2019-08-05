@@ -378,6 +378,7 @@
   # 8) ttf-ms-fonts
   # 9) wqy-microhei
   #10) noto-fonts-cjk
+  #11) nerd-fonts-complete
   FONTS_OPTIONS="1-9"
 #}}}
 #IME INPUT TOOLS  {{{
