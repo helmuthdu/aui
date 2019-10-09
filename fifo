@@ -469,10 +469,14 @@ select_linux_version() {
        if [ "linux (default)" == "$VERSION" ];then
           pacstrap ${MOUNTPOINT} base linux-headers
        elif [ "linux-lts (long term support)" == "$VERSION" ];then
-          pacman -Sg base | cut -d ' ' -f 2 | sed s/\^linux\$/linux-lts/g | pacstrap ${MOUNTPOINT} - linux-lts-headers
+          pacstrap ${MOUNTPOINT} base linux-lts linux-lts-headers
        elif [ "linux-hardened (security features)" == "$VERSION" ];then
-          pacman -Sg base | cut -d ' ' -f 2 | sed s/\^linux\$/linux-hardened/g | pacstrap ${MOUNTPOINT} - linux-hardened-headers
+          pacstrap ${MOUNTPOINT} base linux-hardened linux-hardened-headers
       fi
+      pacstrap ${MOUNTPOINT} \
+        cryptsetup device-mapper dhcpcd diffutils e2fsprogs inetutils jfsutils \
+        less linux-firmware logrotate lvm2 man-db man-pages mdadm nano netctl \
+        perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprogs
       break
     else
       invalid_option
