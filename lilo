@@ -895,7 +895,7 @@ install_desktop_environment(){
       print_title "GNOME ICONS"
       echo " 1) $(menu_item "arc-icon-theme")"
       echo " 2) $(menu_item "numix-icon-theme-git") $AUR"
-      echo " 3) $(menu_item "papirus-icon-theme-git")"
+      echo " 3) $(menu_item "papirus-icon-theme-git") $AUR"
       echo ""
       echo " b) BACK"
       echo ""
