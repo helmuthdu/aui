@@ -1019,7 +1019,7 @@ install_desktop_environment(){
     while true
     do
       print_title "$1 THEMES"
-      echo " 1) $(menu_item "numix-circle-icon-theme-git" "Icons Themes") $AUR"
+      echo " 1) $(menu_item "arc-icon-theme" "Icons Themes")"
       echo " 2) $(menu_item "arc-gtk-theme" "GTK Themes")"
       echo ""
       echo " d) DONE"
