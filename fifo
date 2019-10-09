@@ -467,7 +467,7 @@ select_linux_version() {
   select VERSION in "${version_list[@]}"; do
     if contains_element "$VERSION" "${version_list[@]}"; then
        if [ "linux (default)" == "$VERSION" ];then
-          pacstrap ${MOUNTPOINT} base linux-headers
+          pacstrap ${MOUNTPOINT} base linux linux-headers
        elif [ "linux-lts (long term support)" == "$VERSION" ];then
           pacstrap ${MOUNTPOINT} base linux-lts linux-lts-headers
        elif [ "linux-hardened (security features)" == "$VERSION" ];then
