@@ -474,8 +474,8 @@ select_linux_version() {
           pacstrap ${MOUNTPOINT} base linux-hardened linux-hardened-headers
       fi
       pacstrap ${MOUNTPOINT} \
-        cryptsetup device-mapper dhcpcd diffutils e2fsprogs inetutils jfsutils \
-        less linux-firmware logrotate lvm2 man-db man-pages mdadm nano netctl \
+        cryptsetup lvm2 netctl dhcpcd inetutils jfsutils diffutils e2fsprogs \
+        less linux-firmware logrotate man-db man-pages mdadm nano \
         perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprogs
       break
     else
