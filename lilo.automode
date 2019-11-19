@@ -119,9 +119,10 @@
   # 2) GTK2|GTK3 Themes
   THEMES_OPTIONS="1 2"
   #ICONS THEMES {{{
-    # 1) Numix
-    # 2) Papirus
-    ICONS_THEMES="2"
+    # 1) Arc
+    # 2) Numix
+    # 3) Papirus
+    ICONS_THEMES="3"
   #}}}
   #GTK THEMES {{{
     # 1) Arc
