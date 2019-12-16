@@ -2411,7 +2411,7 @@ install_audio_apps(){
                   package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako"
                   ;;
                 9)
-                  aur_package_install "spotify"
+                  aur_package_install "spotify ffmpeg-compat ffmpeg-compat-57"
                   ;;
                 10)
                   aur_package_install "timidity++ fluidr3"
