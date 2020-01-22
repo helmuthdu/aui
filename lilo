@@ -1450,6 +1450,7 @@ install_nm_wicd(){
       print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
       print_info "NetworkManager is a program for providing detection and configuration for systems to automatically connect to network. NetworkManager's functionality can be useful for both wireless and wired networks."
       package_install "networkmanager dnsmasq networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc"
+      aur_package_install "openvpn-update-resolv-conf-git"
       if [[ ${KDE} -eq 1 ]]; then
         package_install "plasma-nm"
       elif [[ ${GNOME} -eq 0 ]]; then
