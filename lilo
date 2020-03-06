@@ -1812,7 +1812,7 @@ install_system_apps(){
     echo " 8) $(menu_item "hosts-update") $AUR"
     echo " 9) $(menu_item "htop")"
     echo "10) $(menu_item "gotop") $AUR"
-    echo "11) $(menu_item "ufw")
+    echo "11) $(menu_item "ufw")"
     echo "12) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
     echo "13) $(menu_item "virtualbox")"
     echo "14) $(menu_item "wine")"
@@ -2013,7 +2013,7 @@ install_internet_apps(){
             echo " 5) $(menu_item "opera")"
             echo " 6) $(menu_item "vivaldi") $AUR"
             echo " 7) $(menu_item "tor browser") $AUR"
-	    echo " 8) $(menu_item "brave browser") $AUR"
+	          echo " 8) $(menu_item "brave browser") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2046,8 +2046,9 @@ install_internet_apps(){
                 7)
                   aur_package_install "tor-browser"
                   ;;
-		8)
-		  aur_package_install "brave-browser"
+                8)
+                  aur_package_install "brave-browser"
+                  ;;
                 "b")
                   break
                   ;;
@@ -2080,8 +2081,8 @@ install_internet_apps(){
             echo "12) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
             echo "13) $(menu_item "uget")"
             echo "14) $(menu_item "youtube-dl")"
-	    echo "15) $(menu_item "megasync")"
-	    echo "16) $(menu_item "extreme download manager") $AUR"
+            echo "15) $(menu_item "megasync")"
+            echo "16) $(menu_item "extreme download manager") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2139,12 +2140,12 @@ install_internet_apps(){
                 14)
                   package_install "youtube-dl"
                   ;;
-		15)
-		  aur_package_install "megasync"
-		  ;;
-		 16)
-		  aur_package_install "xdman"
-		  ;;
+                15)
+                  aur_package_install "megasync"
+                  ;;
+                16)
+                  aur_package_install "xdman"
+                  ;;
                 "b")
                   break
                   ;;
