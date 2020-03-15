@@ -261,10 +261,44 @@ select_user(){
             ln -s ~/.vimrc ~/.config/nvim/init.vim
           fi
           #}}}
+        elif [[ $EDITOR == emacs ]]; then
+            package_install "emacs"
+            #.emacs.d{{{
+            if [[ ! -d /home/${username}/.emacs.d && ! -f /home/${username}/.emacs ]]; then
+                emacsd_list=("Spacemacs" "Centaur Emacs" "Vanilla .emacs.d" "Get personal .emacs.d from github");
+                PS3="$prompt1"
+                echo -e "Choose your .emacs.d\n"
+                select OPT in "${emacsd_list[@]}"; do
+                    case "$REPLY" in
+                        1)
+                            package_install "git"
+                            git clone https://github.com/syl20bnr/spacemacs /home/${username}/.emacs.d
+                            ;;
+                        2)
+                            package_install "git"
+                            git clone --depth 1 https://github.com/seagle0128/.emacs.d.git /home/${username}/.emacs.d
+                            ;;
+                        4)
+                            package_install "git"
+                            read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
+                            read -p "Enter your github repository [ex: vim]: " GITHUB_REPO
+                            git clone https://github.com/$GITHUB_USER/$GITHUB_REPO /home/${username}/.emacs.d
+                            ;;
+                        2)
+                            echo "Nothing to do..."
+                            ;;
+                        *)
+                            invalid_option
+                            ;;
+                    esac
+                    [[ -n $OPT ]] && break
+                done
+            fi
+            #}}}
         else
-          package_install "$EDITOR"
+            package_install "$EDITOR"
         fi
-        break
+             break
       else
         invalid_option
       fi
@@ -366,7 +400,9 @@ choose_aurhelper(){
       3)
         if ! is_package_installed "aurman" ; then
           package_install "base-devel git expac python pyalpm python-requests python-feedparser python-regex python-dateutil"
-          aui_download_packages "aurman"
+	  git clone https://github.com/polygamma/aurman.git
+	  python3 aurman/setup.py install
+	  rm -rf aurman
           if ! is_package_installed "aurman" ; then
             echo "aurman not installed. EXIT now"
             pause_function
@@ -857,8 +893,9 @@ install_desktop_environment(){
     while true
     do
       print_title "GNOME ICONS"
-      echo " 1) $(menu_item "numix-icon-theme-git") $AUR"
-      echo " 2) $(menu_item "papirus-icon-theme-git")"
+      echo " 1) $(menu_item "arc-icon-theme")"
+      echo " 2) $(menu_item "numix-icon-theme-git") $AUR"
+      echo " 3) $(menu_item "papirus-icon-theme-git") $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -867,9 +904,12 @@ install_desktop_environment(){
       for OPT in ${OPTIONS[@]}; do
         case "$OPT" in
           1)
-            aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
+            package_install "arc-icon-theme elementary-icon-theme"
             ;;
           2)
+            aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
+            ;;
+          3)
             aur_package_install "papirus-icon-theme-git"
             ;;
           "b")
@@ -979,7 +1019,7 @@ install_desktop_environment(){
     while true
     do
       print_title "$1 THEMES"
-      echo " 1) $(menu_item "numix-circle-icon-theme-git" "Icons Themes") $AUR"
+      echo " 1) $(menu_item "arc-icon-theme" "Icons Themes")"
       echo " 2) $(menu_item "arc-gtk-theme" "GTK Themes")"
       echo ""
       echo " d) DONE"
@@ -1168,7 +1208,7 @@ install_desktop_environment(){
       print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
       print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
       package_install "plasma kf5 sddm"
-      package_install "ark dolphin dolphin-plugins kio-extras kdeconnect quota-tools gwenview kipi-plugins kate kcalc konsole spectacle okular sweeper kwalletmanager"
+      package_install "ark dolphin dolphin-plugins kio-extras kdeconnect quota-tools gwenview kipi-plugins kate kcalc konsole spectacle okular sweeper kwalletmanager packagekit-qt5"
       is_package_installed "cups" && package_install "print-manager"
       [[ $LOCALE != en_US ]] && package_install "kde-l10n-$LOCALE_KDE"
       # config xinitrc
@@ -1772,7 +1812,7 @@ install_system_apps(){
     echo " 8) $(menu_item "hosts-update") $AUR"
     echo " 9) $(menu_item "htop")"
     echo "10) $(menu_item "gotop") $AUR"
-    echo "11) $(menu_item "ufw") $AUR"
+    echo "11) $(menu_item "ufw")"
     echo "12) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
     echo "13) $(menu_item "virtualbox")"
     echo "14) $(menu_item "wine")"
@@ -1831,7 +1871,7 @@ install_system_apps(){
           print_title "UFW - https://wiki.archlinux.org/index.php/Ufw"
           print_info "Ufw stands for Uncomplicated Firewall, and is a program for managing a netfilter firewall. It provides a command line interface and aims to be uncomplicated and easy to use."
           is_package_installed "firewalld" && package_remove "firewalld"
-          aur_package_install "ufw gufw"
+          package_install "ufw gufw"
           system_ctl enable ufw.service
           ;;
         12)
@@ -1973,6 +2013,7 @@ install_internet_apps(){
             echo " 5) $(menu_item "opera")"
             echo " 6) $(menu_item "vivaldi") $AUR"
             echo " 7) $(menu_item "tor browser") $AUR"
+	          echo " 8) $(menu_item "brave browser") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2004,6 +2045,9 @@ install_internet_apps(){
                   ;;
                 7)
                   aur_package_install "tor-browser"
+                  ;;
+                8)
+                  aur_package_install "brave-browser"
                   ;;
                 "b")
                   break
@@ -2037,8 +2081,8 @@ install_internet_apps(){
             echo "12) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
             echo "13) $(menu_item "uget")"
             echo "14) $(menu_item "youtube-dl")"
-	    echo "15) $(menu_item "megasync")"
-	    echo "16) $(menu_item "extreme download manager") $AUR"
+            echo "15) $(menu_item "megasync")"
+            echo "16) $(menu_item "extreme download manager") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2096,12 +2140,12 @@ install_internet_apps(){
                 14)
                   package_install "youtube-dl"
                   ;;
-		15)
-		  aur_package_install "megasync"
-		  ;;
-		 16)
-		  aur_package_install "xdman"
-		  ;;
+                15)
+                  aur_package_install "megasync"
+                  ;;
+                16)
+                  aur_package_install "xdman"
+                  ;;
                 "b")
                   break
                   ;;
@@ -2371,7 +2415,7 @@ install_audio_apps(){
                   package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako"
                   ;;
                 9)
-                  aur_package_install "spotify"
+                  aur_package_install "spotify ffmpeg-compat ffmpeg-compat-57"
                   ;;
                 10)
                   aur_package_install "timidity++ fluidr3"
@@ -2826,6 +2870,7 @@ install_fonts(){
     echo " 8) $(menu_item "ttf-ms-fonts") $AUR"
     echo " 9) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support)"
     echo "10) $(menu_item "noto-fonts-cjk") (Chinese/Japanese/Korean Support)"
+    echo "11) $(menu_item "nerd-fonts-complete") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2866,6 +2911,9 @@ install_fonts(){
           ;;
         10)
           package_install "noto-fonts-cjk"
+          ;;
+        11)
+          package_install "nerd-fonts-complete"
           ;;
         "b")
           break
