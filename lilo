@@ -2207,7 +2207,7 @@ install_internet_apps(){
             echo " 7) $(menu_item "viber") $AUR"
             echo " 8) $(menu_item "telegram-desktop")"
             echo " 9) $(menu_item "qtox")"
-            echo " 10) $(menu_item "discord") $AUR"
+            echo " 10) $(menu_item "discord")"
             echo " 11) $(menu_item "slack") $AUR"
             echo " 12) $(menu_item "vk-messenger") $AUR"
             echo " 13) $(menu_item "zoom") $AUR"
@@ -2250,7 +2250,7 @@ install_internet_apps(){
                   package_install "qtox"
                   ;;
                 10)
-                  aur_package_install "discord"
+                  package_install "discord"
                   ;;
                 11)
                   aur_package_install "slack-desktop"
