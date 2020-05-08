@@ -1337,7 +1337,7 @@ install_desktop_environment(){
         echo " 1) $(menu_item "choqok")"
         echo " 2) $(menu_item "digikam")"
         echo " 3) $(menu_item "k3b")"
-        echo " 4) $(menu_item "kvantum")"
+        echo " 4) $(menu_item "kvantum") $AUR"
         echo " 5) $(menu_item "latte-dock")"
         echo " 6) $(menu_item "skrooge")"
         echo " 7) $(menu_item "yakuake")"
@@ -1501,12 +1501,88 @@ install_desktop_environment(){
       print_title "i3 - https://wiki.archlinux.org/index.php/I3"
       print_info "i3-gaps is a fork of i3wm, a tiling window manager for X11 with more features, such as gaps between windows."
       package_install "i3-gaps"
-      package_install "dmenu"
+      install_misc_apps "i3"
+      install_themes "i3"
       # config xinitrc
       config_xinitrc "i3"
       pause_function
-      install_misc_apps "i3"
-      install_themes "i3"
+      #i3-GAPS CUSTOMIZATION {{{
+      while true
+      do
+        print_title "i3-GAPS CUSTOMIZATION"
+        echo " 1) $(menu_item "arandr")"
+        echo " 2) $(menu_item "bashtop")"
+        echo " 3) $(menu_item "cava") $AUR"
+        echo " 4) $(menu_item "cmus")"
+        echo " 5) $(menu_item "dmenu")"
+        echo " 6) $(menu_item "dunst")"
+        echo " 7) $(menu_item "excalibar") $AUR"
+        echo " 8) $(menu_item "feh")"
+        echo " 9) $(menu_item "picom")"
+        echo " 10) $(menu_item "polybar") $AUR"
+        echo " 11) $(menu_item "qutebrowser")"
+        echo " 12) $(menu_item "ranger")"
+        echo " 13) $(menu_item "rofi")"
+        echo " 14) $(menu_item "rxvt-unicode")"
+        echo ""
+        echo " d) DONE"
+        echo ""
+        GAPS_OPTIONS+=" d"
+        read_input_options "$GAPS_OPTIONS"
+        for OPT in ${OPTIONS[@]}; do
+          case "$OPT" in
+            1)
+              package_install "arandr"
+              ;;
+            2)
+              package_install "bashtop"
+              ;;
+            3) 
+              aur_package_install "cava"
+              ;;
+            4) 
+              package_install "cmus"
+              ;;
+            5)
+              package_install "dmenu"
+              ;;
+            6)
+              package_install "dunst"
+              ;;
+            7)
+              aur_package_install "excalibar-git"
+              ;;
+            8)
+              package_install "feh"
+              ;;
+            9)
+              package_install "picom"
+              ;;
+            10)
+              aur_package_install "polybar"
+              ;;
+            11)
+              package_install "qutebrowser"
+              ;;
+            12)
+              package_install "ranger"
+              ;;
+            13)
+              package_install "rofi"
+              ;;
+            14)
+              package_install "rxvt-unicode"
+              ;;
+            "d")
+              break
+              ;;
+            *)
+              invalid_option
+              ;;
+          esac
+        done
+        source sharedfuncs_elihw
+      done
       ;;
       #}}}
     14)
