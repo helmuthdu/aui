@@ -618,6 +618,21 @@ install_zsh(){
   fi
 }
 #}}}
+#FISH {{{
+install_fish(){
+  print_title "fish - https://wiki.archlinux.org/index.php/fish"
+  print_info "fish is a friendly interactive shell and a commandline shell intended to be interactive and user-friendly. "
+  read_input_text "Install fish" $FISH
+  if [[ $OPTION == y ]]; then
+    package_install "fish"
+    read_input_text "Install oh-my-fish" $OH_MY_FISH
+    if [[ $OPTION == y ]]; then
+      run_as_user curl -L https://get.oh-my.fish | fish
+    fi
+    pause_function
+  fi
+}
+#}}}
 #SAMBA {{{
 install_samba(){
   print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
