@@ -370,7 +370,7 @@ choose_aurhelper(){
   print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
   print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
   print_warning "\tNone of these tools are officially supported by Arch devs."
-  aurhelper=("trizen" "yay" "aurman")
+  aurhelper=("trizen" "yay" "aurman" "aura" "pikaur")
   PS3="$prompt1"
   echo -e "Choose your default AUR helper to install\n"
   select OPT in "${aurhelper[@]}"; do
@@ -413,6 +413,37 @@ choose_aurhelper(){
           fi
         fi
         AUR_PKG_MANAGER="aurman"
+        ;;
+      4)
+        if ! is_package_installed "aura" ; then
+          package_install "base-devel git stack"
+          git clone https://github.com/fosskers/aura.git
+          stack install -- aura/aura
+          rm -rf aura
+          if ! is_package_installed "aura" ; then
+            echo "aura not installed. EXIT now"
+            pause_function
+            exit 0
+          fi
+        fi
+        AUR_PKG_MANAGER="aura"
+        ;;
+      5)
+        if ! is_package_installed "pikaur" ; then
+          package_install "base-devel git"
+          git clone https://aur.archlinux.org/pikaur.git
+          (
+            cd pikaur || exit
+            makepkg -fsri
+          )
+          rm -rf pikaur
+          if ! is_package_installed "pikaur" ; then
+            echo "pikaur not installed. EXIT now"
+            pause_function
+            exit 0
+          fi
+        fi
+        AUR_PKG_MANAGER="pikaur"
         ;;
       *)
         invalid_option
