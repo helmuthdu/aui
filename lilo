@@ -2922,6 +2922,7 @@ install_games(){
     echo " 2) PlayOnLinux $AUR"
     echo " 3) Steam"
     echo " 4) Minecraft"
+    echo " 5) OSU!-Lazer $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2944,6 +2945,10 @@ install_games(){
         4)
           aur_package_install "minecraft"
           OPT=4
+          ;;
+        5)
+          aur_package_install "osu-lazer"
+          OPT=5
           ;;
         "b")
           break
