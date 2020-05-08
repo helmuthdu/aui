@@ -2430,6 +2430,7 @@ install_internet_apps(){
             echo " 1) $(menu_item "hexchat konversation" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
             echo " 2) $(menu_item "irssi")"
             echo " 3) $(menu_item "pidgin")"
+            echo " 4) $(menu_item "riot")"
             echo " 4) $(menu_item "skypeforlinux-stable-bin" "Skype Stable") $AUR"
             echo " 5) $(menu_item "skypeforlinux-preview-bin" "Skype Preview") $AUR"
             echo " 6) $(menu_item "teamspeak3")"
@@ -2461,33 +2462,36 @@ install_internet_apps(){
                   package_install "pidgin"
                   ;;
                 4)
-                  aur_package_install "skypeforlinux-stable-bin"
+                  package_install "riot-desktop"
                   ;;
                 5)
-                  aur_package_install "skypeforlinux-preview-bin"
+                  aur_package_install "skypeforlinux-stable-bin"
                   ;;
                 6)
-                  package_install "teamspeak3"
+                  aur_package_install "skypeforlinux-preview-bin"
                   ;;
                 7)
-                  aur_package_install "viber"
+                  package_install "teamspeak3"
                   ;;
                 8)
-                  package_install "telegram-desktop"
+                  aur_package_install "viber"
                   ;;
                 9)
-                  package_install "qtox"
+                  package_install "telegram-desktop"
                   ;;
                 10)
-                  package_install "discord"
+                  package_install "qtox"
                   ;;
                 11)
-                  aur_package_install "slack-desktop"
+                  package_install "discord"
                   ;;
                 12)
-                  aur_package_install "vk-messanger"
+                  aur_package_install "slack-desktop"
                   ;;
                 13)
+                  aur_package_install "vk-messanger"
+                  ;;
+                14)
                   aur_package_install "zoom"
                   ;;
                 "b")
