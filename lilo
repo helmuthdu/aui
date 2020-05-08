@@ -2549,6 +2549,7 @@ install_internet_apps(){
           while true
           do
             print_title "DESKTOP SHARE"
+            echo " 1) $(menu_item "anydesk") $AUR"
             echo " 1) $(menu_item "remmina")"
             echo " 2) $(menu_item "teamviewer") $AUR"
             echo ""
@@ -2559,9 +2560,12 @@ install_internet_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
-                  package_install "remmina"
+                  aur_package_install "anydesk"
                   ;;
                 2)
+                  package_install "remmina"
+                  ;;
+                3)
                   aur_package_install "teamviewer"
                   ;;
                 "b")
