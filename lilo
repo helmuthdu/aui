@@ -1809,26 +1809,27 @@ install_development_apps(){
     echo " 2) $(menu_item "emacs")"
     echo " 3) $(menu_item "gvim")"
     echo " 4) $(menu_item "meld")"
-    echo " 5) $(menu_item "sublime-text2" "Sublime Text 2") $AUR"
-    echo " 6) $(menu_item "sublime-text-dev" "Sublime Text 3") $AUR"
-    echo " 7) $(menu_item "android-studio" "Android Studio") $AUR"
-    echo " 8) $(menu_item "jetbrains-toolbox" "Jetbrains Toolbox") $AUR"
-    echo " 9) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA Community Edition")"
-    echo "10) $(menu_item "intellij-idea-ultimate-edition" "IntelliJ IDEA Ultimate Edition") $AUR"
-    echo "11) $(menu_item "monodevelop")"
-    echo "12) $(menu_item "qtcreator")"
-    echo "13) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
-    echo "14) $(menu_item "jdk8-openjdk" "OpenJDK 8")"
-    echo "15) $(menu_item "jdk9-openjdk" "OpenJDK 9")"
-    echo "16) $(menu_item "jdk10-openjdk" "OpenJDK 10")"
-    echo "17) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "18) $(menu_item "nodejs")"
-    echo "19) $(menu_item "visual-studio-code-bin" "Visual Studio Code") $AUR"
-    echo "20) $(menu_item "gitg")"
-    echo "21) $(menu_item "kdiff3")"
-    echo "22) $(menu_item "regexxer")"
-    echo "23) $(menu_item "postman-bin" "Postman") $AUR"
-    echo "24) $(menu_item "gitkraken" "Gitkraken") $AUR"
+    echo " 5) $(menu_item "sublime-merge") $AUR"
+    echo " 6) $(menu_item "sublime-text2" "Sublime Text 2") $AUR"
+    echo " 7) $(menu_item "sublime-text-dev" "Sublime Text 3") $AUR"
+    echo " 8) $(menu_item "android-studio" "Android Studio") $AUR"
+    echo " 9) $(menu_item "jetbrains-toolbox" "Jetbrains Toolbox") $AUR"
+    echo " 10) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA Community Edition")"
+    echo "11) $(menu_item "intellij-idea-ultimate-edition" "IntelliJ IDEA Ultimate Edition") $AUR"
+    echo "12) $(menu_item "monodevelop")"
+    echo "13) $(menu_item "qtcreator")"
+    echo "14) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
+    echo "15) $(menu_item "jdk8-openjdk" "OpenJDK 8")"
+    echo "16) $(menu_item "jdk9-openjdk" "OpenJDK 9")"
+    echo "17) $(menu_item "jdk10-openjdk" "OpenJDK 10")"
+    echo "18) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "19) $(menu_item "nodejs")"
+    echo "20) $(menu_item "visual-studio-code-bin" "Visual Studio Code") $AUR"
+    echo "21) $(menu_item "gitg")"
+    echo "22) $(menu_item "kdiff3")"
+    echo "23) $(menu_item "regexxer")"
+    echo "24) $(menu_item "postman-bin" "Postman") $AUR"
+    echo "25) $(menu_item "gitkraken" "Gitkraken") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1850,12 +1851,15 @@ install_development_apps(){
           package_install "meld"
           ;;
         5)
-          aur_package_install "sublime-text2"
+          aur_package_install "sublime-merge"
           ;;
         6)
-          aur_package_install "sublime-text-dev"
+          aur_package_install "sublime-text2"
           ;;
         7)
+          aur_package_install "sublime-text-dev"
+          ;;
+        8)
           aur_package_install "android-sdk android-sdk-platform-tools android-sdk-build-tools android-platform"
           add_user_to_group ${username} sdkusers
           chown -R :sdkusers /opt/android-sdk/
@@ -1863,61 +1867,61 @@ install_development_apps(){
           add_line "export ANDROID_HOME=/opt/android-sdk" "/home/${username}/.bashrc"
           aur_package_install "android-studio"
           ;;
-        8)
+        9)
           aur_package_install "jetbrains-toolbox"
           ;;
-        9)
+        10)
           package_install "intellij-idea-community-edition"
           ;;
-        10)
+        11)
           aur_package_install "intellij-idea-ultimate-edition"
           ;;
-        11)
+        12)
           package_install "monodevelop monodevelop-debugger-gdb"
           ;;
-        12)
+        13)
           package_install "qtcreator"
           ;;
-        13)
-          aur_package_install "mysql-workbench"
-          ;;
         14)
-          package_remove "jdk"
-          package_install "jdk8-openjdk"
+          aur_package_install "mysql-workbench"
           ;;
         15)
           package_remove "jdk"
-          package_install "jdk9-openjdk"
+          package_install "jdk8-openjdk"
           ;;
         16)
           package_remove "jdk"
-          package_install "jdk10-openjdk"
+          package_install "jdk9-openjdk"
           ;;
         17)
+          package_remove "jdk"
+          package_install "jdk10-openjdk"
+          ;;
+        18)
           package_remove "jre{7,8,9,10}-openjdk"
           package_remove "jdk{7,8,9,10}-openjdk"
           aur_package_install "jdk"
           ;;
-        18)
+        19)
           package_install "nodejs"
           ;;
-        19)
+        20)
           aur_package_install "visual-studio-code-bin"
           ;;
-        20)
+        21)
           aur_package_install "gitg"
           aur_package_install "qgit"
           ;;
-        21)
+        22)
           aur_package_install "kdiff3"
           ;;
-        22)
+        23)
           aur_package_install "regexxer"
           ;;
-        23)
+        24)
           aur_package_install "postman-bin"
           ;;
-        24)
+        25)
           aur_package_install "gitkraken"
           ;;
         "b")
