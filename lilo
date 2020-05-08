@@ -2149,13 +2149,14 @@ install_graphics_apps(){
     echo " 2) $(menu_item "gimp")"
     echo " 3) $(menu_item "gthumb")"
     echo " 4) $(menu_item "inkscape")"
-    echo " 5) $(menu_item "mcomix")"
-    echo " 6) $(menu_item "mypaint")"
-    echo " 7) $(menu_item "pencil" "Pencil Prototyping Tool") $AUR"
-    echo " 8) $(menu_item "scribus")"
-    echo " 9) $(menu_item "shotwell")"
-    echo "10) $(menu_item "simple-scan")"
-    echo "11) $(menu_item "yacreader")"
+    echo " 5) $(menu_item "krita")"
+    echo " 6) $(menu_item "mcomix")"
+    echo " 7) $(menu_item "mypaint")"
+    echo " 8) $(menu_item "pencil" "Pencil Prototyping Tool") $AUR"
+    echo " 9) $(menu_item "scribus")"
+    echo "10) $(menu_item "shotwell")"
+    echo "11) $(menu_item "simple-scan")"
+    echo "12) $(menu_item "yacreader")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2176,24 +2177,27 @@ install_graphics_apps(){
           package_install "inkscape python2-numpy python-lxml"
           ;;
         5)
-          package_install "mcomix"
+          package_install "krita"
           ;;
         6)
-          package_install "mypaint"
+          package_install "mcomix"
           ;;
         7)
-          aur_package_install "pencil"
+          package_install "mypaint"
           ;;
         8)
-          package_install "scribus"
+          aur_package_install "pencil"
           ;;
         9)
-          package_install "shotwell"
+          package_install "scribus"
           ;;
         10)
-          package_install "simple-scan"
+          package_install "shotwell"
           ;;
         11)
+          package_install "simple-scan"
+          ;;
+        12)
           package_install "yacreader"
           ;;
         "b")
