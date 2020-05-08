@@ -1011,7 +1011,16 @@ install_desktop_environment(){
     while true
     do
       print_title "GTK2/GTK3 THEMES"
-      echo " 1) $(menu_item "arc-gtk-theme" "Arc Themes")"
+      echo " 1) $(menu_item "arc-gtk-theme")"
+      echo " 2) $(menu_item "abrus-gtk-theme-git") $AUR"
+      echo " 3) $(menu_item "acid-gtk-theme") $AUR"
+      echo " 4) $(menu_item "adapta-gtk-theme-git") $AUR"
+      echo " 5) $(menu_item "amber-theme-git") $AUR"
+      echo " 6) $(menu_item "candy-gtk-theme") $AUR"
+      echo " 7) $(menu_item "evopop-gtk-theme-git") $AUR"
+      echo " 8) $(menu_item "flat-remix-gtk") $AUR"
+      echo " 9) $(menu_item "zuki-themes-git") $AUR"
+      echo " 10) $(menu_item "zukitwo-themes-git") $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -1021,6 +1030,33 @@ install_desktop_environment(){
         case "$OPT" in
           1)
             package_install "arc-gtk-theme"
+            ;;
+          2)
+            aur_package_install "abrus-gtk-theme-git"
+            ;;
+          3)
+            aur_package_install "acid-gtk-theme"
+            ;;
+          4)
+            aur_package_install "adapta-gtk-theme-git"
+            ;;
+          5)
+            aur_package_install "amber-theme-git"
+            ;;
+          6)
+            aur_package_install "candy-gtk-theme"
+            ;;
+          7)
+            aur_package_install "evopop-gtk-theme-git"
+            ;;
+          8)
+            aur_package_install "flat-remix-gtk"
+            ;;
+          9)
+            aur_package_install "zuki-themes-git"
+            ;;
+          10)
+            aur_package_install "zukitwo-themes-git"
             ;;
           "b")
             break
