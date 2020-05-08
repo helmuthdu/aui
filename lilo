@@ -2299,19 +2299,20 @@ install_internet_apps(){
             echo " 1) $(menu_item "deluge")"
             echo " 2) $(menu_item "dropbox") $AUR"
             echo " 3) $(menu_item "flareget") $AUR"
-            echo " 4) $(menu_item "google-drive-ocamlfuse", "Google Drive OCamlFuse") $AUR"
-            echo " 5) $(menu_item "jdownloader") $AUR"
-            echo " 6) $(menu_item "qbittorrent")"
-            echo " 7) $(menu_item "nitroshare") $AUR"
-            echo " 8) $(menu_item "rslsync" "Resilio Sync") $AUR"
-            echo " 9) $(menu_item "sparkleshare")"
-            echo "10) $(menu_item "spideroak-one") $AUR"
-            echo "11) $(menu_item "tixati") $AUR"
-            echo "12) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
-            echo "13) $(menu_item "uget")"
-            echo "14) $(menu_item "youtube-dl")"
-            echo "15) $(menu_item "megasync")"
-            echo "16) $(menu_item "extreme download manager") $AUR"
+            echo " 4) $(menu_item "freedownloadmanager") $AUR"
+            echo " 5) $(menu_item "google-drive-ocamlfuse", "Google Drive OCamlFuse") $AUR"
+            echo " 6) $(menu_item "jdownloader") $AUR"
+            echo " 7) $(menu_item "qbittorrent")"
+            echo " 8) $(menu_item "nitroshare") $AUR"
+            echo " 9) $(menu_item "rslsync" "Resilio Sync") $AUR"
+            echo "10) $(menu_item "sparkleshare")"
+            echo "11) $(menu_item "spideroak-one") $AUR"
+            echo "12) $(menu_item "tixati") $AUR"
+            echo "13) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+            echo "14) $(menu_item "uget")"
+            echo "15) $(menu_item "youtube-dl")"
+            echo "16) $(menu_item "megasync")"
+            echo "17) $(menu_item "extreme download manager") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2329,30 +2330,33 @@ install_internet_apps(){
                   aur_package_install "flareget"
                   ;;
                 4)
-                  aur_package_install "google-drive-ocamlfuse"
+                  aur_package_install "freedownloadmanager"
                   ;;
                 5)
-                  aur_package_install "jdownloader"
+                  aur_package_install "google-drive-ocamlfuse"
                   ;;
                 6)
-                  package_install "qbittorrent"
+                  aur_package_install "jdownloader"
                   ;;
                 7)
-                  package_install "nitroshare"
+                  package_install "qbittorrent"
                   ;;
                 8)
-                  aur_package_install "rslsync"
+                  package_install "nitroshare"
                   ;;
                 9)
-                  package_install "sparkleshare"
+                  aur_package_install "rslsync"
                   ;;
                 10)
-                  aur_package_install "spideroak"
+                  package_install "sparkleshare"
                   ;;
                 11)
-                  aur_package_install "tixati"
+                  aur_package_install "spideroak"
                   ;;
                 12)
+                  aur_package_install "tixati"
+                  ;;
+                13)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "transmission-qt"
                   else
@@ -2363,16 +2367,16 @@ install_internet_apps(){
                     replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${username}/.config/transmission/settings.json
                   fi
                   ;;
-                13)
+                14)
                   package_install "uget"
                   ;;
-                14)
+                15)
                   package_install "youtube-dl"
                   ;;
-                15)
+                16)
                   aur_package_install "megasync"
                   ;;
-                16)
+                17)
                   aur_package_install "xdman"
                   ;;
                 "b")
@@ -2437,10 +2441,10 @@ install_internet_apps(){
             echo " 7) $(menu_item "viber") $AUR"
             echo " 8) $(menu_item "telegram-desktop")"
             echo " 9) $(menu_item "qtox")"
-            echo " 10) $(menu_item "discord")"
-            echo " 11) $(menu_item "slack") $AUR"
-            echo " 12) $(menu_item "vk-messenger") $AUR"
-            echo " 13) $(menu_item "zoom") $AUR"
+            echo "10) $(menu_item "discord")"
+            echo "11) $(menu_item "slack") $AUR"
+            echo "12) $(menu_item "vk-messenger") $AUR"
+            echo "13) $(menu_item "zoom") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
