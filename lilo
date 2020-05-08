@@ -1830,6 +1830,7 @@ install_development_apps(){
     echo "23) $(menu_item "regexxer")"
     echo "24) $(menu_item "postman-bin" "Postman") $AUR"
     echo "25) $(menu_item "gitkraken" "Gitkraken") $AUR"
+    echo "26) $(menu_item "freecad" "FreeCad") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1923,6 +1924,9 @@ install_development_apps(){
           ;;
         25)
           aur_package_install "gitkraken"
+          ;;
+        26)
+          aur_package_install "freecad"
           ;;
         "b")
           break
