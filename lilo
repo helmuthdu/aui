@@ -1247,9 +1247,9 @@ install_desktop_environment(){
   echo " 1) Cinnamon        10) Awesome"
   echo " 2) Deepin          11) Fluxbox"
   echo " 3) Enlightenment   12) i3"
-  echo " 4) GNOME           13) OpenBox"
-  echo " 5) KDE             14) Xmonad"
-  echo " 6) LXQT"
+  echo " 4) GNOME           13) i3-Gaps"
+  echo " 5) KDE             14) OpenBox"
+  echo " 6) LXQT            15) Xmonad"
   echo " 7) Mate"
   echo " 8) XFCE"
   echo " 9) Budgie"
@@ -1489,6 +1489,19 @@ install_desktop_environment(){
       ;;
       #}}}
     13)
+      #I3-Gaps {{{
+      print_title "i3 - https://wiki.archlinux.org/index.php/I3"
+      print_info "i3-gaps is a fork of i3wm, a tiling window manager for X11 with more features, such as gaps between windows."
+      package_install "i3-gaps"
+      package_install "dmenu"
+      # config xinitrc
+      config_xinitrc "i3"
+      pause_function
+      install_misc_apps "i3"
+      install_themes "i3"
+      ;;
+      #}}}
+    14)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -1505,7 +1518,7 @@ install_desktop_environment(){
       install_themes "OPENBOX"
       ;;
       #}}}
-    14)
+    15)
       #XMONAD {{{
       print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
       print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
