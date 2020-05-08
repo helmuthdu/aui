@@ -418,7 +418,10 @@ choose_aurhelper(){
         if ! is_package_installed "aura" ; then
           package_install "base-devel git stack"
           git clone https://github.com/fosskers/aura.git
-          stack install -- aura/aura
+          (
+            cd aura || exit
+            stack install -- aura
+          )
           rm -rf aura
           if ! is_package_installed "aura" ; then
             echo "aura not installed. EXIT now"
