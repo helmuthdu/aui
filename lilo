@@ -948,6 +948,14 @@ install_desktop_environment(){
       echo " 1) $(menu_item "arc-icon-theme")"
       echo " 2) $(menu_item "numix-icon-theme-git") $AUR"
       echo " 3) $(menu_item "papirus-icon-theme-git") $AUR"
+      echo " 4) $(menu_item "yaru-icon-theme-git") $AUR"
+      echo " 5) $(menu_item "solus-icon-theme-git") $AUR"
+      echo " 6) $(menu_item "pop-icon-theme-git") $AUR"
+      echo " 7) $(menu_item "paper-icon-theme-git") $AUR"
+      echo " 8) $(menu_item "numix-icon-theme-git") $AUR"
+      echo " 9) $(menu_item "la-capitaine-icon-theme-git") $AUR"
+      echo " 10) $(menu_item "emerald-icon-theme-git") $AUR"
+      echo " 11) $(menu_item "adwaita-icon-theme-git") $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -963,6 +971,30 @@ install_desktop_environment(){
             ;;
           3)
             aur_package_install "papirus-icon-theme-git"
+            ;;
+          4)
+            aur_package_install "yaru-icon-theme-git"
+            ;;
+          5)
+            aur_package_install "solus-icon-theme-git"
+            ;;
+          6)
+            aur_package_install "pop-icon-theme-git"
+            ;;
+          7)
+            aur_package_install "paper-icon-theme-git"
+            ;;
+          8)
+            aur_package_install "numix-icon-theme-git"
+            ;;
+          9)
+            aur_package_install "la-capitaine-icon-theme-git"
+            ;;
+          10)
+            aur_package_install "emerald-icon-theme-git"
+            ;;
+          11)
+            aur_package_install "adwaita-icon-theme-git"
             ;;
           "b")
             break
