@@ -954,7 +954,7 @@ install_desktop_environment(){
       echo " 7) $(menu_item "papirus-icon-theme-git") $AUR"
       echo " 8) $(menu_item "pop-icon-theme-git") $AUR"
       echo " 9) $(menu_item "solus-icon-theme-git") $AUR"
-      echo " 10) $(menu_item "yaru-icon-theme-git") $AUR"
+      echo "10) $(menu_item "yaru-icon-theme-git") $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -1016,7 +1016,7 @@ install_desktop_environment(){
       echo " 7) $(menu_item "evopop-gtk-theme-git") $AUR"
       echo " 8) $(menu_item "flat-remix-gtk") $AUR"
       echo " 9) $(menu_item "zuki-themes-git") $AUR"
-      echo " 10) $(menu_item "zukitwo-themes-git") $AUR"
+      echo "10) $(menu_item "zukitwo-themes-git") $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -1519,11 +1519,11 @@ install_desktop_environment(){
         echo " 7) $(menu_item "excalibar") $AUR"
         echo " 8) $(menu_item "feh")"
         echo " 9) $(menu_item "picom")"
-        echo " 10) $(menu_item "polybar") $AUR"
-        echo " 11) $(menu_item "qutebrowser")"
-        echo " 12) $(menu_item "ranger")"
-        echo " 13) $(menu_item "rofi")"
-        echo " 14) $(menu_item "rxvt-unicode")"
+        echo "10) $(menu_item "polybar") $AUR"
+        echo "11) $(menu_item "qutebrowser")"
+        echo "12) $(menu_item "ranger")"
+        echo "13) $(menu_item "rofi")"
+        echo "14) $(menu_item "rxvt-unicode")"
         echo ""
         echo " d) DONE"
         echo ""
@@ -1740,7 +1740,7 @@ install_accessories_apps(){
     echo " 7) $(menu_item "pamac-aur" "Pamac") $AUR"
     echo " 8) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots" || echo "Shutter";)")"
     echo " 9) $(menu_item "synapse")"
-    echo " 10) $(menu_item "terminator")"
+    echo "10) $(menu_item "terminator")"
     echo "11) $(menu_item "tilix-bin") $AUR"
     echo ""
     echo " b) BACK"
@@ -2032,14 +2032,15 @@ install_system_apps(){
     echo " 7) $(menu_item "grsync")"
     echo " 8) $(menu_item "hosts-update") $AUR"
     echo " 9) $(menu_item "htop")"
-    echo "10) $(menu_item "gotop") $AUR"
-    echo "11) $(menu_item "ufw")"
-    echo "12) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
-    echo "13) $(menu_item "virtualbox")"
-    echo "14) $(menu_item "wine")"
-    echo "15) $(menu_item "netdata")"
-    echo "16) $(menu_item "nload")"
-    echo "17) $(menu_item "vmware-workstation12" "VMware Workstation 12") $AUR"
+    echo "10) $(menu_item "stacer") $AUR"
+    echo "11) $(menu_item "gotop") $AUR"
+    echo "12) $(menu_item "ufw")"
+    echo "13) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
+    echo "14) $(menu_item "virtualbox")"
+    echo "15) $(menu_item "wine")"
+    echo "16) $(menu_item "netdata")"
+    echo "17) $(menu_item "nload")"
+    echo "18) $(menu_item "vmware-workstation12" "VMware Workstation 12") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2085,21 +2086,24 @@ install_system_apps(){
         9)
           package_install "htop"
           ;;
-        10)
+        10) 
+          aur_package_install "stacer"
+          ;;
+        11)
           aur_package_install "gotop-bin"
 	  ;;
-        11)
+        12)
           print_title "UFW - https://wiki.archlinux.org/index.php/Ufw"
           print_info "Ufw stands for Uncomplicated Firewall, and is a program for managing a netfilter firewall. It provides a command line interface and aims to be uncomplicated and easy to use."
           is_package_installed "firewalld" && package_remove "firewalld"
           package_install "ufw gufw"
           system_ctl enable ufw.service
           ;;
-        12)
+        13)
           aur_package_install "unified-remote-server"
           system_ctl enable urserver.service
           ;;
-        13)
+        14)
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
@@ -2111,17 +2115,17 @@ install_system_apps(){
             cecho "${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
           ;;
-        14)
+        15)
           package_install "icoutils wine wine_gecko wine-mono winetricks"
           ;;
-        15)
+        16)
           package_install "netdata"
           system_ctl enable netdata.service
           ;;
-        16)
+        17)
           package_install "nload"
           ;;
-        17)
+        18)
           aur_package_install "vmware-workstation12"
           ;;
         "b")
