@@ -1337,8 +1337,10 @@ install_desktop_environment(){
         echo " 1) $(menu_item "choqok")"
         echo " 2) $(menu_item "digikam")"
         echo " 3) $(menu_item "k3b")"
-        echo " 4) $(menu_item "skrooge")"
-        echo " 5) $(menu_item "yakuake")"
+        echo " 4) $(menu_item "kvantum")"
+        echo " 5) $(menu_item "latte-dock")"
+        echo " 6) $(menu_item "skrooge")"
+        echo " 7) $(menu_item "yakuake")"
         echo ""
         echo " d) DONE"
         echo ""
@@ -1356,9 +1358,15 @@ install_desktop_environment(){
               package_install "k3b cdrdao dvd+rw-tools"
               ;;
             4)
-              package_install "skrooge"
+              aur_package_install "kvantum-qt5-git"
               ;;
             5)
+              package_install "latte-dock"
+              ;;
+            6)
+              package_install "skrooge"
+              ;;
+            7)
               package_install "yakuake"
               ;;
             "d")
