@@ -2618,12 +2618,13 @@ install_audio_apps(){
             echo " 3) $(menu_item "clementine")"
             echo " 4) $(menu_item "deadbeef")"
             echo " 5) $(menu_item "guayadeque") $AUR"
-            echo " 6) $(menu_item "musique") $AUR"
-            echo " 7) $(menu_item "pragha")"
-            echo " 8) $(menu_item "rhythmbox")"
-            echo " 9) $(menu_item "spotify") $AUR"
-            echo "10) $(menu_item "timidity++") $AUR"
-            echo "11) $(menu_item "quodlibet")"
+            echo " 6) $(menu_item "lollypop") $AUR"
+            echo " 7) $(menu_item "musique") $AUR"
+            echo " 8) $(menu_item "pragha")"
+            echo " 9) $(menu_item "rhythmbox")"
+            echo "10) $(menu_item "spotify") $AUR"
+            echo "11) $(menu_item "timidity++") $AUR"
+            echo "12) $(menu_item "quodlibet")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2646,23 +2647,26 @@ install_audio_apps(){
                 5)
                   aur_package_install "guayadeque"
                   ;;
-                6)
-                  aur_package_install "musique"
+                6) 
+                  aur_package_install "lollypop"
                   ;;
                 7)
-                  package_install "pragha"
+                  aur_package_install "musique"
                   ;;
                 8)
-                  package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako"
+                  package_install "pragha"
                   ;;
                 9)
-                  aur_package_install "spotify ffmpeg-compat ffmpeg-compat-57"
+                  package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako"
                   ;;
                 10)
+                  aur_package_install "spotify ffmpeg-compat ffmpeg-compat-57"
+                  ;;
+                11)
                   aur_package_install "timidity++ fluidr3"
                   echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                   ;;
-                11)
+                12)
                   package_install "quodlibet"
                   ;;
                 "b")
