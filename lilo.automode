@@ -423,7 +423,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   # 2) ibus
   IME_OPTIONS=""
 #}}}
-  #EXTRA {{{
+#EXTRA {{{
   # 1) Profile Sync
   EXTRA_OPTIONS=""
 #}}}
