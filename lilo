@@ -1,22 +1,25 @@
 #!/bin/bash
-#-------------------------------------------------------------------------------
-#Created by helmuthdu mailto: helmuthdu[at]gmail[dot]com
-#Contribution: flexiondotorg
-#-------------------------------------------------------------------------------
-#This program is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, either version 3 of the License, or
-#(at your option) any later version.
-#
-#This program is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
-#
-#You should have received a copy of the GNU General Public License
-#along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
-# Run this script after your first boot with archlinux (as root)
+
+: 'ATTENTION!:
+------------------------------------------------------
+|  Created by helmuthdu mailto: helmuthdu@gmail.com  |
+|  Contribution: flexiondotorg                       |
+------------------------------------------------------
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+------------------------------------------------------------------------
+Run this script after your first boot with archlinux (as root)
+'
 
 if [[ -f `pwd`/sharedfuncs ]]; then
   source sharedfuncs
@@ -367,7 +370,7 @@ choose_aurhelper(){
   print_title "AUR HELPER - https://wiki.archlinux.org/index.php/AUR_Helpers"
   print_info "AUR Helpers are written to make using the Arch User Repository more comfortable."
   print_warning "\tNone of these tools are officially supported by Arch devs."
-  aurhelper=("trizen" "yay" "aurman")
+  aurhelper=("trizen" "yay" "aurman" "aura" "pikaur")
   PS3="$prompt1"
   echo -e "Choose your default AUR helper to install\n"
   select OPT in "${aurhelper[@]}"; do
@@ -410,6 +413,40 @@ choose_aurhelper(){
           fi
         fi
         AUR_PKG_MANAGER="aurman"
+        ;;
+      4)
+        if ! is_package_installed "aura" ; then
+          package_install "base-devel git stack"
+          git clone https://github.com/fosskers/aura.git
+          (
+            cd aura || exit
+            stack install -- aura
+          )
+          rm -rf aura
+          if ! is_package_installed "aura" ; then
+            echo "aura not installed. EXIT now"
+            pause_function
+            exit 0
+          fi
+        fi
+        AUR_PKG_MANAGER="aura"
+        ;;
+      5)
+        if ! is_package_installed "pikaur" ; then
+          package_install "base-devel git"
+          git clone https://aur.archlinux.org/pikaur.git
+          (
+            cd pikaur || exit
+            makepkg -fsri
+          )
+          rm -rf pikaur
+          if ! is_package_installed "pikaur" ; then
+            echo "pikaur not installed. EXIT now"
+            pause_function
+            exit 0
+          fi
+        fi
+        AUR_PKG_MANAGER="pikaur"
         ;;
       *)
         invalid_option
@@ -576,6 +613,21 @@ install_zsh(){
         run_as_user "sh -c \"$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)\""
         run_as_user "$EDITOR /home/${username}/.zshrc"
       fi
+    fi
+    pause_function
+  fi
+}
+#}}}
+#FISH {{{
+install_fish(){
+  print_title "fish - https://wiki.archlinux.org/index.php/fish"
+  print_info "fish is a friendly interactive shell and a commandline shell intended to be interactive and user-friendly. "
+  read_input_text "Install fish" $FISH
+  if [[ $OPTION == y ]]; then
+    package_install "fish"
+    read_input_text "Install oh-my-fish" $OH_MY_FISH
+    if [[ $OPTION == y ]]; then
+      run_as_user curl -L https://get.oh-my.fish | fish
     fi
     pause_function
   fi
@@ -894,8 +946,15 @@ install_desktop_environment(){
     do
       print_title "GNOME ICONS"
       echo " 1) $(menu_item "arc-icon-theme")"
-      echo " 2) $(menu_item "numix-icon-theme-git") $AUR"
-      echo " 3) $(menu_item "papirus-icon-theme-git") $AUR"
+      echo " 2) $(menu_item "adwaita-icon-theme-git") $AUR"
+      echo " 3) $(menu_item "emerald-icon-theme-git") $AUR"
+      echo " 4) $(menu_item "la-capitaine-icon-theme-git") $AUR"
+      echo " 5) $(menu_item "numix-icon-theme-git") $AUR"
+      echo " 6) $(menu_item "paper-icon-theme-git") $AUR"
+      echo " 7) $(menu_item "papirus-icon-theme-git") $AUR"
+      echo " 8) $(menu_item "pop-icon-theme-git") $AUR"
+      echo " 9) $(menu_item "solus-icon-theme-git") $AUR"
+      echo "10) $(menu_item "yaru-icon-theme-git") $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -907,10 +966,31 @@ install_desktop_environment(){
             package_install "arc-icon-theme elementary-icon-theme"
             ;;
           2)
-            aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
+            aur_package_install "adwaita-icon-theme-git"
             ;;
           3)
+            aur_package_install "emerald-icon-theme-git"
+            ;;
+          4)
+            aur_package_install "la-capitaine-icon-theme-git"
+            ;;
+          5)
+            aur_package_install "numix-icon-theme-git numix-circle-icon-theme-git"
+            ;;
+          6)
+            aur_package_install "paper-icon-theme-git"
+            ;;
+          7)
             aur_package_install "papirus-icon-theme-git"
+            ;;
+          8)
+            aur_package_install "pop-icon-theme-git"
+            ;;
+          9)
+            aur_package_install "solus-icon-theme-git"
+            ;;
+          10)
+            aur_package_install "yaru-icon-theme-git"
             ;;
           "b")
             break
@@ -927,7 +1007,16 @@ install_desktop_environment(){
     while true
     do
       print_title "GTK2/GTK3 THEMES"
-      echo " 1) $(menu_item "arc-gtk-theme" "Arc Themes")"
+      echo " 1) $(menu_item "arc-gtk-theme")"
+      echo " 2) $(menu_item "abrus-gtk-theme-git") $AUR"
+      echo " 3) $(menu_item "acid-gtk-theme") $AUR"
+      echo " 4) $(menu_item "adapta-gtk-theme-git") $AUR"
+      echo " 5) $(menu_item "amber-theme-git") $AUR"
+      echo " 6) $(menu_item "candy-gtk-theme") $AUR"
+      echo " 7) $(menu_item "evopop-gtk-theme-git") $AUR"
+      echo " 8) $(menu_item "flat-remix-gtk") $AUR"
+      echo " 9) $(menu_item "zuki-themes-git") $AUR"
+      echo "10) $(menu_item "zukitwo-themes-git") $AUR"
       echo ""
       echo " b) BACK"
       echo ""
@@ -937,6 +1026,33 @@ install_desktop_environment(){
         case "$OPT" in
           1)
             package_install "arc-gtk-theme"
+            ;;
+          2)
+            aur_package_install "abrus-gtk-theme-git"
+            ;;
+          3)
+            aur_package_install "acid-gtk-theme"
+            ;;
+          4)
+            aur_package_install "adapta-gtk-theme-git"
+            ;;
+          5)
+            aur_package_install "amber-theme-git"
+            ;;
+          6)
+            aur_package_install "candy-gtk-theme"
+            ;;
+          7)
+            aur_package_install "evopop-gtk-theme-git"
+            ;;
+          8)
+            aur_package_install "flat-remix-gtk"
+            ;;
+          9)
+            aur_package_install "zuki-themes-git"
+            ;;
+          10)
+            aur_package_install "zukitwo-themes-git"
             ;;
           "b")
             break
@@ -1131,9 +1247,9 @@ install_desktop_environment(){
   echo " 1) Cinnamon        10) Awesome"
   echo " 2) Deepin          11) Fluxbox"
   echo " 3) Enlightenment   12) i3"
-  echo " 4) GNOME           13) OpenBox"
-  echo " 5) KDE             14) Xmonad"
-  echo " 6) LXQT"
+  echo " 4) GNOME           13) i3-Gaps"
+  echo " 5) KDE             14) OpenBox"
+  echo " 6) LXQT            15) Xmonad"
   echo " 7) Mate"
   echo " 8) XFCE"
   echo " 9) Budgie"
@@ -1221,8 +1337,10 @@ install_desktop_environment(){
         echo " 1) $(menu_item "choqok")"
         echo " 2) $(menu_item "digikam")"
         echo " 3) $(menu_item "k3b")"
-        echo " 4) $(menu_item "skrooge")"
-        echo " 5) $(menu_item "yakuake")"
+        echo " 4) $(menu_item "kvantum") $AUR"
+        echo " 5) $(menu_item "latte-dock")"
+        echo " 6) $(menu_item "skrooge")"
+        echo " 7) $(menu_item "yakuake")"
         echo ""
         echo " d) DONE"
         echo ""
@@ -1240,9 +1358,15 @@ install_desktop_environment(){
               package_install "k3b cdrdao dvd+rw-tools"
               ;;
             4)
-              package_install "skrooge"
+              aur_package_install "kvantum-qt5-git"
               ;;
             5)
+              package_install "latte-dock"
+              ;;
+            6)
+              package_install "skrooge"
+              ;;
+            7)
               package_install "yakuake"
               ;;
             "d")
@@ -1363,7 +1487,7 @@ install_desktop_environment(){
       #I3 {{{
       print_title "i3 - https://wiki.archlinux.org/index.php/I3"
       print_info "i3 is a dynamic tiling window manager inspired by wmii that is primarily targeted at developers and advanced users. The stated goals for i3 include clear documentation, proper multi-monitor support, a tree structure for windows, and different modes like in vim."
-      package_install "i3"
+      package_install "i3-wm"
       package_install "dmenu"
       # config xinitrc
       config_xinitrc "i3"
@@ -1373,6 +1497,95 @@ install_desktop_environment(){
       ;;
       #}}}
     13)
+      #I3-Gaps {{{
+      print_title "i3 - https://wiki.archlinux.org/index.php/I3"
+      print_info "i3-gaps is a fork of i3wm, a tiling window manager for X11 with more features, such as gaps between windows."
+      package_install "i3-gaps"
+      install_misc_apps "i3"
+      install_themes "i3"
+      # config xinitrc
+      config_xinitrc "i3"
+      pause_function
+      #i3-GAPS CUSTOMIZATION {{{
+      while true
+      do
+        print_title "i3-GAPS CUSTOMIZATION"
+        echo " 1) $(menu_item "arandr")"
+        echo " 2) $(menu_item "bashtop")"
+        echo " 3) $(menu_item "cava") $AUR"
+        echo " 4) $(menu_item "cmus")"
+        echo " 5) $(menu_item "dmenu")"
+        echo " 6) $(menu_item "dunst")"
+        echo " 7) $(menu_item "excalibar") $AUR"
+        echo " 8) $(menu_item "feh")"
+        echo " 9) $(menu_item "picom")"
+        echo "10) $(menu_item "polybar") $AUR"
+        echo "11) $(menu_item "qutebrowser")"
+        echo "12) $(menu_item "ranger")"
+        echo "13) $(menu_item "rofi")"
+        echo "14) $(menu_item "rxvt-unicode")"
+        echo ""
+        echo " d) DONE"
+        echo ""
+        GAPS_OPTIONS+=" d"
+        read_input_options "$GAPS_OPTIONS"
+        for OPT in ${OPTIONS[@]}; do
+          case "$OPT" in
+            1)
+              package_install "arandr"
+              ;;
+            2)
+              package_install "bashtop"
+              ;;
+            3) 
+              aur_package_install "cava"
+              ;;
+            4) 
+              package_install "cmus"
+              ;;
+            5)
+              package_install "dmenu"
+              ;;
+            6)
+              package_install "dunst"
+              ;;
+            7)
+              aur_package_install "excalibar-git"
+              ;;
+            8)
+              package_install "feh"
+              ;;
+            9)
+              package_install "picom"
+              ;;
+            10)
+              aur_package_install "polybar"
+              ;;
+            11)
+              package_install "qutebrowser"
+              ;;
+            12)
+              package_install "ranger"
+              ;;
+            13)
+              package_install "rofi"
+              ;;
+            14)
+              package_install "rxvt-unicode"
+              ;;
+            "d")
+              break
+              ;;
+            *)
+              invalid_option
+              ;;
+          esac
+        done
+        source sharedfuncs_elihw
+      done
+      ;;
+      #}}}
+    14)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -1389,7 +1602,7 @@ install_desktop_environment(){
       install_themes "OPENBOX"
       ;;
       #}}}
-    14)
+    15)
       #XMONAD {{{
       print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
       print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
@@ -1522,12 +1735,13 @@ install_accessories_apps(){
     echo " 2) $(menu_item "catfish")"
     echo " 3) $(menu_item "conky-lua") $AUR"
     echo " 4) $(menu_item "enpass-bin") $AUR"
-    echo " 5) $(menu_item "keepass")"
-    echo " 6) $(menu_item "pamac-aur" "Pamac") $AUR"
-    echo " 7) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots" || echo "Shutter";)")"
-    echo " 8) $(menu_item "synapse")"
-    echo " 9) $(menu_item "terminator")"
-    echo "10) $(menu_item "tilix-bin") $AUR"
+    echo " 5) $(menu_item "flameshot")"
+    echo " 6) $(menu_item "keepass")"
+    echo " 7) $(menu_item "pamac-aur" "Pamac") $AUR"
+    echo " 8) $(menu_item "shutter hotshots" "$([[ ${KDE} -eq 1 ]] && echo "Hotshots" || echo "Shutter";)")"
+    echo " 9) $(menu_item "synapse")"
+    echo "10) $(menu_item "terminator")"
+    echo "11) $(menu_item "tilix-bin") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1550,25 +1764,28 @@ install_accessories_apps(){
           aur_package_install "enpass-bin"
           ;;
         5)
-          package_install "keepass"
+          package_install "flameshot"
           ;;
         6)
-          aur_package_install "pamac-aur"
+          package_install "keepass"
           ;;
         7)
+          aur_package_install "pamac-aur"
+          ;;
+        8)
           if [[ ${KDE} -eq 1 ]]; then
             aur_package_install "hotshots"
           else
             aur_package_install "shutter"
           fi
           ;;
-        8)
+        9)
           package_install "synapse"
           ;;
-        9)
+        10)
           package_install "terminator"
           ;;
-        10)
+        11)
           aur_package_install "tilix-bin"
           ;;
         "b")
@@ -1592,26 +1809,28 @@ install_development_apps(){
     echo " 2) $(menu_item "emacs")"
     echo " 3) $(menu_item "gvim")"
     echo " 4) $(menu_item "meld")"
-    echo " 5) $(menu_item "sublime-text2" "Sublime Text 2") $AUR"
-    echo " 6) $(menu_item "sublime-text-dev" "Sublime Text 3") $AUR"
-    echo " 7) $(menu_item "android-studio" "Android Studio") $AUR"
-    echo " 8) $(menu_item "jetbrains-toolbox" "Jetbrains Toolbox") $AUR"
-    echo " 9) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA Community Edition")"
-    echo "10) $(menu_item "intellij-idea-ultimate-edition" "IntelliJ IDEA Ultimate Edition") $AUR"
-    echo "11) $(menu_item "monodevelop")"
-    echo "12) $(menu_item "qtcreator")"
-    echo "13) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
-    echo "14) $(menu_item "jdk8-openjdk" "OpenJDK 8")"
-    echo "15) $(menu_item "jdk9-openjdk" "OpenJDK 9")"
-    echo "16) $(menu_item "jdk10-openjdk" "OpenJDK 10")"
-    echo "17) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "18) $(menu_item "nodejs")"
-    echo "19) $(menu_item "visual-studio-code-bin" "Visual Studio Code") $AUR"
-    echo "20) $(menu_item "gitg")"
-    echo "21) $(menu_item "kdiff3")"
-    echo "22) $(menu_item "regexxer")"
-    echo "23) $(menu_item "postman-bin" "Postman") $AUR"
-    echo "24) $(menu_item "gitkraken" "Gitkraken") $AUR"
+    echo " 5) $(menu_item "sublime-merge") $AUR"
+    echo " 6) $(menu_item "sublime-text2" "Sublime Text 2") $AUR"
+    echo " 7) $(menu_item "sublime-text-dev" "Sublime Text 3") $AUR"
+    echo " 8) $(menu_item "android-studio" "Android Studio") $AUR"
+    echo " 9) $(menu_item "jetbrains-toolbox" "Jetbrains Toolbox") $AUR"
+    echo " 10) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA Community Edition")"
+    echo "11) $(menu_item "intellij-idea-ultimate-edition" "IntelliJ IDEA Ultimate Edition") $AUR"
+    echo "12) $(menu_item "monodevelop")"
+    echo "13) $(menu_item "qtcreator")"
+    echo "14) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
+    echo "15) $(menu_item "jdk8-openjdk" "OpenJDK 8")"
+    echo "16) $(menu_item "jdk9-openjdk" "OpenJDK 9")"
+    echo "17) $(menu_item "jdk10-openjdk" "OpenJDK 10")"
+    echo "18) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "19) $(menu_item "nodejs")"
+    echo "20) $(menu_item "visual-studio-code-bin" "Visual Studio Code") $AUR"
+    echo "21) $(menu_item "gitg")"
+    echo "22) $(menu_item "kdiff3")"
+    echo "23) $(menu_item "regexxer")"
+    echo "24) $(menu_item "postman-bin" "Postman") $AUR"
+    echo "25) $(menu_item "gitkraken" "Gitkraken") $AUR"
+    echo "26) $(menu_item "freecad" "FreeCad") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1633,12 +1852,15 @@ install_development_apps(){
           package_install "meld"
           ;;
         5)
-          aur_package_install "sublime-text2"
+          aur_package_install "sublime-merge"
           ;;
         6)
-          aur_package_install "sublime-text-dev"
+          aur_package_install "sublime-text2"
           ;;
         7)
+          aur_package_install "sublime-text-dev"
+          ;;
+        8)
           aur_package_install "android-sdk android-sdk-platform-tools android-sdk-build-tools android-platform"
           add_user_to_group ${username} sdkusers
           chown -R :sdkusers /opt/android-sdk/
@@ -1646,62 +1868,65 @@ install_development_apps(){
           add_line "export ANDROID_HOME=/opt/android-sdk" "/home/${username}/.bashrc"
           aur_package_install "android-studio"
           ;;
-        8)
+        9)
           aur_package_install "jetbrains-toolbox"
           ;;
-        9)
+        10)
           package_install "intellij-idea-community-edition"
           ;;
-        10)
+        11)
           aur_package_install "intellij-idea-ultimate-edition"
           ;;
-        11)
+        12)
           package_install "monodevelop monodevelop-debugger-gdb"
           ;;
-        12)
+        13)
           package_install "qtcreator"
           ;;
-        13)
-          aur_package_install "mysql-workbench"
-          ;;
         14)
-          package_remove "jdk"
-          package_install "jdk8-openjdk"
+          aur_package_install "mysql-workbench"
           ;;
         15)
           package_remove "jdk"
-          package_install "jdk9-openjdk"
+          package_install "jdk8-openjdk"
           ;;
         16)
           package_remove "jdk"
-          package_install "jdk10-openjdk"
+          package_install "jdk9-openjdk"
           ;;
         17)
+          package_remove "jdk"
+          package_install "jdk10-openjdk"
+          ;;
+        18)
           package_remove "jre{7,8,9,10}-openjdk"
           package_remove "jdk{7,8,9,10}-openjdk"
           aur_package_install "jdk"
           ;;
-        18)
+        19)
           package_install "nodejs"
           ;;
-        19)
+        20)
           aur_package_install "visual-studio-code-bin"
           ;;
-        20)
+        21)
           aur_package_install "gitg"
           aur_package_install "qgit"
           ;;
-        21)
+        22)
           aur_package_install "kdiff3"
           ;;
-        22)
+        23)
           aur_package_install "regexxer"
           ;;
-        23)
+        24)
           aur_package_install "postman-bin"
           ;;
-        24)
+        25)
           aur_package_install "gitkraken"
+          ;;
+        26)
+          aur_package_install "freecad"
           ;;
         "b")
           break
@@ -1811,14 +2036,15 @@ install_system_apps(){
     echo " 7) $(menu_item "grsync")"
     echo " 8) $(menu_item "hosts-update") $AUR"
     echo " 9) $(menu_item "htop")"
-    echo "10) $(menu_item "gotop") $AUR"
-    echo "11) $(menu_item "ufw")"
-    echo "12) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
-    echo "13) $(menu_item "virtualbox")"
-    echo "14) $(menu_item "wine")"
-    echo "15) $(menu_item "netdata")"
-    echo "16) $(menu_item "nload")"
-    echo "17) $(menu_item "vmware-workstation12" "VMware Workstation 12") $AUR"
+    echo "10) $(menu_item "stacer") $AUR"
+    echo "11) $(menu_item "gotop") $AUR"
+    echo "12) $(menu_item "ufw")"
+    echo "13) $(menu_item "unified-remote-server" "Unified Remote") $AUR"
+    echo "14) $(menu_item "virtualbox")"
+    echo "15) $(menu_item "wine")"
+    echo "16) $(menu_item "netdata")"
+    echo "17) $(menu_item "nload")"
+    echo "18) $(menu_item "vmware-workstation12" "VMware Workstation 12") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1864,21 +2090,24 @@ install_system_apps(){
         9)
           package_install "htop"
           ;;
-        10)
+        10) 
+          aur_package_install "stacer"
+          ;;
+        11)
           aur_package_install "gotop-bin"
 	  ;;
-        11)
+        12)
           print_title "UFW - https://wiki.archlinux.org/index.php/Ufw"
           print_info "Ufw stands for Uncomplicated Firewall, and is a program for managing a netfilter firewall. It provides a command line interface and aims to be uncomplicated and easy to use."
           is_package_installed "firewalld" && package_remove "firewalld"
           package_install "ufw gufw"
           system_ctl enable ufw.service
           ;;
-        12)
+        13)
           aur_package_install "unified-remote-server"
           system_ctl enable urserver.service
           ;;
-        13)
+        14)
           #Make sure we are not a VirtualBox Guest
           VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
@@ -1890,17 +2119,17 @@ install_system_apps(){
             cecho "${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
           fi
           ;;
-        14)
+        15)
           package_install "icoutils wine wine_gecko wine-mono winetricks"
           ;;
-        15)
+        16)
           package_install "netdata"
           system_ctl enable netdata.service
           ;;
-        16)
+        17)
           package_install "nload"
           ;;
-        17)
+        18)
           aur_package_install "vmware-workstation12"
           ;;
         "b")
@@ -1924,13 +2153,14 @@ install_graphics_apps(){
     echo " 2) $(menu_item "gimp")"
     echo " 3) $(menu_item "gthumb")"
     echo " 4) $(menu_item "inkscape")"
-    echo " 5) $(menu_item "mcomix")"
-    echo " 6) $(menu_item "mypaint")"
-    echo " 7) $(menu_item "pencil" "Pencil Prototyping Tool") $AUR"
-    echo " 8) $(menu_item "scribus")"
-    echo " 9) $(menu_item "shotwell")"
-    echo "10) $(menu_item "simple-scan")"
-    echo "11) $(menu_item "yacreader")"
+    echo " 5) $(menu_item "krita")"
+    echo " 6) $(menu_item "mcomix")"
+    echo " 7) $(menu_item "mypaint")"
+    echo " 8) $(menu_item "pencil" "Pencil Prototyping Tool") $AUR"
+    echo " 9) $(menu_item "scribus")"
+    echo "10) $(menu_item "shotwell")"
+    echo "11) $(menu_item "simple-scan")"
+    echo "12) $(menu_item "yacreader")"
     echo ""
     echo " b) BACK"
     echo ""
@@ -1951,24 +2181,27 @@ install_graphics_apps(){
           package_install "inkscape python2-numpy python-lxml"
           ;;
         5)
-          package_install "mcomix"
+          package_install "krita"
           ;;
         6)
-          package_install "mypaint"
+          package_install "mcomix"
           ;;
         7)
-          aur_package_install "pencil"
+          package_install "mypaint"
           ;;
         8)
-          package_install "scribus"
+          aur_package_install "pencil"
           ;;
         9)
-          package_install "shotwell"
+          package_install "scribus"
           ;;
         10)
-          package_install "simple-scan"
+          package_install "shotwell"
           ;;
         11)
+          package_install "simple-scan"
+          ;;
+        12)
           package_install "yacreader"
           ;;
         "b")
@@ -2070,19 +2303,20 @@ install_internet_apps(){
             echo " 1) $(menu_item "deluge")"
             echo " 2) $(menu_item "dropbox") $AUR"
             echo " 3) $(menu_item "flareget") $AUR"
-            echo " 4) $(menu_item "google-drive-ocamlfuse", "Google Drive OCamlFuse") $AUR"
-            echo " 5) $(menu_item "jdownloader") $AUR"
-            echo " 6) $(menu_item "qbittorrent")"
-            echo " 7) $(menu_item "nitroshare") $AUR"
-            echo " 8) $(menu_item "rslsync" "Resilio Sync") $AUR"
-            echo " 9) $(menu_item "sparkleshare")"
-            echo "10) $(menu_item "spideroak-one") $AUR"
-            echo "11) $(menu_item "tixati") $AUR"
-            echo "12) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
-            echo "13) $(menu_item "uget")"
-            echo "14) $(menu_item "youtube-dl")"
-            echo "15) $(menu_item "megasync")"
-            echo "16) $(menu_item "extreme download manager") $AUR"
+            echo " 4) $(menu_item "freedownloadmanager") $AUR"
+            echo " 5) $(menu_item "google-drive-ocamlfuse", "Google Drive OCamlFuse") $AUR"
+            echo " 6) $(menu_item "jdownloader") $AUR"
+            echo " 7) $(menu_item "qbittorrent")"
+            echo " 8) $(menu_item "nitroshare") $AUR"
+            echo " 9) $(menu_item "rslsync" "Resilio Sync") $AUR"
+            echo "10) $(menu_item "sparkleshare")"
+            echo "11) $(menu_item "spideroak-one") $AUR"
+            echo "12) $(menu_item "tixati") $AUR"
+            echo "13) $(menu_item "transmission-qt transmission-gtk" "Transmission")"
+            echo "14) $(menu_item "uget")"
+            echo "15) $(menu_item "youtube-dl")"
+            echo "16) $(menu_item "megasync")"
+            echo "17) $(menu_item "extreme download manager") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2100,30 +2334,33 @@ install_internet_apps(){
                   aur_package_install "flareget"
                   ;;
                 4)
-                  aur_package_install "google-drive-ocamlfuse"
+                  aur_package_install "freedownloadmanager"
                   ;;
                 5)
-                  aur_package_install "jdownloader"
+                  aur_package_install "google-drive-ocamlfuse"
                   ;;
                 6)
-                  package_install "qbittorrent"
+                  aur_package_install "jdownloader"
                   ;;
                 7)
-                  package_install "nitroshare"
+                  package_install "qbittorrent"
                   ;;
                 8)
-                  aur_package_install "rslsync"
+                  package_install "nitroshare"
                   ;;
                 9)
-                  package_install "sparkleshare"
+                  aur_package_install "rslsync"
                   ;;
                 10)
-                  aur_package_install "spideroak"
+                  package_install "sparkleshare"
                   ;;
                 11)
-                  aur_package_install "tixati"
+                  aur_package_install "spideroak"
                   ;;
                 12)
+                  aur_package_install "tixati"
+                  ;;
+                13)
                   if [[ ${KDE} -eq 1 ]]; then
                     package_install "transmission-qt"
                   else
@@ -2134,16 +2371,16 @@ install_internet_apps(){
                     replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${username}/.config/transmission/settings.json
                   fi
                   ;;
-                13)
+                14)
                   package_install "uget"
                   ;;
-                14)
+                15)
                   package_install "youtube-dl"
                   ;;
-                15)
+                16)
                   aur_package_install "megasync"
                   ;;
-                16)
+                17)
                   aur_package_install "xdman"
                   ;;
                 "b")
@@ -2201,16 +2438,17 @@ install_internet_apps(){
             echo " 1) $(menu_item "hexchat konversation" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
             echo " 2) $(menu_item "irssi")"
             echo " 3) $(menu_item "pidgin")"
+            echo " 4) $(menu_item "riot")"
             echo " 4) $(menu_item "skypeforlinux-stable-bin" "Skype Stable") $AUR"
             echo " 5) $(menu_item "skypeforlinux-preview-bin" "Skype Preview") $AUR"
             echo " 6) $(menu_item "teamspeak3")"
             echo " 7) $(menu_item "viber") $AUR"
             echo " 8) $(menu_item "telegram-desktop")"
             echo " 9) $(menu_item "qtox")"
-            echo " 10) $(menu_item "discord") $AUR"
-            echo " 11) $(menu_item "slack") $AUR"
-            echo " 12) $(menu_item "vk-messenger") $AUR"
-            echo " 13) $(menu_item "zoom") $AUR"
+            echo "10) $(menu_item "discord")"
+            echo "11) $(menu_item "slack") $AUR"
+            echo "12) $(menu_item "vk-messenger") $AUR"
+            echo "13) $(menu_item "zoom") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2232,33 +2470,36 @@ install_internet_apps(){
                   package_install "pidgin"
                   ;;
                 4)
-                  aur_package_install "skypeforlinux-stable-bin"
+                  package_install "riot-desktop"
                   ;;
                 5)
-                  aur_package_install "skypeforlinux-preview-bin"
+                  aur_package_install "skypeforlinux-stable-bin"
                   ;;
                 6)
-                  package_install "teamspeak3"
+                  aur_package_install "skypeforlinux-preview-bin"
                   ;;
                 7)
-                  aur_package_install "viber"
+                  package_install "teamspeak3"
                   ;;
                 8)
-                  package_install "telegram-desktop"
+                  aur_package_install "viber"
                   ;;
                 9)
-                  package_install "qtox"
+                  package_install "telegram-desktop"
                   ;;
                 10)
-                  aur_package_install "discord"
+                  package_install "qtox"
                   ;;
                 11)
-                  aur_package_install "slack-desktop"
+                  package_install "discord"
                   ;;
                 12)
-                  aur_package_install "vk-messanger"
+                  aur_package_install "slack-desktop"
                   ;;
                 13)
+                  aur_package_install "vk-messanger"
+                  ;;
+                14)
                   aur_package_install "zoom"
                   ;;
                 "b")
@@ -2312,6 +2553,7 @@ install_internet_apps(){
           while true
           do
             print_title "DESKTOP SHARE"
+            echo " 1) $(menu_item "anydesk") $AUR"
             echo " 1) $(menu_item "remmina")"
             echo " 2) $(menu_item "teamviewer") $AUR"
             echo ""
@@ -2322,9 +2564,12 @@ install_internet_apps(){
             for OPT in ${OPTIONS[@]}; do
               case "$OPT" in
                 1)
-                  package_install "remmina"
+                  aur_package_install "anydesk"
                   ;;
                 2)
+                  package_install "remmina"
+                  ;;
+                3)
                   aur_package_install "teamviewer"
                   ;;
                 "b")
@@ -2377,12 +2622,13 @@ install_audio_apps(){
             echo " 3) $(menu_item "clementine")"
             echo " 4) $(menu_item "deadbeef")"
             echo " 5) $(menu_item "guayadeque") $AUR"
-            echo " 6) $(menu_item "musique") $AUR"
-            echo " 7) $(menu_item "pragha")"
-            echo " 8) $(menu_item "rhythmbox")"
-            echo " 9) $(menu_item "spotify") $AUR"
-            echo "10) $(menu_item "timidity++") $AUR"
-            echo "11) $(menu_item "quodlibet")"
+            echo " 6) $(menu_item "lollypop") $AUR"
+            echo " 7) $(menu_item "musique") $AUR"
+            echo " 8) $(menu_item "pragha")"
+            echo " 9) $(menu_item "rhythmbox")"
+            echo "10) $(menu_item "spotify") $AUR"
+            echo "11) $(menu_item "timidity++") $AUR"
+            echo "12) $(menu_item "quodlibet")"
             echo ""
             echo " b) BACK"
             echo ""
@@ -2405,23 +2651,26 @@ install_audio_apps(){
                 5)
                   aur_package_install "guayadeque"
                   ;;
-                6)
-                  aur_package_install "musique"
+                6) 
+                  aur_package_install "lollypop"
                   ;;
                 7)
-                  package_install "pragha"
+                  aur_package_install "musique"
                   ;;
                 8)
-                  package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako"
+                  package_install "pragha"
                   ;;
                 9)
-                  aur_package_install "spotify ffmpeg-compat ffmpeg-compat-57"
+                  package_install "rhythmbox grilo grilo-plugins libgpod libdmapsharing gnome-python python-mako"
                   ;;
                 10)
+                  aur_package_install "spotify ffmpeg-compat ffmpeg-compat-57"
+                  ;;
+                11)
                   aur_package_install "timidity++ fluidr3"
                   echo -e 'soundfont /usr/share/soundfonts/fluidr3/FluidR3GM.SF2' >> /etc/timidity++/timidity.cfg
                   ;;
-                11)
+                12)
                   package_install "quodlibet"
                   ;;
                 "b")
@@ -2677,6 +2926,7 @@ install_games(){
     echo " 2) PlayOnLinux $AUR"
     echo " 3) Steam"
     echo " 4) Minecraft"
+    echo " 5) OSU!-Lazer $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2699,6 +2949,10 @@ install_games(){
         4)
           aur_package_install "minecraft"
           OPT=4
+          ;;
+        5)
+          aur_package_install "osu-lazer"
+          OPT=5
           ;;
         "b")
           break
@@ -2871,6 +3125,7 @@ install_fonts(){
     echo " 9) $(menu_item "wqy-microhei") (Chinese/Japanese/Korean Support)"
     echo "10) $(menu_item "noto-fonts-cjk") (Chinese/Japanese/Korean Support)"
     echo "11) $(menu_item "nerd-fonts-complete") $AUR"
+    echo "12) $(menu_item "yanc-font") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
@@ -2913,7 +3168,10 @@ install_fonts(){
           package_install "noto-fonts-cjk"
           ;;
         11)
-          package_install "nerd-fonts-complete"
+          aur_package_install "nerd-fonts-complete"
+          ;;
+        12)
+          aur_package_install "yanc-font"
           ;;
         "b")
           break
@@ -3111,6 +3369,7 @@ do
         add_custom_repositories
         install_basic_setup
         install_zsh
+        install_fish
         install_ssh
         install_nfs
         install_samba

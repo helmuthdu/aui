@@ -1,21 +1,24 @@
 #!/bin/bash
-#-------------------------------------------------------------------------------
-#Created by helmuthdu mailto: helmuthdu[at]gmail[dot]com
-#-------------------------------------------------------------------------------
-#This program is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, either version 3 of the License, or
-#(at your option) any later version.
-#
-#This program is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
-#
-#You should have received a copy of the GNU General Public License
-#along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
-# Run this script after your first boot with archlinux (as root)
+
+: 'ATTENTION!:
+------------------------------------------------------
+|  Created by helmuthdu mailto: helmuthdu@gmail.com  |                      
+------------------------------------------------------
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+------------------------------------------------------------------------
+Run this script after your first boot with archlinux (as root)
+'
 
 if [[ -f $(pwd)/sharedfuncs ]]; then
   source sharedfuncs
@@ -60,8 +63,8 @@ select_editor() {
 #}}}
 #MIRRORLIST {{{
 configure_mirrorlist() {
-  local countries_code=("AU" "AT" "BY" "BE" "BD" "BR" "BG" "CA" "CL" "CN" "CO" "CZ" "DK" "EE" "FI" "FR" "DE" "GR" "HK" "HU" "IS" "ID" "IN" "IR" "IE" "IL" "IT" "JP" "KZ" "KR" "LV" "LU" "MK" "NL" "NC" "NZ" "NO" "PL" "PT" "RO" "RU" "RS" "SG" "SK" "ZA" "ES" "LK" "SE" "CH" "TW" "TR" "UA" "GB" "US" "UZ" "VN")
-  local countries_name=("Australia" "Austria" "Belarus" "Belgium" "Bangladesh" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hong Kong" "Hungary" "Iceland" "Indonesia" "India" "Iran" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Latvia" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russia" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
+  local countries_code=("AU" "AT" "BD" "BY" "BE" "BA" "BR" "BG" "CA" "CL" "CN" "CO" "HR" "CZ" "DK" "EC" "FI" "FR" "GE" "DE" "GR" "HK" "HU" "IS" "IN" "ID" "IR" "IE" "IL" "IT" "JP" "KZ" "KE" "LV" "LT" "LU" "NL" "NC" "NZ" "MK" "NO" "PY" "PH" "PL" "PT" "RO" "RU" "RS" "SG" "SK" "SI" "ZA" "KR" "ES" "SE" "CH" "TW" "TH" "TR" "UA" "GB" "US" "VN")
+  local countries_name=("Australia" "Austria" "Bangladesh" "Belarus" "Belgium" "Bosnia and Herzegovina" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Croatia" "Czech Republic" "Denmark" "Ecuador" "Finland" "France" "Georgia" "Germany" "Greece" "Hong Kong" "Hungary" "Iceland" "India" "Indonesia" "Iran" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Kenya" "Latvia" "Lithuania" "Luxembourg" "Netherlands" "New Caledonia" "New Zealand" "North Macedonia" "Norway" "Paraguay" "Philippines" "Poland" "Portugal" "Romania" "Russia" "Serbia" "Singapore" "Slovakia" "Slovenia" "South Africa" "South Korea" "Spain" "Sweden" "Switzerland" "Taiwan" "Thailand" "Turkey" "Ukraine" "United Kingdom" "United States" "Viet Nam")
   country_list() {
     #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/^/"/g' | sed 's/,.*//g' | sed 's/ *$//g'  | sed 's/$/"/g' | sed -e :a -e '$!N; s/\n/ /; ta'`
     PS3="$prompt1"
@@ -465,7 +468,7 @@ format_partitions() {
 #INSTALL BASE SYSTEM {{{
 select_linux_version() {
   print_title "LINUX VERSION"
-  version_list=("linux (default)" "linux-lts (long term support)" "linux-hardened (security features)")
+  version_list=("linux (default)" "linux-lts (long term support)" "linux-hardened (security features)" "linux-zen (tuned kernel)")
   PS3="$prompt1"
   echo -e "Select linux version to install\n"
   select VERSION in "${version_list[@]}"; do
@@ -476,6 +479,8 @@ select_linux_version() {
         pacstrap ${MOUNTPOINT} base linux-lts linux-lts-headers
       elif [ "linux-hardened (security features)" == "$VERSION" ]; then
         pacstrap ${MOUNTPOINT} base linux-hardened linux-hardened-headers
+      elif [ "linux-zen (tuned kernel)" == "$VERSION" ]; then
+        pacstrap ${MOUNTPOINT} base linux-zen linux-zen-headers
       fi
       pacstrap ${MOUNTPOINT} \
         cryptsetup lvm2 netctl dhcpcd inetutils jfsutils diffutils e2fsprogs \
@@ -635,6 +640,8 @@ configure_mkinitcpio() {
     arch_chroot "mkinitcpio -p linux-hardened"
   elif [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep lts -c)" -gt "0" ]; then
     arch_chroot "mkinitcpio -p linux-lts"
+  elif [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep zen -c)" -gt "0" ]; then
+    arch_chroot "mkinitcpio -p linux-zen"
   else
     arch_chroot "mkinitcpio -p linux"
   fi
@@ -785,6 +792,8 @@ configure_bootloader() {
           img_name="linux-hardened"
         elif [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep lts -c)" -gt "0" ]; then
           img_name="linux-lts"
+        elif [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep zen -c)" -gt "0" ]; then
+          img_name="linux-zen"
         else
           img_name="linux"
         fi
@@ -862,8 +871,6 @@ finish() {
 }
 #}}}
 
-print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
-print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
 pause_function
 check_boot_system
 check_connection
