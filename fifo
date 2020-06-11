@@ -1,13 +1,6 @@
 #!/bin/bash
 # FIX THIS ISSUES | NON-ACUTE
-#shellcheck disable=SC1091
-#shellcheck disable=SC2001
-#shellcheck disable=SC2015
-#shellcheck disable=SC2153
-#shellcheck disable=SC2154
-#shellcheck disable=SC2155
-#shellcheck disable=SC2181
-#shellcheck disable=SC2207
+#shellcheck disable=SC1091,SC2001,SC2015,SC2153,SC2154,SC2155,SC2181,SC2207
 
 
 : 'ATTENTION!:
