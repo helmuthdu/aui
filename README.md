@@ -6,6 +6,14 @@ This project is not actively developed but *will* accept Pull Requests.
 </h1>
 <h4 align="center">Installation & Configuration of archlinux has never been much easier!</h4>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Maintained%3F-Yes-green?style=for-the-badge">
+  <img src="https://img.shields.io/github/license/helmuthdu/aui?style=for-the-badge">
+  <img src="https://img.shields.io/github/issues/helmuthdu/aui?color=violet&style=for-the-badge">
+  <img src="https://img.shields.io/github/stars/helmuthdu/aui?style=for-the-badge">
+  <img src="https://img.shields.io/github/forks/helmuthdu/aui?color=teal&style=for-the-badge">
+</p>
+
 ## Note
 * You can first try it in a `VirtualMachine`
 

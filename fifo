@@ -1,4 +1,7 @@
 #!/bin/bash
+# FIX THIS ISSUES | NON-ACUTE
+#shellcheck disable=SC1091,SC2001,SC2015,SC2153,SC2154,SC2155,SC2181,SC2207
+
 
 : 'ATTENTION!:
 ------------------------------------------------------
@@ -71,7 +74,7 @@ configure_mirrorlist() {
     echo "Select your country:"
     select country_name in "${countries_name[@]}"; do
       if contains_element "$country_name" "${countries_name[@]}"; then
-        country_code=${countries_code[$(($REPLY - 1))]}
+        country_code=${countries_code[$((REPLY - 1))]}
         break
       else
         invalid_option
@@ -91,8 +94,8 @@ configure_mirrorlist() {
   tmpfile=$(mktemp --suffix=-mirrorlist)
 
   # Get latest mirror list and save to tmpfile
-  curl -so ${tmpfile} ${url}
-  sed -i 's/^#Server/Server/g' ${tmpfile}
+  curl -so "${tmpfile}" "${url}"
+  sed -i 's/^#Server/Server/g' "${tmpfile}"
 
   # Backup and replace current mirrorlist file (if new file is non-zero)
   if [[ -s ${tmpfile} ]]; then
@@ -102,7 +105,7 @@ configure_mirrorlist() {
     } &&
       {
         echo " Rotating the new list into place..."
-        mv -i ${tmpfile} /etc/pacman.d/mirrorlist
+        mv -i "${tmpfile}" /etc/pacman.d/mirrorlist
       }
   else
     echo " Unable to update, could not download list."
@@ -119,10 +122,10 @@ configure_mirrorlist() {
 #}}}
 #UMOUNT PARTITIONS {{{
 umount_partitions() {
-  mounted_partitions=($(lsblk | grep ${MOUNTPOINT} | awk '{print $7}' | sort -r))
+  mounted_partitions=($(lsblk | grep "${MOUNTPOINT}" | awk '{print $7}' | sort -r))
   swapoff -a
-  for i in ${mounted_partitions[@]}; do
-    umount $i
+  for i in "${mounted_partitions[@]}"; do
+    umount "$i"
   done
 }
 #}}}
@@ -192,10 +195,10 @@ create_partition() {
       select_device
       case $OPT in
       parted)
-        parted -a opt ${device}
+        parted -a opt "${device}"
         ;;
       *)
-        $OPT ${device}
+        $OPT "${device}"
         ;;
       esac
       break
@@ -215,10 +218,10 @@ setup_luks() {
   echo -e "Select partition:"
   select OPT in "${block_list[@]}"; do
     if contains_element "$OPT" "${block_list[@]}"; then
-      cryptsetup --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random --verify-passphrase luksFormat $OPT
-      cryptsetup open --type luks $([[ $TRIM -eq 1 ]] && echo "--allow-discards") $OPT crypt
+      cryptsetup --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random --verify-passphrase luksFormat "$OPT"
+      cryptsetup open --type luks "$([[ $TRIM -eq 1 ]] && echo '--allow-discards')" "$OPT" crypt
       LUKS=1
-      LUKS_DISK=$(echo ${OPT} | sed 's/\/dev\///')
+      LUKS_DISK=$(echo "${OPT}" | sed 's/\/dev\///')
       break
     elif [[ $OPT == "Cancel" ]]; then
       break
@@ -242,23 +245,26 @@ setup_lvm() {
     echo -e "Select partition:"
     select OPT in "${block_list[@]}"; do
       if contains_element "$OPT" "${block_list[@]}"; then
-        pvcreate $OPT
-        vgcreate lvm $OPT
+        pvcreate "$OPT"
+        vgcreate lvm "$OPT"
         break
       else
         invalid_option
       fi
     done
   fi
-  read -p "Enter number of partitions [ex: 2]: " number_partitions
+  printf "%s" "Enter number of partitions [ex: 2]: " 
+  read -r number_partitions
   i=1
   while [[ $i -le $number_partitions ]]; do
-    read -p "Enter $iª partition name [ex: home]: " partition_name
+    printf "%s" "Enter $iª partition name [ex: home]: " 
+    read -r partition_name
     if [[ $i -eq $number_partitions ]]; then
-      lvcreate -l 100%FREE lvm -n ${partition_name}
+      lvcreate -l 100%FREE lvm -n "${partition_name}"
     else
-      read -p "Enter $iª partition size [ex: 25G, 200M]: " partition_size
-      lvcreate -L ${partition_size} lvm -n ${partition_name}
+      printf "%s" "Enter $iª partition size [ex: 25G, 200M]: " 
+      read -r partition_size
+      lvcreate -L "${partition_size}" lvm -n "${partition_name}"
     fi
     i=$((i + 1))
   done
@@ -281,8 +287,8 @@ format_partitions() {
   fi
 
   partitions_list=()
-  for OPT in ${block_list[@]}; do
-    check_lvm=$(echo $OPT | grep lvm)
+  for OPT in "${block_list[@]}"; do
+    check_lvm=$(echo "$OPT" | grep lvm)
     if [[ -z $check_lvm ]]; then
       partitions_list+=("/dev/$OPT")
     else
@@ -312,8 +318,8 @@ format_partitions() {
 
   disable_partition() {
     #remove the selected partition from list
-    unset partitions_list[${partition_number}]
-    partitions_list=(${partitions_list[@]})
+    unset partitions_list["${partition_number}"]
+    partitions_list=("${partitions_list[@]}")
     #increase i
     [[ ${partition_name[i]} != another ]] && i=$((i + 1))
   }
@@ -322,13 +328,13 @@ format_partitions() {
     read_input_text "Confirm format $1 partition"
     if [[ $OPTION == y ]]; then
       [[ -z $3 ]] && select_filesystem || filesystem=$3
-      mkfs.${filesystem} $1 \
-        $([[ ${filesystem} == xfs || ${filesystem} == btrfs || ${filesystem} == reiserfs ]] && echo "-f") \
-        $([[ ${filesystem} == vfat ]] && echo "-F32") \
-        $([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard")
-      fsck $1
-      mkdir -p $2
-      mount -t ${filesystem} $1 $2
+      mkfs."${filesystem}" "$1" \
+        "$([[ ${filesystem} == xfs || ${filesystem} == btrfs || ${filesystem} == reiserfs ]] && echo "-f")" \
+        "$([[ ${filesystem} == vfat ]] && echo "-F32")" \
+        "$([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard")"
+      fsck "$1"
+      mkdir -p "$2"
+      mount -t "${filesystem}" "$1" "$2"
       disable_partition
     fi
   }
@@ -336,8 +342,8 @@ format_partitions() {
   format_swap_partition() {
     read_input_text "Confirm format $1 partition"
     if [[ $OPTION == y ]]; then
-      mkswap $1
-      swapon $1
+      mkswap "$1"
+      swapon "$1"
       disable_partition
     fi
   }
@@ -351,7 +357,7 @@ format_partitions() {
       1)
         select partition in "${partitions_list[@]}"; do
           #get the selected number - 1
-          partition_number=$(($REPLY - 1))
+          partition_number=$((REPLY - 1))
           if contains_element "${partition}" "${partitions_list[@]}"; then
             format_swap_partition "${partition}"
           fi
@@ -362,10 +368,10 @@ format_partitions() {
         ;;
       2)
         total_memory=$(grep MemTotal /proc/meminfo | awk '{print $2/1024}' | sed 's/\..*//')
-        fallocate -l ${total_memory}M ${MOUNTPOINT}/swapfile
-        chmod 600 ${MOUNTPOINT}/swapfile
-        mkswap ${MOUNTPOINT}/swapfile
-        swapon ${MOUNTPOINT}/swapfile
+        fallocate -l "${total_memory}"M "${MOUNTPOINT}"/swapfile
+        chmod 600 "${MOUNTPOINT}"/swapfile
+        mkswap "${MOUNTPOINT}"/swapfile
+        swapon "${MOUNTPOINT}"/swapfile
         i=$((i + 1))
         swap_type="file"
         break
@@ -383,7 +389,7 @@ format_partitions() {
   }
 
   check_mountpoint() {
-    if mount | grep $2; then
+    if mount | grep "$2"; then
       echo "Successfully mounted"
       disable_partition "$1"
     else
@@ -412,11 +418,11 @@ format_partitions() {
       echo -e "Select ${BYellow}${partition_name[i]}${Reset} partition:\n"
       select partition in "${partitions_list[@]}"; do
         #get the selected number - 1
-        partition_number=$(($REPLY - 1))
+        partition_number=$((REPLY - 1))
         if contains_element "${partition}" "${partitions_list[@]}"; then
           case ${partition_name[i]} in
           root)
-            ROOT_PART=$(echo ${partition} | sed 's/\/dev\/mapper\///' | sed 's/\/dev\///')
+            ROOT_PART=$(echo "${partition}" | sed 's/\/dev\/mapper\///' | sed 's/\/dev\///')
             ROOT_MOUNTPOINT=${partition}
             format_partition "${partition}" "${MOUNTPOINT}"
             ;;
@@ -432,17 +438,18 @@ format_partitions() {
             fi
             ;;
           another)
-            read -p "Mountpoint [ex: /home]:" directory
-            [[ $directory == "/boot" ]] && BOOT_MOUNTPOINT=$(echo ${partition} | sed 's/[0-9]//')
+            printf "%s" "Mountpoint [ex: /home]:" 
+            read -r directory
+            [[ $directory == "/boot" ]] && BOOT_MOUNTPOINT=$(echo "${partition}" | sed 's/[0-9]//')
             select_filesystem
             read_input_text "Format ${partition} partition"
             if [[ $OPTION == y ]]; then
               format_partition "${partition}" "${MOUNTPOINT}${directory}" "${filesystem}"
             else
-              read_input_text "Confirm fs="${filesystem}" part="${partition}" dir="${directory}""
+              read_input_text "Confirm fs=""${filesystem}"" part=""${partition}"" dir=""${directory}"""
               if [[ $OPTION == y ]]; then
-                mkdir -p ${MOUNTPOINT}${directory}
-                mount -t ${filesystem} ${partition} ${MOUNTPOINT}${directory}
+                mkdir -p "${MOUNTPOINT}${directory}"
+                mount -t "${filesystem}" "${partition}" "${MOUNTPOINT}""${directory}"
                 check_mountpoint "${partition}" "${MOUNTPOINT}${directory}"
               fi
             fi
@@ -474,15 +481,15 @@ select_linux_version() {
   select VERSION in "${version_list[@]}"; do
     if contains_element "$VERSION" "${version_list[@]}"; then
       if [ "linux (default)" == "$VERSION" ]; then
-        pacstrap ${MOUNTPOINT} base linux linux-headers
+        pacstrap "${MOUNTPOINT}" base linux linux-headers
       elif [ "linux-lts (long term support)" == "$VERSION" ]; then
-        pacstrap ${MOUNTPOINT} base linux-lts linux-lts-headers
+        pacstrap "${MOUNTPOINT}" base linux-lts linux-lts-headers
       elif [ "linux-hardened (security features)" == "$VERSION" ]; then
-        pacstrap ${MOUNTPOINT} base linux-hardened linux-hardened-headers
+        pacstrap "${MOUNTPOINT}" base linux-hardened linux-hardened-headers
       elif [ "linux-zen (tuned kernel)" == "$VERSION" ]; then
-        pacstrap ${MOUNTPOINT} base linux-zen linux-zen-headers
+        pacstrap "${MOUNTPOINT}" base linux-zen linux-zen-headers
       fi
-      pacstrap ${MOUNTPOINT} \
+      pacstrap "${MOUNTPOINT}" \
         cryptsetup lvm2 netctl dhcpcd inetutils jfsutils diffutils e2fsprogs \
         less linux-firmware logrotate man-db man-pages mdadm nano \
         perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprogs
@@ -497,15 +504,15 @@ install_base_system() {
   print_info "Installing PGP keyring"
   pacman -Sy archlinux-keyring
   print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
-  rm ${MOUNTPOINT}${EFI_MOUNTPOINT}/vmlinuz-linux
+  rm "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/vmlinuz-linux
   select_linux_version
-  pacstrap ${MOUNTPOINT} base-devel parted btrfs-progs f2fs-tools net-tools
+  pacstrap "${MOUNTPOINT}" base-devel parted btrfs-progs f2fs-tools net-tools
   [[ $? -ne 0 ]] && error_msg "Installing base system to ${MOUNTPOINT} failed. Check error messages above."
   local PTABLE=$(parted -sl | grep "gpt")
-  [[ -n $PTABLE ]] && pacstrap ${MOUNTPOINT} gptfdisk
+  [[ -n $PTABLE ]] && pacstrap "${MOUNTPOINT}" gptfdisk
   WIRELESS_DEV=$(ip link | grep wl | awk '{print $2}' | sed 's/://' | sed '1!d')
   if [[ -n $WIRELESS_DEV ]]; then
-    pacstrap ${MOUNTPOINT} iw wireless_tools wpa_supplicant dialog
+    pacstrap "${MOUNTPOINT}" iw wireless_tools wpa_supplicant dialog
   else
     WIRED_DEV=$(ip link | grep "ens\|eno\|enp" | awk '{print $2}' | sed 's/://' | sed '1!d')
     if [[ -n $WIRED_DEV ]]; then
@@ -513,7 +520,7 @@ install_base_system() {
     fi
   fi
   if is_package_installed "espeakup"; then
-    pacstrap ${MOUNTPOINT} alsa-utils espeakup brltty
+    pacstrap "${MOUNTPOINT}" alsa-utils espeakup brltty
     arch_chroot "systemctl enable espeakup.service"
   fi
 }
@@ -521,7 +528,7 @@ install_base_system() {
 #CONFIGURE KEYMAP {{{
 configure_keymap() {
   #ADD KEYMAP TO THE NEW SETUP
-  echo "KEYMAP=$KEYMAP" >${MOUNTPOINT}/etc/vconsole.conf
+  echo "KEYMAP=$KEYMAP" >"${MOUNTPOINT}"/etc/vconsole.conf
 }
 #}}}
 #CONFIGURE FSTAB {{{
@@ -529,9 +536,9 @@ configure_fstab() {
   print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
   print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific partition or partition."
   if [[ ! -f ${MOUNTPOINT}/etc/fstab.aui ]]; then
-    cp ${MOUNTPOINT}/etc/fstab ${MOUNTPOINT}/etc/fstab.aui
+    cp "${MOUNTPOINT}"/etc/fstab "${MOUNTPOINT}"/etc/fstab.aui
   else
-    cp ${MOUNTPOINT}/etc/fstab.aui ${MOUNTPOINT}/etc/fstab
+    cp "${MOUNTPOINT}"/etc/fstab.aui "${MOUNTPOINT}"/etc/fstab
   fi
   if [[ $UEFI -eq 1 ]]; then
     fstab_list=("DEV" "PARTUUID" "LABEL")
@@ -543,36 +550,37 @@ configure_fstab() {
   echo -e "Configure fstab based on:"
   select OPT in "${fstab_list[@]}"; do
     case "$REPLY" in
-    1) genfstab -p ${MOUNTPOINT} >>${MOUNTPOINT}/etc/fstab ;;
+    1) genfstab -p "${MOUNTPOINT}" >>"${MOUNTPOINT}"/etc/fstab ;;
     2)
       if [[ $UEFI -eq 1 ]]; then
-        genfstab -t PARTUUID -p ${MOUNTPOINT} >>${MOUNTPOINT}/etc/fstab
+        genfstab -t PARTUUID -p "${MOUNTPOINT}" >>"${MOUNTPOINT}"/etc/fstab
       else
-        genfstab -U -p ${MOUNTPOINT} >>${MOUNTPOINT}/etc/fstab
+        genfstab -U -p "${MOUNTPOINT}" >>"${MOUNTPOINT}"/etc/fstab
       fi
       ;;
-    3) genfstab -L -p ${MOUNTPOINT} >>${MOUNTPOINT}/etc/fstab ;;
+    3) genfstab -L -p "${MOUNTPOINT}" >>"${MOUNTPOINT}"/etc/fstab ;;
     *) invalid_option ;;
     esac
     [[ -n $OPT ]] && break
   done
   fstab=$OPT
   echo "Review your fstab"
-  [[ -f ${MOUNTPOINT}/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" ${MOUNTPOINT}/etc/fstab
+  [[ -f ${MOUNTPOINT}/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" "${MOUNTPOINT}"/etc/fstab
   pause_function
-  $EDITOR ${MOUNTPOINT}/etc/fstab
+  $EDITOR "${MOUNTPOINT}"/etc/fstab
 }
 #}}}
 #CONFIGURE HOSTNAME {{{
 configure_hostname() {
   print_title "HOSTNAME - https://wiki.archlinux.org/index.php/HOSTNAME"
   print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
-  read -p "Hostname [ex: archlinux]: " host_name
-  echo "$host_name" >${MOUNTPOINT}/etc/hostname
+  printf "%s" "Hostname [ex: archlinux]: " 
+  read -r host_name
+  echo "$host_name" >"${MOUNTPOINT}"/etc/hostname
   if [[ ! -f ${MOUNTPOINT}/etc/hosts.aui ]]; then
-    cp ${MOUNTPOINT}/etc/hosts ${MOUNTPOINT}/etc/hosts.aui
+    cp "${MOUNTPOINT}"/etc/hosts "${MOUNTPOINT}"/etc/hosts.aui
   else
-    cp ${MOUNTPOINT}/etc/hosts.aui ${MOUNTPOINT}/etc/hosts
+    cp "${MOUNTPOINT}"/etc/hosts.aui "${MOUNTPOINT}"/etc/hosts
   fi
   arch_chroot "sed -i '/127.0.0.1/s/$/ '${host_name}'/' /etc/hosts"
   arch_chroot "sed -i '/::1/s/$/ '${host_name}'/' /etc/hosts"
@@ -624,7 +632,7 @@ configure_locale() {
     setlocale
     read_input_text "Confirm locale ($LOCALE)"
   done
-  echo 'LANG="'$LOCALE_UTF8'"' >${MOUNTPOINT}/etc/locale.conf
+  echo 'LANG="'"$LOCALE_UTF8"'"' >"${MOUNTPOINT}"/etc/locale.conf
   arch_chroot "sed -i 's/#\('${LOCALE_UTF8}'\)/\1/' /etc/locale.gen"
   arch_chroot "locale-gen"
 }
@@ -633,14 +641,14 @@ configure_locale() {
 configure_mkinitcpio() {
   print_title "MKINITCPIO - https://wiki.archlinux.org/index.php/Mkinitcpio"
   print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
-  [[ $LUKS -eq 1 ]] && sed -i '/^HOOK/s/block/block keymap encrypt/' ${MOUNTPOINT}/etc/mkinitcpio.conf
-  [[ $LVM -eq 1 ]] && sed -i '/^HOOK/s/filesystems/lvm2 filesystems/' ${MOUNTPOINT}/etc/mkinitcpio.conf
-  $EDITOR ${MOUNTPOINT}/etc/mkinitcpio.conf
-  if [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep hardened -c)" -gt "0" ]; then
+  [[ $LUKS -eq 1 ]] && sed -i '/^HOOK/s/block/block keymap encrypt/' "${MOUNTPOINT}"/etc/mkinitcpio.conf
+  [[ $LVM -eq 1 ]] && sed -i '/^HOOK/s/filesystems/lvm2 filesystems/' "${MOUNTPOINT}"/etc/mkinitcpio.conf
+  $EDITOR "${MOUNTPOINT}"/etc/mkinitcpio.conf
+  if [ "$(arch-chroot "${MOUNTPOINT}" ls /boot | grep hardened -c)" -gt "0" ]; then
     arch_chroot "mkinitcpio -p linux-hardened"
-  elif [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep lts -c)" -gt "0" ]; then
+  elif [ "$(arch-chroot "${MOUNTPOINT}" ls /boot | grep lts -c)" -gt "0" ]; then
     arch_chroot "mkinitcpio -p linux-lts"
-  elif [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep zen -c)" -gt "0" ]; then
+  elif [ "$(arch-chroot "${MOUNTPOINT}" ls /boot | grep zen -c)" -gt "0" ]; then
     arch_chroot "mkinitcpio -p linux-zen"
   else
     arch_chroot "mkinitcpio -p linux"
@@ -664,11 +672,11 @@ install_bootloader() {
   select bootloader in "${bootloaders_list[@]}"; do
     case "$REPLY" in
     1)
-      pacstrap ${MOUNTPOINT} grub os-prober
+      pacstrap "${MOUNTPOINT}" grub os-prober
       break
       ;;
     2)
-      pacstrap ${MOUNTPOINT} syslinux gptfdisk
+      pacstrap "${MOUNTPOINT}" syslinux gptfdisk
       break
       ;;
     3)
@@ -676,7 +684,7 @@ install_bootloader() {
       ;;
     4)
       if [[ $UEFI -eq 1 ]]; then
-        pacstrap ${MOUNTPOINT} refind-efi os-prober
+        pacstrap "${MOUNTPOINT}" refind-efi os-prober
         break
       else
         invalid_option
@@ -690,7 +698,7 @@ install_bootloader() {
       ;;
     esac
   done
-  [[ $UEFI -eq 1 ]] && pacstrap ${MOUNTPOINT} efibootmgr dosfstools
+  [[ $UEFI -eq 1 ]] && pacstrap "${MOUNTPOINT}" efibootmgr dosfstools
 }
 #}}}
 #CONFIGURE BOOTLOADER {{{
@@ -706,7 +714,7 @@ configure_bootloader() {
       case "$REPLY" in
       1)
         if [[ $LUKS -eq 1 ]]; then
-          sed -i -e 's/GRUB_CMDLINE_LINUX="\(.\+\)"/GRUB_CMDLINE_LINUX="\1 cryptdevice=\/dev\/'"${LUKS_DISK}"':crypt"/g' -e 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="cryptdevice=\/dev\/'"${LUKS_DISK}"':crypt"/g' ${MOUNTPOINT}/etc/default/grub
+          sed -i -e 's/GRUB_CMDLINE_LINUX="\(.\+\)"/GRUB_CMDLINE_LINUX="\1 cryptdevice=\/dev\/'"${LUKS_DISK}"':crypt"/g' -e 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="cryptdevice=\/dev\/'"${LUKS_DISK}"':crypt"/g' "${MOUNTPOINT}"/etc/default/grub
         fi
         if [[ $UEFI -eq 1 ]]; then
           arch_chroot "grub-install --target=x86_64-efi --efi-directory=${EFI_MOUNTPOINT} --bootloader-id=arch_grub --recheck"
@@ -716,7 +724,7 @@ configure_bootloader() {
         break
         ;;
       2)
-        arch-chroot ${MOUNTPOINT}
+        arch-chroot "${MOUNTPOINT}"
         break
         ;;
       *)
@@ -737,36 +745,36 @@ configure_bootloader() {
       1)
         arch_chroot "syslinux-install_update -iam"
         if [[ $LUKS -eq 1 ]]; then
-          sed -i "s/APPEND root=.*/APPEND root=\/dev\/mapper\/${ROOT_PART} cryptdevice=\/dev\/${LUKS_DISK}:crypt ro/g" ${MOUNTPOINT}${EFI_MOUNTPOINT}/syslinux/syslinux.cfg
+          sed -i "s/APPEND root=.*/APPEND root=\/dev\/mapper\/${ROOT_PART} cryptdevice=\/dev\/${LUKS_DISK}:crypt ro/g" "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/syslinux/syslinux.cfg
         elif [[ $LVM -eq 1 ]]; then
-          sed -i "s/sda[0-9]/\/dev\/mapper\/${ROOT_PART}/g" ${MOUNTPOINT}${EFI_MOUNTPOINT}/syslinux/syslinux.cfg
+          sed -i "s/sda[0-9]/\/dev\/mapper\/${ROOT_PART}/g" "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/syslinux/syslinux.cfg
         else
-          sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}${EFI_MOUNTPOINT}/syslinux/syslinux.cfg
+          sed -i "s/sda[0-9]/${ROOT_PART}/g" "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/syslinux/syslinux.cfg
         fi
         print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
         pause_function
-        $EDITOR ${MOUNTPOINT}${EFI_MOUNTPOINT}/syslinux/syslinux.cfg
+        $EDITOR "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/syslinux/syslinux.cfg
         break
         ;;
       2)
         arch_chroot "syslinux-install_update -i"
         if [[ $LUKS -eq 1 ]]; then
-          sed -i "s/APPEND root=.*/APPEND root=\/dev\/mapper\/${ROOT_PART} cryptdevice=\/dev\/${LUKS_DISK}:crypt ro/g" ${MOUNTPOINT}${EFI_MOUNTPOINT}/syslinux/syslinux.cfg
+          sed -i "s/APPEND root=.*/APPEND root=\/dev\/mapper\/${ROOT_PART} cryptdevice=\/dev\/${LUKS_DISK}:crypt ro/g" "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/syslinux/syslinux.cfg
         elif [[ $LVM -eq 1 ]]; then
-          sed -i "s/sda[0-9]/\/dev\/mapper\/${ROOT_PART}/g" ${MOUNTPOINT}${EFI_MOUNTPOINT}/syslinux/syslinux.cfg
+          sed -i "s/sda[0-9]/\/dev\/mapper\/${ROOT_PART}/g" "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/syslinux/syslinux.cfg
         else
-          sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}${EFI_MOUNTPOINT}/syslinux/syslinux.cfg
+          sed -i "s/sda[0-9]/${ROOT_PART}/g" "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/syslinux/syslinux.cfg
         fi
         print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
         pause_function
-        $EDITOR ${MOUNTPOINT}${EFI_MOUNTPOINT}/syslinux/syslinux.cfg
+        $EDITOR "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/syslinux/syslinux.cfg
         break
         ;;
       3)
         print_info "Your boot partition, on which you plan to install Syslinux, must contain a FAT, ext2, ext3, ext4, or Btrfs file system. You should install it on a mounted directory, not a /dev/sdXY partition. You do not have to install it on the root directory of a file system, e.g., with partition /dev/sda1 mounted on /boot you can install Syslinux in the syslinux directory"
-        echo -e $prompt3
+        echo -e "$prompt3"
         print_warning "mkdir /boot/syslinux\nextlinux --install /boot/syslinux "
-        arch-chroot ${MOUNTPOINT}
+        arch-chroot "${MOUNTPOINT}"
         break
         ;;
       *)
@@ -787,31 +795,31 @@ configure_bootloader() {
       1)
         arch_chroot "bootctl --path=${EFI_MOUNTPOINT} install"
         print_warning "Please check your .conf file"
-        partuuid=$(blkid -s PARTUUID ${ROOT_MOUNTPOINT} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//')
-        if [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep hardened -c)" -gt "0" ]; then
+        partuuid=$(blkid -s PARTUUID "${ROOT_MOUNTPOINT}" | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//')
+        if [ "$(arch-chroot "${MOUNTPOINT}" ls /boot | grep hardened -c)" -gt "0" ]; then
           img_name="linux-hardened"
-        elif [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep lts -c)" -gt "0" ]; then
+        elif [ "$(arch-chroot "${MOUNTPOINT}" ls /boot | grep lts -c)" -gt "0" ]; then
           img_name="linux-lts"
-        elif [ "$(arch-chroot ${MOUNTPOINT} ls /boot | grep zen -c)" -gt "0" ]; then
+        elif [ "$(arch-chroot "${MOUNTPOINT}" ls /boot | grep zen -c)" -gt "0" ]; then
           img_name="linux-zen"
         else
           img_name="linux"
         fi
         if [[ $LUKS -eq 1 ]]; then
-          echo -e "title\tArch Linux\nlinux\t/vmlinuz-${img_name}\ninitrd\t/initramfs-${img_name}.img\noptions\tcryptdevice=\/dev\/${LUKS_DISK}:luks root=\/dev\/mapper\/${ROOT_PART} rw" >${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/entries/arch.conf
+          echo -e "title\tArch Linux\nlinux\t/vmlinuz-${img_name}\ninitrd\t/initramfs-${img_name}.img\noptions\tcryptdevice=\/dev\/${LUKS_DISK}:luks root=\/dev\/mapper\/${ROOT_PART} rw" >"${MOUNTPOINT}""${EFI_MOUNTPOINT}"/loader/entries/arch.conf
         elif [[ $LVM -eq 1 ]]; then
-          echo -e "title\tArch Linux\nlinux\t/vmlinuz-${img_name}\ninitrd\t/initramfs-${img_name}.img\noptions\troot=\/dev\/mapper\/${ROOT_PART} rw" >${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/entries/arch.conf
+          echo -e "title\tArch Linux\nlinux\t/vmlinuz-${img_name}\ninitrd\t/initramfs-${img_name}.img\noptions\troot=\/dev\/mapper\/${ROOT_PART} rw" >"${MOUNTPOINT}""${EFI_MOUNTPOINT}"/loader/entries/arch.conf
         else
-          echo -e "title\tArch Linux\nlinux\t/vmlinuz-${img_name}\ninitrd\t/initramfs-${img_name}.img\noptions\troot=PARTUUID=${partuuid} rw" >${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/entries/arch.conf
+          echo -e "title\tArch Linux\nlinux\t/vmlinuz-${img_name}\ninitrd\t/initramfs-${img_name}.img\noptions\troot=PARTUUID=${partuuid} rw" >"${MOUNTPOINT}""${EFI_MOUNTPOINT}"/loader/entries/arch.conf
         fi
-        echo -e "default  arch\ntimeout  5" >${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/loader.conf
+        echo -e "default  arch\ntimeout  5" >"${MOUNTPOINT}""${EFI_MOUNTPOINT}"/loader/loader.conf
         pause_function
-        $EDITOR ${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/entries/arch.conf
-        $EDITOR ${MOUNTPOINT}${EFI_MOUNTPOINT}/loader/loader.conf
+        $EDITOR "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/loader/entries/arch.conf
+        $EDITOR "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/loader/loader.conf
         break
         ;;
       2)
-        arch-chroot ${MOUNTPOINT}
+        arch-chroot "${MOUNTPOINT}"
         break
         ;;
       *)
@@ -831,11 +839,11 @@ configure_bootloader() {
       case "$REPLY" in
       1)
         arch_chroot "refind-install"
-        $EDITOR ${MOUNTPOINT}${EFI_MOUNTPOINT}/refind_linux.conf
+        $EDITOR "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/refind_linux.conf
         break
         ;;
       2)
-        arch-chroot ${MOUNTPOINT}
+        arch-chroot "${MOUNTPOINT}"
         break
         ;;
       *)
@@ -861,7 +869,7 @@ finish() {
   print_title "INSTALL COMPLETED"
   #COPY AUI TO ROOT FOLDER IN THE NEW SYSTEM
   print_warning "\nA copy of the AUI will be placed in /root directory of your new system"
-  cp -R $(pwd) ${MOUNTPOINT}/root
+  cp -R "$(pwd)" "${MOUNTPOINT}"/root
   read_input_text "Reboot system"
   if [[ $OPTION == y ]]; then
     umount_partitions
@@ -895,7 +903,7 @@ while true; do
   echo " d) Done"
   echo ""
   read_input_options
-  for OPT in ${OPTIONS[@]}; do
+  for OPT in "${OPTIONS[@]}"; do
     case "$OPT" in
     1)
       select_keymap
