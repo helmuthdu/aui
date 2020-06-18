@@ -2,10 +2,10 @@
 #shellcheck disable=SC2034
 
 : 'ATTENTION!:
--------------------------------------------------------
-|  Created by helmuthdu mailto <helmuthdu@gmail.com>  |
-|  Shellchecked by uniminin <uniminin@zoho.com>       |
--------------------------------------------------------
+--------------------------------------------------
+|  Created by helmuthdu <helmuthdu@gmail.com>    |
+|  Shellchecked by uniminin <uniminin@zoho.com>  |
+--------------------------------------------------
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -190,21 +190,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   #  9) Jetbrains Toolbox
   # 10) IntelliJ IDEA
   # 11) IntelliJ IDEA Ultimate Edition
-  # 12) Monodevelop
-  # 13) QT Creator
-  # 14) MySQL Workbench
-  # 15) OpenJDK 8
-  # 16) OpenJDK 9
-  # 17) OpenJDK 10
-  # 18) OracleJDK
-  # 19) NodeJS
-  # 20) Microsoft Visual Studio Code
-  # 21) Git GUI-s
-  # 22) kdiff3
-  # 23) Regexxer
-  # 24) Postman
-  # 25) Gitkraken
-  # 26) FreeCad
+  # 12) Micro
+  # 13) Monodevelop
+  # 14) QT Creator
+  # 15) MySQL Workbench
+  # 16) OpenJDK 8
+  # 17) OpenJDK 9
+  # 18) OpenJDK 10
+  # 19) OracleJDK
+  # 20) NodeJS
+  # 21) Microsoft Visual Studio Code
+  # 22) Git GUI-s
+  # 23) kdiff3
+  # 24) Regexxer
+  # 25) Postman
+  # 26) Gitkraken
+  # 27) FreeCad
   DEVELOPMENT_OPTIONS="18"
 #}}}
 #OFFICE {{{
