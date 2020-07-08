@@ -369,7 +369,7 @@ format_partitions() {
         ;;
       2)
         total_memory=$(grep MemTotal /proc/meminfo | awk '{print $2/1024}' | sed 's/\..*//')
-        fallocate -l "${total_memory}"M "${MOUNTPOINT}"/swapfile
+        dd if=/dev/zero of="${MOUNTPOINT}"/swapfile bs=1M count="${total_memory}" status=progress
         chmod 600 "${MOUNTPOINT}"/swapfile
         mkswap "${MOUNTPOINT}"/swapfile
         swapon "${MOUNTPOINT}"/swapfile
