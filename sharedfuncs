@@ -324,7 +324,7 @@ Run this script after your first boot with archlinux (as root)
     else
       printf "%s" "$prompt2"
       read -r OPTION
-      array=("$OPTION")
+      IFS=' ' read -r -a array <<< "${OPTION}"
     fi
     for line in "${array[@]/,/ }"; do
       if [[ ${line/-/} != "$line" ]]; then
