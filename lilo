@@ -758,6 +758,8 @@ create_ramdisk_environment(){
     mkinitcpio -p linux-hardened
   elif [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
     mkinitcpio -p linux-lts
+  elif [ "$(ls /boot | grep zen -c)" -gt "0" ]; then
+    mkinitcpio -p linux-zen
   else
     mkinitcpio -p linux
   fi
