@@ -2575,8 +2575,8 @@ install_internet_apps(){
           do
             print_title "DESKTOP SHARE"
             echo " 1) $(menu_item "anydesk") $AUR"
-            echo " 1) $(menu_item "remmina")"
-            echo " 2) $(menu_item "teamviewer") $AUR"
+            echo " 2) $(menu_item "remmina")"
+            echo " 3) $(menu_item "teamviewer") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
