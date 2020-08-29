@@ -1,10 +1,14 @@
 #!/bin/bash
+# FIX THIS ISSUES | NON-ACUTE
+#shellcheck disable=SC1001,SC1091,SC2001,SC2010,SC2015,SC2034,SC2104,SC2154
+#shellcheck disable=SC2154,SC2153,SC2155,SC2165,SC2167,SC2181,SC2207
 
 : 'ATTENTION!:
-------------------------------------------------------
-|  Created by helmuthdu mailto: helmuthdu@gmail.com  |
-|  Contribution: flexiondotorg                       |
-------------------------------------------------------
+--------------------------------------------------
+|  Created by helmuthdu <helmuthdu@gmail.com>    |
+|  Contributed by flexiondotorg                  |
+|  Shellchecked by uniminin <uniminin@zoho.com>  |
+--------------------------------------------------
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -21,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Run this script after your first boot with archlinux (as root)
 '
 
-if [[ -f `pwd`/sharedfuncs ]]; then
+if [[ -f $(pwd)/sharedfuncs ]]; then
   source sharedfuncs
 else
   echo "missing file: sharedfuncs"
@@ -57,102 +61,103 @@ welcome(){
 language_selector(){
   #AUTOMATICALLY DETECTS THE SYSTEM LOCALE {{{
   #automatically detects the system language based on your locale
-  LOCALE=`locale | grep LANG | sed 's/LANG=//' | cut -c1-5`
+  LOCALE=$(locale | grep LANG | sed 's/LANG=//' | cut -c1-5)
   #KDE #{{{
   if [[ $LOCALE == pt_BR || $LOCALE == en_GB || $LOCALE == zh_CN ]]; then
-    LOCALE_KDE=`echo $LOCALE | tr '[:upper:]' '[:lower:]'`
+    LOCALE_KDE=$(echo "$LOCALE" | tr '[:upper:]' '[:lower:]')
   else
-    LOCALE_KDE=`echo $LOCALE | cut -d\_ -f1`
+    LOCALE_KDE=$(echo "$LOCALE" | cut -d\_ -f1)
   fi
   #}}}
   #FIREFOX #{{{
   if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_GB || $LOCALE == en_US || $LOCALE == es_AR || $LOCALE == es_CL || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
-    LOCALE_FF=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+    LOCALE_FF=$(echo "$LOCALE" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/')
   else
-    LOCALE_FF=`echo $LOCALE | cut -d\_ -f1`
+    LOCALE_FF=$(echo "$LOCALE" | cut -d\_ -f1)
   fi
   #}}}
   #THUNDERBIRD #{{{
   if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_US || $LOCALE == en_GB || $LOCALE == es_AR || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
-    LOCALE_TB=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+    LOCALE_TB=$(echo "$LOCALE" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/')
   elif [[ $LOCALE == es_CL ]]; then
     LOCALE_TB="es-es"
   else
-    LOCALE_TB=`echo $LOCALE | cut -d\_ -f1`
+    LOCALE_TB=$(echo "$LOCALE" | cut -d\_ -f1)
   fi
   #}}}
   #HUNSPELL #{{{
   if [[ $LOCALE == pt_BR ]]; then
-    LOCALE_HS=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+    LOCALE_HS=$(echo "$LOCALE" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/')
   elif [[ $LOCALE == pt_PT ]]; then
     LOCALE_HS="pt_pt"
   else
-    LOCALE_HS=`echo $LOCALE | cut -d\_ -f1`
+    LOCALE_HS=$(echo "$LOCALE" | cut -d\_ -f1)
   fi
   #}}}
   #ASPELL #{{{
-  LOCALE_AS=`echo $LOCALE | cut -d\_ -f1`
+  LOCALE_AS=$(echo "$LOCALE" | cut -d\_ -f1)
   #}}}
   #LIBREOFFICE #{{{
   if [[ $LOCALE == pt_BR || $LOCALE == en_GB || $LOCALE == en_US || $LOCALE == zh_CN ]]; then
-    LOCALE_LO=`echo $LOCALE | sed 's/_/-/'`
+    LOCALE_LO=$(echo "$LOCALE" | sed 's/_/-/')
   else
-    LOCALE_LO=`echo $LOCALE | cut -d\_ -f1`
+    LOCALE_LO=$(echo "$LOCALE" | cut -d\_ -f1)
   fi
   #}}}
   #}}}
   print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
   print_info "Locales are used in Linux to define which language the user uses. As the locales define the character sets being used as well, setting up the correct locale is especially important if the language contains non-ASCII characters."
-  read -p "Default system language: \"$LOCALE\" [Y/n]: " OPTION
+  printf "%s" "Default system language: \"$LOCALE\" [Y/n]: " 
+  read -r OPTION
   case "$OPTION" in
     "n")
       while [[ $OPTION != y ]]; do
         setlocale
         read_input_text "Confirm locale ($LOCALE)"
       done
-      sed -i '/'${LOCALE}'/s/^#//' /etc/locale.gen
+      sed -i '/'"${LOCALE}"'/s/^#//' /etc/locale.gen
       locale-gen
-      localectl set-locale LANG=${LOCALE_UTF8}
+      localectl set-locale LANG="${LOCALE_UTF8}"
       #KDE #{{{
       if [[ $LOCALE == pt_BR || $LOCALE == en_GB || $LOCALE == zh_CN ]]; then
-        LOCALE_KDE=`echo $LOCALE | tr '[:upper:]' '[:lower:]'`
+        LOCALE_KDE=$(echo "$LOCALE" | tr '[:upper:]' '[:lower:]')
       else
-        LOCALE_KDE=`echo $LOCALE | cut -d\_ -f1`
+        LOCALE_KDE=$(echo "$LOCALE" | cut -d\_ -f1)
       fi
       #}}}
       #FIREFOX #{{{
       if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_GB || $LOCALE == en_US || $LOCALE == es_AR || $LOCALE == es_CL || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
-        LOCALE_FF=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+        LOCALE_FF=$(echo "$LOCALE" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/')
       else
-        LOCALE_FF=`echo $LOCALE | cut -d\_ -f1`
+        LOCALE_FF=$(echo "$LOCALE" | cut -d\_ -f1)
       fi
       #}}}
       #THUNDERBIRD #{{{
       if [[ $LOCALE == pt_BR || $LOCALE == pt_PT || $LOCALE == en_US || $LOCALE == en_GB || $LOCALE == es_AR || $LOCALE == es_ES || $LOCALE == zh_CN ]]; then
-        LOCALE_TB=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+        LOCALE_TB=$(echo "$LOCALE" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/')
       elif [[ $LOCALE == es_CL ]]; then
         LOCALE_TB="es-es"
       else
-        LOCALE_TB=`echo $LOCALE | cut -d\_ -f1`
+        LOCALE_TB=$(echo "$LOCALE" | cut -d\_ -f1)
       fi
       #}}}
       #HUNSPELL #{{{
       if [[ $LOCALE == pt_BR ]]; then
-        LOCALE_HS=`echo $LOCALE | tr '[:upper:]' '[:lower:]' | sed 's/_/-/'`
+        LOCALE_HS=$(echo "$LOCALE" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/')
       elif [[ $LOCALE == pt_PT ]]; then
         LOCALE_HS="pt_pt"
       else
-        LOCALE_HS=`echo $LOCALE | cut -d\_ -f1`
+        LOCALE_HS=$(echo "$LOCALE" | cut -d\_ -f1)
       fi
       #}}}
       #ASPELL #{{{
-      LOCALE_AS=`echo $LOCALE | cut -d\_ -f1`
+      LOCALE_AS=$(echo "$LOCALE" | cut -d\_ -f1)
       #}}}
       #LIBREOFFICE #{{{
       if [[ $LOCALE == pt_BR || $LOCALE == en_GB || $LOCALE == en_US || $LOCALE == zh_CN ]]; then
-        LOCALE_LO=`echo $LOCALE | sed 's/_/-/'`
+        LOCALE_LO=$(echo "$LOCALE" | sed 's/_/-/')
       else
-        LOCALE_LO=`echo $LOCALE | cut -d\_ -f1`
+        LOCALE_LO=$(echo "$LOCALE" | cut -d\_ -f1)
       fi
       #}}}
       ;;
@@ -165,13 +170,14 @@ language_selector(){
 select_user(){
   #CREATE NEW USER {{{
   create_new_user(){
-    read -p "Username: " username
-    username=`echo $username | tr '[:upper:]' '[:lower:]'`
-    useradd -m -g users -G wheel -s /bin/bash ${username}
-    chfn ${username}
-    passwd ${username}
+    printf "%s" "Username: "
+    read -r username
+    username=$(echo "$username" | tr '[:upper:]' '[:lower:]')
+    useradd -m -g users -G wheel -s /bin/bash "${username}"
+    chfn "${username}"
+    passwd "${username}"
     while [[ $? -ne 0 ]]; do
-      passwd ${username}
+      passwd "${username}"
     done
     pause_function
     configure_user_account
@@ -191,19 +197,21 @@ select_user(){
           package_install "colordiff"
           git clone https://github.com/helmuthdu/dotfiles
           cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc dotfiles/.yaourtrc ~/
-          cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc dotfiles/.yaourtrc /home/${username}/
+          cp dotfiles/.bashrc dotfiles/.dircolors dotfiles/.dircolors_256 dotfiles/.nanorc dotfiles/.yaourtrc /home/"${username}"/
           rm -fr dotfiles
           ;;
         2)
-          cp /etc/skel/.bashrc /home/${username}
+          cp /etc/skel/.bashrc /home/"${username}"
           ;;
         3)
           package_install "git"
-          read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
-          read -p "Enter your github repository [ex: aui]: " GITHUB_REPO
-          git clone https://github.com/$GITHUB_USER/$GITHUB_REPO
-          cp -R $GITHUB_REPO/.* /home/${username}/
-          rm -fr $GITHUB_REPO
+          printf "%s" "Enter your github username [ex: helmuthdu]: " 
+          read -r GITHUB_USER
+          printf "%s" "Enter your github repository [ex: aui]: "
+          read -r GITHUB_REPO
+          git clone https://github.com/"$GITHUB_USER"/"$GITHUB_REPO"
+          cp -R "$GITHUB_REPO"/.* /home/"${username}"/
+          rm -fr "$GITHUB_REPO"
           ;;
         *)
           invalid_option
@@ -230,23 +238,25 @@ select_user(){
               case "$REPLY" in
                 1)
                   package_install "git"
-                  git clone https://github.com/helmuthdu/vim /home/${username}/.vim
-                  ln -sf /home/${username}/.vim/vimrc /home/${username}/.vimrc
-                  cp -R vim /home/${username}/.vim/fonts /home/${username}/.fonts
+                  git clone https://github.com/helmuthdu/vim /home/"${username}"/.vim
+                  ln -sf /home/"${username}"/.vim/vimrc /home/"${username}"/.vimrc
+                  cp -R vim /home/"${username}"/.vim/fonts /home/"${username}"/.fonts
                   GRUVBOX_NEEDED=1
                   ;;
                 3)
                   package_install "git"
-                  read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
-                  read -p "Enter your github repository [ex: vim]: " GITHUB_REPO
-                  git clone https://github.com/$GITHUB_USER/$GITHUB_REPO
-                  cp -R $GITHUB_REPO/.vim /home/${username}/
+                  printf "%s" "Enter your github username [ex: helmuthdu]: "
+                  read -r GITHUB_USER
+                  printf "%s" "Enter your github repository [ex: vim]: "
+                  read -r GITHUB_REPO
+                  git clone https://github.com/"$GITHUB_USER"/"$GITHUB_REPO"
+                  cp -R "$GITHUB_REPO"/.vim /home/"${username}"/
                   if [[ -f $GITHUB_REPO/vimrc ]]; then
-                    ln -sf /home/${username}/.vim/vimrc /home/${username}/.vimrc
+                    ln -sf /home/"${username}"/.vim/vimrc /home/"${username}"/.vimrc
                   else
-                    ln -sf /home/${username}/.vim/.vimrc /home/${username}/.vimrc
+                    ln -sf /home/"${username}"/.vim/.vimrc /home/"${username}"/.vimrc
                   fi
-                  rm -fr $GITHUB_REPO
+                  rm -fr "$GITHUB_REPO"
                   ;;
                 2)
                   echo "Nothing to do..."
@@ -275,19 +285,21 @@ select_user(){
                     case "$REPLY" in
                         1)
                             package_install "git"
-                            git clone https://github.com/syl20bnr/spacemacs /home/${username}/.emacs.d
+                            git clone https://github.com/syl20bnr/spacemacs /home/"${username}"/.emacs.d
                             ;;
                         2)
                             package_install "git"
-                            git clone --depth 1 https://github.com/seagle0128/.emacs.d.git /home/${username}/.emacs.d
+                            git clone --depth 1 https://github.com/seagle0128/.emacs.d.git /home/"${username}"/.emacs.d
+                            ;;
+                        3)
+                            package_install "git"
+                            printf "%s" "Enter your github username [ex: helmuthdu]: "
+                            read -r GITHUB_USER
+                            printf "%s" "Enter your github repository [ex: vim]: "
+                            read -r GITHUB_REPO
+                            git clone https://github.com/"$GITHUB_USER"/"$GITHUB_REPO" /home/"${username}"/.emacs.d
                             ;;
                         4)
-                            package_install "git"
-                            read -p "Enter your github username [ex: helmuthdu]: " GITHUB_USER
-                            read -p "Enter your github repository [ex: vim]: " GITHUB_REPO
-                            git clone https://github.com/$GITHUB_USER/$GITHUB_REPO /home/${username}/.emacs.d
-                            ;;
-                        2)
                             echo "Nothing to do..."
                             ;;
                         *)
@@ -307,11 +319,11 @@ select_user(){
       fi
     done
     #}}}
-    chown -R ${username}:users /home/${username}
+    chown -R "${username}":users /home/"${username}"
   }
   #}}}
   print_title "SELECT/CREATE USER - https://wiki.archlinux.org/index.php/Users_and_Groups"
-  users_list=(`cat /etc/passwd | grep "/home" | cut -d: -f1`);
+  users_list=($(grep "/home" /etc/passwd | cut -d: -f1));
   PS3="$prompt1"
   echo "Avaliable Users:"
   if [[ $(( ${#users_list[@]} )) -gt 0 ]]; then
@@ -331,8 +343,8 @@ select_user(){
   done
   [[ ! -f /home/${username}/.bashrc ]] && configure_user_account;
   if [[ -n "$http_proxy" ]]; then
-    echo "proxy = $http_proxy" > /home/${username}/.curlrc
-    chown ${username}:users /home/${username}/.curlrc
+    echo "proxy = $http_proxy" > /home/"${username}"/.curlrc
+    chown "${username}":users /home/"${username}"/.curlrc
   fi
 }
 #}}}
@@ -351,16 +363,18 @@ configure_sudo(){
     #sed -i '/%wheel ALL=(ALL) NOPASSWD: ALL/s/^#//' /etc/sudoers
 
     #This config is especially helpful for those using terminal multiplexers like screen, tmux, or ratpoison, and those using sudo from scripts/cronjobs:
-    echo "" >> /etc/sudoers
-    echo 'Defaults !requiretty, !tty_tickets, !umask' >> /etc/sudoers
-    echo 'Defaults visiblepw, path_info, insults, lecture=always' >> /etc/sudoers
-    echo 'Defaults loglinelen=0, logfile =/var/log/sudo.log, log_year, log_host, syslog=auth' >> /etc/sudoers
-    echo 'Defaults passwd_tries=3, passwd_timeout=1' >> /etc/sudoers
-    echo 'Defaults env_reset, always_set_home, set_home, set_logname' >> /etc/sudoers
-    echo 'Defaults !env_editor, editor="/usr/bin/vim:/usr/bin/vi:/usr/bin/nano"' >> /etc/sudoers
-    echo 'Defaults timestamp_timeout=15' >> /etc/sudoers
-    echo 'Defaults passprompt="[sudo] password for %u: "' >> /etc/sudoers
-    echo 'Defaults lecture=never' >> /etc/sudoers
+    {
+        echo ""
+        echo 'Defaults !requiretty, !tty_tickets, !umask'
+        echo 'Defaults visiblepw, path_info, insults, lecture=always'
+        echo 'Defaults loglinelen=0, logfile =/var/log/sudo.log, log_year, log_host, syslog=auth'
+        echo 'Defaults passwd_tries=3, passwd_timeout=1'
+        echo 'Defaults env_reset, always_set_home, set_home, set_logname'
+        echo 'Defaults !env_editor, editor="/usr/bin/vim:/usr/bin/vi:/usr/bin/nano"'
+        echo 'Defaults timestamp_timeout=15'
+        echo 'Defaults passprompt="[sudo] password for %u: "'
+        echo 'Defaults lecture=never'
+    } >> /etc/sudoers
   fi
   #}}}
 }
@@ -464,8 +478,9 @@ automatic_mode(){
   print_danger "\tUse this mode only if you already know all the option.\n\tYou won't be able to select anything later."
   read_input_text "Enable Automatic Mode"
   if [[ $OPTION == y ]]; then
-    $EDITOR ${AUI_DIR}/lilo.automode
-    source ${AUI_DIR}/lilo.automode
+    $EDITOR "${AUI_DIR}"/lilo.automode
+    # shellcheck source=/root/aui/lilo.automode
+    source "${AUI_DIR}"/lilo.automode
     echo -e "The installation will start now."
     pause_function
     AUTOMATIC_MODE=1
@@ -475,7 +490,7 @@ automatic_mode(){
 #CUSTOM REPOSITORIES {{{
 add_custom_repositories(){
   print_title "CUSTOM REPOSITORIES - https://wiki.archlinux.org/index.php/Unofficial_User_Repositories"
-  read_input_text "Add custom repositories" $CUSTOMREPO
+  read_input_text "Add custom repositories" "$CUSTOMREPO"
   if [[ $OPTION == y ]]; then
     while true
     do
@@ -484,11 +499,13 @@ add_custom_repositories(){
       echo ""
       echo " d) DONE"
       echo ""
-      read -p "$prompt1" OPTION
+      printf "%s" "$prompt1" OPTION
       case $OPTION in
         1)
-          read -p "Repository Name [ex: custom]: " repository_name
-          read -p "Repository Address [ex: file:///media/backup/Archlinux]: " repository_addr
+          printf "%s" "Repository Name [ex: custom]: "
+          read -r repository_name
+          printf "%s" "Repository Address [ex: file:///media/backup/Archlinux]: " 
+          read -r repository_addr
           add_repository "${repository_name}" "${repository_addr}" "Never"
           pause_function
           ;;
@@ -538,7 +555,7 @@ install_basic_setup(){
 install_ssh(){
   print_title "SSH - https://wiki.archlinux.org/index.php/Ssh"
   print_info "Secure Shell (SSH) is a network protocol that allows data to be exchanged over a secure channel between two computers."
-  read_input_text "Install ssh" $SSH
+  read_input_text "Install ssh" "$SSH"
   if [[ $OPTION == y ]]; then
     package_install "openssh"
     system_ctl enable sshd
@@ -583,7 +600,7 @@ install_ssh(){
 install_nfs(){
   print_title "NFS - https://wiki.archlinux.org/index.php/Nfs"
   print_info "NFS allowing a user on a client computer to access files over a network in a manner similar to how local storage is accessed."
-  read_input_text "Install nfs" $NFS
+  read_input_text "Install nfs" "$NFS"
   if [[ $OPTION == y ]]; then
     package_install "nfs-utils"
     system_ctl enable rpcbind
@@ -597,10 +614,10 @@ install_nfs(){
 install_zsh(){
   print_title "ZSH - https://wiki.archlinux.org/index.php/Zsh"
   print_info "Zsh is a powerful shell that operates as both an interactive shell and as a scripting language interpreter. "
-  read_input_text "Install zsh" $ZSH
+  read_input_text "Install zsh" "$ZSH"
   if [[ $OPTION == y ]]; then
     package_install "zsh"
-    read_input_text "Install oh-my-zsh" $OH_MY_ZSH
+    read_input_text "Install oh-my-zsh" "$OH_MY_ZSH"
     if [[ $OPTION == y ]]; then
       if [[ -f /home/${username}/.zshrc ]]; then
         read_input_text "Replace current .zshrc file"
@@ -622,12 +639,12 @@ install_zsh(){
 install_fish(){
   print_title "fish - https://wiki.archlinux.org/index.php/fish"
   print_info "fish is a friendly interactive shell and a commandline shell intended to be interactive and user-friendly. "
-  read_input_text "Install fish" $FISH
+  read_input_text "Install fish" "$FISH"
   if [[ $OPTION == y ]]; then
     package_install "fish"
-    read_input_text "Install oh-my-fish" $OH_MY_FISH
+    read_input_text "Install oh-my-fish" "$OH_MY_FISH"
     if [[ $OPTION == y ]]; then
-      run_as_user curl -L https://get.oh-my.fish | fish
+      run_as_user "curl -L https://get.oh-my.fish | fish"
     fi
     pause_function
   fi
@@ -637,11 +654,11 @@ install_fish(){
 install_samba(){
   print_title "SAMBA - https://wiki.archlinux.org/index.php/Samba"
   print_info "Samba is a re-implementation of the SMB/CIFS networking protocol, it facilitates file and printer sharing among Linux and Windows systems as an alternative to NFS."
-  read_input_text "Install Samba" $SAMBA
+  read_input_text "Install Samba" "$SAMBA"
   if [[ $OPTION == y ]]; then
     package_install "wget samba smbnetfs"
     [[ ! -f /etc/samba/smb.conf ]] && wget -q -O /etc/samba/smb.conf "https://git.samba.org/samba.git/?p=samba.git;a=blob_plain;f=examples/smb.conf.default;hb=HEAD"
-    local CONFIG_SAMBA=`cat /etc/samba/smb.conf | grep usershare`
+    local CONFIG_SAMBA=$(grep usershare /etc/samba/smb.conf)
     if [[ -z $CONFIG_SAMBA ]]; then
       # configure usershare
       export USERSHARES_DIR="/var/lib/samba/usershare"
@@ -652,14 +669,14 @@ install_samba(){
       chmod 1770 ${USERSHARES_DIR}
       sed -i -e '/\[global\]/a\\n   usershare path = /var/lib/samba/usershare\n   usershare max shares = 100\n   usershare allow guests = yes\n   usershare owner only = False' /etc/samba/smb.conf
       sed -i -e '/\[global\]/a\\n   socket options = IPTOS_LOWDELAY TCP_NODELAY SO_KEEPALIVE\n   write cache size = 2097152\n   use sendfile = yes\n' /etc/samba/smb.conf
-      usermod -a -G ${USERSHARES_GROUP} ${username}
+      usermod -a -G ${USERSHARES_GROUP} "${username}"
       sed -i '/user_allow_other/s/^#//' /etc/fuse.conf
       modprobe fuse
     fi
     echo "Enter your new samba account password:"
-    pdbedit -a -u ${username}
+    pdbedit -a -u "${username}"
     while [[ $? -ne 0 ]]; do
-      pdbedit -a -u ${username}
+      pdbedit -a -u "${username}"
     done
     # enable services
     system_ctl enable smb.service
@@ -672,7 +689,7 @@ install_samba(){
 enable_readahead(){
   print_title "Readahead - https://wiki.archlinux.org/index.php/Improve_Boot_Performance"
   print_info "Systemd comes with its own readahead implementation, this should in principle improve boot time. However, depending on your kernel version and the type of your hard drive, your mileage may vary (i.e. it might be slower)."
-  read_input_text "Enable Readahead" $READAHEAD
+  read_input_text "Enable Readahead" "$READAHEAD"
   if [[ $OPTION == y ]]; then
     system_ctl enable systemd-readahead-collect
     system_ctl enable systemd-readahead-replay
@@ -684,7 +701,7 @@ enable_readahead(){
 install_zram (){
   print_title "ZRAM - https://wiki.archlinux.org/index.php/Maximizing_Performance"
   print_info "Zram creates a device in RAM and compresses it. If you use for swap means that part of the RAM can hold much more information but uses more CPU. Still, it is much quicker than swapping to a hard drive. If a system often falls back to swap, this could improve responsiveness. Zram is in mainline staging (therefore its not stable yet, use with caution)."
-  read_input_text "Install Zram" $ZRAM
+  read_input_text "Install Zram" "$ZRAM"
   if [[ $OPTION == y ]]; then
     aur_package_install "zramswap"
     system_ctl enable zramswap
@@ -696,7 +713,7 @@ install_zram (){
 install_tlp(){
   print_title "TLP - https://wiki.archlinux.org/index.php/Tlp"
   print_info "TLP is an advanced power management tool for Linux. It is a pure command line tool with automated background tasks and does not contain a GUI."
-  read_input_text "Install TLP" $TLP
+  read_input_text "Install TLP" "$TLP"
   if [[ $OPTION == y ]]; then
     package_install "tlp"
     system_ctl enable tlp.service
@@ -741,6 +758,8 @@ create_ramdisk_environment(){
     mkinitcpio -p linux-hardened
   elif [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
     mkinitcpio -p linux-lts
+  elif [ "$(ls /boot | grep zen -c)" -gt "0" ]; then
+    mkinitcpio -p linux-zen
   else
     mkinitcpio -p linux
   fi
@@ -760,7 +779,7 @@ install_video_cards(){
       package_install "virtualbox-guest-modules-arch virtualbox-guest-utils mesa-libgl"
     fi
     add_module "vboxguest vboxsf vboxvideo" "virtualbox-guest"
-    add_user_to_group ${username} vboxsf
+    add_user_to_group "${username}" vboxsf
     system_ctl enable vboxservice
     create_ramdisk_environment
   #}}}
@@ -779,18 +798,18 @@ install_video_cards(){
   #Bumblebee {{{
   elif [[ ${VIDEO_DRIVER} == bumblebee ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
-    [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
+    [[ -n $XF86_DRIVERS ]] && pacman -Rcsn "$XF86_DRIVERS"
     pacman -S --needed xf86-video-intel bumblebee nvidia
     [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-virtualgl lib32-nvidia-utils
     replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
     replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
     create_ramdisk_environment
-    add_user_to_group ${username} bumblebee
+    add_user_to_group "${username}" bumblebee
   #}}}
   #NVIDIA {{{
   elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
-    [[ -n $XF86_DRIVERS ]] && pacman -Rcsn $XF86_DRIVERS
+    [[ -n $XF86_DRIVERS ]] && pacman -Rcsn "$XF86_DRIVERS"
     if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
       package_install "nvidia-dkms nvidia-utils libglvnd"
       echo "Do not forget to make a mkinitcpio every time you updated the nvidia driver!"
@@ -852,7 +871,7 @@ install_video_cards(){
 install_cups(){
   print_title "CUPS - https://wiki.archlinux.org/index.php/Cups"
   print_info "CUPS is the standards-based, open source printing system developed by Apple Inc. for Mac OS X and other UNIX-like operating systems."
-  read_input_text "Install CUPS (aka Common Unix Printing System)" $CUPS
+  read_input_text "Install CUPS (aka Common Unix Printing System)" "$CUPS"
   if [[ $OPTION == y ]]; then
     package_install "cups cups-pdf"
     package_install "gutenprint ghostscript gsfonts foomatic-db foomatic-db-engine foomatic-db-nonfree foomatic-db-ppds foomatic-db-nonfree-ppds foomatic-db-gutenprint-ppds"
@@ -864,7 +883,7 @@ install_cups(){
 #ADDITIONAL FIRMWARE {{{
 install_additional_firmwares(){
   print_title "INSTALL ADDITIONAL FIRMWARES"
-  read_input_text "Install additional firmwares [Audio,Bluetooth,Scanner,Wireless]" $FIRMWARE
+  read_input_text "Install additional firmwares [Audio,Bluetooth,Scanner,Wireless]" "$FIRMWARE"
   if [[ $OPTION == y ]]; then
     while true
     do
@@ -886,7 +905,7 @@ install_additional_firmwares(){
       echo ""
       FIRMWARE_OPTIONS+=" d"
       read_input_options "$FIRMWARE_OPTIONS"
-      for OPT in ${OPTIONS[@]}; do
+      for OPT in "${OPTIONS[@]}"; do
         case "$OPT" in
           1)
             aur_package_install "aic94xx-firmware"
@@ -960,7 +979,7 @@ install_desktop_environment(){
       echo ""
       ICONS_THEMES+=" b"
       read_input_options "$ICONS_THEMES"
-      for OPT in ${OPTIONS[@]}; do
+      for OPT in "${OPTIONS[@]}"; do
         case "$OPT" in
           1)
             package_install "arc-icon-theme elementary-icon-theme"
@@ -1022,7 +1041,7 @@ install_desktop_environment(){
       echo ""
       GTK_THEMES+=" b"
       read_input_options "$GTK_THEMES"
-      for OPT in ${OPTIONS[@]}; do
+      for OPT in "${OPTIONS[@]}"; do
         case "$OPT" in
           1)
             package_install "arc-gtk-theme"
@@ -1082,7 +1101,7 @@ install_desktop_environment(){
       echo ""
       DISPLAY_MANAGER+=" b"
       read_input_options "$DISPLAY_MANAGER"
-      for OPT in ${OPTIONS[@]}; do
+      for OPT in "${OPTIONS[@]}"; do
         case "$OPT" in
           1)
             aur_package_install "entrance-git"
@@ -1142,7 +1161,7 @@ install_desktop_environment(){
       echo ""
       THEMES_OPTIONS+=" d"
       read_input_options "$THEMES_OPTIONS"
-      for OPT in ${OPTIONS[@]}; do
+      for OPT in "${OPTIONS[@]}"; do
         case "$OPT" in
           1)
             install_icon_theme
@@ -1185,7 +1204,7 @@ install_desktop_environment(){
       echo ""
       MISCAPPS+=" d"
       read_input_options "$MISCAPPS"
-      for OPT in ${OPTIONS[@]}; do
+      for OPT in "${OPTIONS[@]}"; do
         case "$OPT" in
           1)
             install_display_manager
@@ -1255,7 +1274,7 @@ install_desktop_environment(){
   echo " 9) Budgie"
   echo ""
   echo " b) BACK"
-  read_input $DESKTOPENV
+  read_input "$DESKTOPENV"
   case "$OPTION" in
     1)
       #CINNAMON {{{
@@ -1346,7 +1365,7 @@ install_desktop_environment(){
         echo ""
         KDE_OPTIONS+=" d"
         read_input_options "$KDE_OPTIONS"
-        for OPT in ${OPTIONS[@]}; do
+        for OPT in "${OPTIONS[@]}"; do
           case "$OPT" in
             1)
               package_install "choqok"
@@ -1394,11 +1413,11 @@ install_desktop_environment(){
       print_info "LXQt is the Qt port and the upcoming version of LXDE, the Lightweight Desktop Environment. It is the product of the merge between the LXDE-Qt and the Razor-qt projects: A lightweight, modular, blazing-fast and user-friendly desktop environment."
       package_install "lxqt openbox breeze-icons"
       package_install "leafpad epdfview"
-      mkdir -p /home/${username}/.config/lxqt
-      cp /etc/xdg/lxqt/* /home/${username}/.config/lxqt
-      mkdir -p /home/${username}/.config/openbox/
-      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${username}/.config/openbox/
-      chown -R ${username}:users /home/${username}/.config
+      mkdir -p /home/"${username}"/.config/lxqt
+      cp /etc/xdg/lxqt/* /home/"${username}"/.config/lxqt
+      mkdir -p /home/"${username}"/.config/openbox/
+      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/"${username}"/.config/openbox/
+      chown -R "${username}":users /home/"${username}"/.config
       # config xinitrc
       config_xinitrc "startlxqt"
       pause_function
@@ -1458,9 +1477,9 @@ install_desktop_environment(){
       package_install "lxappearance"
       package_install "leafpad epdfview nitrogen"
       if [[ ! -d /home/${username}/.config/awesome/ ]]; then
-        mkdir -p /home/${username}/.config/awesome/
-        cp /etc/xdg/awesome/rc.lua /home/${username}/.config/awesome/
-        chown -R ${username}:users /home/${username}/.config
+        mkdir -p /home/"${username}"/.config/awesome/
+        cp /etc/xdg/awesome/rc.lua /home/"${username}"/.config/awesome/
+        chown -R "${username}":users /home/"${username}"/.config
       fi
       # config xinitrc
       config_xinitrc "awesome"
@@ -1529,7 +1548,7 @@ install_desktop_environment(){
         echo ""
         GAPS_OPTIONS+=" d"
         read_input_options "$GAPS_OPTIONS"
-        for OPT in ${OPTIONS[@]}; do
+        for OPT in "${OPTIONS[@]}"; do
           case "$OPT" in
             1)
               package_install "arandr"
@@ -1592,9 +1611,9 @@ install_desktop_environment(){
       package_install "openbox obconf obmenu menumaker"
       package_install "lxappearance"
       package_install "leafpad epdfview nitrogen"
-      mkdir -p /home/${username}/.config/openbox/
-      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/${username}/.config/openbox/
-      chown -R ${username}:users /home/${username}/.config
+      mkdir -p /home/"${username}"/.config/openbox/
+      cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} /home/"${username}"/.config/openbox/
+      chown -R "${username}":users /home/"${username}"/.config
       # config xinitrc
       config_xinitrc "openbox-session"
       pause_function
@@ -1657,7 +1676,7 @@ install_nm_wicd(){
   echo ""
   echo " n) NONE"
   echo ""
-  read_input $NETWORKMANAGER
+  read_input "$NETWORKMANAGER"
   case "$OPTION" in
     1)
       print_title "NETWORKMANAGER - https://wiki.archlinux.org/index.php/Networkmanager"
@@ -1700,7 +1719,7 @@ install_nm_wicd(){
 install_usb_modem(){
   print_title "USB 3G MODEM - https://wiki.archlinux.org/index.php/USB_3G_Modem"
   print_info "A number of mobile telephone networks around the world offer mobile internet connections over UMTS (or EDGE or GSM) using a portable USB modem device."
-  read_input_text "Install usb 3G modem support" $USBMODEM
+  read_input_text "Install usb 3G modem support" "$USBMODEM"
   if [[ $OPTION == y ]]; then
     package_install "usbutils usb_modeswitch"
     if is_package_installed "networkmanager"; then
@@ -1718,7 +1737,7 @@ install_usb_modem(){
 install_bluetooth(){
   print_title "BLUETOOTH - https://wiki.archlinux.org/index.php/Bluetooth"
   print_info "Bluetooth is a standard for the short-range wireless interconnection of cellular phones, computers, and other electronic devices. In Linux, the canonical implementation of the Bluetooth protocol stack is BlueZ"
-  read_input_text "Install bluetooth support" $BLUETOOTH
+  read_input_text "Install bluetooth support" "$BLUETOOTH"
   if [[ $OPTION == y ]]; then
     package_install "bluez bluez-utils"
     system_ctl enable bluetooth.service
@@ -1747,7 +1766,7 @@ install_accessories_apps(){
     echo ""
     ACCESSORIES_OPTIONS+=" b"
     read_input_options "$ACCESSORIES_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
           package_install "albert"
@@ -1814,29 +1833,30 @@ install_development_apps(){
     echo " 7) $(menu_item "sublime-text-dev" "Sublime Text 3") $AUR"
     echo " 8) $(menu_item "android-studio" "Android Studio") $AUR"
     echo " 9) $(menu_item "jetbrains-toolbox" "Jetbrains Toolbox") $AUR"
-    echo " 10) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA Community Edition")"
+    echo "10) $(menu_item "intellij-idea-community-edition" "IntelliJ IDEA Community Edition")"
     echo "11) $(menu_item "intellij-idea-ultimate-edition" "IntelliJ IDEA Ultimate Edition") $AUR"
-    echo "12) $(menu_item "monodevelop")"
-    echo "13) $(menu_item "qtcreator")"
-    echo "14) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
-    echo "15) $(menu_item "jdk8-openjdk" "OpenJDK 8")"
-    echo "16) $(menu_item "jdk9-openjdk" "OpenJDK 9")"
-    echo "17) $(menu_item "jdk10-openjdk" "OpenJDK 10")"
-    echo "18) $(menu_item "jdk" "Oracle JDK") $AUR"
-    echo "19) $(menu_item "nodejs")"
-    echo "20) $(menu_item "visual-studio-code-bin" "Visual Studio Code") $AUR"
-    echo "21) $(menu_item "gitg")"
-    echo "22) $(menu_item "kdiff3")"
-    echo "23) $(menu_item "regexxer")"
-    echo "24) $(menu_item "postman-bin" "Postman") $AUR"
-    echo "25) $(menu_item "gitkraken" "Gitkraken") $AUR"
-    echo "26) $(menu_item "freecad" "FreeCad") $AUR"
+    echo "12) $(menu_item "micro") $AUR"
+    echo "13) $(menu_item "monodevelop")"
+    echo "14) $(menu_item "qtcreator")"
+    echo "15) $(menu_item "mysql-workbench" "MySQL Workbench") $AUR"
+    echo "16) $(menu_item "jdk8-openjdk" "OpenJDK 8")"
+    echo "17) $(menu_item "jdk9-openjdk" "OpenJDK 9")"
+    echo "18) $(menu_item "jdk10-openjdk" "OpenJDK 10")"
+    echo "19) $(menu_item "jdk" "Oracle JDK") $AUR"
+    echo "20) $(menu_item "nodejs")"
+    echo "21) $(menu_item "visual-studio-code-bin" "Visual Studio Code") $AUR"
+    echo "22) $(menu_item "gitg")"
+    echo "23) $(menu_item "kdiff3")"
+    echo "24) $(menu_item "regexxer")"
+    echo "25) $(menu_item "postman-bin" "Postman") $AUR"
+    echo "26) $(menu_item "gitkraken" "Gitkraken") $AUR"
+    echo "27) $(menu_item "freecad" "FreeCad") $AUR"
     echo ""
     echo " b) BACK"
     echo ""
     DEVELOPMENT_OPTIONS+=" b"
     read_input_options "$DEVELOPMENT_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
           package_install "atom"
@@ -1862,7 +1882,7 @@ install_development_apps(){
           ;;
         8)
           aur_package_install "android-sdk android-sdk-platform-tools android-sdk-build-tools android-platform"
-          add_user_to_group ${username} sdkusers
+          add_user_to_group "${username}" sdkusers
           chown -R :sdkusers /opt/android-sdk/
           chmod -R g+w /opt/android-sdk/
           add_line "export ANDROID_HOME=/opt/android-sdk" "/home/${username}/.bashrc"
@@ -1878,54 +1898,57 @@ install_development_apps(){
           aur_package_install "intellij-idea-ultimate-edition"
           ;;
         12)
-          package_install "monodevelop monodevelop-debugger-gdb"
+          aur_package_install "micro"
           ;;
         13)
-          package_install "qtcreator"
+          package_install "monodevelop monodevelop-debugger-gdb"
           ;;
         14)
-          aur_package_install "mysql-workbench"
+          package_install "qtcreator"
           ;;
         15)
-          package_remove "jdk"
-          package_install "jdk8-openjdk"
+          aur_package_install "mysql-workbench"
           ;;
         16)
           package_remove "jdk"
-          package_install "jdk9-openjdk"
+          package_install "jdk8-openjdk"
           ;;
         17)
           package_remove "jdk"
-          package_install "jdk10-openjdk"
+          package_install "jdk9-openjdk"
           ;;
         18)
+          package_remove "jdk"
+          package_install "jdk10-openjdk"
+          ;;
+        19)
           package_remove "jre{7,8,9,10}-openjdk"
           package_remove "jdk{7,8,9,10}-openjdk"
           aur_package_install "jdk"
           ;;
-        19)
+        20)
           package_install "nodejs"
           ;;
-        20)
+        21)
           aur_package_install "visual-studio-code-bin"
           ;;
-        21)
+        22)
           aur_package_install "gitg"
           aur_package_install "qgit"
           ;;
-        22)
+        23)
           aur_package_install "kdiff3"
           ;;
-        23)
+        24)
           aur_package_install "regexxer"
           ;;
-        24)
+        25)
           aur_package_install "postman-bin"
           ;;
-        25)
+        26)
           aur_package_install "gitkraken"
           ;;
-        26)
+        27)
           aur_package_install "freecad"
           ;;
         "b")
@@ -1961,7 +1984,7 @@ install_office_apps(){
     echo ""
     OFFICE_OPTIONS+=" b"
     read_input_options "$OFFICE_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
           if [[ ${KDE} -eq 1 ]]; then
@@ -2050,7 +2073,7 @@ install_system_apps(){
     echo ""
     SYSTEMTOOLS_OPTIONS+=" b"
     read_input_options "$SYSTEMTOOLS_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
           package_install "clamav"
@@ -2069,7 +2092,7 @@ install_system_apps(){
           ;;
         4)
           package_install "docker"
-          add_user_to_group ${username} docker
+          add_user_to_group "${username}" docker
           ;;
         5)
           is_package_installed "ufw" && package_remove "ufw"
@@ -2109,11 +2132,11 @@ install_system_apps(){
           ;;
         14)
           #Make sure we are not a VirtualBox Guest
-          VIRTUALBOX_GUEST=`dmidecode --type 1 | grep VirtualBox`
+          VIRTUALBOX_GUEST=$(dmidecode --type 1 | grep VirtualBox)
           if [[ -z ${VIRTUALBOX_GUEST} ]]; then
             package_install "virtualbox virtualbox-host-dkms virtualbox-guest-iso linux-headers"
             aur_package_install "virtualbox-ext-oracle"
-            add_user_to_group ${username} vboxusers
+            add_user_to_group "${username}" vboxusers
             modprobe vboxdrv vboxnetflt
           else
             cecho "${BBlue}[${Reset}${Bold}!${BBlue}]${Reset} VirtualBox was not installed as we are a VirtualBox guest."
@@ -2166,7 +2189,7 @@ install_graphics_apps(){
     echo ""
     GRAPHICS_OPTIONS+=" b"
     read_input_options "$GRAPHICS_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
           package_install "blender"
@@ -2232,7 +2255,7 @@ install_internet_apps(){
     echo ""
     INTERNET_OPTIONS+=" b"
     read_input_options "$INTERNET_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
           #BROWSER {{{
@@ -2252,7 +2275,7 @@ install_internet_apps(){
             echo ""
             BROWSERS_OPTIONS+=" b"
             read_input_options "$BROWSERS_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
+            for OPT in "${OPTIONS[@]}"; do
               case "$OPT" in
                 1)
                   aur_package_install "google-chrome"
@@ -2322,7 +2345,7 @@ install_internet_apps(){
             echo ""
             DOWNLOAD_OPTIONS+=" b"
             read_input_options "$DOWNLOAD_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
+            for OPT in "${OPTIONS[@]}"; do
               case "$OPT" in
                 1)
                   package_install "deluge"
@@ -2367,8 +2390,8 @@ install_internet_apps(){
                     package_install "transmission-gtk"
                   fi
                   if [[ -f /home/${username}/.config/transmission/settings.json ]]; then
-                    replace_line '"blocklist-enabled": false' '"blocklist-enabled": true' /home/${username}/.config/transmission/settings.json
-                    replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/${username}/.config/transmission/settings.json
+                    replace_line '"blocklist-enabled": false' '"blocklist-enabled": true' /home/"${username}"/.config/transmission/settings.json
+                    replace_line "www\.example\.com\/blocklist" "list\.iblocklist\.com\/\?list=bt_level1&fileformat=p2p&archiveformat=gz" /home/"${username}"/.config/transmission/settings.json
                   fi
                   ;;
                 14)
@@ -2408,14 +2431,14 @@ install_internet_apps(){
             echo ""
             EMAIL_OPTIONS+=" b"
             read_input_options "$EMAIL_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
+            for OPT in "${OPTIONS[@]}"; do
               case "$OPT" in
                 1)
                   package_install "liferea"
                   ;;
                 2)
                   package_install "thunderbird"
-                  [[ LOCALE_TB != en_US ]] && package_install "thunderbird-i18n-$LOCALE_TB"
+                  [[ "$LOCALE_TB" != en_US ]] && package_install "thunderbird-i18n-$LOCALE_TB"
                   ;;
                 "b")
                   break
@@ -2454,7 +2477,7 @@ install_internet_apps(){
             echo ""
             IM_OPTIONS+=" b"
             read_input_options "$IM_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
+            for OPT in "${OPTIONS[@]}"; do
               case "$OPT" in
                 1)
                   if [[ ${KDE} -eq 1 ]]; then
@@ -2527,7 +2550,7 @@ install_internet_apps(){
             echo ""
             MAPPING_OPTIONS+=" b"
             read_input_options "$MAPPING_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
+            for OPT in "${OPTIONS[@]}"; do
               case "$OPT" in
                 1)
                   aur_package_install "google-earth"
@@ -2554,14 +2577,14 @@ install_internet_apps(){
           do
             print_title "DESKTOP SHARE"
             echo " 1) $(menu_item "anydesk") $AUR"
-            echo " 1) $(menu_item "remmina")"
-            echo " 2) $(menu_item "teamviewer") $AUR"
+            echo " 2) $(menu_item "remmina")"
+            echo " 3) $(menu_item "teamviewer") $AUR"
             echo ""
             echo " b) BACK"
             echo ""
             VNC_OPTIONS+=" b"
             read_input_options "$VNC_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
+            for OPT in "${OPTIONS[@]}"; do
               case "$OPT" in
                 1)
                   aur_package_install "anydesk"
@@ -2610,7 +2633,7 @@ install_audio_apps(){
     echo ""
     AUDIO_OPTIONS+=" b"
     read_input_options "$AUDIO_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
           #PLAYERS {{{
@@ -2634,7 +2657,7 @@ install_audio_apps(){
             echo ""
             AUDIO_PLAYER_OPTIONS+=" b"
             read_input_options "$AUDIO_PLAYER_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
+            for OPT in "${OPTIONS[@]}"; do
               case "$OPT" in
                 1)
                   package_install "amarok"
@@ -2700,7 +2723,7 @@ install_audio_apps(){
             echo ""
             AUDIO_EDITOR_OPTIONS+=" b"
             read_input_options "$AUDIO_EDITOR_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
+            for OPT in "${OPTIONS[@]}"; do
               case "$OPT" in
                 1)
                   package_install "audacity"
@@ -2765,7 +2788,7 @@ install_video_apps(){
     echo ""
     VIDEO_OPTIONS+=" b"
     read_input_options "$VIDEO_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
           #PLAYERS {{{
@@ -2787,7 +2810,7 @@ install_video_apps(){
             echo ""
             VIDEO_PLAYER_OPTIONS+=" b"
             read_input_options "$VIDEO_PLAYER_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
+            for OPT in "${OPTIONS[@]}"; do
               case "$OPT" in
                 1)
                   package_install "gnome-mplayer"
@@ -2819,7 +2842,7 @@ install_video_apps(){
                   ;;
                 10)
                   package_install "kodi"
-                  add_user_to_group ${username} kodi
+                  add_user_to_group "${username}" kodi
                   ;;
                 "b")
                   break
@@ -2853,7 +2876,7 @@ install_video_apps(){
             echo ""
             VIDEO_EDITOR_OPTIONS+=" b"
             read_input_options "$VIDEO_EDITOR_OPTIONS"
-            for OPT in ${OPTIONS[@]}; do
+            for OPT in "${OPTIONS[@]}"; do
               case "$OPT" in
                 1)
                   aur_package_install "arista"
@@ -2922,24 +2945,30 @@ install_games(){
   while true
   do
     print_title "GAMES - https://wiki.archlinux.org/index.php/Games"
-    echo " 1) Desura $AUR"
-    echo " 2) PlayOnLinux $AUR"
+    echo " 1) 0AD"
+    echo " 2) PlayOnLinux"
     echo " 3) Steam"
-    echo " 4) Minecraft"
-    echo " 5) OSU!-Lazer $AUR"
+    echo " 4) Lutris"
+    echo " 5) Mindustry $AUR"
+    echo " 6) Minecraft $AUR"
+    echo " 7) Minetest"
+    echo " 8) Openra"
+    echo " 9) OSU!-Lazer $AUR"
+    echo "10) Wesnoth"
+    echo "11) Xonotic"
     echo ""
     echo " b) BACK"
     echo ""
     GAMES_OPTIONS+=" b"
     read_input_options "$GAMES_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
-          aur_package_install "desura"
+          package_install "0ad"
           OPT=1
           ;;
         2)
-          aur_package_install "playonlinux"
+          package_install "playonlinux"
           OPT=2
           ;;
         3)
@@ -2947,12 +2976,36 @@ install_games(){
           OPT=3
           ;;
         4)
-          aur_package_install "minecraft"
+          package_install "lutris"
           OPT=4
           ;;
         5)
-          aur_package_install "osu-lazer"
+          aur_package_install "mindustry"
           OPT=5
+          ;;
+        6)
+          aur_package_install "minecraft"
+          OPT=6
+          ;;
+        7)
+          package_install "minetest"
+          OPT=7
+          ;;
+        8)
+          package_install "openra"
+          OPT=8
+          ;;
+        9)
+          aur_package_install "osu-lazer"
+          OPT=9
+          ;;
+        10)
+          package_install "wesnoth"
+          OPT=10
+          ;;
+        11)
+          package_install "xonotic"
+          OPT=11
           ;;
         "b")
           break
@@ -2970,7 +3023,7 @@ install_games(){
 install_web_server(){
   install_adminer(){ #{{{
     aur_package_install "adminer"
-    local ADMINER=`cat /etc/httpd/conf/httpd.conf | grep Adminer`
+    local ADMINER=$(grep Adminer /etc/httpd/conf/httpd.conf)
     [[ -z $ADMINER ]] && echo -e '\n# Adminer Configuration\nInclude conf/extra/httpd-adminer.conf' >> /etc/httpd/conf/httpd.conf
   } #}}}
 
@@ -2995,7 +3048,7 @@ install_web_server(){
     su - postgres -c "initdb --locale ${LOCALE}.UTF-8 -D /var/lib/postgres/data"
     system_ctl enable postgresql.service
     system_ctl start postgresql.service
-    read_input_text "Install Postgis + Pgrouting" $POSTGIS
+    read_input_text "Install Postgis + Pgrouting" "$POSTGIS"
     [[ $OPTION == y ]] && install_gis_extension
   } #}}}
 
@@ -3029,7 +3082,7 @@ install_web_server(){
       rm -v /etc/httpd/conf/httpd.conf.aui
     fi
     [[ -f /etc/httpd/conf/httpd.conf.aui ]] && echo "/etc/httpd/conf/httpd.conf.aui" || cp -v /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.aui
-    local IS_DISABLED=`cat /etc/httpd/conf/httpd.conf | grep php5_module.conf`
+    local IS_DISABLED=$(grep php5_module.conf /etc/httpd/conf/httpd.conf)
     if [[ -z $IS_DISABLED ]]; then
       echo -e 'application/x-httpd-php5                php php5' >> /etc/httpd/conf/mime.types
       sed -i '/LoadModule dir_module modules\/mod_dir.so/a\LoadModule php5_module modules\/libphp5.so' /etc/httpd/conf/httpd.conf
@@ -3053,8 +3106,8 @@ install_web_server(){
   create_sites_folder(){ #{{{
     [[ ! -f  /etc/httpd/conf/extra/httpd-userdir.conf.aui ]] && cp -v /etc/httpd/conf/extra/httpd-userdir.conf /etc/httpd/conf/extra/httpd-userdir.conf.aui
     replace_line 'public_html' 'Sites' /etc/httpd/conf/extra/httpd-userdir.conf
-    su - ${username} -c "mkdir -p ~/Sites"
-    su - ${username} -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
+    su - "${username}" -c "mkdir -p ~/Sites"
+    su - "${username}" -c "chmod o+x ~/ && chmod -R o+x ~/Sites"
     print_line
     echo "The folder \"Sites\" has been created in your home"
     echo "You can access your projects at \"http://localhost/~username\""
@@ -3070,7 +3123,7 @@ install_web_server(){
   echo ""
   echo " b) BACK"
   echo ""
-  read_input $WEBSERVER
+  read_input "$WEBSERVER"
   case "$OPTION" in
     1)
       package_install "apache php php-apache php-mcrypt php-gd"
@@ -3131,7 +3184,7 @@ install_fonts(){
     echo ""
     FONTS_OPTIONS+=" b"
     read_input_options "$FONTS_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
           package_install "ttf-dejavu"
@@ -3197,7 +3250,7 @@ choose_ime_m17n(){
     echo ""
     IME_OPTIONS+=" b"
     read_input_options "IME_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
           package_install "fcitx"
@@ -3232,7 +3285,7 @@ choose_ime_m17n(){
 #CLEAN ORPHAN PACKAGES {{{
 clean_orphan_packages(){
   print_title "CLEAN ORPHAN PACKAGES"
-  pacman -Rsc --noconfirm $(pacman -Qqdt)
+  pacman -Rsc --noconfirm "$(pacman -Qqdt)"
   #pacman -Sc --noconfirm
   pacman-optimize
 }
@@ -3241,8 +3294,9 @@ clean_orphan_packages(){
 reconfigure_system(){
   print_title "HOSTNAME - https://wiki.archlinux.org/index.php/HOSTNAME"
   print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
-  read -p "Hostname [ex: archlinux]: " HN
-  hostnamectl set-hostname $HN
+  printf "%s" "Hostname [ex: archlinux]: "
+  read -r HN
+  hostnamectl set-hostname "$HN"
 
   print_title "TIMEZONE - https://wiki.archlinux.org/index.php/Timezone"
   print_info "In an operating system the time (clock) is determined by four parts: Time value, Time standard, Time Zone, and DST (Daylight Saving Time if applicable)."
@@ -3251,7 +3305,7 @@ reconfigure_system(){
     settimezone
     read_input_text "Confirm timezone ($ZONE/$SUBZONE)"
   done
-  timedatectl set-timezone ${ZONE}/${SUBZONE}
+  timedatectl set-timezone "${ZONE}"/"${SUBZONE}"
 
   print_title "HARDWARE CLOCK TIME - https://wiki.archlinux.org/index.php/Internationalization"
   print_info "This is set in /etc/adjtime. Set the hardware clock mode uniformly between your operating systems on the same machine. Otherwise, they will overwrite the time and cause clock shifts (which can cause time drift correction to be miscalibrated)."
@@ -3283,7 +3337,7 @@ install_extra(){
     echo ""
     EXTRA_OPTIONS+=" b"
     read_input_options "$EXTRA_OPTIONS"
-    for OPT in ${OPTIONS[@]}; do
+    for OPT in "${OPTIONS[@]}"; do
       case "$OPT" in
         1)
           aur_package_install "profile-sync-daemon"
@@ -3309,12 +3363,13 @@ finish(){
   print_danger "List of packages not officially supported that may kill your cat:"
   pause_function
   AUR_PKG_LIST="${AUI_DIR}/aur_pkg_list.log"
-  pacman -Qm | awk '{print $1}' > $AUR_PKG_LIST
-  less $AUR_PKG_LIST
+  pacman -Qm | awk '{print $1}' > "$AUR_PKG_LIST"
+  less "$AUR_PKG_LIST"
   print_title "INSTALL COMPLETED"
   echo -e "Thanks for using the Archlinux Ultimate Install script by helmuthdu\n"
   #REBOOT
-  read -p "Reboot your system [y/N]: " OPTION
+  printf "%s" "Reboot your system [y/N]: "
+  read -r OPTION
   [[ $OPTION == y ]] && reboot
   exit 0
 }
@@ -3363,7 +3418,7 @@ do
   echo ""
   MAINMENU+=" q"
   read_input_options "$MAINMENU"
-  for OPT in ${OPTIONS[@]}; do
+  for OPT in "${OPTIONS[@]}"; do
     case "$OPT" in
       1)
         add_custom_repositories
