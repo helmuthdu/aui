@@ -2461,7 +2461,7 @@ install_internet_apps(){
             echo " 1) $(menu_item "hexchat konversation" "$([[ ${KDE} -eq 1 ]] && echo "Konversation" || echo "Hexchat";)")"
             echo " 2) $(menu_item "irssi")"
             echo " 3) $(menu_item "pidgin")"
-            echo " 4) $(menu_item "riot")"
+            echo " 4) $(menu_item "element-desktop")"
             echo " 5) $(menu_item "skypeforlinux-stable-bin" "Skype Stable") $AUR"
             echo " 6) $(menu_item "skypeforlinux-preview-bin" "Skype Preview") $AUR"
             echo " 7) $(menu_item "teamspeak3")"
@@ -2493,7 +2493,7 @@ install_internet_apps(){
                   package_install "pidgin"
                   ;;
                 4)
-                  package_install "riot-desktop"
+                  package_install "element-desktop"
                   ;;
                 5)
                   aur_package_install "skypeforlinux-stable-bin"
