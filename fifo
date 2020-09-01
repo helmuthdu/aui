@@ -530,6 +530,7 @@ install_base_system() {
 configure_keymap() {
   #ADD KEYMAP TO THE NEW SETUP
   echo "KEYMAP=$KEYMAP" >"${MOUNTPOINT}"/etc/vconsole.conf
+  localectl set-x11-keymap $KEYMAP
 }
 #}}}
 #CONFIGURE FSTAB {{{
