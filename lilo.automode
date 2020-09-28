@@ -82,12 +82,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   #  7) Mate
   #  8) XFCE
   #  9) Budgie
-  # 10) Awesome
-  # 11) Fluxbox
-  # 12) i3
-  # 13) i3-Gaps
-  # 14) OpenBox
-  # 15) Xmonad
+  # 10) UKUI
+  # 11) Awesome
+  # 12) Fluxbox
+  # 13) i3
+  # 14) i3-Gaps
+  # 15) OpenBox
+  # 16) Xmonad
   DESKTOPENV="4"
   #KDE {{{
     # 1) Choqok
