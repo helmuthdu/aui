@@ -1263,15 +1263,16 @@ install_desktop_environment(){
 
   echo -e "Select your DE or WM:\n"
   echo " --- DE ---         --- WM ---"
-  echo " 1) Cinnamon        10) Awesome"
-  echo " 2) Deepin          11) Fluxbox"
-  echo " 3) Enlightenment   12) i3"
-  echo " 4) GNOME           13) i3-Gaps"
-  echo " 5) KDE             14) OpenBox"
-  echo " 6) LXQT            15) Xmonad"
+  echo " 1) Cinnamon        11) Awesome"
+  echo " 2) Deepin          12) Fluxbox"
+  echo " 3) Enlightenment   13) i3"
+  echo " 4) GNOME           14) i3-Gaps"
+  echo " 5) KDE             15) OpenBox"
+  echo " 6) LXQT            16) Xmonad"
   echo " 7) Mate"
   echo " 8) XFCE"
   echo " 9) Budgie"
+  echo " 10) UKUI"
   echo ""
   echo " b) BACK"
   read_input "$DESKTOPENV"
@@ -1470,6 +1471,18 @@ install_desktop_environment(){
       ;;
       #}}}
     10)
+      #UKUI {{{
+      print_title "UKUI - https://wiki.archlinux.org/index.php/UKUI"
+      print_info "UKUI is a lightweight Linux desktop environment, developed based on GTK and Qt. UKUI is the default desktop environment for Ubuntu kylin."
+      package_install "ukui xorg-server"
+      # config xinitrc
+      config_xinitrc "ukui-session"
+      pause_function
+      #Light Display Manager
+      system_ctl enable lightdm
+      ;;
+      #}}}
+    11)
       #AWESOME {{{
       print_title "AWESOME - http://wiki.archlinux.org/index.php/Awesome"
       print_info "awesome is a highly configurable, next generation framework window manager for X. It is very fast, extensible and licensed under the GNU GPLv2 license."
@@ -1488,7 +1501,7 @@ install_desktop_environment(){
       install_themes "AWESOME"
       ;;
       #}}}
-    11)
+    12)
       #FLUXBOX {{{
       print_title "FLUXBOX - http://wiki.archlinux.org/index.php/Fluxbox"
       print_info "Fluxbox is yet another window manager for X11. It is based on the (now abandoned) Blackbox 0.61.1 code, but with significant enhancements and continued development. Fluxbox is very light on resources and fast, yet provides interesting window management tools such as tabbing and grouping."
@@ -1502,7 +1515,7 @@ install_desktop_environment(){
       pause_function
       ;;
       #}}}
-    12)
+    13)
       #I3 {{{
       print_title "i3 - https://wiki.archlinux.org/index.php/I3"
       print_info "i3 is a dynamic tiling window manager inspired by wmii that is primarily targeted at developers and advanced users. The stated goals for i3 include clear documentation, proper multi-monitor support, a tree structure for windows, and different modes like in vim."
@@ -1515,7 +1528,7 @@ install_desktop_environment(){
       install_themes "i3"
       ;;
       #}}}
-    13)
+    14)
       #I3-Gaps {{{
       print_title "i3 - https://wiki.archlinux.org/index.php/I3"
       print_info "i3-gaps is a fork of i3wm, a tiling window manager for X11 with more features, such as gaps between windows."
@@ -1604,7 +1617,7 @@ install_desktop_environment(){
       done
       ;;
       #}}}
-    14)
+    15)
       #OPENBOX {{{
       print_title "OPENBOX - http://wiki.archlinux.org/index.php/Openbox"
       print_info "Openbox is a lightweight and highly configurable window manager with extensive standards support."
@@ -1621,7 +1634,7 @@ install_desktop_environment(){
       install_themes "OPENBOX"
       ;;
       #}}}
-    15)
+    16)
       #XMONAD {{{
       print_title "XMONAD - http://wiki.archlinux.org/index.php/Xmonad"
       print_info "xmonad is a tiling window manager for X. Windows are arranged automatically to tile the screen without gaps or overlap, maximizing screen use. Window manager features are accessible from the keyboard: a mouse is optional."
