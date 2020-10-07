@@ -70,8 +70,8 @@ configure_mirrorlist() {
   #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 1,2`
   mirror_countries=$(mktemp --suffix=-reflector)
   reflector --list-countries > $mirror_countries
-  local countries_name=$(cat $mirror_countries | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 1 | sed 's/\s*$//g' | sed 's/\(.*\)/"\1"/g' | awk '$1=$1' ORS=' ')
-  local countries_code=$(cat $mirror_countries | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 2 | sed 's/\s*$//g' | sed 's/\(.*\)/"\1"/g' | awk '$1=$1' ORS=' ')
+  declare -a local countries_name=($(cat $mirror_countries | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 1 | sed 's/\s*$//g'))
+  declare -a local countries_code=($(cat $mirror_countries | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 2 | sed 's/\s*$//g'))
   country_list() {
     PS3="$prompt1"
     echo "Select your country:"
