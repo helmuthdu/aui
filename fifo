@@ -35,7 +35,7 @@ fi
 #SELECT KEYMAP {{{
 select_keymap() {
   print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
-  keymap_list=$(find /usr/share/kbd/keymaps/ -type f -printf "%f\n" | sort -V | sed 's/.map.gz//g' | sed 's/\(.*\)/"\1"/g')
+  keymap_list=($(find /usr/share/kbd/keymaps/ -type f -printf "%f\n" | sort -V | sed 's/.map.gz//g'))
   PS3="$prompt1"
   print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
   echo "keymap list in /usr/share/kbd/keymaps"
