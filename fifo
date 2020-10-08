@@ -68,6 +68,7 @@ select_editor() {
 #MIRRORLIST {{{
 configure_mirrorlist() {
   #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 1,2`
+  reflector_data=$(mktemp --suffix=-reflector)
   (reflector --list-countries | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./') > $reflector_data
   # Modified from: https://stackoverflow.com/a/24628676
   SAVEIFS=$IFS
