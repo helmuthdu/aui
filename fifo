@@ -67,21 +67,17 @@ select_editor() {
 #}}}
 #MIRRORLIST {{{
 configure_mirrorlist() {
-  #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 1,2`
-  reflector_data=$(mktemp --suffix=-reflector)
-  (reflector --list-countries | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./') > $reflector_data
   # Modified from: https://stackoverflow.com/a/24628676
   SAVEIFS=$IFS
   IFS=$'\n'
-  local countries_name=($(cat $reflector_data | cut -d '.' -f 1 | sed 's/\s*$//g'))
-  local countries_code=($(cat $reflector_data | cut -d '.' -f 2 | sed 's/\s*$//g'))
+  #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 1 | sed 's/\s*$//g'`
+  local countries_name=($((reflector --list-countries) | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 1 | sed 's/\s*$//g'))
   IFS=$SAVEIFS
   country_list() {
     PS3="$prompt1"
     echo "Select your country:"
     select country_name in "${countries_name[@]}"; do
       if contains_element "$country_name" "${countries_name[@]}"; then
-        country_code=${countries_code[$((REPLY - 1))]}
         break
       else
         invalid_option
