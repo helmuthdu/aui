@@ -95,34 +95,18 @@ configure_mirrorlist() {
     read_input_text "Confirm country: $country_name"
   done
 
-  url="https://www.archlinux.org/mirrorlist/?country=${country_code}&use_mirror_status=on"
+  # Backup and replace current mirrorlist file.
+  echo " Backing up the original mirrorlist..."
+  mv -i /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.orig
+  
+  # Get fastest mirrors of the country by Reflector.
+  echo " Fetching mirrors located in $country_name..."
+  reflector --country "$country_name" --sort rate --save /etc/pacman.d/mirrorlist
 
-  tmpfile=$(mktemp --suffix=-mirrorlist)
-
-  # Get latest mirror list and save to tmpfile
-  curl -so "${tmpfile}" "${url}"
-  sed -i 's/^#Server/Server/g' "${tmpfile}"
-
-  # Backup and replace current mirrorlist file (if new file is non-zero)
-  if [[ -s ${tmpfile} ]]; then
-    {
-      echo " Backing up the original mirrorlist..."
-      mv -i /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.orig
-    } &&
-      {
-        echo " Rotating the new list into place..."
-        mv -i "${tmpfile}" /etc/pacman.d/mirrorlist
-      }
-  else
-    echo " Unable to update, could not download list."
-  fi
-  # better repo should go first
-  pacman -Sy pacman-contrib
-  cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.tmp
-  rankmirrors /etc/pacman.d/mirrorlist.tmp >/etc/pacman.d/mirrorlist
-  rm /etc/pacman.d/mirrorlist.tmp
   # allow global read access (required for non-root yaourt execution)
   chmod +r /etc/pacman.d/mirrorlist
+  
+  # Final touches to mirrorlist by $EDITOR
   $EDITOR /etc/pacman.d/mirrorlist
 }
 #}}}
