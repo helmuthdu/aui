@@ -773,7 +773,7 @@ install_video_cards(){
     if [ "$(lspci | grep 'VMware SVGA' -c)" -gt "0" ]; then
       package_install "xf86-video-vmware"
     fi
-    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ] || [ "$(ls /boot | grep zen -c)" -gt "0" ]; then
       package_install "virtualbox-guest-dkms virtualbox-guest-utils mesa-libgl"
     else
       package_install "virtualbox-guest-modules-arch virtualbox-guest-utils mesa-libgl"
@@ -786,7 +786,7 @@ install_video_cards(){
   #VMware {{{
   elif [[ ${VIDEO_DRIVER} == vmware ]]; then
     package_install "xf86-video-vmware xf86-input-vmmouse"
-    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ] || [ "$(ls /boot | grep zen -c)" -gt "0" ]; then
       aur_package_install "open-vm-tools-dkms"
     else
       package_install "open-vm-tools"
@@ -810,7 +810,7 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == nvidia ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn "$XF86_DRIVERS"
-    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ]; then
+    if [ "$(ls /boot | grep hardened -c)" -gt "0" ] || [ "$(ls /boot | grep lts -c)" -gt "0" ] || [ "$(ls /boot | grep zen -c)" -gt "0" ]; then
       package_install "nvidia-dkms nvidia-utils libglvnd"
       echo "Do not forget to make a mkinitcpio every time you updated the nvidia driver!"
     else
