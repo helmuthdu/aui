@@ -241,6 +241,8 @@ select_user(){
                   git clone https://github.com/helmuthdu/vim /home/"${username}"/.vim
                   ln -sf /home/"${username}"/.vim/vimrc /home/"${username}"/.vimrc
                   cp -R vim /home/"${username}"/.vim/fonts /home/"${username}"/.fonts
+                  mkdir /home/"${username}"/.vim/colors
+                  curl -fsSL -o /home/"${username}"/.vim/colors/tender.vim https://raw.githubusercontent.com/jacoborus/tender.vim/master/colors/tender.vim 
                   GRUVBOX_NEEDED=1
                   ;;
                 3)
