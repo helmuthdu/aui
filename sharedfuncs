@@ -266,8 +266,8 @@ Run this script after your first boot with archlinux (as root)
       cecho VMware
       VIDEO_DRIVER="vmware"
     elif [[ $_vga_length -eq 2 ]] && [[ -n $(echo "${_vga}" | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
-      cecho Bumblebee
-      VIDEO_DRIVER="bumblebee"
+      cecho Optimus
+      VIDEO_DRIVER="optimus"
     elif [[ -n $(echo "${_vga}" | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
       cecho Nvidia
       read_input_text "Install NVIDIA proprietary driver" "$BETTER_VIDEO_DRIVER"
