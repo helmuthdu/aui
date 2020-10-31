@@ -801,21 +801,21 @@ install_video_cards(){
   elif [[ ${VIDEO_DRIVER} == optimus ]]; then
     XF86_DRIVERS=$(pacman -Qe | grep xf86-video | awk '{print $1}')
     [[ -n $XF86_DRIVERS ]] && pacman -Rcsn "$XF86_DRIVERS"
-    read_input_text "Use Bumblebee instead of NVIDIA PRIME Render Offload?" "$BUMBLEBEE"
+    read_input_text "Use NVIDIA PRIME Render Offload instead of Bumblebee?" "$BUMBLEBEE"
     if [[ $OPTION == y ]]; then
-      pacman -S --needed xf86-video-intel bumblebee nvidia
-      [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-virtualgl lib32-nvidia-utils
-      replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
-      replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
-      create_ramdisk_environment
-      add_user_to_group "${username}" bumblebee
-    else
       package_install "nvidia nvidia-utils libglvnd nvidia-prime"
       package_install "mesa mesa-libgl libvdpau-va-gl"
       [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-virtualgl lib32-nvidia-utils
       replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
       replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
       create_ramdisk_environment
+    else
+      pacman -S --needed xf86-video-intel bumblebee nvidia
+      [[ ${ARCHI} == x86_64 ]] && pacman -S --needed lib32-virtualgl lib32-nvidia-utils
+      replace_line '*options nouveau modeset=1' '#options nouveau modeset=1' /etc/modprobe.d/modprobe.conf
+      replace_line '*MODULES="nouveau"' '#MODULES="nouveau"' /etc/mkinitcpio.conf
+      create_ramdisk_environment
+      add_user_to_group "${username}" bumblebee
     fi
   #}}}
   #NVIDIA {{{
@@ -912,7 +912,7 @@ install_additional_firmwares(){
       echo "10) $(menu_item "libmtp") [Android Devices]"
       echo "11) $(menu_item "libraw1394") [IEEE1394 Driver]"
       echo "12) $(menu_item "wd719x-firmware") $AUR"
-      echo "13) $(menu_item "upd72020x-fw") $AUR"
+      echo "13) $(menu_item "upd72020x-fw") [Renesas USB3.0 Driver] $AUR"
       echo ""
       echo " d) DONE"
       echo ""
