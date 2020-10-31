@@ -1663,7 +1663,6 @@ install_desktop_environment(){
       ;;
       #}}}
     "b")
-      break
       ;;
     *)
       invalid_option
