@@ -53,22 +53,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   ZSH="n"
   OH_MY_ZSH="n"
   BETTER_VIDEO_DRIVER="y" # NVIDIA/AMDGPU
+  BUMBLEBEE="y" # Optimus, use Bumblebee instead of NVIDIA PRIME Render Offload
   FONTCONFIG="y"
   #}}}
   #ADDITIONAL FIRMWARE {{{
     #  1) aic94xx-firmware
     #  2) alsa-firmware
-    #  3) b43
-    #  4) b43legacy
-    #  5) bfa-firmware
-    #  6) bluez-firmware
-    #  7) broadcom-wl
-    #  8) ipw2100
-    #  9) ipw2200
-    # 10) libffado [Firmware Audio Devices]
-    # 11) libmtp [Android Devices]
-    # 12) libraw1394 [IEE1394 Driver]
-    # 13) wd719x-firmware
+    #  3) b43-firmware
+    #  4) b43-firmware-legacy
+    #  5) bluez-firmware
+    #  6) broadcom-wl-dkms
+    #  7) ipw2100-fw
+    #  8) ipw2200-fw
+    #  9) libffado [Firmware Audio Devices]
+    # 10) libmtp [Android Devices]
+    # 11) libraw1394 [IEE1394 Driver]
+    # 12) wd719x-firmware
+    # 13) upd72020x-fw [Renesas USB3.0 Driver]
     FIRMWARE_OPTIONS=""
   #}}}
 #}}}

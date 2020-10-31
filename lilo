@@ -912,7 +912,7 @@ install_additional_firmwares(){
       echo "10) $(menu_item "libmtp") [Android Devices]"
       echo "11) $(menu_item "libraw1394") [IEEE1394 Driver]"
       echo "12) $(menu_item "wd719x-firmware") $AUR"
-      echo "13) $(menu_item "upd72020x-fw") $AUR"
+      echo "13) $(menu_item "upd72020x-fw") [Renesas USB3.0 Driver] $AUR"
       echo ""
       echo " d) DONE"
       echo ""
