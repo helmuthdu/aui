@@ -507,7 +507,7 @@ install_base_system() {
     fi
   fi
   if is_package_installed "espeakup"; then
-    pacstrap "${MOUNTPOINT}" alsa-utils espeakup brltty
+    pacstrap "${MOUNTPOINT}" alsa-utils 
     arch_chroot "systemctl enable espeakup.service"
   fi
 }
