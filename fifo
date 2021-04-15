@@ -206,7 +206,7 @@ setup_luks() {
   select OPT in "${block_list[@]}"; do
     if contains_element "$OPT" "${block_list[@]}"; then
       cryptsetup --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random --verify-passphrase luksFormat "$OPT"
-	  if [[ $TRIM -eq 1]]; then
+	  if [[ $TRIM -eq 1 ]]; then
 	    cryptsetup open --type luks --allow-discards "$OPT" crypt
 	  else
 	    cryptsetup open --type luks "$OPT" crypt
