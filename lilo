@@ -3439,7 +3439,7 @@ do
       1)
         add_custom_repositories
         install_basic_setup
-        install_zsh
+        # install_zsh
         install_fish
         install_ssh
         install_nfs
