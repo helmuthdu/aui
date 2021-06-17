@@ -3449,9 +3449,9 @@ do
         install_zram
         install_video_cards
         # install_xorg
-        install_wayland
-        font_config
-        install_cups
+        # install_wayland
+        # font_config
+        # install_cups
         install_additional_firmwares
         checklist[1]=1
         ;;
