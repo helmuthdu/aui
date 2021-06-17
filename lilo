@@ -890,14 +890,14 @@ install_additional_firmwares(){
       print_title "INSTALL ADDITIONAL FIRMWARES"
       echo " 1) $(menu_item "aic94xx-firmware") $AUR"
       echo " 2) $(menu_item "alsa-firmware")"
-      echo " 3) $(menu_item "b43-firmware") $AUR"
-      echo " 4) $(menu_item "b43-firmware-legacy") $AUR"
-      echo " 5) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
-      echo " 6) $(menu_item "broadcom-wl-dkms")"
+      # echo " 3) $(menu_item "b43-firmware") $AUR"
+      # echo " 4) $(menu_item "b43-firmware-legacy") $AUR"
+      # echo " 5) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
+      # echo " 6) $(menu_item "broadcom-wl-dkms")"
       echo " 7) $(menu_item "ipw2100-fw")"
       echo " 8) $(menu_item "ipw2200-fw")"
-      echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
-      echo "10) $(menu_item "libmtp") [Android Devices]"
+      # echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
+      # echo "10) $(menu_item "libmtp") [Android Devices]"
       echo "11) $(menu_item "libraw1394") [IEEE1394 Driver]"
       echo "12) $(menu_item "wd719x-firmware") $AUR"
       echo "13) $(menu_item "upd72020x-fw") [Renesas USB3.0 Driver] $AUR"
@@ -914,31 +914,31 @@ install_additional_firmwares(){
           2)
             package_install "alsa-firmware"
             ;;
-          3)
-            aur_package_install "b43-firmware"
-            ;;
-          4)
-            aur_package_install "b43-firmware-legacy"
-            ;;
-          5)
-            package_install "bluez-firmware"
-            ;;
-          6)
-            package_install "broadcom-wl-dkms"
-            ;;
+          #3)
+          #  aur_package_install "b43-firmware"
+          #  ;;
+          #4)
+          # aur_package_install "b43-firmware-legacy"
+          #  ;;
+          #5)
+          #  package_install "bluez-firmware"
+          # ;;
+          #6)
+          #  package_install "broadcom-wl-dkms"
+          #  ;;
           7)
             package_install "ipw2100-fw"
             ;;
           8)
             package_install "ipw2200-fw"
             ;;
-          9)
-            package_install "libffado"
-            ;;
-          10)
-            package_install "libmtp"
-            package_install "android-udev"
-            ;;
+          #9)
+          #  package_install "libffado"
+          #  ;;
+          #10)
+          #  package_install "libmtp"
+          #  package_install "android-udev"
+          #  ;;
           11)
             package_install "libraw1394"
             ;;
