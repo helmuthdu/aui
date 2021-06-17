@@ -530,23 +530,6 @@ install_basic_setup(){
   print_title "(UN)COMPRESS TOOLS - https://wiki.archlinux.org/index.php/P7zip"
   package_install "zip unzip unrar p7zip lzop cpio"
   pause_function
-  print_title "AVAHI - https://wiki.archlinux.org/index.php/Avahi"
-  print_info "Avahi is a free Zero Configuration Networking (Zeroconf) implementation, including a system for multicast DNS/DNS-SD discovery. It allows programs to publish and discovers services and hosts running on a local network with no specific configuration."
-  package_install "avahi nss-mdns"
-  is_package_installed "avahi" && system_ctl enable avahi-daemon.service
-  pause_function
-  print_title "ALSA - https://wiki.archlinux.org/index.php/Alsa"
-  print_info "The Advanced Linux Sound Architecture (ALSA) is a Linux kernel component intended to replace the original Open Sound System (OSSv3) for providing device drivers for sound cards."
-  package_install "alsa-utils alsa-plugins"
-  pause_function
-  print_title "PULSEAUDIO - https://wiki.archlinux.org/index.php/Pulseaudio"
-  print_info "PulseAudio is the default sound server that serves as a proxy to sound applications using existing kernel sound components like ALSA or OSS"
-  package_install "pulseaudio pulseaudio-alsa"
-  pause_function
-  print_title "NTFS/FAT/exFAT/F2FS - https://wiki.archlinux.org/index.php/File_Systems"
-  print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
-  package_install "ntfs-3g dosfstools exfat-utils f2fs-tools fuse fuse-exfat autofs mtpfs"
-  pause_function
   print_title "SYSTEMD-TIMESYNCD - https://wiki.archlinux.org/index.php/Systemd-timesyncd"
   print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
   timedatectl set-ntp true
@@ -902,14 +885,14 @@ install_additional_firmwares(){
       print_title "INSTALL ADDITIONAL FIRMWARES"
       echo " 1) $(menu_item "aic94xx-firmware") $AUR"
       echo " 2) $(menu_item "alsa-firmware")"
-      echo " 3) $(menu_item "b43-firmware") $AUR"
-      echo " 4) $(menu_item "b43-firmware-legacy") $AUR"
-      echo " 5) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
-      echo " 6) $(menu_item "broadcom-wl-dkms")"
+      # echo " 3) $(menu_item "b43-firmware") $AUR"
+      # echo " 4) $(menu_item "b43-firmware-legacy") $AUR"
+      # echo " 5) $(menu_item "bluez-firmware") [Broadcom BCM203x/STLC2300 Bluetooth]"
+      # echo " 6) $(menu_item "broadcom-wl-dkms")"
       echo " 7) $(menu_item "ipw2100-fw")"
       echo " 8) $(menu_item "ipw2200-fw")"
-      echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
-      echo "10) $(menu_item "libmtp") [Android Devices]"
+      # echo " 9) $(menu_item "libffado") [Fireware Audio Devices]"
+      # echo "10) $(menu_item "libmtp") [Android Devices]"
       echo "11) $(menu_item "libraw1394") [IEEE1394 Driver]"
       echo "12) $(menu_item "wd719x-firmware") $AUR"
       echo "13) $(menu_item "upd72020x-fw") [Renesas USB3.0 Driver] $AUR"
@@ -926,31 +909,31 @@ install_additional_firmwares(){
           2)
             package_install "alsa-firmware"
             ;;
-          3)
-            aur_package_install "b43-firmware"
-            ;;
-          4)
-            aur_package_install "b43-firmware-legacy"
-            ;;
-          5)
-            package_install "bluez-firmware"
-            ;;
-          6)
-            package_install "broadcom-wl-dkms"
-            ;;
+          #3)
+          #  aur_package_install "b43-firmware"
+          #  ;;
+          #4)
+          # aur_package_install "b43-firmware-legacy"
+          #  ;;
+          #5)
+          #  package_install "bluez-firmware"
+          # ;;
+          #6)
+          #  package_install "broadcom-wl-dkms"
+          #  ;;
           7)
             package_install "ipw2100-fw"
             ;;
           8)
             package_install "ipw2200-fw"
             ;;
-          9)
-            package_install "libffado"
-            ;;
-          10)
-            package_install "libmtp"
-            package_install "android-udev"
-            ;;
+          #9)
+          #  package_install "libffado"
+          #  ;;
+          #10)
+          #  package_install "libmtp"
+          #  package_install "android-udev"
+          #  ;;
           11)
             package_install "libraw1394"
             ;;
@@ -3451,7 +3434,7 @@ do
       1)
         add_custom_repositories
         install_basic_setup
-        install_zsh
+        # install_zsh
         install_fish
         install_ssh
         install_nfs
@@ -3460,10 +3443,10 @@ do
         enable_readahead
         install_zram
         install_video_cards
-        install_xorg
-        install_wayland
-        font_config
-        install_cups
+        # install_xorg
+        # install_wayland
+        # font_config
+        # install_cups
         install_additional_firmwares
         checklist[1]=1
         ;;
