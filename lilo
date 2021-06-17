@@ -3448,7 +3448,7 @@ do
         enable_readahead
         install_zram
         install_video_cards
-        install_xorg
+        # install_xorg
         install_wayland
         font_config
         install_cups
