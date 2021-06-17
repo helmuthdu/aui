@@ -535,10 +535,6 @@ install_basic_setup(){
   package_install "avahi nss-mdns"
   is_package_installed "avahi" && system_ctl enable avahi-daemon.service
   pause_function
-  print_title "NTFS/FAT/exFAT/F2FS - https://wiki.archlinux.org/index.php/File_Systems"
-  print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
-  package_install "ntfs-3g dosfstools exfat-utils f2fs-tools fuse fuse-exfat autofs mtpfs"
-  pause_function
   print_title "SYSTEMD-TIMESYNCD - https://wiki.archlinux.org/index.php/Systemd-timesyncd"
   print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
   timedatectl set-ntp true
