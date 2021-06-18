@@ -34,8 +34,8 @@ This project is not actively developed but *will* accept Pull Requests.
     - an alternate URL (for less typing) is ` wget https://bit.ly/2U4sTRg -O - | tar xz`
 
 ## How to use
-- FIFO [System Base]: `cd aui ; ./fifo`
-- LILO [The Rest]: `cd aui ; ./lilo`
+- FIFO [System Base]: `cd aui-no-x ; ./fifo`
+- LILO [The Rest]: `cd aui-no-x ; ./lilo`
 
 ## Features
 ### FIFO SCRIPT
