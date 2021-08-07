@@ -320,9 +320,9 @@ format_partitions() {
     if [[ $OPTION == y ]]; then
       [[ -z $3 ]] && select_filesystem || filesystem=$3
       mkfs."${filesystem}" "$1" \
-        $([[ ${filesystem} == xfs || ${filesystem} == btrfs || ${filesystem} == reiserfs ]] && echo "-f") \
-        $([[ ${filesystem} == vfat ]] && echo "-F32") \
-        $([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard")
+        "$([[ ${filesystem} == xfs || ${filesystem} == btrfs || ${filesystem} == reiserfs ]] && echo "-f")" \
+        "$([[ ${filesystem} == vfat ]] && echo "-F32")" \
+        "$([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard")"
       fsck "$1"
       mkdir -p "$2"
       mount -t "${filesystem}" "$1" "$2"
@@ -520,7 +520,7 @@ install_base_system() {
 configure_keymap() {
   #ADD KEYMAP TO THE NEW SETUP
   echo "KEYMAP=$KEYMAP" >"${MOUNTPOINT}"/etc/vconsole.conf
-  localectl set-x11-keymap $KEYMAP
+  localectl set-x11-keymap "$KEYMAP"
 }
 #}}}
 #CONFIGURE FSTAB {{{
