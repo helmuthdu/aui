@@ -71,7 +71,7 @@ configure_mirrorlist() {
   SAVEIFS=$IFS
   IFS=$'\n'
   #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 1 | sed 's/\s*$//g'`
-  local countries_name=($((reflector --list-countries) | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 1 | sed 's/\s*$//g'))
+  local countries_name=($( (reflector --list-countries) | sed 's/[0-9]//g' | sed 's/\s*$//g' | sed -r 's/(.*) /\1./' | cut -d '.' -f 1 | sed 's/\s*$//g') )
   IFS=$SAVEIFS
   country_list() {
     PS3="$prompt1"
