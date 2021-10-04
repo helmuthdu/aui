@@ -85,12 +85,13 @@ FIRMWARE_OPTIONS=""
 #  8) XFCE
 #  9) Budgie
 # 10) UKUI
-# 11) Awesome
-# 12) Fluxbox
-# 13) i3
-# 14) i3-Gaps
-# 15) OpenBox
-# 16) Xmonad
+# 11) Pantheon
+# 12) Awesome
+# 13) Fluxbox
+# 14) i3
+# 15) i3-Gaps
+# 16) OpenBox
+# 17) Xmonad
 DESKTOPENV="4"
 #KDE {{{
 # 1) Choqok
