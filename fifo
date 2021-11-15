@@ -483,7 +483,7 @@ select_linux_version() {
 			pacstrap "${MOUNTPOINT}" \
 				cryptsetup lvm2 netctl dhcpcd inetutils jfsutils diffutils e2fsprogs \
 				less linux-firmware logrotate man-db man-pages mdadm nano \
-				perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprogs
+				perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprogs --needed
 			break
 		else
 			invalid_option
@@ -497,13 +497,13 @@ install_base_system() {
 	print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
 	rm "${MOUNTPOINT}""${EFI_MOUNTPOINT}"/vmlinuz-linux
 	select_linux_version
-	pacstrap "${MOUNTPOINT}" base-devel parted btrfs-progs f2fs-tools net-tools
+	pacstrap "${MOUNTPOINT}" base-devel parted btrfs-progs f2fs-tools net-tools --needed
 	[[ $? -ne 0 ]] && error_msg "Installing base system to ${MOUNTPOINT} failed. Check error messages above."
 	local PTABLE=$(parted -sl | grep "gpt")
-	[[ -n $PTABLE ]] && pacstrap "${MOUNTPOINT}" gptfdisk
+	[[ -n $PTABLE ]] && pacstrap "${MOUNTPOINT}" gptfdisk --needed
 	WIRELESS_DEV=$(ip link | grep wl | awk '{print $2}' | sed 's/://' | sed '1!d')
 	if [[ -n $WIRELESS_DEV ]]; then
-		pacstrap "${MOUNTPOINT}" iw wireless_tools wpa_supplicant dialog
+		pacstrap "${MOUNTPOINT}" iw wireless_tools wpa_supplicant dialog --needed
 	else
 		WIRED_DEV=$(ip link | grep "ens\|eno\|enp" | awk '{print $2}' | sed 's/://' | sed '1!d')
 		if [[ -n $WIRED_DEV ]]; then
@@ -511,7 +511,7 @@ install_base_system() {
 		fi
 	fi
 	if is_package_installed "espeakup"; then
-		pacstrap "${MOUNTPOINT}" alsa-utils
+		pacstrap "${MOUNTPOINT}" alsa-utils --needed
 		arch_chroot "systemctl enable espeakup.service"
 	fi
 }
@@ -664,11 +664,11 @@ install_bootloader() {
 	select bootloader in "${bootloaders_list[@]}"; do
 		case "$REPLY" in
 		1)
-			pacstrap "${MOUNTPOINT}" grub os-prober
+			pacstrap "${MOUNTPOINT}" grub os-prober --needed
 			break
 			;;
 		2)
-			pacstrap "${MOUNTPOINT}" syslinux gptfdisk
+			pacstrap "${MOUNTPOINT}" syslinux gptfdisk --needed
 			break
 			;;
 		3)
@@ -676,7 +676,7 @@ install_bootloader() {
 			;;
 		4)
 			if [[ $UEFI -eq 1 ]]; then
-				pacstrap "${MOUNTPOINT}" refind-efi os-prober
+				pacstrap "${MOUNTPOINT}" refind-efi os-prober --needed
 				break
 			else
 				invalid_option
@@ -690,7 +690,7 @@ install_bootloader() {
 			;;
 		esac
 	done
-	[[ $UEFI -eq 1 ]] && pacstrap "${MOUNTPOINT}" efibootmgr dosfstools
+	[[ $UEFI -eq 1 ]] && pacstrap "${MOUNTPOINT}" efibootmgr dosfstools --needed
 }
 #}}}
 #CONFIGURE BOOTLOADER {{{
