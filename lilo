@@ -543,9 +543,9 @@ install_basic_setup() {
 	print_info "PulseAudio is the default sound server that serves as a proxy to sound applications using existing kernel sound components like ALSA or OSS"
 	package_install "pulseaudio pulseaudio-alsa"
 	pause_function
-	print_title "NTFS/FAT/exFAT/F2FS - https://wiki.archlinux.org/index.php/File_Systems"
+	print_title "FAT/exFAT/F2FS - https://wiki.archlinux.org/index.php/File_Systems"
 	print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
-	package_install "ntfs-3g dosfstools exfat-utils f2fs-tools fuse fuse-exfat mtpfs"
+	package_install "dosfstools exfat-utils f2fs-tools fuse fuse-exfat mtpfs"
 	pause_function
 	print_title "SYSTEMD-TIMESYNCD - https://wiki.archlinux.org/index.php/Systemd-timesyncd"
 	print_info "A file system (or filesystem) is a means to organize data expected to be retained after a program terminates by providing procedures to store, retrieve and update data, as well as manage the available space on the device(s) which contain it. A file system organizes data in an efficient manner and is tuned to the specific characteristics of the device."
@@ -1355,7 +1355,7 @@ install_desktop_environment() {
 		print_title "KDE - https://wiki.archlinux.org/index.php/KDE"
 		print_info "KDE is an international free software community producing an integrated set of cross-platform applications designed to run on Linux, FreeBSD, Microsoft Windows, Solaris and Mac OS X systems. It is known for its Plasma Desktop, a desktop environment provided as the default working environment on many Linux distributions."
 		package_install "plasma kf5 sddm"
-		package_install "ark dolphin dolphin-plugins kaccounts-providers kio-extras kdeconnect sshfs quota-tools gwenview kipi-plugins kate kcalc konsole spectacle okular sweeper kwalletmanager packagekit-qt5"
+		package_install "ark dolphin dolphin-plugins kaccounts-providers kio-extras kdeconnect sshfs quota-tools gwenview kipi-plugins kwrite kcalc konsole spectacle okular sweeper kwalletmanager packagekit-qt5"
 		is_package_installed "cups" && package_install "print-manager"
 		[[ $LOCALE != en_US ]] && package_install "kde-l10n-$LOCALE_KDE"
 		# config xinitrc
